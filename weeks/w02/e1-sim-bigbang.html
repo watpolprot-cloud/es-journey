@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E1 ไทม์แมชชีนเอกภพ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E1 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์และเว็บ) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --panel-solid: #111A3D; --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #0c3b5a55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+header.top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.solid { background: var(--cyan); color: var(--ink); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 30px; }
+/* ภารกิจ A */
+.tl { position: relative; margin: 10px 4px 2px; }
+.ticks { display: grid; grid-template-columns: repeat(9, 1fr); font-size: 11.5px; color: var(--muted); text-align: center; line-height: 1.15; margin-top: -2px; }
+.ticks span.on { color: var(--gold); font-weight: 600; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl .sp { flex: 1; }
+.st-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 12px 0 8px; }
+.st-no { font-family: var(--head); font-size: 14px; color: var(--ink); background: var(--gold); border-radius: 999px; padding: 1px 10px; font-weight: 700; }
+.st-time { font-family: var(--head); font-size: 26px; font-weight: 700; color: var(--cyan); }
+.st-name { font-family: var(--head); font-size: 20px; font-weight: 600; }
+.quad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.q { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; }
+.q h4 { margin: 0 0 2px; font-family: var(--head); font-size: 14px; letter-spacing: .03em; }
+.q .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.2; }
+.q p { margin: 2px 0 0; font-size: 15px; line-height: 1.4; }
+.q.e h4 { color: var(--gold); } .q.m h4 { color: var(--violet); } .q.s h4 { color: var(--cyan); } .q.t h4 { color: var(--orange); }
+.meter { height: 8px; border-radius: 6px; background: #1a2350; overflow: hidden; margin-top: 6px; }
+.meter i { display: block; height: 100%; border-radius: 6px; transition: width .5s; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; color: var(--muted); margin-top: 8px; }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; background: var(--c); vertical-align: 0; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+/* ภารกิจ B */
+.lab { display: grid; grid-template-columns: 1fr 250px; gap: 12px; }
+.thermo { display: flex; gap: 10px; align-items: stretch; }
+.tube { width: 26px; border-radius: 13px; background: #1a2350; border: 1px solid var(--line-hi); position: relative; overflow: hidden; min-height: 180px; }
+.tube i { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(0deg, #ff6b8a, #ffd166); transition: height .25s; }
+.read { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.read .k { font-size: 13.5px; color: var(--muted); line-height: 1.1; }
+.read .v { font-family: var(--head); font-size: 26px; font-weight: 700; line-height: 1.1; }
+.read .v.c { color: var(--cyan); } .read .v.o { color: var(--orange); } .read .v.g { color: var(--gold); font-size: 18px; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 2px 10px; cursor: pointer; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+/* ภารกิจ C */
+.cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 8px; }
+.card { background: #0b1233; border: 1.5px solid var(--line-hi); border-radius: 12px; padding: 8px 10px; cursor: pointer; display: flex; gap: 10px;
+  align-items: center; text-align: left; color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.35; }
+.card .L { font-family: var(--head); font-weight: 700; color: var(--gold); font-size: 20px; min-width: 22px; }
+.card .n { margin-left: auto; font-family: var(--head); font-weight: 700; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: transparent; color: transparent; flex: 0 0 auto; }
+.card.ok { border-color: var(--ok); background: #5ef2a512; cursor: default; }
+.card.ok .n { background: var(--ok); color: var(--ink); }
+.card.bad { animation: shake .35s; border-color: var(--err); }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.seq { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; align-items: center; }
+.seq .s { width: 38px; height: 38px; border-radius: 9px; border: 1.5px dashed var(--line-hi); display: grid; place-items: center; font-family: var(--head); font-weight: 700; font-size: 20px; color: var(--gold); }
+.seq .s.f { border-style: solid; border-color: var(--ok); }
+.msg { margin-top: 10px; min-height: 26px; font-size: 16px; }
+.msg.err { color: var(--err); } .msg.ok { color: var(--ok); }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .1em; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .quad { grid-template-columns: repeat(2, 1fr); }
+  .lab { grid-template-columns: 1fr; }
+  .tube { min-height: 120px; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .ticks { font-size: 10px; }
+  .st-time { font-size: 22px; }
+}
+@media (max-width: 420px) { .cards { grid-template-columns: 1fr; } .q .v { font-size: 19px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">ES JOURNEY · E1 <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  </header>
+  <h1>ไทม์แมชชีน<b>เอกภพ</b></h1>
+  <p class="lead">ย้อนเวลากลับไปตั้งแต่บิกแบง ดูว่าพลังงาน สสาร ขนาด และอุณหภูมิของเอกภพเปลี่ยนไปอย่างไร แล้วจดผลลงใบงาน E1</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ไทม์แมชชีน<small>9 สถานีตั้งแต่บิกแบง</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ห้องทดลองขยายเอกภพ<small>ยิ่งขยาย ยิ่งเย็น จริงไหม</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>เรียงเหตุการณ์<small>รับรหัสผ่านภารกิจ</small></button>
+  </nav>
+
+  <!-- ภารกิจ A -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ไทม์แมชชีนเอกภพ</h2>
+    <p class="how">เลื่อนแถบเวลา หรือกด "สถานีถัดไป" ทีละสถานี อ่านค่าในกล่อง 4 สี แล้วจดลงใบงาน ส่วนที่ 1</p>
+    <canvas id="cvA" height="300"></canvas>
+    <div class="legend" id="legA"></div>
+    <div class="tl"><input id="slA" type="range" min="0" max="8" step="1" value="0" aria-label="เลือกสถานีเวลา"></div>
+    <div class="ticks" id="ticks"></div>
+    <div class="ctrl">
+      <button class="btn" id="prevA">สถานีก่อนหน้า</button>
+      <button class="btn solid" id="nextA">สถานีถัดไป</button>
+      <span class="sp"></span>
+      <button class="btn gold" id="playA">เล่นอัตโนมัติ</button>
+    </div>
+    <div class="st-head"><span class="st-no" id="stNo">สถานี 1/9</span><span class="st-time" id="stTime"></span><span class="st-name" id="stName"></span></div>
+    <div class="quad">
+      <div class="q e"><h4>พลังงาน</h4><p id="qE"></p></div>
+      <div class="q m"><h4>สสาร</h4><p id="qM"></p></div>
+      <div class="q s"><h4>ขนาดเอกภพ</h4><div class="v" id="qSv"></div><p id="qS"></p><div class="meter"><i id="mS" style="background:var(--cyan)"></i></div></div>
+      <div class="q t"><h4>อุณหภูมิ</h4><div class="v" id="qTv"></div><p id="qT"></p><div class="meter"><i id="mT" style="background:linear-gradient(90deg,#ff6b8a,#ffd166)"></i></div></div>
+    </div>
+    <div class="note" id="stNote"></div>
+    <div class="ws">ใบงาน E1 ส่วนที่ 1 ใช้สถานี <b>2, 3, 4, 5, 6 และ 9</b></div>
+  </section>
+
+  <!-- ภารกิจ B -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ห้องทดลองขยายเอกภพ</h2>
+    <p class="how">เริ่มจากเอกภพจำลองที่อุณหภูมิ 3,000 K (ตอนอายุประมาณ 380,000 ปี) เลื่อนแถบ "ขนาดเอกภพ" แล้วสังเกตระยะห่างของอะตอม ความยาวคลื่นแสง และอุณหภูมิ กด "บันทึกค่า" ทุกขนาดที่ใบงานส่วนที่ 2 ถาม</p>
+    <div class="lab">
+      <div>
+        <canvas id="cvB" height="300"></canvas>
+        <div class="legend"><span style="--c:#ffd166">อะตอม (แสดงระยะห่าง)</span><span style="--c:#ff9f6b">คลื่นแสง</span><span style="--c:#4fd8ff">กรอบสังเกต ขนาดคงที่</span></div>
+        <div style="margin-top:8px"><label for="slB" style="font-family:var(--head);font-size:15px">ขนาดเอกภพ (เท่าของตอนเริ่ม) : <b id="sVal" style="color:var(--gold)">1</b> เท่า</label>
+          <input id="slB" type="range" min="0.5" max="10" step="0.5" value="1"></div>
+        <div class="chips" id="chipsB"></div>
+      </div>
+      <div>
+        <div class="thermo">
+          <div class="tube"><i id="tubeB"></i></div>
+          <div class="read">
+            <div><div class="k">อุณหภูมิ</div><div class="v o" id="rT">3,000 K</div></div>
+            <div><div class="k">ความยาวคลื่นแสง (เทียบตอนเริ่ม)</div><div class="v c" id="rL">1 เท่า</div></div>
+            <div><div class="k">แสงที่เปล่งออกมา</div><div class="v g" id="rC"></div></div>
+            <div><div class="k">อะตอมในกรอบสังเกต</div><div class="v c" id="rN"></div></div>
+          </div>
+        </div>
+        <div class="ctrl"><button class="btn solid" id="recB">บันทึกค่า</button><button class="btn" id="clrB">ล้างตาราง</button></div>
+        <table class="log"><thead><tr><th>ครั้งที่</th><th>ขนาด (เท่า)</th><th>อุณหภูมิ (K)</th></tr></thead><tbody id="logB"></tbody></table>
+      </div>
+    </div>
+    <div class="note">ถ้าเลื่อนไปทางซ้าย (ขนาดเล็กลง) เท่ากับ "ย้อนเวลา" กลับไปหาบิกแบง ลองดูว่าอุณหภูมิเป็นอย่างไร</div>
+  </section>
+
+  <!-- ภารกิจ C -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> เรียงเหตุการณ์ของเอกภพ</h2>
+    <p class="how">แตะการ์ดตามลำดับเหตุการณ์ <b>จากเกิดก่อนไปเกิดทีหลัง</b> ถ้าแตะถูก การ์ดจะขึ้นเลขลำดับ ถ้าผิดลองกลับไปดูภารกิจ A ได้ เรียงครบ 7 ใบจะได้รหัสผ่านภารกิจ เขียนลงใบงานส่วนที่ 3</p>
+    <div class="seq" id="seqC"></div>
+    <div class="cards" id="cardsC"></div>
+    <div class="msg" id="msgC"></div>
+    <div id="winC" class="win hide">
+      <div style="font-family:var(--head);font-size:20px;color:var(--ok)">ภารกิจ C สำเร็จ</div>
+      <div>รหัสผ่านภารกิจ (เขียนลงใบงานส่วนที่ 3)</div>
+      <div class="code">BANG-138</div>
+      <div style="color:var(--muted);font-size:15px">13,800 ล้านปีแห่งการเดินทาง จากพลังงานล้วน ๆ สู่ดาวฤกษ์ กาแล็กซี และโลกของเรา</div>
+      <button class="btn" id="againC" style="margin-top:8px">เล่นอีกครั้ง</button>
+    </div>
+  </section>
+
+  <footer>ES Journey · ครูนพพล ภาณุสุวัฒน์ · โรงเรียนพรตพิทยพยัต · ตัวเลขเป็นค่าโดยประมาณจากความรู้ทางดาราศาสตร์ปัจจุบัน
+    <br><a href="https://watpolprot-cloud.github.io/es-journey/#/week/2">กลับไปหน้าสัปดาห์ที่ 2 บนเว็บ ES Journey</a></footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var TAU = Math.PI * 2;
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function pick(a) { return a[(Math.random() * a.length) | 0]; }
+  function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
+
+  /* ---------------- ข้อมูลสถานี (ค่าโดยประมาณ) ---------------- */
+  var ST = [
+    { tick: "10<sup>-43</sup> s", time: "10<sup>-43</sup> วินาที", name: "จุดเริ่มต้น",
+      E: "พลังงานมหาศาลอัดแน่นอยู่ในพื้นที่เล็กมาก", M: "ยังไม่มีสสาร มีแต่พลังงาน",
+      Sv: "เล็กมาก", S: "เล็กกว่าอะตอมหนึ่งอะตอมอีกหลายล้านล้านเท่า", sz: 0.03,
+      Tv: "10<sup>32</sup> K", T: "ร้อนที่สุดเท่าที่วิทยาศาสตร์อธิบายได้", tl: 32,
+      note: "บิกแบงไม่ใช่การระเบิดของอะไรสักอย่างในอวกาศ แต่เป็นจุดเริ่มต้นที่อวกาศเองเริ่มขยายตัว เกิดขึ้นประมาณ 13,800 ล้านปีก่อน",
+      era: 0, legend: [["#fff4d6", "พลังงาน"]] },
+    { tick: "10<sup>-35</sup> s", time: "10<sup>-35</sup> วินาที", name: "ขยายตัวอย่างรวดเร็ว (อินฟเลชัน)",
+      E: "พลังงานบางส่วนเปลี่ยนเป็นอนุภาค", M: "เกิดอนุภาคมูลฐาน เช่น ควาร์ก และอิเล็กตรอน",
+      Sv: "ใหญ่ขึ้นทันที", S: "ขยายตัวขึ้นอย่างรวดเร็วมากในเวลาสั้นนิดเดียว", sz: 0.12,
+      Tv: "10<sup>27</sup> K", T: "เริ่มเย็นลงเมื่อขยายตัว", tl: 27,
+      note: "อนุภาคเกิดจากพลังงาน (พลังงานเปลี่ยนเป็นมวลได้ ตามสมการ E = mc²) ช่วงนี้ยังร้อนเกินกว่าที่อนุภาคจะรวมกันได้",
+      era: 1, legend: [["#fff4d6", "พลังงาน (แสง)"], ["#ff5c7a", "ควาร์ก"], ["#4fd8ff", "อิเล็กตรอน"]] },
+    { tick: "10<sup>-6</sup> s", time: "10<sup>-6</sup> วินาที", name: "กำเนิดโปรตอนและนิวตรอน",
+      E: "พลังงานลดลง อนุภาคเคลื่อนที่ช้าลง", M: "ควาร์กรวมกันเป็นโปรตอนและนิวตรอน",
+      Sv: "ใหญ่ขึ้นต่อเนื่อง", S: "เอกภพยังขยายตัวตลอดเวลา", sz: 0.2,
+      Tv: "10<sup>13</sup> K", T: "เย็นลงพอให้ควาร์กจับกลุ่มกันได้", tl: 13,
+      note: "10<sup>-6</sup> วินาที คือ 1 ในล้านส่วนของวินาที โปรตอน 1 ตัวเกิดจากควาร์ก 3 ตัว",
+      era: 2, legend: [["#fff4d6", "แสง"], ["#ff5c7a", "โปรตอน"], ["#9fb3d9", "นิวตรอน"], ["#4fd8ff", "อิเล็กตรอน"]] },
+    { tick: "3 นาที", time: "3 นาที", name: "กำเนิดนิวเคลียส",
+      E: "ยังร้อนมาก แสงยังเดินทางไปไกลไม่ได้", M: "โปรตอนกับนิวตรอนรวมกันเป็นนิวเคลียสของฮีเลียม",
+      Sv: "ใหญ่ขึ้นต่อเนื่อง", S: "ขยายตัวต่อและเย็นลงเรื่อย ๆ", sz: 0.3,
+      Tv: "10<sup>9</sup> K", T: "ประมาณ 1,000 ล้านเคลวิน", tl: 9,
+      note: "นิวเคลียสไฮโดรเจนคือโปรตอน 1 ตัว ได้ไฮโดรเจนประมาณ 3 ส่วน ต่อฮีเลียม 1 ส่วน (โดยมวล) ซึ่งตรงกับที่วัดได้ในเอกภพปัจจุบัน",
+      era: 3, legend: [["#fff4d6", "แสง"], ["#ff5c7a", "นิวเคลียสไฮโดรเจน"], ["#ffd166", "นิวเคลียสฮีเลียม"], ["#4fd8ff", "อิเล็กตรอน"]] },
+    { tick: "3.8 แสนปี", time: "380,000 ปี", name: "กำเนิดอะตอม เอกภพโปร่งแสง",
+      E: "แสงเดินทางได้อิสระเป็นครั้งแรก", M: "อิเล็กตรอนรวมกับนิวเคลียส เกิดอะตอมไฮโดรเจนและฮีเลียม",
+      Sv: "1/1,100", S: "ของขนาดปัจจุบัน", sz: 0.4,
+      Tv: "3,000 K", T: "ประมาณ 2,700 องศาเซลเซียส", tl: 3.48,
+      note: "ก่อนหน้านี้แสงชนอิเล็กตรอนตลอดเวลา เอกภพจึงขุ่นเหมือนหมอก พอเกิดอะตอม แสงจึงพุ่งตรงได้ แสงชุดนี้ยังเหลือมาถึงวันนี้ เรียกว่า ไมโครเวฟพื้นหลัง (เรียนต่อใน E2)",
+      era: 4, legend: [["#ffb36b", "แสง (พุ่งตรงได้แล้ว)"], ["#ffd166", "อะตอม (นิวเคลียส + อิเล็กตรอน)"]] },
+    { tick: "200 ล้านปี", time: "200 ล้านปี", name: "ดาวฤกษ์รุ่นแรก",
+      E: "ดาวฤกษ์เปลี่ยนมวลเป็นพลังงานแสงด้วยปฏิกิริยานิวเคลียร์", M: "แก๊สไฮโดรเจนและฮีเลียมรวมตัวกันด้วยแรงโน้มถ่วงเป็นดาวฤกษ์",
+      Sv: "1/21", S: "ของขนาดปัจจุบัน", sz: 0.55,
+      Tv: "60 K", T: "อุณหภูมิพื้นหลังของเอกภพ", tl: 1.78,
+      note: "หลังยุคอะตอม เอกภพมืดอยู่นานราว 200 ล้านปี เรียกว่า ยุคมืด จนดาวฤกษ์ดวงแรก ๆ ส่องสว่างขึ้น",
+      era: 5, legend: [["#a77bff", "กลุ่มแก๊ส"], ["#ffffff", "ดาวฤกษ์รุ่นแรก"]] },
+    { tick: "1,000 ล้านปี", time: "1,000 ล้านปี", name: "กำเนิดกาแล็กซี",
+      E: "ดาวฤกษ์นับล้านล้านดวงส่องสว่าง", M: "ดาวฤกษ์และแก๊สรวมกันเป็นกาแล็กซี ธาตุหนักเกิดขึ้นในดาวฤกษ์",
+      Sv: "1/7", S: "ของขนาดปัจจุบัน", sz: 0.68,
+      Tv: "20 K", T: "อุณหภูมิพื้นหลังของเอกภพ", tl: 1.3,
+      note: "ธาตุอื่น ๆ นอกจากไฮโดรเจนและฮีเลียม เช่น คาร์บอน ออกซิเจน เหล็ก เกิดในดาวฤกษ์ แล้วกระจายออกไปเมื่อดาวฤกษ์สิ้นอายุ (เรียนต่อใน E4)",
+      era: 6, legend: [["#c9b6ff", "กาแล็กซี"], ["#ffffff", "ดาวฤกษ์"]] },
+    { tick: "9,200 ล้านปี", time: "9,200 ล้านปี", name: "กำเนิดระบบสุริยะ",
+      E: "ดวงอาทิตย์เริ่มส่องสว่าง", M: "ระบบสุริยะและโลกเกิดจากกลุ่มแก๊สและฝุ่นในกาแล็กซีทางช้างเผือก",
+      Sv: "2/3", S: "ของขนาดปัจจุบัน", sz: 0.84,
+      Tv: "4 K", T: "อุณหภูมิพื้นหลังของเอกภพ", tl: 0.6,
+      note: "เหตุการณ์นี้คือเมื่อประมาณ 4,600 ล้านปีก่อน ธาตุในร่างกายเราส่วนใหญ่เคยอยู่ในดาวฤกษ์รุ่นก่อน ๆ มาแล้ว",
+      era: 7, legend: [["#ffd166", "ดวงอาทิตย์"], ["#4fd8ff", "ดาวเคราะห์"]] },
+    { tick: "13,800 ล้านปี", time: "13,800 ล้านปี", name: "ปัจจุบัน",
+      E: "พลังงานเบาบางมาก แผ่กระจายไปทั่วเอกภพ", M: "กาแล็กซีหลายแสนล้านแห่ง ดาวฤกษ์ ดาวเคราะห์ และสิ่งมีชีวิต",
+      Sv: "1", S: "ขนาดปัจจุบัน และยังขยายตัวต่อไป", sz: 1,
+      Tv: "2.7 K", T: "ประมาณ -270 องศาเซลเซียส", tl: 0.43,
+      note: "เอกภพยังขยายตัวอยู่ กาแล็กซีที่อยู่ไกลจึงเคลื่อนที่ห่างออกไปจากเรา (หลักฐานนี้เรียนต่อใน E2)",
+      era: 8, legend: [["#c9b6ff", "กาแล็กซี"]] }
+  ];
+
+  /* ---------------- canvas ทั่วไป ---------------- */
+  function fit(cv) {
+    var r = cv.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 2);
+    var h = r.width < 520 ? 240 : 320;
+    cv.style.height = h + "px";
+    cv.width = Math.round(r.width * d); cv.height = Math.round(h * d);
+    var c = cv.getContext("2d"); c.setTransform(d, 0, 0, d, 0, 0);
+    return { c: c, w: r.width, h: h };
+  }
+
+  /* ---------------- ภารกิจ A ---------------- */
+  var cvA = $("cvA"), A = null, k = 0, parts = [], play = null, tA = 0;
+  var BG = [["#fffbe8", "#ffd27a"], ["#fff1c4", "#ff9a3c"], ["#ffcf7a", "#c2410c"], ["#ff9f5a", "#7c1d0e"],
+            ["#5a2410", "#140718"], ["#0d0a26", "#03040e"], ["#0a0b26", "#020309"], ["#0a0b24", "#020309"], ["#080a20", "#010207"]];
+
+  function build(e) {
+    parts = [];
+    var W = A.w, H = A.h, i, n;
+    function add(o) { o.x = rnd(0, W); o.y = rnd(0, H); var a = rnd(0, TAU), v = o.v || 1; o.vx = Math.cos(a) * v; o.vy = Math.sin(a) * v; parts.push(o); }
+    if (e === 0) { for (i = 0; i < 60; i++) add({ t: "glow", r: rnd(20, 70), v: 0.4, ph: rnd(0, TAU) }); }
+    if (e >= 1 && e <= 3) { n = e === 1 ? 90 : 60; for (i = 0; i < n; i++) add({ t: "ph", v: 3.2 - e * 0.5, wl: 5 + e * 2, ph: rnd(0, TAU) }); }
+    if (e === 1) {
+      for (i = 0; i < 70; i++) add({ t: "q", v: 3.4, col: pick(["#ff5c7a", "#5ef2a5", "#5c9bff"]) });
+      for (i = 0; i < 30; i++) add({ t: "e", v: 3.8 });
+    }
+    if (e === 2) {
+      for (i = 0; i < 26; i++) add({ t: "p", v: 1.5 });
+      for (i = 0; i < 22; i++) add({ t: "n", v: 1.5 });
+      for (i = 0; i < 26; i++) add({ t: "e", v: 3 });
+    }
+    if (e === 3) {
+      for (i = 0; i < 30; i++) add({ t: "p", v: 1.1 });
+      for (i = 0; i < 9; i++) add({ t: "he", v: 0.9, rot: rnd(0, TAU) });
+      for (i = 0; i < 40; i++) add({ t: "e", v: 2.4 });
+    }
+    if (e === 4) {
+      for (i = 0; i < 26; i++) add({ t: "atom", v: 0.45, ph: rnd(0, TAU), he: Math.random() < 0.25 });
+      for (i = 0; i < 30; i++) add({ t: "ph", v: 2.2, wl: 13, ph: rnd(0, TAU), straight: true });
+    }
+    if (e === 5) {
+      for (i = 0; i < 14; i++) add({ t: "gas", r: rnd(30, 70), v: 0.15 });
+      for (i = 0; i < 10; i++) parts.push({ t: "star", gas: parts[i], x: 0, y: 0, vx: 0, vy: 0, r: rnd(1.5, 3), ph: rnd(0, TAU), born: 0.3 + i * 0.25 });
+    }
+    if (e === 6 || e === 8) {
+      n = e === 6 ? 7 : 16;
+      for (i = 0; i < n; i++) add({ t: "gal", v: e === 8 ? 0.12 : 0.18, r: e === 6 ? rnd(22, 40) : rnd(8, 22), rot: rnd(0, TAU), tilt: rnd(0.35, 0.9), spin: rnd(-0.004, 0.004), hue: pick([260, 210, 35, 300]) });
+    }
+    if (e === 6 || e === 8) { for (i = 0; i < 90; i++) add({ t: "dot", v: 0, r: rnd(0.4, 1.3) }); }
+    if (e === 7) {
+      for (i = 0; i < 110; i++) add({ t: "dot", v: 0, r: rnd(0.4, 1.3) });
+      parts.push({ t: "sun", x: W / 2, y: H / 2, vx: 0, vy: 0 });
+      [[38, 0.02, 2.5], [56, 0.015, 3.5], [78, 0.011, 4], [100, 0.008, 3], [140, 0.005, 8], [178, 0.0038, 7]].forEach(function (o) {
+        parts.push({ t: "pl", R: o[0] * Math.min(1, H / 300), w: o[1], r: o[2], a: rnd(0, TAU), x: 0, y: 0, vx: 0, vy: 0 });
+      });
+    }
+  }
+
+  function drawA() {
+    var c = A.c, W = A.w, H = A.h, e = ST[k].era, i, p;
+    tA += 1;
+    var g = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) * 0.75);
+    g.addColorStop(0, BG[e][0]); g.addColorStop(1, BG[e][1]);
+    c.fillStyle = g; c.fillRect(0, 0, W, H);
+    for (i = 0; i < parts.length; i++) {
+      p = parts[i];
+      if (p.t !== "pl" && p.t !== "sun" && p.t !== "star") {
+        p.x += p.vx; p.y += p.vy;
+        if (p.t === "ph" && !p.straight && Math.random() < 0.06) { var a = rnd(0, TAU), s = Math.hypot(p.vx, p.vy); p.vx = Math.cos(a) * s; p.vy = Math.sin(a) * s; }
+        if (p.x < -60) p.x = W + 50; if (p.x > W + 60) p.x = -50; if (p.y < -60) p.y = H + 50; if (p.y > H + 60) p.y = -50;
+      }
+      switch (p.t) {
+        case "glow":
+          var al = 0.35 + 0.3 * Math.sin(tA * 0.05 + p.ph);
+          var gg = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+          gg.addColorStop(0, "rgba(255,255,255," + al + ")"); gg.addColorStop(1, "rgba(255,220,140,0)");
+          c.fillStyle = gg; c.beginPath(); c.arc(p.x, p.y, p.r, 0, TAU); c.fill(); break;
+        case "ph":
+          var ang = Math.atan2(p.vy, p.vx), L = p.wl * 2.2;
+          c.save(); c.translate(p.x, p.y); c.rotate(ang);
+          c.strokeStyle = e >= 4 ? "rgba(255,179,107,.85)" : "rgba(255,248,220,.9)"; c.lineWidth = 1.6; c.beginPath();
+          for (var xx = -L; xx <= L; xx += 1) { var yy = Math.sin(xx / p.wl * TAU + p.ph + tA * 0.3) * 3; xx === -L ? c.moveTo(xx, yy) : c.lineTo(xx, yy); }
+          c.stroke(); c.restore(); break;
+        case "q": c.fillStyle = p.col; c.beginPath(); c.arc(p.x, p.y, 2.6, 0, TAU); c.fill(); break;
+        case "e": c.fillStyle = "#4fd8ff"; c.beginPath(); c.arc(p.x, p.y, 1.8, 0, TAU); c.fill(); break;
+        case "p": case "n":
+          c.fillStyle = p.t === "p" ? "#ff5c7a" : "#9fb3d9"; c.beginPath(); c.arc(p.x, p.y, 5, 0, TAU); c.fill();
+          c.strokeStyle = "rgba(0,0,0,.25)"; c.lineWidth = 1; c.stroke(); break;
+        case "he":
+          p.rot += 0.03;
+          for (var j = 0; j < 4; j++) {
+            var aa = p.rot + j * TAU / 4;
+            c.fillStyle = j % 2 ? "#9fb3d9" : "#ff5c7a"; c.beginPath(); c.arc(p.x + Math.cos(aa) * 4.2, p.y + Math.sin(aa) * 4.2, 4.2, 0, TAU); c.fill();
+          }
+          c.strokeStyle = "rgba(255,209,102,.9)"; c.lineWidth = 1.5; c.beginPath(); c.arc(p.x, p.y, 10.5, 0, TAU); c.stroke(); break;
+        case "atom":
+          var rr = p.he ? 12 : 9;
+          c.strokeStyle = "rgba(79,216,255,.45)"; c.lineWidth = 1; c.beginPath(); c.arc(p.x, p.y, rr, 0, TAU); c.stroke();
+          c.fillStyle = p.he ? "#ffd166" : "#ff5c7a"; c.beginPath(); c.arc(p.x, p.y, p.he ? 4 : 3, 0, TAU); c.fill();
+          var ea = tA * 0.08 + p.ph;
+          c.fillStyle = "#4fd8ff"; c.beginPath(); c.arc(p.x + Math.cos(ea) * rr, p.y + Math.sin(ea) * rr, 2, 0, TAU); c.fill();
+          if (p.he) { c.beginPath(); c.arc(p.x - Math.cos(ea) * rr, p.y - Math.sin(ea) * rr, 2, 0, TAU); c.fill(); }
+          break;
+        case "gas":
+          var g2 = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r);
+          g2.addColorStop(0, "rgba(167,123,255,.28)"); g2.addColorStop(1, "rgba(167,123,255,0)");
+          c.fillStyle = g2; c.beginPath(); c.arc(p.x, p.y, p.r, 0, TAU); c.fill(); break;
+        case "star":
+          p.x = p.gas.x; p.y = p.gas.y;
+          var age = tA / 60 - p.born; if (age < 0) break;
+          var b = Math.min(1, age) * (0.75 + 0.25 * Math.sin(tA * 0.1 + p.ph)), R = p.r * 5;
+          var g3 = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, R);
+          g3.addColorStop(0, "rgba(255,255,255," + b + ")"); g3.addColorStop(0.3, "rgba(170,200,255," + b * 0.5 + ")"); g3.addColorStop(1, "rgba(120,160,255,0)");
+          c.fillStyle = g3; c.beginPath(); c.arc(p.x, p.y, R, 0, TAU); c.fill(); break;
+        case "dot": c.fillStyle = "rgba(255,255,255,.55)"; c.fillRect(p.x, p.y, p.r, p.r); break;
+        case "gal":
+          p.rot += p.spin;
+          c.save(); c.translate(p.x, p.y); c.rotate(p.rot); c.scale(1, p.tilt);
+          var g4 = c.createRadialGradient(0, 0, 0, 0, 0, p.r);
+          g4.addColorStop(0, "hsla(" + p.hue + ",100%,92%,.95)"); g4.addColorStop(0.25, "hsla(" + p.hue + ",80%,70%,.45)"); g4.addColorStop(1, "hsla(" + p.hue + ",80%,60%,0)");
+          c.fillStyle = g4; c.beginPath(); c.arc(0, 0, p.r, 0, TAU); c.fill();
+          c.strokeStyle = "hsla(" + p.hue + ",80%,80%,.35)"; c.lineWidth = 1.2;
+          for (var arm = 0; arm < 2; arm++) { c.beginPath(); for (var s2 = 0; s2 < 30; s2++) { var th = s2 * 0.2 + arm * Math.PI, rad = s2 / 30 * p.r; c.lineTo(Math.cos(th) * rad, Math.sin(th) * rad); } c.stroke(); }
+          c.restore(); break;
+        case "sun":
+          var g5 = c.createRadialGradient(p.x, p.y, 0, p.x, p.y, 34);
+          g5.addColorStop(0, "#fffbe0"); g5.addColorStop(0.4, "#ffd166"); g5.addColorStop(1, "rgba(255,150,40,0)");
+          c.fillStyle = g5; c.beginPath(); c.arc(p.x, p.y, 34, 0, TAU); c.fill(); break;
+        case "pl":
+          p.a += p.w; var cx = W / 2, cy = H / 2;
+          c.strokeStyle = "rgba(79,216,255,.14)"; c.lineWidth = 1; c.beginPath(); c.ellipse(cx, cy, p.R * 1.25, p.R * 0.55, 0, 0, TAU); c.stroke();
+          c.fillStyle = "#4fd8ff"; c.beginPath(); c.arc(cx + Math.cos(p.a) * p.R * 1.25, cy + Math.sin(p.a) * p.R * 0.55, p.r * 0.6, 0, TAU); c.fill(); break;
+      }
+    }
+    if (e === 8) { c.fillStyle = "rgba(255,209,102,.9)"; c.font = "600 13px 'Chakra Petch', sans-serif"; c.fillText("กาแล็กซีเคลื่อนห่างออกจากกัน", 12, H - 12); }
+    if (e <= 3) { c.fillStyle = "rgba(6,16,42,.7)"; c.font = "600 13px 'Chakra Petch', sans-serif"; c.fillText(e === 0 ? "พลังงานล้วน ๆ" : "แสงชนอนุภาคตลอดเวลา เอกภพขุ่นเหมือนหมอก", 12, H - 12); }
+  }
+
+  function showA(n) {
+    k = Math.max(0, Math.min(8, n));
+    var s = ST[k];
+    $("slA").value = k;
+    $("stNo").textContent = "สถานี " + (k + 1) + "/9";
+    $("stTime").innerHTML = s.time; $("stName").textContent = s.name;
+    $("qE").textContent = s.E; $("qM").textContent = s.M;
+    $("qSv").innerHTML = s.Sv; $("qS").textContent = s.S; $("mS").style.width = (s.sz * 100) + "%";
+    $("qTv").innerHTML = s.Tv; $("qT").textContent = s.T; $("mT").style.width = Math.max(3, s.tl / 32 * 100) + "%";
+    $("stNote").innerHTML = s.note;
+    $("legA").innerHTML = s.legend.map(function (l) { return '<span style="--c:' + l[0] + '">' + l[1] + "</span>"; }).join("");
+    $("prevA").disabled = k === 0; $("nextA").disabled = k === 8;
+    Array.prototype.forEach.call($("ticks").children, function (el, i) { el.className = i === k ? "on" : ""; });
+    tA = 0; build(s.era);
+  }
+
+  $("ticks").innerHTML = ST.map(function (s) { return "<span>" + s.tick + "</span>"; }).join("");
+  $("slA").addEventListener("input", function () { stopPlay(); showA(+this.value); });
+  $("prevA").addEventListener("click", function () { stopPlay(); showA(k - 1); });
+  $("nextA").addEventListener("click", function () { stopPlay(); showA(k + 1); });
+  function stopPlay() { if (play) { clearInterval(play); play = null; $("playA").textContent = "เล่นอัตโนมัติ"; } }
+  $("playA").addEventListener("click", function () {
+    if (play) { stopPlay(); return; }
+    if (k === 8) showA(0);
+    this.textContent = "หยุด";
+    play = setInterval(function () { if (k >= 8) { stopPlay(); return; } showA(k + 1); }, 4500);
+  });
+
+  /* ---------------- ภารกิจ B ---------------- */
+  var cvB = $("cvB"), B = null, sB = 1, atoms = [], tB = 0, logged = [];
+  var NEED = [0.5, 1, 2, 4, 5, 10];
+  for (var i0 = 0; i0 < 240; i0++) atoms.push({ x: rnd(-1, 1), y: rnd(-1, 1), ph: rnd(0, TAU) });
+  function TB(s) { return 3000 / s; }
+  function bbColor(T) {
+    // สีโดยประมาณของวัตถุร้อนที่อุณหภูมิ T (ใช้แสดงผลเท่านั้น)
+    var t = T / 100, r, g, b;
+    if (t <= 66) { r = 255; g = Math.max(0, Math.min(255, 99.47 * Math.log(t) - 161.12)); } else { r = 329.7 * Math.pow(t - 60, -0.1332); g = 288.1 * Math.pow(t - 60, -0.0755); }
+    b = t >= 66 ? 255 : t <= 19 ? 0 : 138.5 * Math.log(t - 10) - 305.04;
+    return [r, g, b].map(function (v) { return Math.max(0, Math.min(255, Math.round(v))); });
+  }
+  function lightName(T) {
+    if (T >= 5000) return "ขาวอมเหลือง สว่างจ้า";
+    if (T >= 2500) return "ส้มอมเหลือง";
+    if (T >= 1200) return "แดง";
+    if (T >= 700) return "แดงเข้ม เกือบมองไม่เห็น";
+    return "อินฟราเรด ตามองไม่เห็น";
+  }
+  function drawB() {
+    var c = B.c, W = B.w, H = B.h, T = TB(sB), col = bbColor(T), i;
+    tB += 1;
+    var vis = Math.max(0, Math.min(1, (T - 500) / 2500));
+    var g = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, Math.max(W, H) * 0.7);
+    g.addColorStop(0, "rgba(" + col.join(",") + "," + (0.12 + 0.55 * vis) + ")"); g.addColorStop(1, "#04061a");
+    c.fillStyle = "#04061a"; c.fillRect(0, 0, W, H); c.fillStyle = g; c.fillRect(0, 0, W, H);
+    // กรอบสังเกต
+    var bw = Math.min(W, H) * 0.86, bx = (W - bw) / 2, by = (H - bw) / 2;
+    c.strokeStyle = "rgba(79,216,255,.7)"; c.lineWidth = 1.5; c.setLineDash([6, 5]); c.strokeRect(bx, by, bw, bw); c.setLineDash([]);
+    // อะตอม ระยะห่างเพิ่มตามขนาด
+    var cnt = 0, base = bw * 0.9;
+    c.save(); c.beginPath(); c.rect(bx, by, bw, bw); c.clip();
+    for (i = 0; i < atoms.length; i++) {
+      var a = atoms[i], x = W / 2 + a.x * base * 0.55 * sB, y = H / 2 + a.y * base * 0.55 * sB;
+      if (x < bx || x > bx + bw || y < by || y > by + bw) continue;
+      cnt++;
+      c.fillStyle = "#ffd166"; c.beginPath(); c.arc(x, y, 2.6, 0, TAU); c.fill();
+    }
+    // คลื่นแสง 3 เส้น ความยาวคลื่นเพิ่มตามขนาด
+    var wl = 14 * sB, amp = 9;
+    c.lineWidth = 2.2; c.strokeStyle = "rgba(" + Math.max(120, col[0]) + "," + Math.round(col[1] * 0.8 + 40) + "," + Math.round(col[2] * 0.5 + 40) + ",.95)";
+    for (var r = 0; r < 3; r++) {
+      var yy0 = by + bw * (0.25 + r * 0.25);
+      c.beginPath();
+      for (var x2 = bx; x2 <= bx + bw; x2 += 1.5) { var yv = yy0 + Math.sin((x2 - bx) / wl * TAU - tB * 0.06 + r) * amp; x2 === bx ? c.moveTo(x2, yv) : c.lineTo(x2, yv); }
+      c.stroke();
+    }
+    c.restore();
+    c.fillStyle = "rgba(232,237,255,.85)"; c.font = "600 13px 'Chakra Petch', sans-serif";
+    c.fillText("ขนาด " + sB + " เท่า", bx + 6, by + 18);
+    return cnt;
+  }
+  function updB() {
+    var T = TB(sB);
+    $("sVal").textContent = sB;
+    $("rT").textContent = fmt(T) + " K";
+    $("rL").textContent = sB + " เท่า";
+    $("rC").textContent = lightName(T);
+    $("tubeB").style.height = Math.min(100, T / 6000 * 100) + "%";
+  }
+  $("slB").addEventListener("input", function () { sB = +this.value; updB(); });
+  $("chipsB").innerHTML = NEED.map(function (v) { return '<button class="chip" data-s="' + v + '">ขนาด ' + v + " เท่า</button>"; }).join("");
+  $("chipsB").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".chip"); if (!b) return;
+    sB = +b.getAttribute("data-s"); $("slB").value = sB; updB();
+  });
+  function renderLog() {
+    $("logB").innerHTML = logged.map(function (r, i) { return "<tr><td>" + (i + 1) + "</td><td>" + r[0] + "</td><td>" + fmt(r[1]) + "</td></tr>"; }).join("") ||
+      '<tr><td colspan="3" style="color:var(--muted)">ยังไม่มีข้อมูล กด "บันทึกค่า"</td></tr>';
+    Array.prototype.forEach.call($("chipsB").children, function (ch) {
+      var v = +ch.getAttribute("data-s");
+      ch.className = "chip" + (logged.some(function (r) { return r[0] === v; }) ? " done" : "");
+    });
+  }
+  $("recB").addEventListener("click", function () {
+    if (!logged.some(function (r) { return r[0] === sB; })) { logged.push([sB, TB(sB)]); logged.sort(function (a, b) { return a[0] - b[0]; }); }
+    renderLog();
+  });
+  $("clrB").addEventListener("click", function () { logged = []; renderLog(); });
+
+  /* ---------------- ภารกิจ C ---------------- */
+  var EV = [
+    ["ง", "เอกภพขยายตัวอย่างรวดเร็ว พลังงานเปลี่ยนเป็นอนุภาค"],
+    ["ข", "ควาร์กรวมกันเป็นโปรตอนและนิวตรอน"],
+    ["จ", "เกิดนิวเคลียสของฮีเลียม"],
+    ["ก", "เกิดอะตอมไฮโดรเจนและฮีเลียม เอกภพโปร่งแสง"],
+    ["ค", "ดาวฤกษ์รุ่นแรกส่องสว่าง"],
+    ["ช", "ดาวฤกษ์และแก๊สรวมกันเป็นกาแล็กซี"],
+    ["ฉ", "ระบบสุริยะและโลกเกิดขึ้น"]
+  ];
+  var stepC = 0;
+  function setupC() {
+    stepC = 0;
+    var order = EV.map(function (e, i) { return i; }).sort(function (a, b) { return EV[a][0].localeCompare(EV[b][0], "th"); });
+    $("cardsC").innerHTML = order.map(function (i) {
+      return '<button class="card" data-i="' + i + '"><span class="L">' + EV[i][0] + "</span><span>" + EV[i][1] + '</span><span class="n"></span></button>';
+    }).join("");
+    $("seqC").innerHTML = '<span style="font-size:14px;color:var(--muted);margin-right:4px">ลำดับ</span>' + EV.map(function () { return '<span class="s"></span>'; }).join("");
+    $("msgC").textContent = ""; $("msgC").className = "msg"; $("winC").classList.add("hide");
+  }
+  $("cardsC").addEventListener("click", function (ev) {
+    var b = ev.target.closest(".card"); if (!b || b.classList.contains("ok")) return;
+    var i = +b.getAttribute("data-i");
+    if (i === stepC) {
+      b.classList.remove("bad"); b.classList.add("ok"); b.querySelector(".n").textContent = stepC + 1;
+      var slot = $("seqC").querySelectorAll(".s")[stepC]; slot.textContent = EV[i][0]; slot.classList.add("f");
+      stepC++;
+      $("msgC").className = "msg ok"; $("msgC").textContent = stepC < EV.length ? "ถูกต้อง เหตุการณ์ถัดไปคืออะไร" : "";
+      if (stepC === EV.length) { $("winC").classList.remove("hide"); $("winC").scrollIntoView({ behavior: "smooth", block: "center" }); }
+    } else {
+      b.classList.remove("bad"); void b.offsetWidth; b.classList.add("bad");
+      $("msgC").className = "msg err"; $("msgC").textContent = "ยังไม่ใช่ เหตุการณ์นี้เกิดทีหลัง ลองดูสถานีในภารกิจ A อีกครั้ง";
+    }
+  });
+  $("againC").addEventListener("click", setupC);
+
+  /* ---------------- แท็บ และรอบวาด ---------------- */
+  var cur = "A";
+  function sizeAll() { A = fit(cvA); B = fit(cvB); if (parts.length === 0 || true) build(ST[k].era); }
+  document.querySelector(".tabs").addEventListener("click", function (ev) {
+    var t = ev.target.closest(".tab"); if (!t) return;
+    cur = t.getAttribute("data-t");
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (x) { x.classList.toggle("on", x === t); });
+    ["A", "B", "C"].forEach(function (m) { $("m" + m).classList.toggle("hide", m !== cur); });
+    if (cur !== "A") stopPlay();
+    sizeAll();
+    try { history.replaceState(null, "", "#" + cur); } catch (e) {}
+  });
+  var rz; window.addEventListener("resize", function () { clearTimeout(rz); rz = setTimeout(sizeAll, 150); });
+  function loop() {
+    if (cur === "A" && A) drawA();
+    if (cur === "B" && B) $("rN").textContent = drawB() + " อะตอม";
+    requestAnimationFrame(loop);
+  }
+  setupC(); renderLog(); updB();
+  var h0 = (location.hash || "").replace("#", "");
+  if (h0 === "B" || h0 === "C") { var tb = document.querySelector('.tab[data-t="' + h0 + '"]'); if (tb) tb.click(); }
+  sizeAll(); showA(0); loop();
+})();
+</script>
+</body>
+</html>

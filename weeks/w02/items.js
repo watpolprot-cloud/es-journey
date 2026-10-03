@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(2, [
-  // { type: "worksheet", code: "E1", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E1", title: "สถานการณ์จำลอง ไทม์แมชชีนเอกภพ (ภารกิจ A B C)", file: "e1-sim-bigbang.html", note: "ใช้คู่กับใบงาน E1 · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e1-sim.png" },
+  { type: "worksheet", code: "E1", title: "ใบงาน E1 ย้อนเวลาไปบิกแบง (1 แผ่น 2 หน้า)", file: "e1-worksheet.pdf", note: "4 คะแนน · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 2 E1 กำเนิดเอกภพและบิกแบง", file: "w02-slides-e1-bigbang.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
