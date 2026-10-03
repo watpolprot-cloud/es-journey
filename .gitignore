@@ -1,0 +1,11 @@
+# ห้ามขึ้น GitHub
+*.xlsx
+*.xls
+*.csv
+*.docx
+*.pptx
+*เฉลย*
+*ข้อสอบ*
+Thumbs.db
+desktop.ini
+.DS_Store
