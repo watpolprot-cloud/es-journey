@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E3 ยานสำรวจทางช้างเผือก · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E3 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1 และ E2) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A; --blue: #8EC5FF;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #0c3b5a55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.solid { background: var(--cyan); color: var(--ink); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn.sm { padding: 4px 12px; font-size: 18px; min-width: 46px; }
+.btn:disabled { opacity: .35; cursor: default; }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 30px; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl .sp { flex: 1; min-width: 120px; }
+.lbl { font-size: 14px; color: var(--muted); }
+.seg { display: inline-flex; border: 1.5px solid var(--line-hi); border-radius: 10px; overflow: hidden; }
+.seg button { font-family: var(--head); font-size: 15px; background: #0b1233; color: var(--muted); border: 0; padding: 6px 14px; cursor: pointer; }
+.seg button.on { background: var(--cyan); color: var(--ink); font-weight: 700; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.layers { display: flex; gap: 6px 14px; flex-wrap: wrap; margin-top: 8px; font-size: 14.5px; color: var(--muted); }
+.layers label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.layers i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; }
+.twin { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 26px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); }
+.scan h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.scan .d { font-size: 15.5px; line-height: 1.5; }
+.scan .row { display: flex; gap: 6px; flex-wrap: wrap; }
+.scan .tg { font-family: var(--head); font-size: 13.5px; border-radius: 999px; padding: 1px 10px; border: 1px solid var(--line-hi); }
+.scan .num { margin-top: 2px; border-top: 1px dashed var(--line-hi); padding-top: 6px; font-size: 15px; color: var(--cyan); font-family: var(--head); }
+.read { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--ok); }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.dirs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+.dir { font-family: var(--head); font-size: 14.5px; line-height: 1.2; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 6px; cursor: pointer; text-align: left; }
+.dir small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.dir.on { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px #4fd8ff33; }
+.dir.done:not(.on) { border-color: var(--ok); }
+.scope { display: grid; grid-template-columns: 200px 1fr; gap: 12px; margin-top: 10px; align-items: stretch; }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 16px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.quiz { margin-top: 6px; }
+.qq { margin-top: 10px; }
+.qq .t { font-weight: 600; }
+.opts { display: grid; gap: 6px; margin-top: 6px; grid-template-columns: 1fr 1fr; }
+@media (max-width: 760px) { .opts { grid-template-columns: 1fr; } }
+.opt { text-align: left; font-family: var(--body); font-size: 16px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+.opt.ok { border-color: var(--ok); color: var(--ok); background: #5ef2a512; }
+.opt.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 8px; margin-top: 8px; }
+.card { font-family: var(--head); font-size: 15.5px; text-align: left; line-height: 1.25; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 12px; padding: 8px 10px; cursor: pointer; }
+.card small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.card.used { opacity: .3; cursor: default; }
+.card.bad { border-color: var(--err); animation: shake .35s; }
+.env { margin-top: 10px; border: 1.5px solid var(--gold); border-radius: 14px; padding: 10px 14px; background: #ffd16608; position: relative; }
+.env h4 { font-family: var(--head); margin: 0 0 4px; color: var(--gold); font-size: 17px; }
+.env ol { margin: 0; padding-left: 26px; }
+.env li { font-size: 15.5px; }
+.env li.ph { color: #ffffff30; }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .1em; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .scope { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .dirs { grid-template-columns: 1fr 1fr; }
+  .info .v { font-size: 22px; }
+}
+@media (max-width: 420px) { .read { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E3 <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ยานสำรวจ<b>ทางช้างเผือก</b></h1>
+  <p class="lead">ทุกคืนที่ฟ้ามืด เราเห็นแถบฝ้าขาวพาดผ่านท้องฟ้า นั่นคือ "บ้าน" ของเราเอง ภารกิจนี้ให้นักบินขับยานสำรวจออกไปดูโครงสร้างของกาแล็กซีทางช้างเผือก หาตำแหน่งของระบบสุริยะ และไขปริศนาว่าทำไมเราเห็นทางช้างเผือกเป็นแถบ แล้วจดผลลงใบงาน E3</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>สแกนโครงสร้าง<small>กาแล็กซีมีส่วนประกอบอะไรบ้าง</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>กล้องนับดาว<small>ทำไมเห็นทางช้างเผือกเป็นแถบ</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ปริศนาภาพถ่าย<small>และจ่าหน้าซองระดับจักรวาล</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> สแกนโครงสร้างกาแล็กซีทางช้างเผือก</h2>
+    <p class="how">ยานลอยออกมานอกกาแล็กซีแล้ว สลับมุมมอง <b>ด้านบน</b> และ <b>ด้านข้าง</b> แตะวงกลมหมายเลขบนภาพ (หรือแตะปุ่มชื่อด้านล่าง) เพื่อสแกนให้ครบ 6 จุด แล้วจดชื่อ ส่วนประกอบ และตัวเลขสำคัญลงใบงาน ส่วนที่ 1</p>
+    <div class="ctrl" style="margin-top:0"><span class="lbl">มุมมอง</span>
+      <div class="seg" id="viewSeg"><button data-v="top" class="on">มองจากด้านบน</button><button data-v="side">มองจากด้านข้าง</button></div>
+    </div>
+    <div class="twin" style="margin-top:10px">
+      <canvas id="cvMap" height="380" aria-label="ภาพกาแล็กซีทางช้างเผือก แตะวงกลมหมายเลขเพื่อสแกน"></canvas>
+      <div class="info scan" id="scanBox">
+        <div class="k">ผลการสแกน</div>
+        <h3 id="scName">แตะวงกลมหมายเลขบนภาพ</h3>
+        <div class="row" id="scTags"></div>
+        <div class="d" id="scDesc">เริ่มที่หมายเลข 1 ใจกลางกาแล็กซี หรือแตะปุ่มชื่อด้านล่าง ถ้าส่วนนั้นอยู่อีกมุมมอง ยานจะหมุนให้เอง</div>
+        <div class="num" id="scNum"></div>
+      </div>
+    </div>
+    <div class="chips" id="partChips" style="margin-top:10px"></div>
+    <div class="layers" id="layers">
+      <span>ชั้นข้อมูล :</span>
+      <label><input type="checkbox" data-l="young" checked><i style="background:#8EC5FF"></i>ดาวอายุน้อย (สีฟ้า)</label>
+      <label><input type="checkbox" data-l="old" checked><i style="background:#FFC98A"></i>ดาวอายุมาก (สีเหลืองส้ม)</label>
+      <label><input type="checkbox" data-l="dust" checked><i style="background:#7a4a6a"></i>แก๊สและฝุ่น</label>
+      <label><input type="checkbox" data-l="gc" checked><i style="background:#FFE7A8"></i>กระจุกดาวทรงกลม</label>
+    </div>
+    <div class="prog" id="progA"></div>
+    <div class="ctrl"><button class="btn gold" id="orbitBtn">ดูระบบสุริยะโคจรรอบใจกลาง</button><span class="lbl" id="orbitMsg"></span></div>
+    <div class="note"><b>ปีแสง</b> คือระยะทางที่แสงเดินทางได้ใน 1 ปี (ประมาณ 9.5 ล้านล้านกิโลเมตร) · แสงจากใจกลางกาแล็กซีที่เราเห็นคืนนี้ ออกเดินทางมาตั้งแต่ประมาณ 26,000 ปีก่อน · ภาพนี้เป็นภาพจำลอง ไม่มีใครเคยออกไปถ่ายภาพทางช้างเผือกจากภายนอกได้จริง นักดาราศาสตร์สร้างแผนที่จากการวัดตำแหน่งดาวและแก๊สจากโลก</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : เติมชื่อส่วนประกอบในแผนผัง สิ่งที่พบมากในแต่ละส่วน และตัวเลขสำคัญ 4 ค่า</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> กล้องนับดาว : ทำไมเราเห็นทางช้างเผือกเป็นแถบ</h2>
+    <p class="how">ภาพบนคือท้องฟ้าทั้งหมดรอบระบบสุริยะ (คลี่ออกเป็นแผ่นเดียว) เลือกทิศที่จะส่องกล้อง 5 ทิศ ดูว่าเส้นสายตาผ่านจานของกาแล็กซีไกลแค่ไหน และกล้องนับดาวได้กี่ดวง แล้วกด "บันทึกค่า" ให้ครบ 5 ทิศ จดลงใบงาน ส่วนที่ 2</p>
+    <canvas id="cvSky" height="300" aria-label="ท้องฟ้าทั้งหมดรอบระบบสุริยะ"></canvas>
+    <div class="lbl" style="margin-top:4px">กึ่งกลางภาพ = ทิศใจกลางกาแล็กซี · เส้นแนวนอนกลางภาพ = แนวระนาบจานของกาแล็กซี · บนสุดและล่างสุด = ทิศตั้งฉากกับจาน</div>
+    <div class="dirs" id="dirBtns"></div>
+    <div class="scope">
+      <canvas id="cvScope" height="200" aria-label="ภาพในกล้องโทรทรรศน์"></canvas>
+      <canvas id="cvPath" height="200" aria-label="แผนผังเส้นสายตาจากระบบสุริยะ"></canvas>
+    </div>
+    <div class="read">
+      <div class="info"><div class="k">ทิศที่ส่องกล้อง</div><div class="v g" id="bDir" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">ระยะที่เส้นสายตาผ่านจานของกาแล็กซี</div><div class="v c" id="bPath">-</div></div>
+      <div class="info"><div class="k">จำนวนดาวในกล้อง</div><div class="v o" id="bCount">-</div></div>
+    </div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกค่า</button>
+      <label class="lbl" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="dustB" checked> มีฝุ่นในจาน (ค่าจริง)</label>
+      <span class="lbl" id="recBMsg"></span></div>
+    <table class="log">
+      <thead><tr><th>ทิศที่ส่องกล้อง</th><th>กลุ่มดาว</th><th>ระยะที่ผ่านจาน (ปีแสง)</th><th>จำนวนดาวในกล้อง</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table>
+    <div class="note"><b>ลองปิดฝุ่น</b> แล้วดูแถบมืดกลางทางช้างเผือก ฝุ่นและแก๊สในจานบังแสงดาวที่อยู่ด้านหลัง ทิศใจกลางจึงดูมีรอยแยกมืด (ค่าที่บันทึกลงใบงานให้ใช้แบบ "มีฝุ่น")</div>
+
+    <h2 class="sub-h"><em>ทดลองต่อ</em> ถ้ายานลอยขึ้นเหนือจานของกาแล็กซี จะเห็นอะไร</h2>
+    <p class="how">เลื่อนแถบเพื่อพายานลอยขึ้นจากตำแหน่งระบบสุริยะ แล้วหันกล้องไปทางใจกลาง ดูว่าแถบทางช้างเผือกค่อย ๆ เปลี่ยนเป็นอะไร</p>
+    <div class="ctrl">
+      <span class="lbl">ความสูงเหนือจาน</span>
+      <input class="sp" id="slZ" type="range" min="0" max="100" step="5" value="0" aria-label="ความสูงของยานเหนือจาน (พันปีแสง)">
+      <span class="lbl" id="zLbl" style="min-width:120px;text-align:right">0 ปีแสง</span>
+    </div>
+    <canvas id="cvShip" height="300" style="margin-top:8px" aria-label="ภาพจากหน้าต่างยานที่หันไปทางใจกลางกาแล็กซี"></canvas>
+    <div class="note" id="shipNote">ตอนนี้ยานอยู่ในจานเหมือนโลก มองไปทางใจกลางจึงเห็นดาวเรียงเป็นแถบยาว</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : จดระยะที่ผ่านจานและจำนวนดาวทั้ง 5 ทิศ แล้วตอบข้อ 5–7</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ปริศนาภาพถ่ายทางช้างเผือก</h2>
+    <p class="how">ภาพนี้จำลองภาพถ่ายท้องฟ้าจากยอดดอยในคืนเดือนมืด ช่วงเดือนกรกฎาคม (ถ่ายนาน 20 วินาที) จุด ก ข ค ง คืออะไร เลือกคำตอบให้ถูกทุกข้อ แล้วจดลงใบงาน ส่วนที่ 3</p>
+    <canvas id="cvPhoto" height="330" aria-label="ภาพถ่ายจำลองทางช้างเผือกเหนือขอบฟ้า มีจุด ก ข ค ง"></canvas>
+    <div class="quiz" id="quizC"></div>
+
+    <h2 class="sub-h"><em>ภารกิจ C2</em> จ่าหน้าซองระดับจักรวาล</h2>
+    <p class="how">ถ้าจะส่งจดหมายจากมนุษย์ต่างดาวที่อยู่ไกลมาก ๆ มาถึงห้องเรียนเรา ต้องเขียนที่อยู่ให้ครบ แตะการ์ดเรียงจาก <b>เล็กไปใหญ่</b> ต่อจากบรรทัดแรก</p>
+    <div class="cards" id="cards"></div>
+    <div class="env">
+      <h4>ถึง นักเรียน ม.4 ห้องเรียนวิทยาศาสตร์โลกและอวกาศ</h4>
+      <ol id="addr"></ol>
+      <div class="ctrl"><button class="btn" id="resetC2" style="font-size:14px">เรียงใหม่</button></div>
+    </div>
+    <div class="win hide" id="winC">
+      <div>แผนที่บ้านของเราครบแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">ORION-26000</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 4 (ORION = แขนนายพราน, 26000 = ระยะจากใจกลางกาแล็กซีเป็นปีแสง)</div>
+    </div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : จับคู่ ก ข ค ง · <b>ส่วนที่ 4</b> : เขียนที่อยู่ระดับจักรวาลและรหัสผ่าน · <b>ส่วนที่ 5</b> : โปสการ์ดจากอวกาศ</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขใกล้เคียงค่าจริง · ภาพกาแล็กซีเป็นภาพจำลอง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e3_sim_v1';
+  var S = load() || {};
+  S.scan = S.scan || {}; S.recB = S.recB || {}; S.quiz = S.quiz || {}; S.order = S.order || [];
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function fit(cv, hh) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = hh || +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function gauss(r) { var u = r() || 1e-9, v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * v); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ================================================================ แบบจำลองกาแล็กซี (หน่วย พันปีแสง)
+  // ใจกลางอยู่ที่ (0,0,0) จานอยู่ในระนาบ x-y ระบบสุริยะอยู่ที่ (0,-26) โคจรตามเข็มนาฬิกาเมื่อมองจากด้านบน
+  var RSUN = 26, ZSUN = 0.02, PITCH = 0.2126, R0 = 4, RD = 50;
+  var PHI0 = -Math.PI / 2 - Math.log(21.5 / R0) / PITCH;          // แขนคนยิงธนูผ่านด้านในระบบสุริยะที่รัศมี 21,500 ปีแสง
+  var BAR = 27 * Math.PI / 180 + Math.PI / 2, CB = Math.cos(BAR), SB = Math.sin(BAR);   // คานทำมุม 27 องศากับแนวดวงอาทิตย์-ใจกลาง
+  function armPhase(x, y) { var R = Math.sqrt(x * x + y * y); return Math.atan2(y, x) - Math.log(Math.max(R, 1) / R0) / PITCH - PHI0; }
+  function sech2(t) { var e = Math.exp(-2 * Math.abs(t)); return 4 * e / ((1 + e) * (1 + e)); }
+  // ตารางค่าในระนาบจาน (คำนวณครั้งเดียว ทำให้คำนวณท้องฟ้าเร็วขึ้น) ช่องละ 0.5 พันปีแสง ครอบคลุม -60 ถึง 60
+  var GN = 241, DISK = new Float32Array(GN * GN), DUST = new Float32Array(GN * GN);
+  (function () {
+    for (var j = 0; j < GN; j++) for (var i = 0; i < GN; i++) {
+      var x = i / 2 - 60, y = j / 2 - 60, R = Math.sqrt(x * x + y * y), ph = armPhase(x, y);
+      var d = Math.exp(-R / 9) * (1 + 1.2 * Math.pow((Math.cos(4 * ph) + 1) / 2, 4));
+      if (R > RD) d *= Math.exp(-(R - RD) / 1.5);
+      DISK[j * GN + i] = d;
+      DUST[j * GN + i] = R > RD ? 0 : Math.exp(-R / 12) * (0.4 + Math.pow((Math.cos(4 * (ph + 0.06)) + 1) / 2, 3));
+    }
+  })();
+  function cell(x, y) { var i = Math.round((x + 60) * 2), j = Math.round((y + 60) * 2); return (i < 0 || j < 0 || i >= GN || j >= GN) ? -1 : j * GN + i; }
+  function dens(x, y, z) {      // ความสว่างของดาวต่อปริมาตร
+    var az = Math.abs(z), r2 = x * x + y * y + z * z, v = 0.0025 / (1 + r2 / 30), c;
+    if (az < 4 && (c = cell(x, y)) >= 0) v += DISK[c] * sech2(z / 0.33);
+    if (r2 < 160) {
+      var xr = x * CB + y * SB, yr = -x * SB + y * CB;
+      v += 2.6 * Math.exp(-1.6 * Math.sqrt(xr * xr / 9 + yr * yr / 2.2 + z * z / 1.6));
+    }
+    return v;
+  }
+  function dustd(x, y, z) {
+    if (Math.abs(z) > 1.5) return 0;
+    var c = cell(x, y); return c < 0 ? 0 : DUST[c] * sech2(z / 0.1);
+  }
+  // ทิศทางจากพิกัดกาแล็กซี l (ลองจิจูด 0 = ใจกลาง 90 = ทิศการโคจร) และ b (ละติจูด)
+  function dirv(l, b) { var L = l * Math.PI / 180, B = b * Math.PI / 180; return [-Math.sin(L) * Math.cos(B), Math.cos(L) * Math.cos(B), Math.sin(B)]; }
+  var STEPS = 60, SMAX = 90, KAPPA = 1.5;
+  function ray(ox, oy, oz, d, dust, steps) {
+    var I = 0, tau = 0, sp = 0, n = steps || STEPS;
+    for (var k = 1; k <= n; k++) {
+      var s = SMAX * (k / n) * (k / n), ds = s - sp; sp = s;
+      var px = ox + d[0] * s, py = oy + d[1] * s, pz = oz + d[2] * s;
+      var j = dens(px, py, pz);
+      if (dust) { tau += KAPPA * dustd(px, py, pz) * ds; }
+      I += j * Math.exp(-tau) * ds;
+      if (tau > 12) break;
+    }
+    return I;
+  }
+  function pathInDisk(l, b) {   // ระยะที่เส้นสายตาอยู่ในจาน (|z| < 0.5 พันปีแสง และรัศมี < 50) หน่วยพันปีแสง
+    var d = dirv(l, b), L = 0, st = 0.02;
+    for (var s = 0; s < 120; s += st) {
+      var px = d[0] * s, py = -RSUN + d[1] * s, pz = ZSUN + d[2] * s;
+      if (Math.abs(pz) < 0.5 && px * px + py * py < RD * RD) L += st;
+    }
+    return L;
+  }
+
+  // ---------------------------------------------------------------- จุดดาวสำหรับวาดภาพ (สุ่มแบบคงที่)
+  var PTS = [];
+  (function build() {
+    var r = rnd(20261116), i, R, th, z, k;
+    for (i = 0; i < 1500; i++) {            // นิวเคลียส + คาน
+      var a = gauss(r) * 2.6, bb = gauss(r) * 1.25, zz = gauss(r) * 1.05;
+      PTS.push({ x: a * CB - bb * SB, y: a * SB + bb * CB, z: zz, t: 'old', m: .8 + r() * .6 });
+    }
+    for (i = 0; i < 2600; i++) {            // จาน (ดาวอายุมากกระจายทั่ว)
+      R = -9 * Math.log(1 - r() * .995); if (R > RD) R = r() * RD; th = r() * 6.2832;
+      PTS.push({ x: R * Math.cos(th), y: R * Math.sin(th), z: gauss(r) * .35, t: 'old', m: .45 + r() * .4 });
+    }
+    for (i = 0; i < 3600; i++) {            // แขนกังหัน (ดาวอายุน้อย)
+      k = i % 4; R = R0 + Math.pow(r(), .85) * (RD - 3 - R0);
+      th = PHI0 + k * Math.PI / 2 + Math.log(R / R0) / PITCH + gauss(r) * .14;
+      R += gauss(r) * (0.8 + R * .03);
+      PTS.push({ x: R * Math.cos(th), y: R * Math.sin(th), z: gauss(r) * .14, t: 'young', m: .5 + r() * .7 });
+    }
+    for (i = 0; i < 260; i++) {             // แขนนายพราน (แขนย่อยที่ระบบสุริยะอยู่)
+      var u = r() - .5; R = RSUN + u * 3 + gauss(r) * .5; th = -Math.PI / 2 + u * .55 + gauss(r) * .03;
+      PTS.push({ x: R * Math.cos(th), y: R * Math.sin(th), z: gauss(r) * .12, t: 'young', m: .45 + r() * .6 });
+    }
+    for (i = 0; i < 700; i++) {             // แก๊สและฝุ่น ตามขอบด้านในของแขน
+      k = i % 4; R = R0 + 2 + Math.pow(r(), .9) * (RD - 8 - R0);
+      th = PHI0 + k * Math.PI / 2 + Math.log(R / R0) / PITCH - .07 + gauss(r) * .05;
+      PTS.push({ x: R * Math.cos(th), y: R * Math.sin(th), z: gauss(r) * .07, t: 'dust', m: .6 + r() * .8 });
+    }
+    for (i = 0; i < 700; i++) {             // ฮาโล (ดาวอายุมาก เบาบาง)
+      R = 6 + Math.pow(r(), 1.8) * 70; var ct = r() * 2 - 1, ph = r() * 6.2832, st2 = Math.sqrt(1 - ct * ct);
+      PTS.push({ x: R * st2 * Math.cos(ph), y: R * st2 * Math.sin(ph), z: R * ct, t: 'halo', m: .3 + r() * .4 });
+    }
+    for (i = 0; i < 70; i++) {              // กระจุกดาวทรงกลม
+      R = 4 + Math.pow(r(), 1.3) * 58; var c2 = r() * 2 - 1, p2 = r() * 6.2832, s2 = Math.sqrt(1 - c2 * c2);
+      PTS.push({ x: R * s2 * Math.cos(p2), y: R * s2 * Math.sin(p2), z: R * c2, t: 'gc', m: 1 });
+    }
+  })();
+  var COL = { old: [255, 205, 140], young: [150, 200, 255], dust: [120, 60, 95], halo: [255, 214, 170], gc: [255, 236, 170] };
+
+  // ---------------------------------------------------------------- แท็บ
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A
+  var PARTS = [
+    { k: 'core', n: 'ใจกลางกาแล็กซี', v: 'top', p: [0, 0, 0], tags: [['หลุมดำมวลยวดยิ่ง', 'gold']],
+      d: 'ตรงกลางสุดมีหลุมดำมวลยวดยิ่งชื่อ Sagittarius A* (คนยิงธนู เอ สตาร์) มวลประมาณ 4 ล้านเท่าของดวงอาทิตย์ ดาวรอบ ๆ โคจรรอบมันเร็วมาก เมื่อมองจากโลกอยู่ในทิศกลุ่มดาวคนยิงธนู',
+      num: 'ห่างจากระบบสุริยะประมาณ 26,000 ปีแสง · ภาพถ่ายเงาหลุมดำนี้เผยแพร่ครั้งแรกปี 2022' },
+    { k: 'bulge', n: 'นิวเคลียส (ส่วนป่องกลาง)', v: 'side', p: [0, 0, 2.6], tags: [['ดาวอายุมาก', 'old'], ['ดาวหนาแน่นมาก', 'old'], ['มีคาน', 'cyan']],
+      d: 'บริเวณกลางกาแล็กซีที่ป่องนูนขึ้นเหมือนไข่แดงของไข่ดาว ดาวอัดแน่นมาก ส่วนใหญ่เป็นดาวอายุมากสีเหลืองถึงแดง มีแก๊สน้อย จึงเกิดดาวใหม่น้อย ตรงกลางยืดเป็นแท่งเรียกว่า "คาน" ทางช้างเผือกจึงเป็นกาแล็กซีกังหันมีคาน',
+      num: 'กว้างประมาณ 10,000 ปีแสง' },
+    { k: 'disk', n: 'จาน', v: 'side', p: [0, 38, 0], tags: [['ดาวทุกช่วงอายุ', 'young'], ['แก๊สและฝุ่น', 'dust'], ['เนบิวลา', 'dust']],
+      d: 'ส่วนที่แบนและบางรอบนิวเคลียส มีดาวทุกช่วงอายุ แก๊ส ฝุ่น เนบิวลา และกระจุกดาวเปิด เป็นบริเวณที่ยังเกิดดาวดวงใหม่อยู่ ทั้งจานหมุนรอบใจกลาง',
+      num: 'เส้นผ่านศูนย์กลางประมาณ 100,000 ปีแสง · หนาประมาณ 1,000 ปีแสง' },
+    { k: 'arm', n: 'แขนกังหัน', v: 'top', p: null, tags: [['ดาวอายุน้อยสีฟ้า', 'young'], ['เนบิวลา', 'dust'], ['เกิดดาวใหม่', 'gold']],
+      d: 'แนวโค้งในจานที่มีแก๊ส ฝุ่น และเนบิวลาหนาแน่น เกิดดาวใหม่มาก จึงสว่างด้วยดาวอายุน้อยสีฟ้า แขนหลักมีชื่อ เช่น แขนเพอร์ซิอุส แขนคนยิงธนู แขนโล่-คนครึ่งม้า ส่วนระบบสุริยะอยู่บนแขนย่อยชื่อ "แขนนายพราน"',
+      num: 'ทางช้างเผือกมีดาวฤกษ์ประมาณ 100,000–400,000 ล้านดวง' },
+    { k: 'halo', n: 'ฮาโล', v: 'side', p: null, tags: [['ดาวอายุมาก', 'old'], ['กระจุกดาวทรงกลม', 'gold'], ['สสารมืด', 'violet']],
+      d: 'บริเวณทรงกลมเบาบางที่ห่อหุ้มทั้งกาแล็กซี มีดาวอายุมากกระจายอยู่ห่าง ๆ และกระจุกดาวทรงกลม (กลุ่มดาวอายุมากนับแสนดวง) ประมาณ 150 กระจุก รวมทั้งสสารมืดซึ่งมองไม่เห็น แต่มีแรงโน้มถ่วงยึดกาแล็กซีไว้',
+      num: 'แผ่ออกไปกว้างกว่าจานหลายเท่า' },
+    { k: 'sun', n: 'ระบบสุริยะของเรา', v: 'top', p: [0, -RSUN, 0], tags: [['อยู่ในจาน', 'young'], ['แขนนายพราน', 'cyan']],
+      d: 'ระบบสุริยะอยู่ในจาน บนแขนนายพราน ห่างจากใจกลางประมาณครึ่งทางไปถึงขอบ และอยู่ใกล้ระนาบกลางของจาน เราจึงมองเห็นดาวในจานเรียงเป็นแถบรอบท้องฟ้า ระบบสุริยะโคจรรอบใจกลางกาแล็กซีเหมือนโลกโคจรรอบดวงอาทิตย์',
+      num: 'ห่างจากใจกลางประมาณ 26,000 ปีแสง · โคจรด้วยอัตราเร็วประมาณ 230 km/s · 1 รอบใช้เวลาประมาณ 230 ล้านปี' }
+  ];
+  (function () {   // จุดบนแขนกังหัน และกระจุกดาวทรงกลมสำหรับสแกนฮาโล
+    var R = 36, th = PHI0 + 3 * Math.PI / 2 + Math.log(R / R0) / PITCH;
+    PARTS[3].p = [R * Math.cos(th), R * Math.sin(th), 0];
+    PARTS[4].p = [0, 20, 30];
+  })();
+  var view = 'top', sel = -1, layer = { young: 1, old: 1, dust: 1, gc: 1 }, orbit = null, sunPhi = -Math.PI / 2, mapCache = {};
+  function proj(v, c, p) {
+    var s = Math.min(c.W, c.H * (v === 'top' ? 1 : 2.2)) * 0.46 / 52;
+    if (v === 'top') return [c.W / 2 + p[0] * s, c.H / 2 - p[1] * s, s];
+    return [c.W / 2 + p[1] * s, c.H / 2 - p[2] * s, s];
+  }
+  function renderMap(c) {   // วาดกาแล็กซีลงผ้าใบสำรอง (ใช้ซ้ำตอนเล่นการโคจร)
+    var key = view + c.W + 'x' + c.H + JSON.stringify(layer);
+    if (mapCache.key === key) return mapCache.cv;
+    var d = window.devicePixelRatio || 1, cv = document.createElement('canvas');
+    cv.width = Math.round(c.W * d); cv.height = Math.round(c.H * d);
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0);
+    var r = rnd(99); x.fillStyle = '#02040d'; x.fillRect(0, 0, c.W, c.H);
+    for (var i = 0; i < 160; i++) { x.globalAlpha = .15 + r() * .35; x.fillStyle = '#fff'; x.fillRect(r() * c.W, r() * c.H, 1, 1); }
+    var s = proj(view, c, [0, 0, 0])[2];
+    // แสงเรือง
+    var q = proj(view, c, [0, 0, 0]);
+    if (layer.old) {
+      var g = x.createRadialGradient(q[0], q[1], 0, q[0], q[1], s * (view === 'top' ? 12 : 9));
+      g.addColorStop(0, 'rgba(255,236,200,.95)'); g.addColorStop(.3, 'rgba(255,200,130,.45)'); g.addColorStop(1, 'rgba(255,190,120,0)');
+      x.globalAlpha = 1; x.fillStyle = g; x.save(); x.translate(q[0], q[1]);
+      if (view === 'side') x.scale(1.5, .62);
+      x.beginPath(); x.arc(0, 0, s * (view === 'top' ? 12 : 9), 0, 6.283); x.fill(); x.restore();
+    }
+    if (view === 'top' && (layer.old || layer.young)) {   // แสงเรืองจาง ๆ ของจาน
+      var gd = x.createRadialGradient(q[0], q[1], 0, q[0], q[1], s * 50);
+      gd.addColorStop(0, 'rgba(170,190,255,.16)'); gd.addColorStop(.6, 'rgba(140,170,255,.06)'); gd.addColorStop(1, 'rgba(140,170,255,0)');
+      x.fillStyle = gd; x.beginPath(); x.arc(q[0], q[1], s * 50, 0, 6.283); x.fill();
+    }
+    x.globalCompositeOperation = 'lighter';
+    PTS.forEach(function (p) {
+      var t = p.t === 'halo' ? 'old' : p.t;
+      if (!layer[t] || p.t === 'dust' || p.t === 'gc') return;
+      var o = proj(view, c, [p.x, p.y, p.z]), cl = COL[p.t];
+      x.globalAlpha = Math.min(1, p.m * (p.t === 'halo' ? .5 : .55));
+      x.fillStyle = 'rgb(' + cl[0] + ',' + cl[1] + ',' + cl[2] + ')';
+      var sz = p.t === 'young' ? 1.5 : 1.2;
+      x.fillRect(o[0], o[1], sz, sz);
+    });
+    x.globalCompositeOperation = 'source-over';
+    if (layer.dust) PTS.forEach(function (p) {
+      if (p.t !== 'dust') return;
+      var o = proj(view, c, [p.x, p.y, p.z]);
+      x.globalAlpha = .22 * p.m; x.fillStyle = view === 'top' ? '#3a1a30' : '#140a12';
+      x.beginPath(); x.arc(o[0], o[1], view === 'top' ? 2.6 : 1.8, 0, 6.283); x.fill();
+      if (view === 'top' && p.m > 1.25) { x.globalAlpha = .35; x.fillStyle = '#ff7ab0'; x.fillRect(o[0], o[1], 1.2, 1.2); }
+    });
+    if (layer.gc) PTS.forEach(function (p) {
+      if (p.t !== 'gc') return;
+      var o = proj(view, c, [p.x, p.y, p.z]);
+      if (o[0] < -5 || o[0] > c.W + 5 || o[1] < -5 || o[1] > c.H + 5) return;
+      var gg = x.createRadialGradient(o[0], o[1], 0, o[0], o[1], 4);
+      gg.addColorStop(0, 'rgba(255,240,190,1)'); gg.addColorStop(1, 'rgba(255,220,150,0)');
+      x.globalAlpha = .95; x.fillStyle = gg; x.beginPath(); x.arc(o[0], o[1], 4, 0, 6.283); x.fill();
+    });
+    x.globalAlpha = 1;
+    // แถบมาตราส่วน 10,000 ปีแสง
+    x.strokeStyle = '#9AA6CF'; x.lineWidth = 2; x.beginPath(); x.moveTo(14, c.H - 16); x.lineTo(14 + 10 * s, c.H - 16); x.stroke();
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('10,000 ปีแสง', 14, c.H - 22);
+    x.fillText(view === 'top' ? 'มองจากด้านบน (เหนือจาน)' : 'มองจากด้านข้าง (ระดับเดียวกับจาน)', 14, 18);
+    mapCache = { key: key, cv: cv };
+    return cv;
+  }
+  function drawMap() {
+    var c = fit($('cvMap')), x = c.x;
+    x.drawImage(renderMap(c), 0, 0, c.W, c.H);
+    PARTS.forEach(function (pt, i) {
+      if (pt.v !== view && !(pt.k === 'sun')) return;
+      var p = pt.k === 'sun' ? [RSUN * Math.cos(sunPhi), RSUN * Math.sin(sunPhi), 0] : pt.p;
+      var o = proj(view, c, p);
+      if (pt.k === 'sun') {
+        x.fillStyle = '#FFD166'; x.shadowColor = '#FFD166'; x.shadowBlur = 12; x.beginPath(); x.arc(o[0], o[1], 4, 0, 6.283); x.fill(); x.shadowBlur = 0;
+        if (orbit) {   // วงโคจร
+          var q = proj(view, c, [0, 0, 0]); x.strokeStyle = 'rgba(255,209,102,.45)'; x.setLineDash([4, 5]); x.lineWidth = 1.2;
+          x.beginPath(); if (view === 'top') x.arc(q[0], q[1], RSUN * q[2], 0, 6.283); x.stroke(); x.setLineDash([]);
+        }
+      }
+      var on = i === sel, done = !!S.scan[pt.k];
+      x.lineWidth = 2; x.strokeStyle = on ? '#FFD166' : done ? '#5EF2A5' : '#4FD8FF';
+      x.fillStyle = on ? 'rgba(255,209,102,.18)' : 'rgba(6,16,42,.55)';
+      var cx = o[0] + (pt.k === 'sun' ? 16 : 0), cy = o[1] - (pt.k === 'sun' ? 16 : 0);
+      if (pt.k === 'sun') { x.beginPath(); x.moveTo(o[0] + 4, o[1] - 4); x.lineTo(cx - 8, cy + 8); x.stroke(); }
+      x.beginPath(); x.arc(cx, cy, 12, 0, 6.283); x.fill(); x.stroke();
+      x.fillStyle = on ? '#FFD166' : '#E8EDFF'; x.font = '700 14px "Chakra Petch", sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.fillText(String(i + 1), cx, cy + 1); x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+      pt._hit = [cx, cy];
+    });
+    if (orbit) {
+      x.fillStyle = '#FFD166'; x.font = '600 15px "Chakra Petch", Sarabun, sans-serif';
+      x.fillText('เวลาผ่านไป ' + fmt(orbit.my) + ' ล้านปี', c.W - 200, 22);
+    }
+  }
+  function partsUI() {
+    var h = '';
+    PARTS.forEach(function (p, i) { h += '<button class="chip' + (i === sel ? ' on' : '') + (S.scan[p.k] ? ' done' : '') + '" data-i="' + i + '">' + (i + 1) + ' ' + p.n + '</button>'; });
+    $('partChips').innerHTML = h;
+    Array.prototype.forEach.call($('partChips').children, function (b) { b.onclick = function () { pick(+b.getAttribute('data-i')); }; });
+    var n = PARTS.filter(function (p) { return S.scan[p.k]; }).length;
+    $('progA').innerHTML = 'สแกนแล้ว <b>' + n + ' / 6</b> จุด' + (n === 6 ? ' · ครบแล้ว ไปต่อภารกิจ B ได้' : '');
+  }
+  var TAGC = { gold: '#FFD166', old: '#FFC98A', cyan: '#4FD8FF', young: '#8EC5FF', dust: '#E79AC0', violet: '#A77BFF' };
+  function pick(i) {
+    var pt = PARTS[i]; sel = i;
+    if (pt.v !== view && pt.k !== 'sun') setView(pt.v);
+    S.scan[pt.k] = 1; save();
+    $('scName').textContent = (i + 1) + ' · ' + pt.n;
+    $('scTags').innerHTML = pt.tags.map(function (t) { return '<span class="tg" style="color:' + TAGC[t[1]] + ';border-color:' + TAGC[t[1]] + '">' + t[0] + '</span>'; }).join('');
+    $('scDesc').textContent = pt.d; $('scNum').textContent = pt.num;
+    partsUI(); drawMap();
+  }
+  function setView(v) {
+    view = v;
+    Array.prototype.forEach.call($('viewSeg').children, function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); });
+    drawMap();
+  }
+  Array.prototype.forEach.call($('viewSeg').children, function (b) { b.onclick = function () { setView(b.getAttribute('data-v')); }; });
+  Array.prototype.forEach.call(document.querySelectorAll('#layers input'), function (cb) {
+    cb.onchange = function () { layer[cb.getAttribute('data-l')] = cb.checked ? 1 : 0; drawMap(); };
+  });
+  $('cvMap').addEventListener('click', function (ev) {
+    var r = $('cvMap').getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, best = -1, bd = 26;
+    PARTS.forEach(function (pt, i) { if (!pt._hit || (pt.v !== view && pt.k !== 'sun')) return; var dd = Math.hypot(pt._hit[0] - mx, pt._hit[1] - my); if (dd < bd) { bd = dd; best = i; } });
+    if (best >= 0) pick(best);
+  });
+  $('orbitBtn').onclick = function () {
+    if (orbit) { orbit = null; $('orbitBtn').textContent = 'ดูระบบสุริยะโคจรรอบใจกลาง'; drawMap(); return; }
+    if (view !== 'top') setView('top');
+    orbit = { my: 0, t0: performance.now() }; $('orbitBtn').textContent = 'หยุด';
+    $('orbitMsg').textContent = '1 รอบ ≈ 230 ล้านปี เรียกว่า 1 ปีกาแล็กซี';
+    (function step(now) {
+      if (!orbit) return;
+      var my = (now - orbit.t0) / 9000 * 230;
+      if (my >= 230 || reduce) { my = 230; }
+      orbit.my = my; sunPhi = -Math.PI / 2 - my / 230 * 6.2832;
+      drawMap();
+      if (my >= 230) {
+        $('orbitMsg').textContent = 'ครบ 1 รอบ = 230 ล้านปี · รอบที่แล้วที่ระบบสุริยะอยู่ตรงนี้ บนโลกเพิ่งเริ่มมีไดโนเสาร์';
+        orbit = null; sunPhi = -Math.PI / 2; $('orbitBtn').textContent = 'ดูระบบสุริยะโคจรรอบใจกลาง'; drawMap(); return;
+      }
+      requestAnimationFrame(step);
+    })(performance.now());
+  };
+
+  // ================================================================ ภารกิจ B
+  var DIRS = [
+    { k: 'C', n: 'ใจกลางกาแล็กซี', c: 'คนยิงธนู', l: 0, b: 0 },
+    { k: 'S', n: 'ตามแนวจาน ด้านข้าง', c: 'หงส์', l: 80, b: 0 },
+    { k: 'A', n: 'ตรงข้ามใจกลาง', c: 'สารถี', l: 180, b: 0 },
+    { k: 'T', n: 'เฉียงขึ้นจากจาน 30°', c: 'คนแบกงู', l: 0, b: 30 },
+    { k: 'P', n: 'ตั้งฉากกับจาน', c: 'ผมเบเรนิซ', l: 0, b: 90 }
+  ];
+  var CNT = 600;   // ตัวคูณแปลงความสว่างเป็น "จำนวนดาวในกล้อง"
+  function countStars(i, dust) {
+    var D = DIRS[i], sum = 0, n = 0, offs = [[0, 0], [2, 0], [-2, 0], [0, 2], [0, -2], [1.4, 1.4], [-1.4, 1.4], [1.4, -1.4], [-1.4, -1.4]];
+    offs.forEach(function (o) { var bb = Math.max(-90, Math.min(90, D.b + o[1])); sum += ray(0, -RSUN, ZSUN, dirv(D.l + o[0], bb), dust, 160); n++; });
+    var v = sum / n * CNT;
+    return v >= 100 ? Math.round(v / 10) * 10 : Math.max(1, Math.round(v));
+  }
+  DIRS.forEach(function (D, i) {
+    var L = pathInDisk(D.l, D.b) * 1000;
+    D.path = L >= 5000 ? Math.round(L / 1000) * 1000 : Math.round(L / 100) * 100;
+  });
+  var cnt = { 1: [], 0: [] };
+  function getCount(i, dust) { var k = dust ? 1 : 0; if (cnt[k][i] === undefined) cnt[k][i] = countStars(i, dust); return cnt[k][i]; }
+  var curD = 0, dustOn = true, zShip = 0, skyCache = {};
+  function skyImage(w, h, oz, dust) {
+    var key = w + 'x' + h + ':' + oz + ':' + (dust ? 1 : 0);
+    if (skyCache[key]) return skyCache[key];
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    var x = cv.getContext('2d'), im = x.createImageData(w, h), I = new Float32Array(w * h), mx = 0, i, j;
+    var steps = w > 300 ? STEPS : 46;
+    for (j = 0; j < h; j++) {
+      var b = 90 - (j + .5) / h * 180;
+      for (i = 0; i < w; i++) {
+        var l = 180 - (i + .5) / w * 360;
+        var v = ray(0, -RSUN, ZSUN + oz, dirv(l, b), dust, steps);
+        I[j * w + i] = v; if (v > mx) mx = v;
+      }
+    }
+    var I0 = 0.08, norm = Math.log(1 + 8 / I0), r = rnd(5 + oz);
+    for (i = 0; i < w * h; i++) {
+      var t = Math.log(1 + Math.max(0, I[i] - 0.015) / I0) / norm; t = Math.min(1, Math.max(0, t));
+      var y = Math.pow(t, 1.35);
+      im.data[i * 4] = Math.min(255, 255 * y * 1.0 + 4);
+      im.data[i * 4 + 1] = Math.min(255, 255 * y * .93 + 6);
+      im.data[i * 4 + 2] = Math.min(255, 255 * y * .82 + 16);
+      im.data[i * 4 + 3] = 255;
+    }
+    x.putImageData(im, 0, 0);
+    skyCache[key] = cv; return cv;
+  }
+  function skyXY(c, l, b) { return [c.W * (180 - l) / 360, c.H * (90 - b) / 180]; }
+  function drawSky() {
+    var cv = $('cvSky'), W = cv.clientWidth || 600, c = fit(cv, Math.round(Math.max(160, Math.min(440, W / 2)))), x = c.x;
+    var img = skyImage(zShip ? 240 : 480, zShip ? 120 : 240, zShip, dustOn);
+    x.imageSmoothingEnabled = true; x.drawImage(img, 0, 0, c.W, c.H);
+    var r = rnd(321); x.fillStyle = '#fff';
+    for (var i = 0; i < 260; i++) { x.globalAlpha = .25 + r() * .6; x.fillRect(r() * c.W, r() * c.H, 1.1, 1.1); }
+    x.globalAlpha = 1;
+    x.strokeStyle = 'rgba(154,166,207,.35)'; x.setLineDash([3, 5]); x.lineWidth = 1;
+    x.beginPath(); x.moveTo(0, c.H / 2); x.lineTo(c.W, c.H / 2); x.moveTo(c.W / 2, 0); x.lineTo(c.W / 2, c.H); x.stroke(); x.setLineDash([]);
+    x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF';
+    x.fillText('ระนาบจาน', 6, c.H / 2 - 5); x.fillText('ทิศตั้งฉากกับจาน', 6, 14);
+    if (zShip) { x.fillStyle = '#FFD166'; x.fillText('มองจากยานที่ลอยสูง ' + fmt(zShip * 1000) + ' ปีแสง', c.W - 190, 14); return; }
+    DIRS.forEach(function (D, k) {
+      var p = skyXY(c, D.l, Math.min(D.b, 86)), on = k === curD;
+      x.strokeStyle = on ? '#FFD166' : S.recB[D.k] ? '#5EF2A5' : '#4FD8FF'; x.lineWidth = on ? 2.4 : 1.4;
+      x.beginPath(); x.arc(p[0], p[1], on ? 12 : 9, 0, 6.283); x.stroke();
+      x.fillStyle = on ? '#FFD166' : '#E8EDFF'; x.font = (on ? '700 ' : '600 ') + '13px "Chakra Petch", Sarabun, sans-serif';
+      x.fillText(String(k + 1), p[0] + 13, p[1] + 4);
+    });
+  }
+  function drawScope() {
+    var c = fit($('cvScope')), x = c.x, n = getCount(curD, dustOn), r = rnd(1000 + curD * 7 + (dustOn ? 0 : 3));
+    x.fillStyle = '#000'; x.fillRect(0, 0, c.W, c.H);
+    var cx = c.W / 2, cy = c.H / 2, R = Math.min(c.W, c.H) / 2 - 8, D = DIRS[curD];
+    x.save(); x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.clip();
+    x.fillStyle = '#03050f'; x.fillRect(0, 0, c.W, c.H);
+    var draw = Math.min(n, 1400);
+    for (var i = 0; i < draw; i++) {
+      var a = r() * 6.283, rr = Math.sqrt(r()) * R, px = cx + Math.cos(a) * rr, py = cy + Math.sin(a) * rr;
+      if (dustOn && D.k === 'C' && Math.abs(py - cy) < R * .12 && r() < .75) continue;   // แถบฝุ่นในทิศใจกลาง
+      var m = r(); x.globalAlpha = .35 + m * .65; x.fillStyle = m > .93 ? '#ffd9a8' : m > .86 ? '#bcd8ff' : '#fff';
+      var s = m > .96 ? 2.2 : m > .8 ? 1.5 : 1; x.fillRect(px, py, s, s);
+    }
+    x.globalAlpha = 1; x.restore();
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.stroke();
+    x.strokeStyle = 'rgba(79,216,255,.45)'; x.lineWidth = 1; x.beginPath(); x.moveTo(cx - R, cy); x.lineTo(cx - R * .25, cy); x.moveTo(cx + R * .25, cy); x.lineTo(cx + R, cy); x.stroke();
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพในกล้อง', 8, 16);
+  }
+  function drawPath() {
+    var c = fit($('cvPath')), x = c.x, D = DIRS[curD];
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, c.W, c.H);
+    var half = c.W / 2, s1 = Math.min(half, c.H) * .42 / 50;
+    // ซ้าย : มองจากด้านบน
+    var ox = half / 2, oy = c.H / 2 + 6;
+    x.fillStyle = 'rgba(150,180,255,.12)'; x.beginPath(); x.arc(ox, oy, 50 * s1, 0, 6.283); x.fill();
+    x.strokeStyle = 'rgba(150,180,255,.35)'; x.stroke();
+    x.fillStyle = 'rgba(255,214,160,.8)'; x.beginPath(); x.ellipse(ox, oy, 6, 4, -BAR + Math.PI / 2, 0, 6.283); x.fill();
+    var sx = ox, sy = oy + RSUN * s1, d = dirv(D.l, D.b), hl = Math.hypot(d[0], d[1]);
+    x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF'; x.fillText('มองจากด้านบน', 6, 16);
+    if (hl > .05) {
+      var ex = sx + d[0] / hl * 200, ey = sy - d[1] / hl * 200;
+      x.save(); x.beginPath(); x.arc(ox, oy, 50 * s1, 0, 6.283); x.clip();
+      x.strokeStyle = '#FFD166'; x.lineWidth = 3 * hl + .6; x.beginPath(); x.moveTo(sx, sy); x.lineTo(ex, ey); x.stroke(); x.restore();
+      x.strokeStyle = 'rgba(255,209,102,.4)'; x.lineWidth = 1; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + d[0] / hl * 70 * s1, sy - d[1] / hl * 70 * s1); x.stroke(); x.setLineDash([]);
+    } else { x.fillStyle = '#FFD166'; x.fillText('ชี้ขึ้นออกจากจอ', sx - 34, sy + 20); }
+    x.fillStyle = '#FFD166'; x.beginPath(); x.arc(sx, sy, 3.5, 0, 6.283); x.fill();
+    // ขวา : มองจากด้านข้าง (แกนนอน = แนวระบบสุริยะ-ใจกลาง)
+    var qx = half + half / 2, qy = c.H / 2 + 6, s2 = s1 * 1.0, ex2 = 4;   // ขยายความหนาให้เห็นง่าย 4 เท่า
+    x.fillStyle = '#9AA6CF'; x.fillText('มองจากด้านข้าง (ความหนาขยาย 4 เท่า)', half + 6, 16);
+    x.fillStyle = 'rgba(150,180,255,.25)'; x.fillRect(qx - 50 * s2, qy - .5 * s2 * ex2, 100 * s2, 1 * s2 * ex2);
+    x.fillStyle = 'rgba(255,214,160,.8)'; x.beginPath(); x.ellipse(qx, qy, 9, 5, 0, 0, 6.283); x.fill();
+    x.strokeStyle = 'rgba(255,214,160,.18)'; x.beginPath(); x.arc(qx, qy, 46 * s2, 0, 6.283); x.stroke();
+    var px = qx - RSUN * s2, py = qy, hz = d[1], vz = d[2], hv = Math.hypot(hz, vz);
+    if (hv > .05) {
+      x.strokeStyle = '#FFD166'; x.lineWidth = 2.4; x.beginPath(); x.moveTo(px, py); x.lineTo(px + hz / hv * 80, py - vz / hv * 80 * (vz ? 1 : 1)); x.stroke();
+    } else { x.fillStyle = '#FFD166'; x.fillText('ชี้ออกจากจอ', px - 26, py + 22); }
+    x.fillStyle = '#FFD166'; x.beginPath(); x.arc(px, py, 3.5, 0, 6.283); x.fill();
+    x.fillStyle = '#E8EDFF'; x.font = '600 13px "Chakra Petch", Sarabun, sans-serif';
+    x.fillText('เส้นสายตาผ่านจาน ' + fmt(D.path) + ' ปีแสง', 8, c.H - 10);
+  }
+  function drawShip() {
+    var c = fit($('cvShip')), x = c.x, z = zShip;
+    x.fillStyle = '#02040d'; x.fillRect(0, 0, c.W, c.H);
+    var C = [0, -RSUN, ZSUN + z], f = [0, RSUN, -(ZSUN + z)], fl = Math.hypot(f[0], f[1], f[2]);
+    f = [f[0] / fl, f[1] / fl, f[2] / fl];
+    var rr = [f[1], -f[0], 0], rl = Math.hypot(rr[0], rr[1]); rr = [rr[0] / rl, rr[1] / rl, 0];
+    var u = [rr[1] * f[2] - rr[2] * f[1], rr[2] * f[0] - rr[0] * f[2], rr[0] * f[1] - rr[1] * f[0]];
+    var foc = Math.min(c.W, c.H * 1.9) * .55;
+    x.globalCompositeOperation = 'lighter';
+    PTS.forEach(function (p) {
+      if (p.t === 'gc') return;
+      var dx = p.x - C[0], dy = p.y - C[1], dz = p.z - C[2];
+      var dep = dx * f[0] + dy * f[1] + dz * f[2]; if (dep < 1) return;
+      var X = (dx * rr[0] + dy * rr[1] + dz * rr[2]) / dep * foc, Y = (dx * u[0] + dy * u[1] + dz * u[2]) / dep * foc;
+      var px = c.W / 2 - X, py = c.H / 2 - Y; if (px < 0 || px > c.W || py < 0 || py > c.H) return;
+      if (p.t === 'dust') { x.globalCompositeOperation = 'source-over'; x.globalAlpha = .12; x.fillStyle = '#000'; x.beginPath(); x.arc(px, py, 2.2, 0, 6.283); x.fill(); x.globalCompositeOperation = 'lighter'; return; }
+      var cl = COL[p.t]; x.globalAlpha = Math.min(1, p.m * .75 * Math.min(1.6, 40 / dep + .3));
+      x.fillStyle = 'rgb(' + cl[0] + ',' + cl[1] + ',' + cl[2] + ')'; x.fillRect(px, py, 1.7, 1.7);
+    });
+    x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('หน้าต่างยาน · หันไปทางใจกลางกาแล็กซี', 8, 16);
+    var msg = z === 0 ? 'ตอนนี้ยานอยู่ในจานเหมือนโลก มองไปทางใจกลางจึงเห็นดาวเรียงเป็นแถบยาว (นี่คือเหตุผลที่เราเห็นทางช้างเผือกเป็นแถบ)'
+      : z < 30 ? 'ยานเริ่มลอยพ้นจาน แถบเริ่มกลายเป็นจานแบนที่เอียงอยู่ เห็นส่วนป่องตรงกลางชัดขึ้น'
+      : 'ยานอยู่สูงเหนือจานมาก มองลงมาเห็นทางช้างเผือกเป็นกังหัน มีแขนโค้งรอบนิวเคลียส ไม่เป็นแถบอีกแล้ว';
+    $('shipNote').textContent = msg;
+  }
+  function dirsUI() {
+    var h = '';
+    DIRS.forEach(function (D, i) { h += '<button class="dir' + (i === curD ? ' on' : '') + (S.recB[D.k] ? ' done' : '') + '" data-i="' + i + '">' + (i + 1) + ' ' + D.n + '<small>กลุ่มดาว' + D.c + '</small></button>'; });
+    $('dirBtns').innerHTML = h;
+    Array.prototype.forEach.call($('dirBtns').children, function (b) { b.onclick = function () { curD = +b.getAttribute('data-i'); updB(); }; });
+  }
+  function logB() {
+    var h = '';
+    DIRS.forEach(function (D, i) {
+      var v = S.recB[D.k];
+      h += '<tr><td class="n">' + (i + 1) + '. ' + D.n + '</td><td>' + D.c + '</td><td>' + (v ? fmt(D.path) : '-') + '</td><td>' + (v ? fmt(v) : '-') + '</td></tr>';
+    });
+    $('logB').innerHTML = h;
+  }
+  function updB() {
+    var D = DIRS[curD];
+    $('bDir').textContent = (curD + 1) + ' · ' + D.n;
+    $('bPath').textContent = fmt(D.path) + ' ปีแสง';
+    $('bCount').textContent = fmt(getCount(curD, dustOn)) + ' ดวง';
+    $('recB').disabled = !dustOn;
+    $('recBMsg').textContent = dustOn ? '' : 'เปิด "มีฝุ่นในจาน" ก่อนบันทึก';
+    dirsUI(); logB(); if (tab === 'B') { drawSky(); drawScope(); drawPath(); }
+  }
+  $('recB').onclick = function () {
+    var D = DIRS[curD]; S.recB[D.k] = getCount(curD, true); save();
+    var n = DIRS.filter(function (d) { return S.recB[d.k]; }).length;
+    $('recBMsg').textContent = 'บันทึกทิศ ' + (curD + 1) + ' แล้ว (' + n + '/5)' + (n === 5 ? ' ครบแล้ว' : '');
+    if (n < 5) { for (var k = 1; k <= 5; k++) { var j = (curD + k) % 5; if (!S.recB[DIRS[j].k]) { curD = j; break; } } }
+    updB();
+  };
+  $('dustB').onchange = function () { dustOn = this.checked; updB(); };
+  $('slZ').oninput = function () { zShip = +this.value; $('zLbl').textContent = fmt(zShip * 1000) + ' ปีแสง'; drawShip(); };
+  $('slZ').onchange = function () { drawSky(); };
+
+  // ================================================================ ภารกิจ C
+  var OPTS = ['ใจกลางทางช้างเผือก (ทิศกลุ่มดาวคนยิงธนู) ดาวหนาแน่นที่สุด', 'แถบมืด : ฝุ่นและแก๊สในจานของกาแล็กซีบังแสงดาวที่อยู่ด้านหลัง',
+    'ดาวฤกษ์ที่อยู่ใกล้โลก อยู่ในกาแล็กซีทางช้างเผือกเหมือนกับเรา', 'แสงจากเมือง (มลภาวะทางแสง) ทำให้มองเห็นดาวได้น้อยลง'];
+  var QC = [{ k: 'ก', a: 0 }, { k: 'ข', a: 1 }, { k: 'ค', a: 2 }, { k: 'ง', a: 3 }];
+  var ADDR = [
+    ['ดาวเคราะห์โลก', 'ดาวเคราะห์ลำดับที่ 3 จากดวงอาทิตย์'],
+    ['ระบบสุริยะ', 'ดวงอาทิตย์และบริวาร'],
+    ['แขนนายพราน', 'แขนย่อยในจานของกาแล็กซี'],
+    ['กาแล็กซีทางช้างเผือก', 'ดาวฤกษ์ราว 1–4 แสนล้านดวง'],
+    ['กลุ่มกาแล็กซีท้องถิ่น', 'ทางช้างเผือก แอนดรอเมดา และกาแล็กซีเล็ก ๆ อีกหลายสิบแห่ง'],
+    ['กลุ่มกระจุกกาแล็กซีลาเนียเคีย', 'กาแล็กซีราว 100,000 แห่ง'],
+    ['เอกภพที่สังเกตได้', 'กาแล็กซีหลายแสนล้านแห่ง']
+  ];
+  var SHUF = [3, 6, 1, 4, 0, 5, 2];
+  var photoMarks = {};
+  function drawPhoto() {
+    var c = fit($('cvPhoto')), x = c.x, W = c.W, H = c.H;
+    var sky = skyImage(480, 240, 0, true);
+    x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H);
+    // ตัดภาพท้องฟ้าช่วง l = +70..-70 b = -25..+25 แล้วหมุนให้แถบพุ่งขึ้นจากขอบฟ้า
+    var sx = 480 * (180 - 110) / 360, sw = 480 * 220 / 360, sy = 240 * (90 - 50) / 180, sh = 240 * 100 / 180;
+    var bw = W * 2.45, bh = bw * sh / sw, ang = -0.62, ox = W * .40, oy = H * .80;
+    x.save(); x.translate(ox, oy); x.rotate(ang);
+    x.globalAlpha = .85; x.drawImage(sky, sx, sy, sw, sh, -bw / 2, -bh / 2, bw, bh); x.globalAlpha = 1; x.restore();
+    var r = rnd(777);
+    for (var i = 0; i < 520; i++) { x.globalAlpha = .2 + r() * .7; x.fillStyle = r() > .9 ? '#ffe2b8' : '#fff'; x.fillRect(r() * W, r() * H * .9, r() > .95 ? 1.8 : 1, r() > .95 ? 1.8 : 1); }
+    x.globalAlpha = 1;
+    var core = [ox, oy];   // l = 0 b = 0 อยู่กลางภาพที่หมุน
+    // ดาวสว่างใกล้โลก (ค)
+    var st = [W * .78, H * .26];
+    var g = x.createRadialGradient(st[0], st[1], 0, st[0], st[1], 14); g.addColorStop(0, 'rgba(255,250,235,1)'); g.addColorStop(.25, 'rgba(255,230,190,.7)'); g.addColorStop(1, 'rgba(255,220,170,0)');
+    x.fillStyle = g; x.beginPath(); x.arc(st[0], st[1], 14, 0, 6.283); x.fill();
+    x.strokeStyle = 'rgba(255,240,210,.7)'; x.lineWidth = 1; x.beginPath(); x.moveTo(st[0] - 12, st[1]); x.lineTo(st[0] + 12, st[1]); x.moveTo(st[0], st[1] - 12); x.lineTo(st[0], st[1] + 12); x.stroke();
+    // แสงเมืองที่ขอบฟ้า (ง)
+    var cityX = W * .86, gl = x.createRadialGradient(cityX, H * .9, 0, cityX, H * .9, W * .32);
+    gl.addColorStop(0, 'rgba(255,170,90,.75)'); gl.addColorStop(.5, 'rgba(255,140,70,.25)'); gl.addColorStop(1, 'rgba(255,140,70,0)');
+    x.fillStyle = gl; x.fillRect(0, 0, W, H);
+    // ภูเขาและต้นไม้
+    x.fillStyle = '#020306'; x.beginPath(); x.moveTo(0, H);
+    for (var px = 0; px <= W; px += 6) { var hh = H * .84 - Math.sin(px / W * 5.2 + 1) * H * .05 - Math.sin(px / W * 13) * H * .015 - (Math.abs(px - W * .3) < W * .1 ? (W * .1 - Math.abs(px - W * .3)) * .35 : 0); x.lineTo(px, hh); }
+    x.lineTo(W, H); x.closePath(); x.fill();
+    for (var t = 0; t < 7; t++) { var tx = W * (.05 + t * .033), ty = H * .86; x.beginPath(); x.moveTo(tx, ty); x.lineTo(tx + 7, ty - 26 - (t % 3) * 6); x.lineTo(tx + 14, ty); x.fill(); }
+    // จุด ก ข ค ง
+    var dust = [ox + Math.cos(ang) * W * .22 - Math.sin(ang) * 9, oy + Math.sin(ang) * W * .22 + Math.cos(ang) * 9];
+    photoMarks = { 'ก': [ox - 10, oy - 6], 'ข': dust, 'ค': [st[0] - 26, st[1] + 22], 'ง': [cityX - 10, H * .78] };
+    photoMarks['ค'] = st;
+    Object.keys(photoMarks).forEach(function (k) {
+      var p = photoMarks[k], lx = p[0] + 26, ly = p[1] - 26;
+      if (k === 'ง') { lx = p[0] - 30; ly = p[1] - 30; }
+      x.strokeStyle = '#4FD8FF'; x.lineWidth = 1.6; x.beginPath(); x.arc(p[0], p[1], 15, 0, 6.283); x.stroke();
+      x.beginPath(); x.moveTo(p[0] + (lx > p[0] ? 11 : -11), p[1] - 11); x.lineTo(lx, ly); x.stroke();
+      x.fillStyle = '#4FD8FF'; x.beginPath(); x.arc(lx, ly, 13, 0, 6.283); x.fill();
+      x.fillStyle = '#06102A'; x.font = '700 15px Sarabun, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(k, lx, ly + 1);
+      x.textAlign = 'left'; x.textBaseline = 'alphabetic';
+    });
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพจำลอง · ขอบฟ้าทิศใต้ เดือนกรกฎาคม หัวค่ำ', 8, 16);
+  }
+  function quizC() {
+    var h = '';
+    QC.forEach(function (q, i) {
+      h += '<div class="qq"><div class="t">จุด ' + q.k + ' คืออะไร</div><div class="opts">';
+      OPTS.forEach(function (o, j) { var cl = S.quiz[i] === j ? (j === q.a ? ' ok' : ' bad') : ''; h += '<button class="opt' + cl + '" data-q="' + i + '" data-o="' + j + '">' + o + '</button>'; });
+      h += '</div></div>';
+    });
+    $('quizC').innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('#quizC .opt'), function (b) {
+      b.onclick = function () { S.quiz[+b.getAttribute('data-q')] = +b.getAttribute('data-o'); save(); quizC(); checkWin(); };
+    });
+  }
+  function cardsUI() {
+    var h = '';
+    SHUF.forEach(function (k) { var used = S.order.indexOf(k) >= 0; h += '<button class="card' + (used ? ' used' : '') + '" data-k="' + k + '"' + (used ? ' disabled' : '') + '>' + ADDR[k][0] + '<small>' + ADDR[k][1] + '</small></button>'; });
+    $('cards').innerHTML = h;
+    Array.prototype.forEach.call($('cards').children, function (b) {
+      b.onclick = function () {
+        var k = +b.getAttribute('data-k');
+        if (k === S.order.length) { S.order.push(k); save(); cardsUI(); checkWin(); }
+        else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); }
+      };
+    });
+    var a = '<li>ห้องเรียน ม.4 โรงเรียนพรตพิทยพยัต กรุงเทพมหานคร ประเทศไทย</li>';
+    for (var i = 0; i < ADDR.length; i++) a += i < S.order.length ? '<li>' + ADDR[i][0] + '</li>' : '<li class="ph">..........................</li>';
+    $('addr').innerHTML = a;
+  }
+  $('resetC2').onclick = function () { S.order = []; save(); cardsUI(); checkWin(); };
+  function checkWin() {
+    var q = QC.every(function (qq, i) { return S.quiz[i] === qq.a; }), o = S.order.length === ADDR.length;
+    $('winC').classList.toggle('hide', !(q && o));
+  }
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawMap();
+    if (tab === 'B') { drawSky(); drawScope(); drawPath(); drawShip(); }
+    if (tab === 'C') drawPhoto();
+  }
+  partsUI(); updB(); quizC(); cardsUI(); checkWin();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { mapCache = {}; drawAll(); }, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { mapCache = {}; drawAll(); });
+  drawAll();
+  window.ESJ_E3 = { DIRS: DIRS, getCount: getCount, pick: pick, setView: setView };   // ใช้ตอนสร้างภาพสไลด์/เฉลย
+})();
+</script>
+</body>
+</html>

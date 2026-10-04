@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(4, [
-  // { type: "worksheet", code: "E3", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E3", title: "สถานการณ์จำลอง ยานสำรวจทางช้างเผือก (ภารกิจ A B C)", file: "e3-sim-milkyway.html", note: "ใช้คู่กับใบงาน E3 · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e3-sim.png" },
+  { type: "worksheet", code: "E3", title: "ใบงาน E3 ยานสำรวจทางช้างเผือก (1 แผ่น 2 หน้า)", file: "e3-worksheet.pdf", note: "4 คะแนน · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 4 E3 กาแล็กซีทางช้างเผือก", file: "w04-slides-e3-milkyway.pdf", note: "25 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
