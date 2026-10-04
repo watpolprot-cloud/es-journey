@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E2 นักสืบหลักฐานบิกแบง · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E2 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ และ E1) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A; --red: #FF5C5C;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #0c3b5a55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.tab .dn { color: var(--ok); }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.solid { background: var(--cyan); color: var(--ink); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn.sm { padding: 4px 12px; font-size: 18px; min-width: 46px; }
+.btn:disabled { opacity: .35; cursor: default; }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 30px; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl .sp { flex: 1; min-width: 120px; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 26px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.r { color: var(--red); } .v.o { color: var(--ok); }
+.read { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+.lock { margin-top: 10px; border-radius: 10px; padding: 6px 12px; font-family: var(--head); font-size: 16px; border: 1.5px solid var(--line-hi); color: var(--muted); }
+.lock.on { border-color: var(--ok); color: var(--ok); background: #5ef2a512; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.msg { margin-top: 8px; min-height: 24px; font-size: 15.5px; }
+.msg.err { color: var(--err); } .msg.ok { color: var(--ok); }
+.send { margin-top: 12px; border: 1.5px dashed var(--violet); border-radius: 14px; padding: 10px 12px; background: #a77bff10; }
+.send h3 { font-family: var(--head); margin: 0 0 2px; font-size: 18px; color: var(--violet); }
+.dirs, .fixes { display: grid; gap: 8px; margin-top: 8px; }
+.dirs { grid-template-columns: repeat(5, 1fr); }
+.fixes { grid-template-columns: repeat(3, 1fr); }
+.dir, .fix { font-family: var(--head); font-size: 14.5px; line-height: 1.2; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 6px; cursor: pointer; }
+.dir.on { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px #4fd8ff33; }
+.fix small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.fix.done { border-color: var(--ok); color: var(--ok); background: #5ef2a510; cursor: default; }
+.gauge { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.gauge .bar { flex: 1; height: 16px; border-radius: 8px; background: #1a2350; overflow: hidden; border: 1px solid var(--line-hi); }
+.gauge .bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--gold), var(--orange)); transition: width .4s; }
+.gauge .num { font-family: var(--head); font-size: 32px; font-weight: 700; color: var(--gold); min-width: 112px; text-align: right; }
+.reveal { margin-top: 14px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; background: #5ef2a50c; }
+.reveal h3 { font-family: var(--head); margin: 0 0 6px; color: var(--ok); font-size: 21px; }
+.chain { display: flex; align-items: stretch; gap: 6px; margin: 10px 0; flex-wrap: wrap; }
+.chain .b { flex: 1 1 150px; border: 1.5px solid var(--line-hi); border-radius: 10px; padding: 6px 8px; text-align: center; background: #0b1233; font-size: 15px; line-height: 1.3; }
+.chain .b b { display: block; font-family: var(--head); font-size: 22px; color: var(--gold); }
+.chain .ar { align-self: center; color: var(--cyan); font-family: var(--head); font-size: 20px; }
+.quiz { margin-top: 10px; }
+.qq { margin-top: 10px; }
+.qq .t { font-weight: 600; }
+.opts { display: grid; gap: 6px; margin-top: 6px; }
+.opt { text-align: left; font-family: var(--body); font-size: 16px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+.opt.ok { border-color: var(--ok); color: var(--ok); background: #5ef2a512; }
+.opt.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .1em; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .dirs { grid-template-columns: repeat(3, 1fr); }
+  .fixes { grid-template-columns: 1fr; }
+  .info .v { font-size: 22px; }
+}
+@media (max-width: 420px) { .read { grid-template-columns: 1fr 1fr; } .gauge .num { font-size: 26px; min-width: 90px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E2 <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>นักสืบ<b>หลักฐานบิกแบง</b></h1>
+  <p class="lead">ถ้าเอกภพเริ่มจากบิกแบงจริง ต้องมีร่องรอยหลงเหลือให้ตรวจพบ ภารกิจนี้ให้นักสืบเก็บหลักฐาน 2 ชิ้น จากแสงของกาแล็กซี และจากคลื่นที่มาจากทุกทิศทาง แล้วจดผลลงใบงาน E2</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>สเปกโตรมิเตอร์<small>วัดการเลื่อนของแสงกาแล็กซี</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>กราฟฮับเบิล<small>ยิ่งไกล ยิ่งเร็ว จริงไหม</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>เสาอากาศปริศนา<small>สัญญาณจากทุกทิศ</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> สเปกโตรมิเตอร์ : วัดการเลื่อนของเส้นสเปกตรัม</h2>
+    <p class="how">เลือกกาแล็กซี แล้วเลื่อนแถบให้ <b>เส้นสีขาวของห้องทดลอง</b> ไปตรงกับ <b>เส้นมืดในแสงของกาแล็กซี</b> เมื่อตรงกันแล้วกด "บันทึกค่า" ทำให้ครบ 6 กาแล็กซี แล้วจดลงใบงาน ส่วนที่ 1</p>
+    <div class="chips" id="galChips"></div>
+    <div class="twin">
+      <canvas id="cvGal" height="190" aria-label="ภาพกาแล็กซีที่เลือก"></canvas>
+      <div class="info">
+        <div class="k">กาแล็กซีที่กำลังวัด</div>
+        <div class="v g" id="gName">-</div>
+        <div class="k">ระยะทางจากโลก (วัดจากความสว่างของซูเปอร์โนวาในกาแล็กซีนั้น)</div>
+        <div class="v c" id="gDist">-</div>
+        <div class="k" id="gHint">กาแล็กซีที่อยู่ไกลกว่า ดูเล็กกว่าและจางกว่า</div>
+      </div>
+    </div>
+    <canvas id="cvSpec" height="228" style="margin-top:12px" aria-label="สเปกตรัมของห้องทดลองเทียบกับกาแล็กซี"></canvas>
+    <div class="ctrl">
+      <span class="lbl">เลื่อนเส้นของห้องทดลอง</span>
+      <button class="btn sm" id="sMinus" aria-label="เลื่อนซ้าย 0.1 นาโนเมตร">−</button>
+      <input class="sp" id="slS" type="range" min="0" max="45" step="0.1" value="0" aria-label="ระยะที่เลื่อนเส้น (นาโนเมตร)">
+      <button class="btn sm" id="sPlus" aria-label="เลื่อนขวา 0.1 นาโนเมตร">+</button>
+    </div>
+    <div class="read">
+      <div class="info"><div class="k">เส้นเลื่อนไป (ความยาวคลื่น)</div><div class="v g" id="rShift">0.0 nm</div></div>
+      <div class="info"><div class="k">เลื่อนไปทางสี</div><div class="v r" id="rDir">-</div></div>
+      <div class="info"><div class="k">ความเร็วที่กาแล็กซีเคลื่อนออกห่าง</div><div class="v c" id="rVel">0 km/s</div></div>
+    </div>
+    <div class="lock" id="lockA">ยังไม่ตรง เลื่อนแถบต่อไป (ใช้ปุ่ม − + ปรับละเอียด)</div>
+    <div class="ctrl"><button class="btn gold solid" id="recA" disabled>บันทึกค่า</button><span class="lbl" id="recMsg"></span></div>
+    <table class="log">
+      <thead><tr><th>กาแล็กซี</th><th>ระยะทาง (ล้านปีแสง)</th><th>เส้นเลื่อนไป (nm)</th><th>ความเร็ว (km/s)</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table>
+    <div class="note"><b>วิธีคิดของเครื่อง</b> ความเร็ว = (เส้นเลื่อนไป ÷ 656.3) × 300,000 km/s · 656.3 nm คือความยาวคลื่นของเส้นสีแดงของไฮโดรเจนในห้องทดลอง · 300,000 km/s คืออัตราเร็วแสง · เส้นเลื่อนไปทาง<b style="color:var(--red)">สีแดง</b> (เรดชิฟต์) แปลว่าแหล่งกำเนิดแสงกำลังเคลื่อนที่ออกห่างจากเรา</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : จดเส้นเลื่อนไปและความเร็วของ 6 กาแล็กซี แล้วตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> กราฟฮับเบิล : ยิ่งไกล ยิ่งเร็ว จริงไหม</h2>
+    <p class="how">จุดบนกราฟมาจากค่าที่บันทึกในภารกิจ A เลื่อนแถบ "หมุนเส้นตรง" ให้เส้นผ่านใกล้ทุกจุดมากที่สุด แล้วอ่านค่าความชันและอายุเอกภพ จดลงใบงาน ส่วนที่ 2</p>
+    <canvas id="cvHub" height="330" aria-label="กราฟความเร็วกับระยะทางของกาแล็กซี"></canvas>
+    <div class="msg err" id="hubMsg"></div>
+    <div class="ctrl">
+      <span class="lbl">หมุนเส้นตรง</span>
+      <button class="btn sm" id="hMinus" aria-label="ลดความชัน">−</button>
+      <input class="sp" id="slH" type="range" min="10" max="35" step="0.5" value="12" aria-label="ความชันของเส้นตรง">
+      <button class="btn sm" id="hPlus" aria-label="เพิ่มความชัน">+</button>
+    </div>
+    <div class="read">
+      <div class="info"><div class="k">ความชัน : ทุก 1 ล้านปีแสง ความเร็วเพิ่มขึ้น</div><div class="v g" id="rH">12 km/s</div></div>
+      <div class="info"><div class="k">เส้นตรงนี้</div><div class="v" id="rFit" style="font-size:18px">-</div></div>
+      <div class="info"><div class="k">อายุเอกภพโดยประมาณ = 300,000 ÷ ความชัน</div><div class="v c" id="rAge">-</div></div>
+    </div>
+    <div class="note"><b>ทำไมหารแบบนี้ได้อายุเอกภพ</b> แสงวิ่ง 300,000 km/s ใช้เวลา 1 ล้านปี จึงไปได้ไกล 1 ล้านปีแสง ถ้ากาแล็กซีวิ่งช้ากว่าแสง 300,000 ÷ ความชัน เท่า ก็ต้องใช้เวลานานกว่ากันเท่านั้น (หน่วยเป็นล้านปี) ถ้าย้อนเวลากลับ ทุกกาแล็กซีจึงเคยอยู่รวมกันที่จุดเริ่มต้นเมื่อนานเท่านี้</div>
+
+    <h2 class="mission-h" style="margin-top:16px;font-size:19px"><em>ทดลองต่อ</em> เอกภพมีจุดศูนย์กลางไหม</h2>
+    <p class="how">แตะกาแล็กซีใดก็ได้ให้เป็น "บ้านของเรา" ลูกศรคือความเร็วที่เห็นกาแล็กซีอื่นเคลื่อนที่ออกไป ลองเปลี่ยนบ้านหลาย ๆ ครั้ง</p>
+    <canvas id="cvRaisin" height="260" aria-label="แบบจำลองเอกภพขยายตัว แตะเพื่อเลือกกาแล็กซีบ้าน"></canvas>
+    <div class="note" id="raisinNote">ไม่ว่ายืนอยู่บนกาแล็กซีใด ก็เห็นกาแล็กซีอื่นถอยห่างออกไป และยิ่งไกลยิ่งถอยเร็ว แปลว่าอวกาศทั้งหมดกำลังขยายตัว ไม่มีจุดศูนย์กลาง (เหมือนขนมปังลูกเกดที่กำลังพอง)</div>
+
+    <div class="send">
+      <h3>ส่งข้อมูลเข้ากราฟของทั้งห้อง</h3>
+      <div class="lbl">กดปุ่มนี้ ระบบส่งงาน ES Journey จะเปิดหน้า E2 พร้อมเติมความเร็ว 6 ค่าที่บันทึกไว้ให้ ยืนยันตัวตนแล้วกดส่ง จะได้ <b style="color:var(--gold)">รหัสยืนยันการส่ง</b> ไว้เขียนในใบงาน ส่วนที่ 5 และเห็นกราฟรวมของเพื่อนทั้งห้อง</div>
+      <div class="ctrl"><a class="btn solid" id="sendLink" href="#" target="_blank" rel="noopener">เปิดหน้าส่งงาน E2</a><span class="lbl" id="sendNote"></span></div>
+    </div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : พล็อต 6 จุดลงกราฟในใบงาน ลากเส้นตรง แล้วตอบข้อ 3–5</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> เสาอากาศปริศนา : สัญญาณนี้มาจากไหน</h2>
+    <p class="how">ปี 1964 นักวิทยาศาสตร์ 2 คน ทดสอบเสาอากาศวิทยุรูปปากแตร แต่ได้ยินสัญญาณรบกวนแปลก ๆ ตลอดเวลา นักสืบต้องช่วยหาที่มา : หันเสาอากาศ 5 ทิศ กด "บันทึกค่า" ทุกทิศ (ก่อนแก้) จากนั้นกำจัดต้นเหตุทั้ง 3 อย่าง แล้ววัดทั้ง 5 ทิศอีกครั้ง (หลังแก้)</p>
+    <canvas id="cvAnt" height="250" aria-label="ภาพเสาอากาศและท้องฟ้า"></canvas>
+    <div class="lbl" style="margin-top:8px">หันเสาอากาศไปทาง</div>
+    <div class="dirs" id="dirBtns"></div>
+    <div class="gauge"><div class="bar"><i id="gBar"></i></div><div class="num" id="gNum">-</div></div>
+    <div class="lbl">อุณหภูมิของสัญญาณที่เสาอากาศรับได้ (เคลวิน, K)</div>
+    <div class="lbl" style="margin-top:10px">กำจัดต้นเหตุของสัญญาณรบกวน</div>
+    <div class="fixes" id="fixBtns"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recC">บันทึกค่า</button><span class="lbl" id="recCMsg"></span></div>
+    <table class="log">
+      <thead><tr><th>ทิศที่หัน</th><th>ก่อนแก้ (K)</th><th>หลังแก้ครบ 3 อย่าง (K)</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table>
+    <div class="ctrl"><button class="btn" id="resetC" style="font-size:14px">เริ่มภารกิจ C ใหม่</button></div>
+
+    <div class="reveal hide" id="reveal">
+      <h3>ไขปริศนา : สัญญาณที่มาจากทุกทิศ</h3>
+      <p style="margin:0">แม้กำจัดสัญญาณรบกวนครบแล้ว ยังมีสัญญาณประมาณ <b style="color:var(--gold)">2.7 K</b> เท่ากันทุกทิศ ไม่ได้มาจากโลก ดวงอาทิตย์ หรือกาแล็กซีของเรา นักวิทยาศาสตร์อธิบายว่า นี่คือ <b style="color:var(--cyan)">ไมโครเวฟพื้นหลังของเอกภพ</b> (Cosmic Microwave Background, CMB) แสงเก่าแก่ที่สุดที่เหลือมาตั้งแต่เอกภพยังอายุน้อย ผู้ค้นพบคือ Arno Penzias และ Robert Wilson ได้รับรางวัลโนเบลสาขาฟิสิกส์ ปี 1978</p>
+      <canvas id="cvCMB" height="200" style="margin-top:10px" aria-label="แผนที่ไมโครเวฟพื้นหลังทั่วท้องฟ้า"></canvas>
+      <div class="lbl" style="margin-top:4px">แผนที่ไมโครเวฟพื้นหลังทั่วท้องฟ้า (ภาพจำลอง) จุดสีต่างกันเพียงเล็กน้อยมาก อุณหภูมิเกือบเท่ากันทุกทิศ</div>
+      <div class="chain">
+        <div class="b"><b>3,000 K</b>แสงตอนเอกภพอายุ 380,000 ปี (จากภารกิจ E1)</div><div class="ar">›</div>
+        <div class="b"><b>ขยาย 1,100 เท่า</b>เอกภพขยายตัว คลื่นแสงยืดออกตาม</div><div class="ar">›</div>
+        <div class="b"><b>2.7 K</b>3,000 ÷ 1,100 ≈ 2.7 กลายเป็นคลื่นไมโครเวฟ</div>
+      </div>
+      <div class="quiz" id="quiz"></div>
+      <div class="win hide" id="winC">
+        <div>แฟ้มหลักฐานครบ 2 ชิ้น รหัสผ่านภารกิจ</div>
+        <div class="code">ECHO-1965</div>
+        <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 5</div>
+      </div>
+    </div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : จดอุณหภูมิก่อนแก้และหลังแก้ แล้วตอบข้อ 6–7 · ตอบคำถามท้ายภารกิจให้ถูกครบ จะได้รหัสผ่านภารกิจ</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขใกล้เคียงค่าจริง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var APPS = 'https://script.google.com/macros/s/AKfycbzkzpoUhpadTIDDmsqQ8qlfV2JWanfKlfkibk_ZQLTE-4V0IR_otSDdPBw7PG_FxFLxzg/exec';
+  var C = 300000, HA = 656.3;
+  var LAB = [410.2, 434.0, 486.1, 656.3];
+  var GAL = [
+    { name: 'กังหันน้ำเงิน', type: 'spiral', d: 60, v: 1300, hue: [150, 190, 255] },
+    { name: 'ไข่ทองคำ', type: 'ellip', d: 150, v: 3400, hue: [255, 214, 150] },
+    { name: 'ผีเสื้อคู่', type: 'pair', d: 280, v: 6100, hue: [200, 180, 255] },
+    { name: 'คานเงิน', type: 'barred', d: 420, v: 9300, hue: [190, 215, 255] },
+    { name: 'ดวงตาแดง', type: 'ellip', d: 600, v: 13000, hue: [255, 170, 140] },
+    { name: 'เกลียวไกลสุด', type: 'spiral', d: 850, v: 18800, hue: [210, 190, 255] }
+  ];
+  GAL.forEach(function (g) { g.shift = Math.round(g.v / C * HA * 10) / 10; });
+  var DIRS = [
+    { k: 'N', name: 'ทิศเหนือ' }, { k: 'E', name: 'ทิศตะวันออก', sub: 'ทางเมืองใหญ่' }, { k: 'S', name: 'ทิศใต้' },
+    { k: 'W', name: 'ทิศตะวันตก' }, { k: 'Z', name: 'กลางฟ้า' }
+  ];
+  var FIXES = [
+    { k: 'bird', name: 'ไล่นกพิราบ', sub: 'ทำความสะอาดมูลนกในเสาอากาศ', dT: 0.8 },
+    { k: 'cool', name: 'ทำให้เครื่องรับเย็น', sub: 'ใช้ฮีเลียมเหลวลดความร้อนของอุปกรณ์', dT: 0.5 },
+    { k: 'city', name: 'กรองคลื่นวิทยุเมือง', sub: 'ตัดสัญญาณวิทยุและโทรทัศน์จากเมือง', dT: 0 }
+  ];
+  var CMB = 2.7, CITY = 2.0;
+  var QUIZ = [
+    { q: '1. กาแล็กซียิ่งอยู่ไกล ยิ่งเคลื่อนที่ออกห่างเร็ว เป็นหลักฐานว่าอะไร',
+      o: ['เอกภพกำลังขยายตัว', 'โลกเป็นจุดศูนย์กลางของเอกภพ', 'กาแล็กซีกำลังจะชนกัน'], a: 0 },
+    { q: '2. ไมโครเวฟพื้นหลังของเอกภพ มาจากอะไร',
+      o: ['คลื่นจากเตาไมโครเวฟและโทรศัพท์มือถือ', 'แสงที่หลงเหลือจากเอกภพยุคแรก ซึ่งยืดออกจนเป็นไมโครเวฟ', 'แสงจากดวงอาทิตย์ที่สะท้อนดวงจันทร์'], a: 1 },
+    { q: '3. ทำไมไมโครเวฟพื้นหลังจึงเย็นมาก เหลือเพียงประมาณ 2.7 K',
+      o: ['เพราะถูกฝุ่นในอวกาศบังไว้', 'เพราะอยู่ไกลจากดวงอาทิตย์', 'เพราะเอกภพขยายตัว คลื่นแสงยืดออก จึงเย็นลง'], a: 2 }
+  ];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e2_sim_v1';
+  var S = load() || { recA: {}, before: {}, after: {}, fixed: {}, quiz: {} };
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function fix1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
+
+  // canvas ตามขนาดจอ (คมชัดบนมือถือ)
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function stars(x, W, H, seed, n) {
+    var r = rnd(seed); x.fillStyle = '#02040d'; x.fillRect(0, 0, W, H);
+    for (var i = 0; i < n; i++) { x.globalAlpha = .25 + r() * .6; x.fillStyle = '#fff'; x.beginPath(); x.arc(r() * W, r() * H, r() * 1.1 + .2, 0, 6.28); x.fill(); }
+    x.globalAlpha = 1;
+  }
+  // สีของแสงตามความยาวคลื่น (nm)
+  function wl(l) {
+    var r = 0, g = 0, b = 0;
+    if (l < 440) { r = -(l - 440) / 60; b = 1; } else if (l < 490) { g = (l - 440) / 50; b = 1; } else if (l < 510) { g = 1; b = -(l - 510) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; } else if (l < 645) { r = 1; g = -(l - 645) / 65; } else { r = 1; }
+    var f = l < 420 ? .3 + .7 * (l - 380) / 40 : l > 700 ? .3 + .7 * (750 - l) / 50 : 1;
+    f = Math.max(.25, Math.min(1, f));
+    return 'rgb(' + Math.round(255 * r * f) + ',' + Math.round(255 * g * f) + ',' + Math.round(255 * b * f) + ')';
+  }
+
+  // ---------------------------------------------------------------- แท็บ
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ---------------------------------------------------------------- ภารกิจ A
+  var cur = 0, sVal = 0;
+  function chipsA() {
+    var h = '';
+    GAL.forEach(function (g, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (S.recA[i] ? ' done' : '') + '" data-i="' + i + '">' + (i + 1) + ' ' + g.name + '</button>'; });
+    $('galChips').innerHTML = h;
+    Array.prototype.forEach.call($('galChips').children, function (b) {
+      b.onclick = function () { cur = +b.getAttribute('data-i'); sVal = S.recA[cur] ? S.recA[cur].s : 0; $('slS').value = sVal; chipsA(); updA(); };
+    });
+  }
+  function drawGal() {
+    var c = fit($('cvGal')), x = c.x, W = c.W, H = c.H, g = GAL[cur];
+    stars(x, W, H, 7 + cur, 120);
+    var r = rnd(100 + cur), sc = Math.max(.32, Math.min(1, 70 / Math.sqrt(g.d * 9))) * Math.min(W, H) * .42, cx = W / 2, cy = H / 2;
+    var bright = Math.max(.35, 1 - g.d / 1300), hu = g.hue;
+    var col = function (a) { return 'rgba(' + hu[0] + ',' + hu[1] + ',' + hu[2] + ',' + a * bright + ')'; };
+    function core(px, py, rr, a) {
+      var gr = x.createRadialGradient(px, py, 0, px, py, rr);
+      gr.addColorStop(0, 'rgba(255,250,235,' + a * bright + ')'); gr.addColorStop(.35, col(.55 * a)); gr.addColorStop(1, col(0));
+      x.fillStyle = gr; x.beginPath(); x.arc(px, py, rr, 0, 6.28); x.fill();
+    }
+    if (g.type === 'ellip') {
+      x.save(); x.translate(cx, cy); x.scale(1.35, .85); core(0, 0, sc, 1); x.restore();
+    } else if (g.type === 'pair') {
+      core(cx - sc * .45, cy - sc * .1, sc * .7, 1); core(cx + sc * .5, cy + sc * .15, sc * .55, .9);
+      for (var i = 0; i < 500; i++) { var t = r(); x.fillStyle = col(.5 * r()); x.fillRect(cx - sc * .45 + t * sc * .95 + (r() - .5) * sc * .3, cy - sc * .1 + t * sc * .25 + Math.sin(t * 6) * sc * .25, 1.3, 1.3); }
+    } else {
+      var arms = 2, tilt = .55;
+      for (var j = 0; j < 1600; j++) {
+        var arm = j % arms, t2 = Math.pow(r(), .8), th = t2 * 3.4 * Math.PI + arm * Math.PI + (r() - .5) * .55, rr = t2 * sc;
+        var px = rr * Math.cos(th), py = rr * Math.sin(th) * tilt;
+        if (g.type === 'barred' && t2 < .3) { px = (t2 / .3 - .5) * sc * .7 + (r() - .5) * 6; py = (r() - .5) * 6; }
+        x.fillStyle = col(.25 + .6 * r()); x.fillRect(cx + px, cy + py, 1.4, 1.4);
+      }
+      core(cx, cy, sc * .45, 1);
+    }
+    x.fillStyle = '#9AA6CF'; x.font = '13px Sarabun, sans-serif'; x.fillText('กล้องโทรทรรศน์ · กาแล็กซีที่ ' + (cur + 1), 10, H - 10);
+  }
+  function drawSpec() {
+    var c = fit($('cvSpec')), x = c.x, W = c.W, H = c.H, g = GAL[cur];
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var L0 = 380, L1 = 720, pad = 14, bw = W - pad * 2, X = function (l) { return pad + (l - L0) / (L1 - L0) * bw; };
+    var y1 = 34, y2 = 128, bh = 56;
+    // แถบสีสเปกตรัม 2 แถบ
+    for (var px = 0; px < bw; px++) {
+      var l = L0 + px / bw * (L1 - L0);
+      x.fillStyle = wl(l); x.globalAlpha = .55; x.fillRect(pad + px, y1, 1.2, bh);
+      x.globalAlpha = .9; x.fillRect(pad + px, y2, 1.2, bh);
+    }
+    x.globalAlpha = 1;
+    x.font = '600 13px "Chakra Petch", Sarabun, sans-serif'; x.fillStyle = '#E8EDFF';
+    x.fillText('แสงไฮโดรเจนในห้องทดลองบนโลก (เส้นสีขาว เลื่อนได้)', pad, y1 - 9);
+    x.fillText('แสงจากกาแล็กซี ' + g.name + ' (เส้นมืด)', pad, y2 - 9);
+    // เส้นมืดของกาแล็กซี
+    var z = g.v / C;
+    LAB.forEach(function (l0) { var lx = X(l0 * (1 + z)); x.fillStyle = '#000'; x.fillRect(lx - 2, y2, 4, bh); });
+    // เส้นสีขาวของห้องทดลอง (เลื่อนตามแถบ ใช้สัดส่วนเดียวกับเส้นสีแดง)
+    var zz = sVal / HA, ok = Math.abs(sVal - g.shift) <= 0.6;
+    LAB.forEach(function (l0) {
+      var lx = X(l0 * (1 + zz));
+      x.fillStyle = '#fff'; x.shadowColor = ok ? '#5EF2A5' : '#fff'; x.shadowBlur = ok ? 12 : 5; x.fillRect(lx - 1.5, y1, 3, bh); x.shadowBlur = 0;
+      x.strokeStyle = ok ? 'rgba(94,242,165,.9)' : 'rgba(255,255,255,.28)'; x.setLineDash(ok ? [] : [4, 4]); x.lineWidth = ok ? 2 : 1;
+      x.beginPath(); x.moveTo(lx, y1 + bh); x.lineTo(lx, y2); x.stroke(); x.setLineDash([]);
+    });
+    // เส้นอ้างอิงตำแหน่งเดิมของเส้นสีแดง
+    var x0 = X(HA);
+    x.strokeStyle = 'rgba(255,209,102,.8)'; x.lineWidth = 1; x.setLineDash([3, 3]); x.beginPath(); x.moveTo(x0, y1 - 2); x.lineTo(x0, y2 + bh + 4); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#FFD166'; x.font = '12px Sarabun, sans-serif'; x.fillText('656.3 nm', x0 - 22, y2 + bh + 16);
+    // แกนความยาวคลื่น
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif';
+    [400, 450, 500, 550, 600].forEach(function (l) { x.fillText(l, X(l) - 10, y2 + bh + 16); });
+    x.fillText("ความยาวคลื่น (nm)", W / 2 - 50, H - 4);
+    x.fillStyle = '#7aa8ff'; x.fillText('สีน้ำเงิน', pad, H - 4); x.fillStyle = '#FF5C5C'; x.fillText('สีแดง', W - pad - 30, H - 4);
+  }
+  function velOf(s) { return Math.round(s / HA * C / 100) * 100; }
+  function updA() {
+    var g = GAL[cur];
+    $('gName').textContent = (cur + 1) + ' · ' + g.name;
+    $('gDist').textContent = fmt(g.d) + ' ล้านปีแสง';
+    $('rShift').textContent = fix1(sVal) + ' nm';
+    $('rDir').textContent = sVal > 0.05 ? 'แดง' : '-';
+    $('rVel').textContent = fmt(velOf(sVal)) + ' km/s';
+    var ok = Math.abs(sVal - g.shift) <= 0.6;
+    $('lockA').className = 'lock' + (ok ? ' on' : '');
+    $('lockA').textContent = ok ? 'เส้นตรงกันแล้ว กด "บันทึกค่า" ได้เลย' : (sVal < g.shift ? 'ยังไม่ตรง เลื่อนไปทางขวาอีก (ใช้ปุ่ม − + ปรับละเอียด)' : 'เลยไปแล้ว เลื่อนกลับทางซ้ายเล็กน้อย');
+    $('recA').disabled = !ok;
+    drawSpec();
+  }
+  function logA() {
+    var h = '';
+    GAL.forEach(function (g, i) {
+      var r = S.recA[i];
+      h += '<tr><td class="n">' + (i + 1) + ' ' + g.name + '</td><td>' + fmt(g.d) + '</td><td>' + (r ? fix1(r.s) : '-') + '</td><td style="color:var(--cyan)">' + (r ? fmt(r.v) : '-') + '</td></tr>';
+    });
+    $('logA').innerHTML = h;
+  }
+  function setS(v) { sVal = Math.max(0, Math.min(45, Math.round(v * 10) / 10)); $('slS').value = sVal; updA(); }
+  $('slS').oninput = function () { setS(+this.value); };
+  $('sMinus').onclick = function () { setS(sVal - 0.1); };
+  $('sPlus').onclick = function () { setS(sVal + 0.1); };
+  $('recA').onclick = function () {
+    S.recA[cur] = { s: sVal, v: velOf(sVal) }; save(); logA(); chipsA(); updSend();
+    var n = Object.keys(S.recA).length;
+    $('recMsg').textContent = 'บันทึกแล้ว ' + n + '/6 กาแล็กซี' + (n === 6 ? ' ครบแล้ว ไปภารกิจ B ได้' : '');
+    if (n < 6) { for (var k = 1; k <= 6; k++) { var j = (cur + k) % 6; if (!S.recA[j]) { cur = j; sVal = 0; $('slS').value = 0; break; } } chipsA(); setTimeout(function () { drawGal(); updA(); }, 350); }
+    else updA();
+  };
+
+  // ---------------------------------------------------------------- ภารกิจ B
+  var H0 = 12;
+  function pts() { var a = []; GAL.forEach(function (g, i) { if (S.recA[i]) a.push({ d: g.d, v: S.recA[i].v, i: i }); }); return a; }
+  function best(p) { var n = 0, dd = 0; p.forEach(function (q) { n += q.d * q.v; dd += q.d * q.d; }); return dd ? n / dd : 0; }
+  function drawHub() {
+    var c = fit($('cvHub')), x = c.x, W = c.W, H = c.H, p = pts();
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var l = 70, r = 14, t = 16, b = 44, gw = W - l - r, gh = H - t - b, XM = 900, YM = 20000;
+    var X = function (d) { return l + d / XM * gw; }, Y = function (v) { return t + gh - v / YM * gh; };
+    x.strokeStyle = '#1d2a5c'; x.lineWidth = 1; x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF';
+    for (var d = 0; d <= XM; d += 100) { x.beginPath(); x.moveTo(X(d), t); x.lineTo(X(d), t + gh); x.stroke(); if (d % 200 === 0 || W > 560) x.fillText(d, X(d) - (d ? 10 : 3), t + gh + 15); }
+    for (var v = 0; v <= YM; v += 2500) { x.beginPath(); x.moveTo(l, Y(v)); x.lineTo(l + gw, Y(v)); x.stroke(); if (v % 5000 === 0) x.fillText(fmt(v), 22, Y(v) + 4); }
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 1.5; x.strokeRect(l, t, gw, gh);
+    x.fillStyle = '#E8EDFF'; x.font = '600 13px "Chakra Petch", Sarabun, sans-serif';
+    x.fillText('ระยะทาง (ล้านปีแสง)', l + gw / 2 - 60, H - 8);
+    x.save(); x.translate(15, t + gh / 2 + 50); x.rotate(-Math.PI / 2); x.fillText('ความเร็ว (km/s)', 0, 0); x.restore();
+    // เส้นตรง
+    var ex = Math.min(XM, YM / H0);
+    x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.shadowColor = '#FFD166'; x.shadowBlur = 8;
+    x.beginPath(); x.moveTo(X(0), Y(0)); x.lineTo(X(ex), Y(ex * H0)); x.stroke(); x.shadowBlur = 0;
+    // จุด
+    p.forEach(function (q) {
+      x.fillStyle = '#4FD8FF'; x.shadowColor = '#4FD8FF'; x.shadowBlur = 10; x.beginPath(); x.arc(X(q.d), Y(q.v), 6, 0, 6.28); x.fill(); x.shadowBlur = 0;
+      x.fillStyle = '#E8EDFF'; x.font = '12px Sarabun, sans-serif'; x.fillText(q.i + 1, X(q.d) + 8, Y(q.v) - 6);
+    });
+  }
+  function updB() {
+    var p = pts(), hb = best(p);
+    $('hubMsg').textContent = p.length < 6 ? 'บันทึกในภารกิจ A แล้ว ' + p.length + '/6 กาแล็กซี (ควรวัดให้ครบ 6 ก่อน ผลจะแม่นที่สุด)' : '';
+    $('rH').textContent = (H0 % 1 ? H0.toFixed(1) : H0) + ' km/s';
+    var ok = p.length >= 4 && Math.abs(H0 - hb) <= 0.75;
+    $('rFit').innerHTML = p.length < 4 ? '<span style="color:var(--muted)">ต้องมีอย่างน้อย 4 จุด</span>' :
+      ok ? '<span style="color:var(--ok)">ผ่านใกล้ทุกจุดที่สุดแล้ว</span>' : (H0 < hb ? '<span style="color:var(--orange)">ต่ำเกินไป หมุนขึ้นอีก</span>' : '<span style="color:var(--orange)">ชันเกินไป หมุนลงอีก</span>');
+    $('rAge').textContent = ok ? fmt(Math.round(C / H0 / 100) * 100) + ' ล้านปี' : '-';
+    drawHub();
+  }
+  function setH(v) { H0 = Math.max(10, Math.min(35, Math.round(v * 2) / 2)); $('slH').value = H0; updB(); }
+  $('slH').oninput = function () { setH(+this.value); };
+  $('hMinus').onclick = function () { setH(H0 - 0.5); };
+  $('hPlus').onclick = function () { setH(H0 + 0.5); };
+  function updSend() {
+    var vs = GAL.map(function (g, i) { return S.recA[i] ? S.recA[i].v : ''; });
+    var n = vs.filter(function (v) { return v !== ''; }).length;
+    $('sendLink').href = APPS + '?a=E2&v=' + vs.join('-');
+    $('sendNote').textContent = n === 6 ? 'ความเร็วครบ 6 ค่า พร้อมส่ง' : 'บันทึกแล้ว ' + n + '/6 ค่า (ค่าที่ขาดพิมพ์เองในหน้าส่งงานได้)';
+  }
+
+  // ขนมปังลูกเกด : เลือกบ้าน
+  var RG = (function () { var r = rnd(2026), a = []; for (var i = 0; i < 16; i++) a.push({ x: r() * .84 + .08, y: r() * .76 + .12 }); return a; })();
+  var home = 0, tt = 0, raf = 0;
+  function drawRaisin() {
+    var c = fit($('cvRaisin')), x = c.x, W = c.W, H = c.H;
+    stars(x, W, H, 99, 70);
+    var k = 1 + .18 * (.5 - .5 * Math.cos(tt)), hx = RG[home].x * W, hy = RG[home].y * H;
+    RG.forEach(function (g, i) {
+      var px = hx + (g.x * W - hx) * k, py = hy + (g.y * H - hy) * k;
+      if (i !== home) {
+        var dx = g.x * W - hx, dy = g.y * H - hy, s = .22;
+        x.strokeStyle = 'rgba(255,209,102,.85)'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(px, py); x.lineTo(px + dx * s, py + dy * s); x.stroke();
+        var a = Math.atan2(dy, dx), ex = px + dx * s, ey = py + dy * s;
+        x.fillStyle = 'rgba(255,209,102,.95)'; x.beginPath(); x.moveTo(ex, ey); x.lineTo(ex - 7 * Math.cos(a - .45), ey - 7 * Math.sin(a - .45)); x.lineTo(ex - 7 * Math.cos(a + .45), ey - 7 * Math.sin(a + .45)); x.fill();
+      }
+      var gr = x.createRadialGradient(px, py, 0, px, py, i === home ? 13 : 8);
+      gr.addColorStop(0, '#fff'); gr.addColorStop(.4, i === home ? '#5EF2A5' : '#A77BFF'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      x.fillStyle = gr; x.beginPath(); x.arc(px, py, i === home ? 13 : 8, 0, 6.28); x.fill();
+    });
+    x.fillStyle = '#5EF2A5'; x.font = '600 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText('บ้านของเรา', Math.min(W - 80, hx + 14), hy - 12);
+  }
+  function loop() { tt += .025; drawRaisin(); raf = tab === 'B' && !reduce ? requestAnimationFrame(loop) : 0; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('cvRaisin').addEventListener('click', function (ev) {
+    var rc = this.getBoundingClientRect(), mx = (ev.clientX - rc.left) / rc.width, my = (ev.clientY - rc.top) / rc.height, bi = 0, bd = 9;
+    RG.forEach(function (g, i) { var d = Math.hypot(g.x - mx, (g.y - my) * rc.height / rc.width); if (d < bd) { bd = d; bi = i; } });
+    home = bi; drawRaisin();
+  });
+
+  // ---------------------------------------------------------------- ภารกิจ C
+  var dir = 0;
+  function nFix() { return FIXES.filter(function (f) { return S.fixed[f.k]; }).length; }
+  function reading(di) {
+    var t = CMB;
+    if (!S.fixed.bird) t += .8;
+    if (!S.fixed.cool) t += .5;
+    if (DIRS[di].k === 'E' && !S.fixed.city) t += CITY;
+    return Math.round(t * 10) / 10;
+  }
+  function btnsC() {
+    var h = '';
+    DIRS.forEach(function (d, i) { h += '<button class="dir' + (i === dir ? ' on' : '') + '" data-i="' + i + '">' + d.name + (d.sub ? '<br><small style="color:var(--muted);font-family:var(--body)">' + d.sub + '</small>' : '') + '</button>'; });
+    $('dirBtns').innerHTML = h;
+    Array.prototype.forEach.call($('dirBtns').children, function (b) { b.onclick = function () { dir = +b.getAttribute('data-i'); btnsC(); updC(); }; });
+    h = '';
+    FIXES.forEach(function (f) { h += '<button class="fix' + (S.fixed[f.k] ? ' done' : '') + '" data-k="' + f.k + '">' + f.name + '<small>' + (S.fixed[f.k] ? 'แก้แล้ว' : f.sub) + '</small></button>'; });
+    $('fixBtns').innerHTML = h;
+    Array.prototype.forEach.call($('fixBtns').children, function (b) {
+      b.onclick = function () {
+        var k = b.getAttribute('data-k'); if (S.fixed[k]) return;
+        var bc = DIRS.filter(function (d) { return S.before[d.k] !== undefined; }).length;
+        if (bc < 5) { $('recCMsg').innerHTML = '<span style="color:var(--orange)">บันทึกค่า "ก่อนแก้" ให้ครบ 5 ทิศก่อน แล้วค่อยกำจัดต้นเหตุ</span>'; return; }
+        S.fixed[k] = 1; save(); btnsC(); updC();
+        $('recCMsg').textContent = nFix() === 3 ? 'แก้ครบ 3 อย่างแล้ว หันเสาอากาศวัดใหม่ทั้ง 5 ทิศ แล้วกดบันทึกค่า' : 'แก้แล้ว ' + nFix() + '/3 อย่าง';
+      };
+    });
+  }
+  function drawAnt() {
+    var c = fit($('cvAnt')), x = c.x, W = c.W, H = c.H, d = DIRS[dir].k, T = reading(dir);
+    var sky = x.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#0a1036'); sky.addColorStop(1, '#1b2a5c');
+    x.fillStyle = sky; x.fillRect(0, 0, W, H);
+    var r = rnd(5); for (var i = 0; i < 70; i++) { x.globalAlpha = .3 + r() * .5; x.fillStyle = '#fff'; x.fillRect(r() * W, r() * H * .7, 1.3, 1.3); } x.globalAlpha = 1;
+    // พื้นและเมืองทางขวา (ทิศตะวันออก)
+    var gy = H - 46; x.fillStyle = '#0d1d2e'; x.fillRect(0, gy, W, H - gy);
+    var bx = W - 150; for (var j = 0; j < 9; j++) { var bh = 18 + (j * 37 % 46); x.fillStyle = '#16233a'; x.fillRect(bx + j * 16, gy - bh, 13, bh); x.fillStyle = 'rgba(255,209,102,.6)'; for (var w = 0; w < bh - 6; w += 8) x.fillRect(bx + j * 16 + 4, gy - bh + 4 + w, 3, 3); }
+    x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('เมืองใหญ่ (ทิศตะวันออก)', W - 150, gy + 30);
+    if (!S.fixed.city) { x.strokeStyle = 'rgba(255,107,138,.55)'; x.lineWidth = 1.5; for (var q = 1; q <= 3; q++) { x.beginPath(); x.arc(W - 80, gy - 46, q * 14, Math.PI * 1.05, Math.PI * 1.6); x.stroke(); } }
+    // เสาอากาศปากแตร
+    var ax = W * .32, ay = gy, ang = { N: -2.2, E: -.35, S: -1.0, W: -2.8, Z: -1.57 }[d];
+    x.fillStyle = '#2b3a66'; x.fillRect(ax - 30, ay - 18, 60, 18);
+    x.save(); x.translate(ax, ay - 30); x.rotate(ang);
+    x.fillStyle = '#c9d3ff'; x.beginPath(); x.moveTo(0, -9); x.lineTo(120, -40); x.lineTo(120, 40); x.lineTo(0, 9); x.closePath(); x.fill();
+    x.fillStyle = '#8b97c7'; x.fillRect(-30, -9, 34, 18);
+    if (!S.fixed.bird) { x.fillStyle = '#ffffff'; for (var p = 0; p < 7; p++) { x.beginPath(); x.arc(40 + p * 11, (p % 3 - 1) * 9, 2.4, 0, 6.28); x.fill(); } }
+    x.restore();
+    if (!S.fixed.bird) { x.fillStyle = '#d7dbe8'; [[ax - 14, ay - 70], [ax + 30, ay - 92]].forEach(function (b) { x.beginPath(); x.ellipse(b[0], b[1], 9, 6, 0, 0, 6.28); x.fill(); x.beginPath(); x.arc(b[0] + 8, b[1] - 4, 4, 0, 6.28); x.fill(); }); x.fillStyle = '#9AA6CF'; x.fillText('นกพิราบทำรังในเสาอากาศ', ax - 50, ay - 108); }
+    x.fillStyle = S.fixed.cool ? '#4FD8FF' : '#FF9F6B'; x.fillRect(ax - 26, ay - 14, 52, 10);
+    x.fillStyle = '#06102A'; x.font = '600 10px Sarabun, sans-serif'; x.fillText(S.fixed.cool ? 'เครื่องรับเย็น' : 'เครื่องรับร้อน', ax - 24, ay - 6);
+    // คลื่นสัญญาณเข้าเสาอากาศ (ทุกทิศมีคลื่นพื้นหลัง)
+    x.strokeStyle = 'rgba(167,123,255,.55)'; x.lineWidth = 1.3;
+    for (var s = 0; s < 6; s++) { var sx = (s + .5) * W / 6; x.beginPath(); for (var yy = 6; yy < gy - 70; yy += 3) x.lineTo(sx + Math.sin(yy / 6 + s) * 4, yy); x.stroke(); }
+    x.fillStyle = '#E8EDFF'; x.font = '600 14px "Chakra Petch", Sarabun, sans-serif'; x.fillText('หันไป' + DIRS[dir].name + ' · อ่านได้ ' + fix1(T) + ' K', 10, 20);
+  }
+  function updC() {
+    var T = reading(dir);
+    $('gNum').textContent = fix1(T) + ' K';
+    $('gBar').style.width = Math.min(100, T / 6.5 * 100) + '%';
+    drawAnt(); logC();
+  }
+  function logC() {
+    var h = '';
+    DIRS.forEach(function (d) {
+      h += '<tr><td class="n">' + d.name + '</td><td>' + (S.before[d.k] !== undefined ? fix1(S.before[d.k]) : '-') + '</td><td style="color:var(--gold)">' + (S.after[d.k] !== undefined ? fix1(S.after[d.k]) : '-') + '</td></tr>';
+    });
+    $('logC').innerHTML = h;
+    var ac = DIRS.filter(function (d) { return S.after[d.k] !== undefined; }).length;
+    $('reveal').classList.toggle('hide', ac < 5);
+    if (ac >= 5) { drawCMB(); quiz(); }
+  }
+  $('recC').onclick = function () {
+    var k = DIRS[dir].k, f = nFix(), T = reading(dir);
+    if (f === 0) { S.before[k] = T; $('recCMsg').textContent = 'บันทึก "ก่อนแก้" ' + DIRS[dir].name + ' แล้ว'; }
+    else if (f === 3) { S.after[k] = T; $('recCMsg').textContent = 'บันทึก "หลังแก้" ' + DIRS[dir].name + ' แล้ว'; }
+    else { $('recCMsg').innerHTML = '<span style="color:var(--orange)">กำลังแก้อยู่ ' + f + '/3 อย่าง กำจัดต้นเหตุให้ครบ 3 อย่างก่อน แล้วค่อยบันทึก "หลังแก้"</span>'; return; }
+    save(); logC();
+    var next = -1; for (var i = 1; i <= 5; i++) { var j = (dir + i) % 5, kk = DIRS[j].k; if ((f === 0 ? S.before : S.after)[kk] === undefined) { next = j; break; } }
+    if (next >= 0) { dir = next; btnsC(); updC(); }
+    else if (f === 0) $('recCMsg').textContent = 'ก่อนแก้ครบ 5 ทิศแล้ว สังเกตว่าทิศไหนสูงผิดปกติ จากนั้นกดกำจัดต้นเหตุทั้ง 3 อย่าง';
+    else $('recCMsg').textContent = 'หลังแก้ครบ 5 ทิศแล้ว สัญญาณที่เหลือเท่ากันทุกทิศ เลื่อนลงไปไขปริศนา';
+  };
+  $('resetC').onclick = function () { S.before = {}; S.after = {}; S.fixed = {}; S.quiz = {}; save(); dir = 0; $('recCMsg').textContent = ''; btnsC(); updC(); };
+
+  function drawCMB() {
+    var c = fit($('cvCMB')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var cx = W / 2, cy = H / 2, rx = Math.min(W * .46, H * .95), ry = rx / 2, r = rnd(1965);
+    x.save(); x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, 6.28); x.clip();
+    var g = x.createLinearGradient(0, cy - ry, 0, cy + ry); g.addColorStop(0, '#2a4fd0'); g.addColorStop(1, '#1d3aa8'); x.fillStyle = g; x.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+    var cols = ['rgba(255,209,102,.35)', 'rgba(255,159,107,.3)', 'rgba(79,216,255,.25)', 'rgba(40,60,200,.4)', 'rgba(255,92,92,.22)'];
+    for (var i = 0; i < 1500; i++) { var px = cx + (r() * 2 - 1) * rx, py = cy + (r() * 2 - 1) * ry, s = 1.5 + r() * 5; x.fillStyle = cols[i % cols.length]; x.beginPath(); x.arc(px, py, s, 0, 6.28); x.fill(); }
+    x.restore();
+    x.strokeStyle = '#9AA6CF'; x.lineWidth = 1.2; x.beginPath(); x.ellipse(cx, cy, rx, ry, 0, 0, 6.28); x.stroke();
+  }
+  function quiz() {
+    var h = '<div style="font-family:var(--head);font-size:18px;margin-top:8px">แฟ้มหลักฐาน : ตอบให้ถูกครบ 3 ข้อ</div>';
+    QUIZ.forEach(function (q, i) {
+      h += '<div class="qq"><div class="t">' + q.q + '</div><div class="opts">';
+      q.o.forEach(function (o, j) { h += '<button class="opt' + (S.quiz[i] === j ? ' ok' : '') + '" data-q="' + i + '" data-o="' + j + '">' + o + '</button>'; });
+      h += '</div></div>';
+    });
+    $('quiz').innerHTML = h;
+    Array.prototype.forEach.call($('quiz').querySelectorAll('.opt'), function (b) {
+      b.onclick = function () {
+        var qi = +b.getAttribute('data-q'), oj = +b.getAttribute('data-o');
+        if (QUIZ[qi].a === oj) { S.quiz[qi] = oj; save(); quiz(); }
+        else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); }
+      };
+    });
+    var done = QUIZ.every(function (q, i) { return S.quiz[i] === q.a; });
+    $('winC').classList.toggle('hide', !done);
+  }
+
+  // ---------------------------------------------------------------- เริ่มต้น
+  function drawAll() {
+    if (tab === 'A') { drawGal(); updA(); }
+    if (tab === 'B') { updB(); if (!raf) loop(); }
+    if (tab === 'C') { updC(); }
+    var n = Object.keys(S.recA).length, tb = document.querySelectorAll('.tab');
+    tb[0].querySelector('b').innerHTML = 'ภารกิจ A' + (n === 6 ? ' <span class="dn">ครบ</span>' : '');
+    var ac = DIRS.filter(function (d) { return S.after[d.k] !== undefined; }).length;
+    tb[2].querySelector('b').innerHTML = 'ภารกิจ C' + (QUIZ.every(function (q, i) { return S.quiz[i] === q.a; }) && ac >= 5 ? ' <span class="dn">ครบ</span>' : '');
+  }
+  chipsA(); logA(); btnsC(); updSend();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  $('recA').addEventListener('click', drawAll);
+})();
+</script>
+</body>
+</html>

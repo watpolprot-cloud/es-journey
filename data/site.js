@@ -13,7 +13,7 @@ ESJ.site = {
   ],
   links: [
     { title: "ลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน)", url: "https://script.google.com/macros/s/AKfycbzkzpoUhpadTIDDmsqQ8qlfV2JWanfKlfkibk_ZQLTE-4V0IR_otSDdPBw7PG_FxFLxzg/exec", note: "สัปดาห์ที่ 1 · เปิดรับเฉพาะในคาบ" },
-    { title: "ส่งกิจกรรมออนไลน์ (Apps Script)", url: "", note: "เปิดใช้ตั้งแต่สัปดาห์ที่ 3" },
+    { title: "ส่งกิจกรรมออนไลน์ (Apps Script)", url: "https://script.google.com/macros/s/AKfycbzkzpoUhpadTIDDmsqQ8qlfV2JWanfKlfkibk_ZQLTE-4V0IR_otSDdPBw7PG_FxFLxzg/exec", note: "หน้าแรกเลือกกิจกรรม · เลือกรหัสงานให้ตรงกับที่ครูบอก" },
     { title: "สอบกลางภาคออนไลน์", url: "", note: "เปิดสัปดาห์ที่ 9 · สอบซ้ำได้ไม่จำกัด" }
   ]
 };
