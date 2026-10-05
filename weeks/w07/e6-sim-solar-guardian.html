@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E6 ผู้พิทักษ์ระบบสุริยะ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E6 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-E5) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #1c3a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.star-tag { display: inline-block; font-family: var(--head); font-size: 13px; color: var(--ink); background: var(--gold); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15.5px; line-height: 1.5; }
+.gauge .g { border-top: 1px dashed var(--line-hi); padding-top: 6px; margin-top: 4px; }
+.meter { font-family: var(--head); font-size: 40px; font-weight: 700; color: var(--ok); letter-spacing: .04em; text-shadow: 0 0 14px #5ef2a555; line-height: 1.1; }
+.pf { display: flex; justify-content: space-between; gap: 6px; font-size: 14.5px; line-height: 1.3; }
+.pf b { font-family: var(--head); font-size: 13.5px; border-radius: 999px; padding: 0 9px; white-space: nowrap; }
+.pf b.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.pf b.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+.verdict { font-family: var(--head); font-weight: 700; font-size: 18px; line-height: 1.25; border-radius: 10px; padding: 6px 10px; margin-top: 4px; }
+.verdict.y { background: #5ef2a51c; color: var(--ok); border: 1.5px solid var(--ok); }
+.verdict.n { background: #ff9f6b14; color: var(--orange); border: 1.5px solid var(--orange); }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.note.c { border-left-color: var(--cyan); background: #4fd8ff0d; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.stepnav { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.stepnav .chip { min-width: 38px; text-align: center; }
+.zones { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; }
+.zb { font-family: var(--head); font-size: 14px; line-height: 1.2; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 6px; cursor: pointer; text-align: center; }
+.zb i { display: block; height: 4px; border-radius: 2px; margin: 0 auto 4px; width: 60%; }
+.zb.on { border-color: var(--cyan); box-shadow: 0 0 12px #4fd8ff33; }
+.zb.full { border-color: var(--ok); }
+.alerts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .h { font-family: var(--head); font-size: 16px; color: var(--gold); line-height: 1.3; margin: 2px 0 2px; }
+.al .q { font-size: 14.5px; color: var(--muted); margin-bottom: 4px; }
+.al button { display: block; width: 100%; text-align: left; font-family: var(--body); font-size: 14.5px; line-height: 1.35; margin-top: 5px; padding: 5px 9px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.events { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 14px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .kw { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+.read { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .alerts, .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .zones { grid-template-columns: 1fr 1fr; }
+  .read { grid-template-columns: 1fr; }
+  .info .v { font-size: 21px; }
+  .meter { font-size: 34px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E6 <span class="star-tag">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ผู้พิทักษ์<b>ระบบสุริยะ</b></h1>
+  <p class="lead">นักบินได้รับแต่งตั้งเป็นผู้พิทักษ์ระบบสุริยะ ภารกิจนี้ย้อนเวลาไปดูการเกิดระบบสุริยะและจัดเขตบริวาร ทดลองหาว่าดาวเคราะห์แบบไหนเอื้อต่อการดำรงชีวิต แล้วเข้าประจำศูนย์เฝ้าระวังพายุสุริยะเพื่อเตือนภัยให้โลกและประเทศไทย จดผลลงใบงาน E6</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>กำเนิดระบบสุริยะ<small>ย้อนเวลา + จัดเขตบริวาร</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ห้องทดลองดาวเคราะห์<small>ดาวแบบไหนเอื้อต่อชีวิต</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์เฝ้าระวังพายุสุริยะ<small>ดวงอาทิตย์ ลมสุริยะ เตือนภัย</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> กำเนิดระบบสุริยะและเขตบริวาร</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> กดเลข 1 ถึง 5 (หรือปุ่มถัดไป) ย้อนเวลาไปดูระบบสุริยะเกิดขึ้นทีละขั้น ดูให้ครบ 5 ขั้น · <b style="color:#4FD8FF">ขั้นที่ 2</b> แตะชื่อวัตถุ แล้วแตะเขตที่วัตถุนั้นอยู่ จัดให้ครบทุกดวง ตารางเขตบริวารจะเติมให้ แล้วจดลงใบงาน ส่วนที่ 1</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> เครื่องย้อนเวลา 4,600 ล้านปี</h2>
+    <div class="twin">
+      <canvas id="cvForm" height="330" aria-label="ภาพจำลองการเกิดระบบสุริยะจากเนบิวลาสุริยะ"></canvas>
+      <div class="info">
+        <div class="k" id="fNo">ขั้นที่ 1 / 5</div>
+        <h3 id="fName">-</h3>
+        <div class="k" id="fTime">-</div>
+        <div class="d" id="fDesc">-</div>
+      </div>
+    </div>
+    <div class="stepnav"><button class="btn" id="fPrev">ก่อนหน้า</button><span id="fChips" class="chips" style="margin:0"></span><button class="btn gold solid" id="fNext">ถัดไป</button><span class="lbl" id="fMsg"></span></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> จัดบ้านให้บริวารของดวงอาทิตย์</h2>
+    <canvas id="cvZone" height="240" aria-label="ผังเขตบริวารของดวงอาทิตย์ ระยะห่างแบบลอการิทึม"></canvas>
+    <div class="chips" id="objChips"></div>
+    <div class="zones" id="zoneBtns"></div>
+    <div class="ctrl"><span class="lbl" id="zMsg">แตะชื่อวัตถุด้านบนก่อน แล้วแตะเขตที่คิดว่าวัตถุนั้นอยู่</span></div>
+    <div class="note c" id="zInfo">-</div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>เขต</th><th>ระยะห่าง (AU)</th><th>สมาชิก</th><th>องค์ประกอบหลัก</th></tr></thead>
+      <tbody id="logZ"></tbody>
+    </table></div>
+    <div class="note"><b>สังเกต</b> ตอนระบบสุริยะเกิด บริเวณใกล้ดวงอาทิตย์ร้อนมาก น้ำและแก๊สกลายเป็นไอถูกพัดออกไป เหลือแต่หินและโลหะ ดาวเคราะห์ชั้นในจึงเป็นดาวเคราะห์หินขนาดเล็ก · ไกลออกไปเลย <b>แนวหิมะ (frost line)</b> ราว 3 AU (ระหว่างดาวอังคารกับดาวพฤหัสบดี) เย็นพอให้น้ำแข็งจับตัว แกนดาวเคราะห์จึงโตเร็วจนดึงแก๊สไว้ได้มาก กลายเป็นดาวเคราะห์แก๊สยักษ์ · 1 AU (หน่วยดาราศาสตร์) = ระยะโลกถึงดวงอาทิตย์ ประมาณ 150 ล้านกิโลเมตร</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : เรียงลำดับ 5 ขั้น ตารางเขตบริวาร 5 เขต ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ห้องทดลองดาวเคราะห์ : ดาวแบบไหนเอื้อต่อชีวิต</h2>
+    <p class="how">สร้างดาวเคราะห์ขนาดเท่าโลกแล้วปรับ 3 อย่าง <b style="color:#FFD166">การทดลองที่ 1</b> บรรยากาศแบบโลก มีสนามแม่เหล็ก เปลี่ยนวงโคจร 0.4 0.7 1.0 1.5 AU · <b style="color:#4FD8FF">การทดลองที่ 2</b> วงโคจร 0.7 AU เปลี่ยนบรรยากาศเป็น ไม่มี และ CO<sub>2</sub> หนาแน่น · <b style="color:#A77BFF">การทดลองที่ 3</b> วงโคจร 1.0 AU บรรยากาศแบบโลก แต่ไม่มีสนามแม่เหล็ก กด "บันทึกค่า" ทุกครั้ง แล้วจดลงใบงาน ส่วนที่ 2</p>
+    <div class="twin">
+      <canvas id="cvLab" height="330" aria-label="ภาพจำลองดาวเคราะห์ที่ระยะต่าง ๆ จากดวงอาทิตย์ และลมสุริยะ"></canvas>
+      <div class="info gauge">
+        <div class="k">อุณหภูมิผิวเฉลี่ย (แบบจำลองอย่างง่าย)</div>
+        <div class="meter" id="bTemp">-</div>
+        <div class="k" id="bReal" style="color:#FFD166">&nbsp;</div>
+        <div class="g"><div class="k">สถานะของน้ำบนผิวดาว</div><div class="v c" id="bWater" style="font-size:20px">-</div></div>
+        <div class="g">
+          <div class="k" style="margin-bottom:3px">เงื่อนไขของดาวเคราะห์ที่เอื้อต่อการดำรงชีวิต</div>
+          <div class="pf"><span>น้ำเป็นของเหลว อุณหภูมิพอเหมาะ</span><b id="c1">-</b></div>
+          <div class="pf"><span>มีบรรยากาศห่อหุ้ม</span><b id="c2">-</b></div>
+          <div class="pf"><span>มีสนามแม่เหล็กป้องกันลมสุริยะ</span><b id="c3">-</b></div>
+          <div class="verdict" id="bVerdict">-</div>
+        </div>
+      </div>
+    </div>
+    <div class="chips" id="dChips"></div>
+    <div class="chips" id="aChips"></div>
+    <div class="chips" id="mChips"></div>
+    <div class="chips" id="pChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกค่า</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>การทดลอง</th><th>วงโคจร (AU)</th><th>บรรยากาศ</th><th>สนามแม่เหล็ก</th><th>อุณหภูมิ (°C)</th><th>น้ำ</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="note" id="bNote">-</div>
+    <div class="note c"><b>ปรากฏการณ์เรือนกระจก</b> แก๊สเรือนกระจก เช่น คาร์บอนไดออกไซด์ (CO<sub>2</sub>) และไอน้ำ ยอมให้แสงอาทิตย์ผ่านลงมา แต่กักความร้อนที่ผิวดาวแผ่ออกไว้ บรรยากาศแบบโลกทำให้โลกอุ่นขึ้นราว 33 องศา ส่วนดาวศุกร์มีบรรยากาศ CO<sub>2</sub> หนาแน่นมาก จึงร้อนที่สุดในระบบสุริยะ · เขตสีเขียวในภาพคือ <b>เขตเอื้อต่อชีวิต</b> (habitable zone) บริเวณที่น้ำบนผิวดาวเป็นของเหลวได้ ตัวเลขขอบเขตแต่ละตำราต่างกัน</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : บันทึกครบ 7 แถว ตอบข้อ 3–5 (ปุ่มดาวจริงใช้เทียบกับค่าจริงเท่านั้น ไม่ต้องบันทึก)</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์เฝ้าระวังพายุสุริยะ</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> แตะชั้นของดวงอาทิตย์ 1–6 และปรากฏการณ์บนดวงอาทิตย์ให้ครบ · <b style="color:#4FD8FF">ขั้นที่ 2</b> ปล่อยสิ่งที่ออกจากดวงอาทิตย์ทีละแบบ ดูว่าใช้เวลาเท่าไรจึงถึงโลก · <b style="color:#A77BFF">ขั้นที่ 3</b> ตอบข่าวด่วน 6 ฉบับ ได้รหัสผ่าน · <b style="color:#5EF2A5">ขั้นที่ 4</b> เลือกเหตุการณ์จริงไปสืบค้นต่อในใบงาน ส่วนที่ 4</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ผ่าดูโครงสร้างดวงอาทิตย์</h2>
+    <div class="twin">
+      <canvas id="cvSun" height="340" aria-label="ภาพตัดขวางโครงสร้างดวงอาทิตย์"></canvas>
+      <div class="info">
+        <div class="k" id="sKind">ชั้นของดวงอาทิตย์</div>
+        <h3 id="sName">-</h3>
+        <div class="v r" id="sTemp" style="font-size:19px">-</div>
+        <div class="d" id="sDesc">-</div>
+      </div>
+    </div>
+    <div class="chips" id="sChips"></div>
+    <div class="chips" id="sChips2"></div>
+    <div class="ctrl"><span class="lbl" id="sMsg"></span></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> จากดวงอาทิตย์ถึงโลก ใช้เวลาเท่าไร</h2>
+    <canvas id="cvTrip" height="210" aria-label="ภาพจำลองสิ่งที่ออกจากดวงอาทิตย์เดินทางมาถึงโลก"></canvas>
+    <div class="chips" id="tChips"></div>
+    <div class="read">
+      <div class="info"><div class="k">ความเร็ว</div><div class="v c" id="tSpd" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">ระยะทางดวงอาทิตย์ถึงโลก</div><div class="v p" style="font-size:19px">150 ล้านกิโลเมตร</div></div>
+      <div class="info"><div class="k">เวลาเดินทางถึงโลก</div><div class="v g" id="tTime" style="font-size:19px">-</div></div>
+    </div>
+    <div class="ctrl"><button class="btn" id="goT">ปล่อยจากดวงอาทิตย์</button><button class="btn gold solid" id="recT">บันทึกค่า</button><span class="lbl" id="recTMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สิ่งที่ออกจากดวงอาทิตย์</th><th>ความเร็ว (กิโลเมตร/วินาที)</th><th>เวลาเดินทางถึงโลก</th></tr></thead>
+      <tbody id="logT"></tbody>
+    </table></div>
+    <div class="note c"><b>ลมสุริยะ</b> คือกระแสอนุภาคมีประจุ (พลาสมา) ที่ไหลออกจากคอโรนาตลอดเวลา · <b>พายุสุริยะ</b> คือเหตุการณ์รุนแรงบนดวงอาทิตย์ เช่น เปลวสุริยะ และการพ่นมวลคอโรนา (CME) ที่ปล่อยพลังงานและอนุภาคออกมามากผิดปกติ · <b>สนามแม่เหล็กโลก</b> เบนอนุภาคส่วนใหญ่ออกไป บางส่วนถูกนำลงที่ขั้วโลก ชนแก๊สในบรรยากาศเกิดเป็น <b>แสงออโรรา</b> ถ้ารุนแรงจะเกิดพายุแม่เหล็กโลก</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ห้องเตือนภัย : ข่าวด่วน 6 ฉบับ</h2>
+    <p class="how" style="margin-bottom:4px">อ่านข่าวด่วนแต่ละฉบับ แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="alerts" id="alerts"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>เตือนภัยครบทุกฉบับแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">AURORA</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · ออโรรา (aurora) คือแสงเหนือแสงใต้ที่เกิดเมื่ออนุภาคจากลมสุริยะชนแก๊สในบรรยากาศบริเวณขั้วโลก ประเทศไทยอยู่ใกล้เส้นศูนย์สูตรจึงไม่เห็นแสงนี้</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 4</em> คลังเหตุการณ์จริง : เริ่มสืบค้นภารกิจปลายทาง</h2>
+    <p class="how" style="margin-bottom:4px">เลือก 1 เหตุการณ์ (หรือหาเหตุการณ์อื่นเอง) สืบค้นเพิ่มจากเว็บไซต์ ข่าว หรือ AI แล้ววิเคราะห์ผลต่อโลกและประเทศไทย เขียน "ประกาศข่าวสภาพอวกาศ" ในใบงาน ส่วนที่ 4 และเล่าให้เพื่อนฟัง</p>
+    <div class="events" id="events"></div>
+    <div class="note"><b>ประเทศไทยได้รับผลอย่างไร</b> ประเทศไทยอยู่ใกล้เส้นศูนย์สูตร จึงไม่เห็นแสงออโรรา แต่พายุสุริยะทำให้ชั้นไอโอโนสเฟียร์ (บรรยากาศชั้นบนที่มีประจุ) แปรปรวนได้ สัญญาณ GPS การสื่อสารผ่านดาวเทียมและวิทยุอาจคลาดเคลื่อนหรือสะดุด ดาวเทียมของไทย เช่น ไทยโชต (THEOS) และดาวเทียมสื่อสาร อาจได้รับผลกระทบ หน่วยงานไทยที่ติดตามสภาพอวกาศ เช่น สถาบันวิจัยดาราศาสตร์แห่งชาติ (NARIT) และ GISTDA</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ชื่อชั้น 1–6 ตารางเวลาเดินทาง 3 แถว รหัสผ่าน · <b>ส่วนที่ 4 (ภารกิจปลายทาง)</b> : สืบค้น วิเคราะห์ นำเสนอ ประกาศข่าวสภาพอวกาศ</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ ภาพไม่ตามมาตราส่วน · อุณหภูมิในภารกิจ B มาจากแบบจำลองอย่างง่าย · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e6_sim_v1';
+  var S = load() || {};
+  S.form = S.form || {}; S.zone = S.zone || {}; S.recB = S.recB || {}; S.sun = S.sun || {}; S.recT = S.recT || {}; S.al = S.al || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(77), a = []; for (var i = 0; i < 240; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k) { STARF.forEach(function (s) { x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function ball(x, cx, cy, r, col, glow) {
+    if (glow) { var g = x.createRadialGradient(cx, cy, r * .6, cx, cy, r * glow); g.addColorStop(0, rgba(col, .55)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r * glow, 0, 6.283); x.fill(); }
+    var b = x.createRadialGradient(cx - r * .3, cy - r * .3, r * .1, cx, cy, r);
+    b.addColorStop(0, 'rgba(255,255,250,1)'); b.addColorStop(.35, rgba(col, 1)); b.addColorStop(1, rgba(col.map(function (c) { return Math.round(c * .6); }), 1));
+    x.fillStyle = b; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill();
+  }
+  function planet(x, cx, cy, r, col) {
+    var b = x.createRadialGradient(cx - r * .35, cy - r * .35, r * .1, cx, cy, r);
+    b.addColorStop(0, rgba(col.map(function (c) { return Math.min(255, c + 60); }), 1)); b.addColorStop(1, rgba(col.map(function (c) { return Math.round(c * .45); }), 1));
+    x.fillStyle = b; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill();
+  }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr)); }; }); }
+
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ขั้นที่ 1 กำเนิดระบบสุริยะ
+  var STAGES = [
+    { n: 'เนบิวลาสุริยะ', t: 'ประมาณ 4,600 ล้านปีก่อน',
+      d: 'กลุ่มแก๊สไฮโดรเจน ฮีเลียม และฝุ่นขนาดมหึมาลอยอยู่ในอวกาศ ธาตุหนักบางส่วนมาจากซากดาวฤกษ์รุ่นก่อนที่ระเบิดเป็นซูเปอร์โนวา (เชื่อมกับ E4)' },
+    { n: 'กลุ่มแก๊สยุบตัวและหมุนเร็วขึ้น', t: 'เริ่มยุบตัว ใช้เวลาราวแสนปี',
+      d: 'แรงโน้มถ่วงดึงแก๊สและฝุ่นเข้าหาศูนย์กลาง ยิ่งยุบตัวเล็กลงก็ยิ่งหมุนเร็วขึ้น เหมือนนักสเก็ตหุบแขนแล้วหมุนเร็วขึ้น ใจกลางร้อนขึ้นเรื่อย ๆ' },
+    { n: 'จานแก๊สและฝุ่นรอบดาวฤกษ์ก่อนเกิด', t: 'ภายในราว 1 ล้านปี',
+      d: 'การหมุนทำให้กลุ่มแก๊สแบนเป็นจาน ใจกลางกลายเป็นดาวฤกษ์ก่อนเกิด (โปรโตสตาร์) ใกล้ใจกลางร้อน ไกลออกไปเย็น เส้นประคือแนวหิมะ ด้านในมีแต่หินและโลหะ ด้านนอกมีน้ำแข็งด้วย' },
+    { n: 'ดาวเคราะห์ก้อนเล็กชนกันรวมเป็นดาวเคราะห์', t: 'หลายล้านถึงหลายสิบล้านปี',
+      d: 'ฝุ่นเกาะกลุ่มเป็นก้อนหินเล็ก ๆ แล้วชนรวมกันเป็นดาวเคราะห์ก้อนเล็ก (planetesimal) และโตเป็นดาวเคราะห์ ด้านนอกแนวหิมะแกนโตเร็วจนดึงแก๊สได้มาก กลายเป็นดาวเคราะห์แก๊สยักษ์' },
+    { n: 'ดวงอาทิตย์จุดปฏิกิริยาฟิวชัน', t: 'ราว 50 ล้านปีหลังเริ่มต้น',
+      d: 'ใจกลางร้อนพอเกิดปฏิกิริยาฟิวชัน ดวงอาทิตย์เป็นดาวฤกษ์เต็มตัว ลมสุริยะกวาดแก๊สและฝุ่นที่เหลือออกไป เหลือดาวเคราะห์โคจรรอบดวงอาทิตย์อย่างที่เห็นในปัจจุบัน' }
+  ];
+  var fStage = 0, fPos = 0, fAnim = null, fT = 0;
+  // อนุภาคในเนบิวลา : r0 (0-1), มุม, z, ชนิด (0 แก๊ส 1 ฝุ่น), กลุ่มดาวเคราะห์
+  var ORB = [.15, .21, .27, .34, .47, .6, .73, .86, .97], FROST = .41;
+  var PCOL = [[190, 170, 160], [235, 200, 140], [110, 170, 255], [230, 120, 80], [180, 170, 160], [230, 190, 140], [230, 210, 160], [150, 220, 235], [90, 130, 255]];
+  var PSZ = [2.2, 3.2, 3.4, 2.6, 0, 9, 8, 5.5, 5.4];
+  var PART = (function () {
+    var r = rnd(4242), a = [];
+    for (var i = 0; i < 950; i++) {
+      var r0 = Math.pow(r(), .7), th = r() * 6.283, z = (r() - .5) * 1.6 * Math.sqrt(1 - r0 * r0 * .5), k = 0, best = 9;
+      ORB.forEach(function (o, j) { var dd = Math.abs(o - r0); if (dd < best) { best = dd; k = j; } });
+      a.push({ r0: r0, th: th, z: z, dust: r() < .45 ? 1 : 0, k: k, ph: r() * 6.283, j: (r() - .5) });
+    }
+    return a;
+  })();
+  function drawForm() {
+    var c = fit($('cvForm')), x = c.x, W = c.W, H = c.H, s = fPos;
+    x.fillStyle = '#03050f'; x.fillRect(0, 0, W, H);
+    starfield(x, W, H, .5);
+    var cx = W / 2, cy = H * .5, R = Math.min(W * .48, H * 1.3), tilt = lerp(.85, .33, smooth(s / 2));
+    var spread = lerp(1, .78, smooth(s)), flat = s < 1 ? lerp(1, .55, smooth(s)) : lerp(.55, .05, smooth(s - 1));
+    var gasA = 1 - smooth(s - 3.2), clump = smooth((s - 2.3) / 1.2);
+    // ความร้อนในจาน + แนวหิมะ
+    if (s > 1.5) {
+      var ha = smooth(s - 1.5) * (1 - smooth(s - 3.6));
+      var gh = x.createRadialGradient(cx, cy, 0, cx, cy, R * FROST * spread);
+      gh.addColorStop(0, 'rgba(255,150,80,' + (.28 * ha) + ')'); gh.addColorStop(1, 'rgba(255,150,80,0)');
+      x.save(); x.translate(cx, cy); x.scale(1, tilt); x.translate(-cx, -cy);
+      x.fillStyle = gh; x.beginPath(); x.arc(cx, cy, R * FROST * spread, 0, 6.283); x.fill();
+      x.strokeStyle = 'rgba(160,220,255,' + (.9 * smooth((s - 1.5) / .5)) + ')'; x.setLineDash([6, 5]); x.lineWidth = 1.6;
+      x.beginPath(); x.arc(cx, cy, R * FROST * spread, 0, 6.283); x.stroke(); x.setLineDash([]); x.restore();
+      x.fillStyle = 'rgba(160,220,255,' + smooth((s - 1.5) / .5) * (1 - smooth(s - 3.6)) + ')'; x.font = '700 14px Sarabun, sans-serif'; x.textAlign = 'left';
+      x.fillText('แนวหิมะ', cx + R * FROST * spread * .72, cy + R * FROST * spread * tilt * .72 + 16);
+    }
+    // วงโคจร
+    if (s > 3.3) {
+      x.save(); x.translate(cx, cy); x.scale(1, tilt); x.translate(-cx, -cy);
+      x.strokeStyle = 'rgba(120,140,210,' + (.35 * smooth(s - 3.3)) + ')'; x.lineWidth = 1;
+      ORB.forEach(function (o, j) { if (j === 4) return; x.beginPath(); x.arc(cx, cy, R * o * spread, 0, 6.283); x.stroke(); });
+      x.restore();
+    }
+    // อนุภาค
+    var pts = [];
+    PART.forEach(function (p) {
+      var w = (.08 + .5 * smooth(s / 2)) / Math.pow(Math.max(p.r0, .12), 1.5) * .25;
+      var th = p.th + fT * w, rr = p.r0 * spread;
+      if (clump > 0 && p.k !== 4) { rr = lerp(rr, ORB[p.k] * spread, clump); th = lerp(th, p.ph + fT * .25 / Math.pow(ORB[p.k], 1.5) + p.j * .5, clump * .9); }
+      if (p.k === 4) rr = lerp(rr, (ORB[4] + p.j * .12) * spread, clump * .8);
+      var px = cx + Math.cos(th) * rr * R, py = cy + (Math.sin(th) * rr * tilt + p.z * flat * .35) * R;
+      var a = p.dust ? .85 : .5 * gasA;
+      if (p.k !== 4 && s > 3.4) a *= 1 - smooth((s - 3.4) / .6);
+      if (a < .03) return;
+      pts.push([py, px, a, p.dust, rr]);
+    });
+    pts.sort(function (a, b) { return a[0] - b[0]; });
+    pts.forEach(function (p) {
+      var hot = p[4] < FROST * spread;
+      x.fillStyle = p[3] ? (hot && s > 1.5 ? 'rgba(255,190,140,' + p[2] + ')' : 'rgba(200,215,255,' + p[2] + ')') : 'rgba(167,123,255,' + (p[2] * .7) + ')';
+      x.fillRect(p[1], p[0], p[3] ? 1.6 : 2.2, p[3] ? 1.6 : 2.2);
+    });
+    // ดาวฤกษ์ใจกลาง
+    var sr = s < .6 ? 0 : lerp(3, 16, smooth((s - .6) / 3.4)), scol = s < 3.6 ? [255, Math.round(lerp(110, 175, smooth((s - 1) / 2.6))), 80] : [255, 220, 120];
+    if (sr > 0) ball(x, cx, cy, sr, scol, s > 3.6 ? 3.4 : 2.6);
+    // ดาวเคราะห์
+    if (s > 3.3) {
+      var pa = smooth((s - 3.3) / .7);
+      x.globalAlpha = pa;
+      ORB.forEach(function (o, j) {
+        if (j === 4) return;
+        var th = PART[0].th * 0 + j * 1.9 + fT * .25 / Math.pow(o, 1.5);
+        planet(x, cx + Math.cos(th) * o * spread * R, cy + Math.sin(th) * o * spread * tilt * R, PSZ[j], PCOL[j]);
+      });
+      x.globalAlpha = 1;
+    }
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ขั้นที่ ' + (fStage + 1) + ' : ' + STAGES[fStage].n, 12, 22);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพจำลอง ไม่ตามมาตราส่วน', W - 8, H - 6); x.textAlign = 'left';
+  }
+  function goStage(k) {
+    k = clamp(k, 0, 4); fStage = k; S.form[k] = 1; save();
+    if (fAnim) cancelAnimationFrame(fAnim), fAnim = null;
+    var from = fPos, t0 = performance.now(), dur = reduce ? 1 : 1100 * Math.max(.6, Math.abs(k - from));
+    (function step(now) { var q = clamp((now - t0) / dur, 0, 1); fPos = lerp(from, k, smooth(q)); if (!bAnim && tab === 'A') drawForm(); if (q < 1) fAnim = requestAnimationFrame(step); else fAnim = null; })(t0);
+    updForm();
+  }
+  function updForm() {
+    var st = STAGES[fStage];
+    $('fNo').textContent = 'ขั้นที่ ' + (fStage + 1) + ' / 5'; $('fName').textContent = st.n; $('fTime').textContent = st.t; $('fDesc').textContent = st.d;
+    var h = '';
+    for (var i = 0; i < 5; i++) h += '<button class="chip' + (i === fStage ? ' on' : '') + (S.form[i] ? ' done' : '') + '" data-s="' + i + '">' + (i + 1) + '</button>';
+    $('fChips').innerHTML = h; bindChips($('fChips'), 's', function (v) { goStage(+v); });
+    $('fPrev').disabled = fStage === 0; $('fNext').disabled = fStage === 4;
+    var n = Object.keys(S.form).length;
+    $('fMsg').textContent = 'ดูแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว เรียงลำดับลงใบงานข้อ 1 ได้' : '');
+  }
+  $('fPrev').onclick = function () { goStage(fStage - 1); };
+  $('fNext').onclick = function () { goStage(fStage + 1); };
+  $('cvForm').addEventListener('click', function () { if (fStage < 4) goStage(fStage + 1); });
+
+  // ================================================================ ภารกิจ A ขั้นที่ 2 เขตบริวาร
+  var ZONES = [
+    { n: 'ดาวเคราะห์ชั้นใน', d: '0.4–1.5', lo: .33, hi: 1.75, mem: 'ดาวพุธ ดาวศุกร์ โลก ดาวอังคาร', comp: 'หินและโลหะ', col: [255, 159, 107],
+      more: 'ดาวเคราะห์หินขนาดเล็ก ความหนาแน่นสูง มีผิวแข็ง ดวงจันทร์น้อยหรือไม่มีเลย ไม่มีวงแหวน' },
+    { n: 'แถบดาวเคราะห์น้อย', d: '2.2–3.3', lo: 2.1, hi: 3.4, mem: 'ดาวเคราะห์น้อย ซีรีส เวสตา', comp: 'หินและโลหะ', col: [154, 166, 207],
+      more: 'ก้อนหินและโลหะจำนวนมากโคจรระหว่างดาวอังคารกับดาวพฤหัสบดี รวมกันเป็นดาวเคราะห์ไม่ได้เพราะแรงโน้มถ่วงของดาวพฤหัสบดีรบกวน ซีรีสเป็นดาวเคราะห์แคระ' },
+    { n: 'ดาวเคราะห์ชั้นนอก', d: '5–30', lo: 4.5, hi: 33, mem: 'ดาวพฤหัสบดี ดาวเสาร์ ดาวยูเรนัส ดาวเนปจูน', comp: 'แก๊สและน้ำแข็ง', col: [79, 216, 255],
+      more: 'ดาวเคราะห์แก๊สยักษ์ ขนาดใหญ่ ความหนาแน่นต่ำ ไม่มีพื้นผิวแข็ง มีวงแหวนและดวงจันทร์จำนวนมาก' },
+    { n: 'แถบไคเปอร์', d: '30–50', lo: 33.5, hi: 58, mem: 'พลูโต เฮาเมอา และวัตถุน้ำแข็ง', comp: 'น้ำแข็งและหิน', col: [167, 123, 255],
+      more: 'วัตถุน้ำแข็งขนาดเล็กจำนวนมาก รวมถึงดาวเคราะห์แคระพลูโต เป็นแหล่งของดาวหางคาบสั้น' },
+    { n: 'เมฆออร์ต', d: '2,000–100,000', lo: 2000, hi: 100000, mem: 'ดาวหางคาบยาว (ก้อนน้ำแข็ง)', comp: 'น้ำแข็ง', col: [94, 242, 165],
+      more: 'เปลือกทรงกลมของก้อนน้ำแข็งห่อหุ้มระบบสุริยะ อยู่ไกลมากจนยังไม่เคยสังเกตเห็นโดยตรง เป็นแหล่งของดาวหางคาบยาว' }
+  ];
+  var OBJ = [
+    { n: 'ดาวพุธ', z: 0, d: .39 }, { n: 'ดาวศุกร์', z: 0, d: .72 }, { n: 'โลก', z: 0, d: 1 }, { n: 'ดาวอังคาร', z: 0, d: 1.52 },
+    { n: 'ซีรีส', z: 1, d: 2.77 }, { n: 'เวสตา', z: 1, d: 2.36 },
+    { n: 'ดาวพฤหัสบดี', z: 2, d: 5.2 }, { n: 'ดาวเสาร์', z: 2, d: 9.5 }, { n: 'ดาวยูเรนัส', z: 2, d: 19.2 }, { n: 'ดาวเนปจูน', z: 2, d: 30.1 },
+    { n: 'พลูโต', z: 3, d: 39.5 }, { n: 'เฮาเมอา', z: 3, d: 43 }, { n: 'ดาวหางคาบยาว', z: 4, d: 20000 }
+  ];
+  var selObj = -1, selZone = 0;
+  function zoneDone(z) { return OBJ.every(function (o, i) { return o.z !== z || S.zone[i] === z; }); }
+  function drawZone() {
+    var c = fit($('cvZone')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .35);
+    var x0 = 40, x1 = W - 14, L0 = Math.log10(.25), L1 = Math.log10(150000), X = function (d) { return x0 + (Math.log10(d) - L0) / (L1 - L0) * (x1 - x0); };
+    var y0 = 46, y1 = H - 58;
+    ZONES.forEach(function (z, i) {
+      var a = X(z.lo), b = X(z.hi), on = i === selZone;
+      x.fillStyle = rgba(z.col, on ? .22 : .1); x.fillRect(a, y0, b - a, y1 - y0);
+      x.strokeStyle = rgba(z.col, on ? .95 : .45); x.lineWidth = on ? 2 : 1; x.strokeRect(a, y0, b - a, y1 - y0);
+      x.fillStyle = rgba(z.col, 1); x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'center';
+      var lab = W < 560 ? ['ชั้นใน', 'แถบดาวเคราะห์น้อย', 'ชั้นนอก', 'ไคเปอร์', 'เมฆออร์ต'][i] : z.n;
+      x.fillText(lab, (a + b) / 2, i % 2 ? y0 - 18 : y0 - 6);
+    });
+    // แนวหิมะ
+    var fx = X(3); x.strokeStyle = 'rgba(160,220,255,.9)'; x.setLineDash([5, 4]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(fx, y0 - 2); x.lineTo(fx, y1 + 4); x.stroke(); x.setLineDash([]);
+    x.fillStyle = 'rgba(160,220,255,1)'; x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('แนวหิมะ ~3 AU', fx, y1 + 18);
+    // ดวงอาทิตย์
+    ball(x, 16, (y0 + y1) / 2, 11, [255, 220, 120], 2.4);
+    // แกน
+    x.fillStyle = '#9AA6CF'; x.font = '11.5px Sarabun, sans-serif';
+    [[1, '1'], [10, '10'], [100, '100'], [1000, '1,000'], [10000, '10,000'], [100000, '100,000']].forEach(function (t) { var px = X(t[0]); x.fillRect(px, y1, 1, 5); x.fillText(t[1], px, y1 + 34); });
+    x.textAlign = 'right'; x.fillText('ระยะห่างจากดวงอาทิตย์ (AU) มาตราลอการิทึม', x1, H - 6);
+    // วัตถุที่จัดแล้ว
+    var cy = (y0 + y1) / 2, lv = 0;
+    OBJ.forEach(function (o, i) {
+      if (S.zone[i] !== o.z) return;
+      var px = X(o.d), py = cy + [-26, 0, 26][lv % 3]; lv++;
+      var col = ZONES[o.z].col;
+      planet(x, px, py, i === 6 || i === 7 ? 5 : 3.5, col);
+      x.fillStyle = '#E8EDFF'; x.font = '600 11.5px Sarabun, sans-serif'; x.textAlign = 'center';
+      if (W >= 560 || i === selObj || o.z === selZone) x.fillText(o.n, px, py - 8);
+    });
+  }
+  function updZone() {
+    var h = '<span class="lbl">วัตถุในระบบสุริยะ</span>';
+    OBJ.forEach(function (o, i) { var ok = S.zone[i] === o.z; h += '<button class="chip' + (i === selObj ? ' on' : '') + (ok ? ' done' : '') + '" data-o="' + i + '">' + o.n + '</button>'; });
+    $('objChips').innerHTML = h;
+    bindChips($('objChips'), 'o', function (v) { selObj = +v; $('zMsg').textContent = 'เลือก ' + OBJ[selObj].n + ' แล้ว แตะเขตที่วัตถุนี้อยู่'; updZone(); });
+    h = '';
+    ZONES.forEach(function (z, i) { h += '<button class="zb' + (i === selZone ? ' on' : '') + (zoneDone(i) ? ' full' : '') + '" data-z="' + i + '"><i style="background:' + rgba(z.col, 1) + '"></i>' + z.n + '</button>'; });
+    $('zoneBtns').innerHTML = h;
+    bindChips($('zoneBtns'), 'z', function (v) {
+      var z = +v; selZone = z;
+      if (selObj >= 0) {
+        var o = OBJ[selObj];
+        if (o.z === z) { S.zone[selObj] = z; save(); $('zMsg').textContent = 'ถูกต้อง ' + o.n + ' อยู่ใน' + ZONES[z].n + ' · จัดแล้ว ' + Object.keys(S.zone).length + '/' + OBJ.length; selObj = -1; }
+        else { $('zMsg').textContent = o.n + ' ไม่ได้อยู่ใน' + ZONES[z].n + ' ลองดูระยะห่างและชนิดของวัตถุอีกครั้ง'; var bt = $('zoneBtns').children[z]; bt.classList.add('bad'); }
+      }
+      updZone();
+    });
+    var z = ZONES[selZone];
+    $('zInfo').innerHTML = '<b style="color:' + rgba(z.col, 1) + '">' + z.n + '</b> · ระยะ ' + z.d + ' AU · ' + z.more;
+    logZ();
+    if (tab === 'A') drawZone();
+  }
+  function logZ() {
+    var h = '';
+    ZONES.forEach(function (z, i) { var ok = zoneDone(i); h += '<tr' + (i === selZone ? ' class="cur"' : '') + '><td class="n">' + z.n + '</td><td>' + (ok ? z.d : '-') + '</td><td>' + (ok ? z.mem : '-') + '</td><td>' + (ok ? z.comp : '-') + '</td></tr>'; });
+    $('logZ').innerHTML = h;
+  }
+
+  // ================================================================ ภารกิจ B ห้องทดลองดาวเคราะห์
+  var DLIST = [.4, .7, 1, 1.5], DNAME = { .4: 'วงโคจรดาวพุธ', .7: 'วงโคจรดาวศุกร์', 1: 'วงโคจรโลก', 1.5: 'วงโคจรดาวอังคาร' };
+  var ATM = { none: { n: 'ไม่มีบรรยากาศ', s: 'ไม่มี', G: 0 }, earth: { n: 'บรรยากาศแบบโลก', s: 'แบบโลก', G: 33 }, thick: { n: 'CO₂ หนาแน่น', s: 'CO₂ หนาแน่น', G: 430 } };
+  var bD = 1, bA = 'earth', bM = 1;
+  var ROWS = [{ e: 1, d: .4, a: 'earth', m: 1 }, { e: 1, d: .7, a: 'earth', m: 1 }, { e: 1, d: 1, a: 'earth', m: 1 }, { e: 1, d: 1.5, a: 'earth', m: 1 },
+    { e: 2, d: .7, a: 'none', m: 1 }, { e: 2, d: .7, a: 'thick', m: 1 }, { e: 3, d: 1, a: 'earth', m: 0 }];
+  var PRE = [{ n: 'ดาวพุธ', d: .4, a: 'none', m: 1, real: 'ค่าจริงโดยประมาณ 167 °C (กลางวัน 430 กลางคืน −180)' },
+    { n: 'ดาวศุกร์', d: .7, a: 'thick', m: 0, real: 'ค่าจริงโดยประมาณ 464 °C ร้อนที่สุดในระบบสุริยะ' },
+    { n: 'โลก', d: 1, a: 'earth', m: 1, real: 'ค่าจริงโดยประมาณ 15 °C' },
+    { n: 'ดาวอังคาร', d: 1.5, a: 'none', m: 0, real: 'ค่าจริงโดยประมาณ −63 °C (บรรยากาศบางมาก)' }];
+  function effAtm(a, m) { return a === 'earth' && !m ? 'none' : a; }
+  function tempC(d, a, m) { return Math.round(255 / Math.sqrt(d) + ATM[effAtm(a, m)].G - 273.15); }
+  function water(d, a, m) { var e = effAtm(a, m), T = tempC(d, a, m); if (e === 'none') return 'ไม่มีน้ำเหลว'; if (T < 0) return 'น้ำแข็ง'; if (T <= 100) return 'ของเหลว'; return 'ไอน้ำ (เดือด)'; }
+  function rowKey(d, a, m) { for (var i = 0; i < ROWS.length; i++) { var r = ROWS[i]; if (r.d === d && r.a === a && (a === 'none' || r.m === m)) return i; } return -1; }
+  var wind = [], lastB = 0, bAnim = null;
+  (function () { var r = rnd(11); for (var i = 0; i < 70; i++) wind.push({ x: r(), y: r(), v: .5 + r() * .5, k: r() }); })();
+  function labX(W, d) { return 70 + (d - .25) / (1.65 - .25) * (W - 100); }
+  function drawLab() {
+    var c = fit($('cvLab')), x = c.x, W = c.W, H = c.H, T = tempC(bD, bA, bM), e = effAtm(bA, bM);
+    x.fillStyle = '#03050f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .45);
+    // เขตเอื้อต่อชีวิต (ในแบบจำลองนี้ บรรยากาศแบบโลก 0-50 °C)
+    var h0 = labX(W, Math.pow(255 / 290.15, 2)), h1 = labX(W, Math.pow(255 / 240.15, 2));
+    x.fillStyle = 'rgba(94,242,165,.13)'; x.fillRect(h0, 30, h1 - h0, H - 78);
+    x.strokeStyle = 'rgba(94,242,165,.5)'; x.setLineDash([4, 4]); x.strokeRect(h0, 30, h1 - h0, H - 78); x.setLineDash([]);
+    x.fillStyle = '#5EF2A5'; x.font = '600 12.5px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('เขตเอื้อต่อชีวิต', (h0 + h1) / 2, H - 54);
+    // ดวงอาทิตย์
+    var sg = x.createRadialGradient(-40, H / 2, 10, -40, H / 2, 150); sg.addColorStop(0, 'rgba(255,230,140,1)'); sg.addColorStop(.45, 'rgba(255,190,80,.9)'); sg.addColorStop(1, 'rgba(255,150,60,0)');
+    x.fillStyle = sg; x.beginPath(); x.arc(-40, H / 2, 150, 0, 6.283); x.fill();
+    // วงโคจรอ้างอิง
+    x.font = '12px Sarabun, sans-serif'; x.textAlign = 'center';
+    DLIST.forEach(function (d) { var px = labX(W, d); x.strokeStyle = d === bD ? 'rgba(255,209,102,.8)' : 'rgba(120,140,210,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(px, 34); x.lineTo(px, H - 44); x.stroke();
+      x.fillStyle = d === bD ? '#FFD166' : '#9AA6CF'; x.fillText(d.toFixed(1) + ' AU', px, H - 28); });
+    x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText('ระยะห่างจากดวงอาทิตย์', W - 8, H - 8);
+    // ดาวเคราะห์
+    var px = labX(W, bD), py = H * .47, pr = Math.min(34, W * .06);
+    var tc = T < 0 ? [190, 220, 255] : T <= 50 ? [80, 150, 230] : T <= 100 ? [220, 170, 110] : [235, 110, 60];
+    // ลมสุริยะ
+    var R = pr + 26;
+    wind.forEach(function (p) {
+      var wx = p.x * W, wy = 34 + p.y * (H - 82), dx = wx - px, dy = wy - py, dist = Math.hypot(dx, dy);
+      if (bM && dist < R + 6 && wx < px + R) { var ang = Math.atan2(dy, dx); wx = px + Math.cos(ang) * (R + 6); wy = py + Math.sin(ang) * (R + 6); }
+      x.fillStyle = 'rgba(255,209,102,' + (.35 + .4 * p.k) + ')'; x.fillRect(wx, wy, 6, 1.5);
+    });
+    if (bM) {
+      x.strokeStyle = 'rgba(79,216,255,.55)'; x.lineWidth = 1.3;
+      [1, 1.45, 1.95].forEach(function (k) { x.beginPath(); x.ellipse(px + 4 * k, py, R * .55 * k, R * .9 * k, 0, 0, 6.283); x.stroke(); });
+      x.fillStyle = '#4FD8FF'; x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'left'; x.fillText('สนามแม่เหล็ก', px + R * 1.15 + 6, py + 4);
+    }
+    // บรรยากาศ
+    if (e !== 'none') {
+      var ar = e === 'thick' ? pr + 13 : pr + 6, acol = e === 'thick' ? [255, 200, 120] : [120, 190, 255];
+      var ag = x.createRadialGradient(px, py, pr * .9, px, py, ar); ag.addColorStop(0, rgba(acol, e === 'thick' ? .75 : .55)); ag.addColorStop(1, rgba(acol, 0));
+      x.fillStyle = ag; x.beginPath(); x.arc(px, py, ar, 0, 6.283); x.fill();
+    } else if (bA === 'earth' && !bM) {
+      // บรรยากาศถูกลมสุริยะกวาดหายไป
+      for (var i = 0; i < 18; i++) { var q = ((fT * .25 + i / 18) % 1); x.fillStyle = 'rgba(120,190,255,' + (.6 * (1 - q)) + ')'; x.fillRect(px + pr + q * 120, py - pr + (i * 37 % 100) / 100 * pr * 2, 3, 3); }
+    }
+    planet(x, px, py, pr, tc);
+    if (bA === 'thick' || (T > 100 && e !== 'none')) { x.fillStyle = 'rgba(255,230,180,.25)'; x.beginPath(); x.arc(px, py, pr, 0, 6.283); x.fill(); }
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif';
+    x.fillText(DNAME[bD] + ' · ' + ATM[bA].n + (bM ? ' · มีสนามแม่เหล็ก' : ' · ไม่มีสนามแม่เหล็ก'), 10, H - 52 < 0 ? 18 : 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ขีดสีเหลืองคือลมสุริยะ', W - 8, 18);
+  }
+  function loopB(now) { fT = now / 1000; if (tab === 'B') drawLab(); if (tab === 'A') drawForm(); bAnim = requestAnimationFrame(loopB); }
+  function updB() {
+    var T = tempC(bD, bA, bM), w = water(bD, bA, bM), e = effAtm(bA, bM);
+    $('bTemp').textContent = (T > 0 ? '+' : T < 0 ? '−' : '') + Math.abs(T) + ' °C';
+    $('bTemp').style.color = T < 0 ? '#9fd0ff' : T <= 50 ? '#5EF2A5' : T <= 100 ? '#FFD166' : '#FF6B8A';
+    $('bWater').textContent = w;
+    var pre = PRE.filter(function (p) { return p.d === bD && p.a === bA && p.m === bM; })[0];
+    $('bReal').textContent = pre ? pre.n + ' : ' + pre.real : ' ';
+    var c1 = e !== 'none' && T >= 0 && T <= 50, c2 = e !== 'none', c3 = !!bM;
+    [['c1', c1], ['c2', c2], ['c3', c3]].forEach(function (q) { var el = $(q[0]); el.textContent = q[1] ? 'ผ่าน' : 'ไม่ผ่าน'; el.className = q[1] ? 'y' : 'n'; });
+    var ok = c1 && c2 && c3, why = '';
+    if (!ok) why = !c2 ? (bA === 'earth' && !bM ? 'ลมสุริยะกวาดบรรยากาศหายไป' : 'ไม่มีบรรยากาศ') : T > 50 ? 'ร้อนเกินไป' : T < 0 ? 'หนาวเกินไป' : 'ไม่มีสนามแม่เหล็ก';
+    $('bVerdict').textContent = ok ? 'ดาวดวงนี้เอื้อต่อการดำรงชีวิต' : 'ยังไม่เอื้อต่อชีวิต : ' + why;
+    $('bVerdict').className = 'verdict ' + (ok ? 'y' : 'n');
+    var h = '<span class="lbl">วงโคจร</span>';
+    DLIST.forEach(function (d) { h += '<button class="chip' + (d === bD ? ' on' : '') + '" data-d="' + d + '">' + d.toFixed(1) + ' AU</button>'; });
+    $('dChips').innerHTML = h; bindChips($('dChips'), 'd', function (v) { bD = +v; updB(); });
+    h = '<span class="lbl">บรรยากาศ</span>';
+    ['none', 'earth', 'thick'].forEach(function (a) { h += '<button class="chip' + (a === bA ? ' on' : '') + '" data-a="' + a + '">' + ATM[a].n + '</button>'; });
+    $('aChips').innerHTML = h; bindChips($('aChips'), 'a', function (v) { bA = v; updB(); });
+    h = '<span class="lbl">สนามแม่เหล็ก</span>';
+    [1, 0].forEach(function (m) { h += '<button class="chip' + (m === bM ? ' on' : '') + '" data-m="' + m + '">' + (m ? 'มี' : 'ไม่มี') + '</button>'; });
+    $('mChips').innerHTML = h; bindChips($('mChips'), 'm', function (v) { bM = +v; updB(); });
+    h = '<span class="lbl">เทียบกับดาวจริง</span>';
+    PRE.forEach(function (p, i) { h += '<button class="chip' + (pre === p ? ' on' : '') + '" data-p="' + i + '">' + p.n + '</button>'; });
+    $('pChips').innerHTML = h; bindChips($('pChips'), 'p', function (v) { var p = PRE[+v]; bD = p.d; bA = p.a; bM = p.m; updB(); });
+    var k = rowKey(bD, bA, bM), n = Object.keys(S.recB).length;
+    $('recB').disabled = k < 0;
+    $('recBMsg').textContent = k < 0 ? 'ค่านี้ไม่อยู่ในตาราง 7 แถว ดูวิธีทดลองด้านบน' : (n ? 'บันทึกแล้ว ' + n + '/7' + (n === 7 ? ' ครบแล้ว' : '') : '');
+    var note = '';
+    if (bA === 'earth' && !bM) note = 'ไม่มีสนามแม่เหล็ก ลมสุริยะพัดชนบรรยากาศโดยตรง ค่อย ๆ กวาดบรรยากาศหลุดสู่อวกาศ เมื่อเวลาผ่านไปหลายร้อยล้านปี บรรยากาศจึงบางมาก น้ำเหลวหายไป อุณหภูมิลดลง นักวิทยาศาสตร์เชื่อว่าดาวอังคารสูญเสียบรรยากาศไปแบบนี้';
+    else if (bA === 'thick' && !bM) note = 'บรรยากาศ CO₂ หนาแน่นมากอย่างดาวศุกร์ยังอยู่ได้แม้ไม่มีสนามแม่เหล็ก แต่ลมสุริยะกวาดไฮโดรเจนจากไอน้ำหลุดหายไป ดาวศุกร์จึงแทบไม่เหลือน้ำ';
+    else if (bA === 'thick') note = 'บรรยากาศ CO₂ หนาแน่นกักความร้อนไว้มาก (ปรากฏการณ์เรือนกระจกรุนแรง) อุณหภูมิสูงจนตะกั่วหลอมเหลวได้ แม้อยู่ไกลกว่าดาวพุธ';
+    else if (bA === 'none') note = 'ไม่มีบรรยากาศ ไม่มีอากาศกดทับผิวดาว น้ำจะระเหยหลุดสู่อวกาศ จึงไม่มีน้ำเหลว และไม่มีอะไรกักความร้อน กลางวันร้อนจัด กลางคืนหนาวจัด';
+    else note = 'บรรยากาศแบบโลกกักความร้อนไว้พอดี (ปรากฏการณ์เรือนกระจกตามธรรมชาติ) ระยะห่างจากดวงอาทิตย์เป็นตัวกำหนดว่าน้ำจะเป็นน้ำแข็ง ของเหลว หรือไอ';
+    $('bNote').innerHTML = '<b>สังเกต</b> ' + note;
+    logB();
+    if (tab === 'B' && !bAnim) drawLab();
+  }
+  function logB() {
+    var h = '', k = rowKey(bD, bA, bM);
+    ROWS.forEach(function (r, i) { var on = S.recB[i], T = tempC(r.d, r.a, r.m);
+      h += '<tr' + (i === k ? ' class="cur"' : '') + '><td class="n">การทดลองที่ ' + r.e + '</td><td>' + r.d.toFixed(1) + '</td><td>' + ATM[r.a].s + '</td><td>' + (r.m ? 'มี' : 'ไม่มี') + '</td><td>' + (on ? (T > 0 ? '+' : T < 0 ? '−' : '') + Math.abs(T) : '-') + '</td><td>' + (on ? water(r.d, r.a, r.m) : '-') + '</td></tr>'; });
+    $('logB').innerHTML = h;
+  }
+  $('recB').onclick = function () { var k = rowKey(bD, bA, bM); if (k < 0) return; S.recB[k] = 1; save(); updB(); var n = Object.keys(S.recB).length; $('recBMsg').textContent = 'บันทึกแล้ว ' + n + '/7' + (n === 7 ? ' ครบแล้ว' : ''); };
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 โครงสร้างดวงอาทิตย์
+  var SUN = [
+    { n: 'แก่น (core)', t: 'ประมาณ 15 ล้านเคลวิน', r0: 0, r1: .25,
+      d: 'ใจกลางของดวงอาทิตย์ ความดันและอุณหภูมิสูงมาก เกิดปฏิกิริยาฟิวชันหลอมไฮโดรเจนเป็นฮีเลียม เป็นแหล่งพลังงานทั้งหมดของดวงอาทิตย์ (เชื่อมกับ E4)' },
+    { n: 'เขตการแผ่รังสี', t: 'ประมาณ 7 ล้าน – 2 ล้านเคลวิน', r0: .25, r1: .7,
+      d: 'พลังงานจากแก่นถูกส่งออกมาในรูปการแผ่รังสี ถูกดูดกลืนและปล่อยออกซ้ำไปมานับครั้งไม่ถ้วน กว่าจะผ่านชั้นนี้ไปได้ใช้เวลานานนับแสนปี' },
+    { n: 'เขตการพาความร้อน', t: 'ประมาณ 2 ล้าน – 6,000 เคลวิน', r0: .7, r1: .985,
+      d: 'แก๊สร้อนด้านล่างลอยตัวขึ้น แก๊สที่เย็นลงจมกลับลงไป หมุนวนเหมือนน้ำเดือดในหม้อ ที่ผิวจึงเห็นเป็นเม็ดเล็ก ๆ เรียกว่าแกรนูล' },
+    { n: 'โฟโตสเฟียร์', t: 'ประมาณ 5,800 เคลวิน', r0: .985, r1: 1,
+      d: 'ผิวของดวงอาทิตย์ที่เรามองเห็น แสงสว่างที่มาถึงโลกส่วนใหญ่มาจากชั้นนี้ (อุณหภูมิ 5,800 K จึงเป็นดาวชนิด G สีเหลือง ตามที่เรียนใน E5) และเป็นบริเวณที่เกิดจุดมืด' },
+    { n: 'โครโมสเฟียร์', t: 'ประมาณ 4,500 – 20,000 เคลวิน', r0: 1, r1: 1.04,
+      d: 'บรรยากาศชั้นบางเหนือโฟโตสเฟียร์ มีสีแดงชมพู มองเห็นได้ขณะเกิดสุริยุปราคาเต็มดวง หรือใช้กล้องที่มีแผ่นกรองแสงพิเศษ (ห้ามมองดวงอาทิตย์ด้วยตาเปล่า)' },
+    { n: 'คอโรนา', t: 'ประมาณ 1 – 2 ล้านเคลวิน', r0: 1.04, r1: 1.75,
+      d: 'บรรยากาศชั้นนอกสุด แผ่ออกไปไกลหลายล้านกิโลเมตร เห็นเป็นแสงสีขาวนวลรอบดวงอาทิตย์ขณะเกิดสุริยุปราคาเต็มดวง ร้อนมากจนแก๊สหลุดออกไปเป็นลมสุริยะ' }
+  ];
+  var SPH = [
+    { n: 'จุดมืด (sunspot)', t: 'ประมาณ 4,000 เคลวิน (เย็นกว่ารอบข้าง)',
+      d: 'บริเวณบนโฟโตสเฟียร์ที่เย็นกว่ารอบข้างจึงดูมืด เกิดจากสนามแม่เหล็กที่เข้มข้นมาก จำนวนจุดมืดเพิ่มและลดเป็นรอบ เรียกว่าวัฏจักรสุริยะ ประมาณ 11 ปี (ช่วงสูงสุดล่าสุดราว พ.ศ. 2567–2568) ช่วงที่มีจุดมืดมากเกิดพายุสุริยะบ่อย' },
+    { n: 'เปลวสุริยะ (solar flare)', t: 'แสงและรังสีเอกซ์ถึงโลกในประมาณ 8 นาที',
+      d: 'การระเบิดปลดปล่อยพลังงานมหาศาลอย่างฉับพลันบริเวณจุดมืด เห็นเป็นแสงวาบสว่างจ้า รังสีเอกซ์และอัลตราไวโอเลตรบกวนชั้นไอโอโนสเฟียร์ด้านกลางวันของโลก ทำให้วิทยุสื่อสารคลื่นสั้นขัดข้อง' },
+    { n: 'การพ่นมวลคอโรนา (CME)', t: 'ถ้าพุ่งมาทางโลก ถึงใน 1–3 วัน',
+      d: 'คอโรนาปลดปล่อยกลุ่มแก๊สร้อน (พลาสมา) มวลมหาศาลพร้อมสนามแม่เหล็กออกสู่อวกาศ ถ้าพุ่งมาทางโลกจะชนสนามแม่เหล็กโลก ทำให้เกิดพายุแม่เหล็กโลก แสงออโรราสว่าง และส่งผลต่อดาวเทียม GPS และระบบไฟฟ้า' }
+  ];
+  var selS = 0, selP = -1;
+  function drawSun() {
+    var c = fit($('cvSun')), x = c.x, W = c.W, H = c.H, narrow = W < 520;
+    x.fillStyle = '#02030a'; x.fillRect(0, 0, W, H); starfield(x, W, H, .35);
+    var R = Math.min(H * .32, W * (narrow ? .3 : .24)), cx = narrow ? W * .42 : W * .4, cy = H * .53;
+    // คอโรนา
+    var cg = x.createRadialGradient(cx, cy, R * .95, cx, cy, R * 1.8); cg.addColorStop(0, 'rgba(255,240,210,.55)'); cg.addColorStop(.35, 'rgba(255,230,200,.18)'); cg.addColorStop(1, 'rgba(255,230,200,0)');
+    x.fillStyle = cg; x.beginPath(); x.arc(cx, cy, R * 1.8, 0, 6.283); x.fill();
+    for (var i = 0; i < 16; i++) { var a = i * .393 + .1; x.strokeStyle = 'rgba(255,240,220,.12)'; x.lineWidth = 3; x.beginPath(); x.moveTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R); x.lineTo(cx + Math.cos(a) * R * (1.5 + (i % 3) * .12), cy + Math.sin(a) * R * (1.5 + (i % 3) * .12)); x.stroke(); }
+    // โครโมสเฟียร์
+    x.fillStyle = 'rgba(255,90,110,.9)'; x.beginPath(); x.arc(cx, cy, R * 1.04, 0, 6.283); x.fill();
+    // โฟโตสเฟียร์ (ผิว)
+    var pg = x.createRadialGradient(cx - R * .2, cy - R * .2, R * .1, cx, cy, R); pg.addColorStop(0, '#FFF3C4'); pg.addColorStop(.7, '#FFC24D'); pg.addColorStop(1, '#F08A24');
+    x.fillStyle = pg; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.fill();
+    // จุดมืด
+    [[-.45, -.25, .07], [-.38, -.18, .045], [-.55, .35, .05], [.1, .62, .035]].forEach(function (s) { x.fillStyle = 'rgba(90,40,10,.85)'; x.beginPath(); x.arc(cx + s[0] * R, cy + s[1] * R, s[2] * R, 0, 6.283); x.fill(); x.fillStyle = 'rgba(40,15,5,.9)'; x.beginPath(); x.arc(cx + s[0] * R, cy + s[1] * R, s[2] * R * .5, 0, 6.283); x.fill(); });
+    // ช่องตัด (ไตรมาสขวาบน)
+    var a0 = -Math.PI / 2, a1 = 0;
+    function wedge(r0, r1, col) { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, r1, a0, a1); x.arc(cx, cy, r0, a1, a0, true); x.closePath(); x.fill(); }
+    wedge(R * .7, R * .985, '#E8682A'); wedge(R * .25, R * .7, '#F59A3A'); wedge(0, R * .25, '#FFF6D0');
+    // เซลล์พาความร้อน
+    x.strokeStyle = 'rgba(255,220,150,.55)'; x.lineWidth = 1.4;
+    for (i = 0; i < 6; i++) { var am = a0 + (i + .5) * (Math.PI / 2) / 6, rm = R * .842; x.beginPath(); x.arc(cx + Math.cos(am) * rm, cy + Math.sin(am) * rm, R * .1, 0, 6.283); x.stroke(); }
+    // ลูกศรรังสีในเขตแผ่รังสี
+    x.strokeStyle = 'rgba(255,255,220,.5)'; x.lineWidth = 1;
+    for (i = 0; i < 4; i++) { var ar = a0 + (i + .5) * (Math.PI / 2) / 4; x.beginPath(); for (var t = 0; t <= 12; t++) { var rr = R * (.28 + t * .033), zz = (t % 2 ? 1 : -1) * .04; x.lineTo(cx + Math.cos(ar + zz) * rr, cy + Math.sin(ar + zz) * rr); } x.stroke(); }
+    x.strokeStyle = 'rgba(0,0,0,.35)'; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx, cy - R); x.moveTo(cx, cy); x.lineTo(cx + R, cy); x.stroke();
+    // ปรากฏการณ์
+    var fl = selP === 1 ? 1 : .5;
+    var fx = cx - .62 * R, fy = cy - .68 * R; var fg = x.createRadialGradient(fx, fy, 0, fx, fy, R * .22 * (selP === 1 ? 1.4 : 1)); fg.addColorStop(0, 'rgba(255,255,255,' + fl + ')'); fg.addColorStop(1, 'rgba(255,255,255,0)'); x.fillStyle = fg; x.beginPath(); x.arc(fx, fy, R * .3, 0, 6.283); x.fill();
+    x.strokeStyle = 'rgba(255,130,120,.85)'; x.lineWidth = 3; x.beginPath(); x.ellipse(cx - R * .95, cy + R * .45, R * .18, R * .28, -.5, Math.PI * .9, Math.PI * 2.1); x.stroke();
+    var cmeK = selP === 2 ? 1 : .55;
+    x.strokeStyle = 'rgba(255,200,160,' + (.55 * cmeK) + ')'; x.lineWidth = 2;
+    for (i = 0; i < 3; i++) { x.beginPath(); x.arc(cx - R * 1.05 - i * R * .14, cy + R * .1, R * (.3 + i * .14), Math.PI * .55, Math.PI * 1.45); x.stroke(); }
+    x.fillStyle = 'rgba(255,200,160,' + (.18 * cmeK) + ')'; x.beginPath(); x.arc(cx - R * 1.25, cy + R * .1, R * .4, 0, 6.283); x.fill();
+    // ป้ายตัวเลข
+    var LBL = [[.12, -.12], [.45, -.32], [.8, -.55], [.995, -.1], [1.02, .05], [1.4, -.9]];
+    var lx = narrow ? W - 12 : W - 16;
+    x.font = '700 13px "Chakra Petch", Sarabun, sans-serif';
+    SUN.forEach(function (s, i) {
+      var p = LBL[i], ang = i < 3 ? a0 + (Math.PI / 2) * (.25 + i * .25) : (i === 3 ? -.15 : i === 4 ? -.4 : -.75);
+      var rr = i < 3 ? R * (s.r0 + s.r1) / 2 : i === 5 ? R * 1.45 : R * (s.r0 + s.r1) / 2;
+      if (i < 3) ang = a0 + (Math.PI / 2) * [.55, .3, .12][i];
+      var ax = cx + Math.cos(ang) * rr, ay = cy + Math.sin(ang) * rr, ty = 30 + i * ((H - 60) / 5);
+      var on = selP < 0 && i === selS;
+      x.strokeStyle = on ? '#4FD8FF' : 'rgba(232,237,255,.55)'; x.lineWidth = on ? 2 : 1;
+      x.beginPath(); x.moveTo(ax, ay); x.lineTo(lx - (narrow ? 22 : 150), ty); x.lineTo(lx - (narrow ? 18 : 146), ty); x.stroke();
+      x.fillStyle = on ? '#4FD8FF' : '#FFD166'; x.beginPath(); x.arc(lx - (narrow ? 9 : 136), ty, 10, 0, 6.283); x.fill();
+      x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(String(i + 1), lx - (narrow ? 9 : 136), ty + 4.5);
+      if (!narrow) { x.fillStyle = on ? '#4FD8FF' : '#E8EDFF'; x.textAlign = 'left'; x.font = '600 13px Sarabun, sans-serif'; x.fillText(S.sun[i] ? s.n.replace(/ \(.*\)/, '') : '?', lx - 120, ty + 4.5); x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; }
+    });
+    if (selP >= 0) {
+      var PP = [[cx - .45 * R, cy - .25 * R, R * .16], [fx, fy, R * .22], [cx - R * 1.25, cy + R * .1, R * .5]][selP];
+      x.strokeStyle = '#4FD8FF'; x.lineWidth = 2; x.setLineDash([5, 4]); x.beginPath(); x.arc(PP[0], PP[1], PP[2], 0, 6.283); x.stroke(); x.setLineDash([]);
+    }
+    x.textAlign = 'left'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพตัดขวาง ไม่ตามมาตราส่วน', 8, H - 6);
+  }
+  function updSun() {
+    var it = selP >= 0 ? SPH[selP] : SUN[selS];
+    $('sKind').textContent = selP >= 0 ? 'ปรากฏการณ์บนดวงอาทิตย์' : 'ชั้นที่ ' + (selS + 1) + ' ของดวงอาทิตย์ (จากในสุดไปนอกสุด)';
+    $('sName').textContent = (selP >= 0 ? '' : (selS + 1) + '. ') + it.n; $('sTemp').textContent = it.t; $('sDesc').textContent = it.d;
+    var h = '<span class="lbl">ชั้นของดวงอาทิตย์</span>';
+    SUN.forEach(function (s, i) { h += '<button class="chip' + (selP < 0 && i === selS ? ' on' : '') + (S.sun[i] ? ' done' : '') + '" data-l="' + i + '">' + (i + 1) + ' ' + s.n.replace(/ \(.*\)/, '') + '</button>'; });
+    $('sChips').innerHTML = h; bindChips($('sChips'), 'l', function (v) { selS = +v; selP = -1; S.sun[selS] = 1; save(); updSun(); });
+    h = '<span class="lbl">ปรากฏการณ์</span>';
+    SPH.forEach(function (s, i) { h += '<button class="chip' + (i === selP ? ' on' : '') + (S.sun['p' + i] ? ' done' : '') + '" data-q="' + i + '">' + s.n.replace(/ \(.*\)/, '') + '</button>'; });
+    $('sChips2').innerHTML = h; bindChips($('sChips2'), 'q', function (v) { selP = +v; S.sun['p' + selP] = 1; save(); updSun(); });
+    var n = Object.keys(S.sun).length;
+    $('sMsg').textContent = 'ดูแล้ว ' + n + '/9' + (n === 9 ? ' ครบแล้ว เขียนชื่อชั้น 1–6 ลงใบงานส่วนที่ 3' : '');
+    if (tab === 'C') drawSun();
+  }
+  $('cvSun').addEventListener('click', function (ev) {
+    var b = this.getBoundingClientRect(), W = b.width, H = b.height, narrow = W < 520, R = Math.min(H * .32, W * (narrow ? .3 : .24)), cx = narrow ? W * .42 : W * .4, cy = H * .53;
+    var d = Math.hypot(ev.clientX - b.left - cx, ev.clientY - b.top - cy) / R;
+    for (var i = 0; i < SUN.length; i++) if (d >= SUN[i].r0 && d < SUN[i].r1) { selS = i; selP = -1; S.sun[i] = 1; save(); updSun(); return; }
+  });
+
+  // ================================================================ ภารกิจ C ขั้นที่ 2 เดินทางถึงโลก
+  var TRIP = [{ n: 'แสงและรังสีเอกซ์จากเปลวสุริยะ', s: 'แสง/รังสีเอกซ์', v: 300000, col: [255, 255, 230], dur: 1.2 },
+    { n: 'ลมสุริยะปกติ', s: 'ลมสุริยะปกติ', v: 400, col: [255, 209, 102], dur: 5 },
+    { n: 'การพ่นมวลคอโรนา (CME) แบบเร็ว', s: 'CME แบบเร็ว', v: 1500, col: [255, 140, 110], dur: 3 }];
+  var selT = 0, tProg = -1, tAnim = null, DIST = 150e6;
+  function tripTxt(v) {
+    var s = DIST / v;
+    if (s < 3600) { var m = Math.floor(s / 60), sc = Math.round(s - m * 60); return 'ประมาณ ' + m + ' นาที ' + sc + ' วินาที'; }
+    var h = s / 3600; if (h < 48) return 'ประมาณ ' + Math.round(h) + ' ชั่วโมง (1 วันกว่า)';
+    var d = Math.floor(h / 24), hh = Math.round(h - d * 24); return 'ประมาณ ' + d + ' วัน ' + hh + ' ชั่วโมง';
+  }
+  function shortTxt(v) { var s = DIST / v; if (s < 3600) return 'ประมาณ 8 นาที'; var h = s / 3600; if (h < 48) return 'ประมาณ ' + Math.round(h) + ' ชั่วโมง'; return 'ประมาณ ' + Math.round(h / 24) + ' วัน'; }
+  function drawTrip() {
+    var c = fit($('cvTrip')), x = c.x, W = c.W, H = c.H, tr = TRIP[selT], p = tProg;
+    x.fillStyle = '#02030a'; x.fillRect(0, 0, W, H); starfield(x, W, H, .45);
+    var sx = 0, ex = W - 70, cy = H * .5;
+    var sg = x.createRadialGradient(sx, cy, 10, sx, cy, 110); sg.addColorStop(0, 'rgba(255,235,160,1)'); sg.addColorStop(.5, 'rgba(255,180,70,.85)'); sg.addColorStop(1, 'rgba(255,150,60,0)');
+    x.fillStyle = sg; x.beginPath(); x.arc(sx, cy, 110, 0, 6.283); x.fill();
+    // สนามแม่เหล็กโลก (แมกนีโตสเฟียร์)
+    x.strokeStyle = 'rgba(79,216,255,.45)'; x.lineWidth = 1.3;
+    [1, 1.5, 2].forEach(function (k) { x.beginPath(); x.ellipse(ex + 12 * k, cy, 16 * k + 6, 26 * k + 8, 0, Math.PI * .5, Math.PI * 1.5); x.stroke(); x.beginPath(); x.moveTo(ex + 12 * k, cy - 26 * k - 8); x.lineTo(W, cy - 18 * k - 6); x.moveTo(ex + 12 * k, cy + 26 * k + 8); x.lineTo(W, cy + 18 * k + 6); x.stroke(); });
+    planet(x, ex, cy, 13, [70, 140, 230]);
+    x.fillStyle = '#E8EDFF'; x.font = '600 12.5px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('โลก', ex, cy + 32);
+    // หน้าคลื่น
+    if (p >= 0) {
+      var fx = lerp(70, ex - 20, Math.min(p, 1));
+      if (selT === 0) { x.strokeStyle = rgba(tr.col, .9); x.lineWidth = 3; x.beginPath(); x.arc(sx, cy, fx, -.5, .5); x.stroke(); }
+      else if (selT === 1) { var r = rnd(5); for (var i = 0; i < 90; i++) { var q = r(), wx = 60 + q * (fx - 60), wy = cy + (r() - .5) * (H - 40) * (.3 + q * .7); x.fillStyle = rgba(tr.col, .35 + .4 * r()); x.fillRect(wx, wy, 6, 1.5); } }
+      else { x.fillStyle = rgba(tr.col, .28); x.beginPath(); x.ellipse(fx - 30, cy, 18 + fx * .03, 24 + fx * .09, 0, 0, 6.283); x.fill(); x.strokeStyle = rgba(tr.col, .9); x.lineWidth = 2.5; x.beginPath(); x.ellipse(fx - 30, cy, 18 + fx * .03, 24 + fx * .09, 0, -1.3, 1.3); x.stroke(); }
+      if (p >= 1) {
+        if (selT === 0) { x.fillStyle = 'rgba(255,255,230,.35)'; x.beginPath(); x.arc(ex, cy, 13, Math.PI * .5, Math.PI * 1.5); x.fill(); }
+        else { x.strokeStyle = 'rgba(94,242,165,.95)'; x.lineWidth = 3; x.beginPath(); x.arc(ex, cy, 16, -2.2, -1); x.stroke(); x.beginPath(); x.arc(ex, cy, 16, 1, 2.2); x.stroke(); }
+        x.fillStyle = selT === 0 ? '#FFFFE6' : '#5EF2A5'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.textAlign = 'right';
+        x.fillText(selT === 0 ? 'วิทยุคลื่นสั้นด้านกลางวันขัดข้อง' : 'เกิดแสงออโรราที่ขั้วโลก', ex - 24, 22);
+      }
+      x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif'; x.textAlign = 'left';
+      var el = DIST / tr.v * Math.min(p, 1);
+      x.fillText('เวลาที่ผ่านไป ' + (el < 3600 ? (el / 60).toFixed(1) + ' นาที' : el < 172800 ? (el / 3600).toFixed(1) + ' ชั่วโมง' : (el / 86400).toFixed(1) + ' วัน'), 120, H - 12);
+    }
+    x.textAlign = 'left'; x.fillStyle = '#E8EDFF'; x.font = '600 13px Sarabun, sans-serif'; x.fillText(tr.n, 120, 20);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ไม่ตามมาตราส่วน', W - 8, H - 6);
+  }
+  function runTrip() {
+    if (tAnim) cancelAnimationFrame(tAnim);
+    var t0 = performance.now(), dur = reduce ? 1 : TRIP[selT].dur * 1000;
+    (function step(now) { tProg = clamp((now - t0) / dur, 0, 1); drawTrip(); if (tProg < 1) tAnim = requestAnimationFrame(step); else { tAnim = null; $('tTime').textContent = tripTxt(TRIP[selT].v); } })(t0);
+  }
+  function updTrip() {
+    var tr = TRIP[selT];
+    $('tSpd').textContent = fmt(tr.v) + ' กิโลเมตร/วินาที';
+    $('tTime').textContent = tProg >= 1 ? tripTxt(tr.v) : 'กดปล่อยจากดวงอาทิตย์';
+    var h = '<span class="lbl">สิ่งที่ออกจากดวงอาทิตย์</span>';
+    TRIP.forEach(function (t, i) { h += '<button class="chip' + (i === selT ? ' on' : '') + (S.recT[i] ? ' done' : '') + '" data-t="' + i + '">' + t.s + '</button>'; });
+    $('tChips').innerHTML = h; bindChips($('tChips'), 't', function (v) { selT = +v; tProg = -1; if (tAnim) cancelAnimationFrame(tAnim), tAnim = null; updTrip(); });
+    $('recT').disabled = tProg < 1;
+    var n = Object.keys(S.recT).length;
+    $('recTMsg').textContent = tProg < 1 ? 'กดปล่อยแล้วรอให้ถึงโลกก่อนบันทึก' : (n ? 'บันทึกแล้ว ' + n + '/3' + (n === 3 ? ' ครบแล้ว' : '') : '');
+    var lg = '';
+    TRIP.forEach(function (t, i) { lg += '<tr' + (i === selT ? ' class="cur"' : '') + '><td class="n">' + t.n + '</td><td>' + (S.recT[i] ? fmt(t.v) : '-') + '</td><td>' + (S.recT[i] ? shortTxt(t.v) : '-') + '</td></tr>'; });
+    $('logT').innerHTML = lg;
+    if (tab === 'C') drawTrip();
+  }
+  $('goT').onclick = function () { runTrip(); var w = setInterval(function () { if (tProg >= 1) { clearInterval(w); updTrip(); } }, 120); };
+  $('recT').onclick = function () { S.recT[selT] = 1; save(); var n = Object.keys(S.recT).length; if (n < 3) { for (var j = 1; j <= 3; j++) { var q = (selT + j) % 3; if (!S.recT[q]) { selT = q; tProg = -1; break; } } } updTrip(); $('recTMsg').textContent = 'บันทึกแล้ว ' + n + '/3' + (n === 3 ? ' ครบแล้ว' : ' · เลือกแบบถัดไปแล้วกดปล่อย'); };
+
+  // ================================================================ ภารกิจ C ขั้นที่ 3 ข่าวด่วน
+  var AL = [
+    { L: 'A', h: 'เปลวสุริยะรุนแรงระดับ X เกิดขึ้นเมื่อ 8 นาทีก่อน แสงและรังสีเอกซ์มาถึงโลกแล้ว', q: 'ใครได้รับผลกระทบทันที',
+      o: ['ไฟฟ้าดับทั่วประเทศไทยทันที', 'วิทยุสื่อสารคลื่นสั้นของเครื่องบินและเรือด้านกลางวันของโลกขัดข้อง', 'เกิดคลื่นสึนามิตามชายฝั่ง', 'น้ำทะเลขึ้นสูงผิดปกติ'], a: 1,
+      w: 'รังสีเอกซ์รบกวนชั้นไอโอโนสเฟียร์ที่ใช้สะท้อนคลื่นวิทยุสั้น เกิดเฉพาะด้านที่หันเข้าหาดวงอาทิตย์' },
+    { L: 'U', h: 'ตรวจพบการพ่นมวลคอโรนา (CME) พุ่งตรงมายังโลก ความเร็ว 1,500 กิโลเมตรต่อวินาที', q: 'ควรประกาศว่าจะถึงโลกเมื่อใด',
+      o: ['ประมาณ 8 นาที', 'ประมาณ 1 วันกว่า (ราว 28 ชั่วโมง)', 'ประมาณ 1 เดือน', 'ไม่มีวันถึงโลก'], a: 1,
+      w: '150 ล้านกิโลเมตร ÷ 1,500 กิโลเมตรต่อวินาที = 100,000 วินาที ประมาณ 28 ชั่วโมง มีเวลาเตรียมรับมือ' },
+    { L: 'R', h: 'พายุแม่เหล็กโลกรุนแรง อนุภาคพลังงานสูงนอกชั้นบรรยากาศเพิ่มขึ้นมาก', q: 'ควรแจ้งเตือนใครเป็นอันดับแรก',
+      o: ['ชาวประมงให้งดออกเรือ', 'นักเรียนให้หยุดเรียน', 'นักบินอวกาศบนสถานีอวกาศให้หลบในส่วนที่มีเกราะกำบังรังสี', 'เกษตรกรให้เก็บเกี่ยวข้าว'], a: 2,
+      w: 'นักบินอวกาศอยู่นอกบรรยากาศที่ช่วยกรองรังสี จึงเสี่ยงที่สุด บนพื้นโลกเราปลอดภัยเพราะมีสนามแม่เหล็กและบรรยากาศ' },
+    { L: 'O', h: 'บรรยากาศชั้นบนของโลกร้อนขึ้นและขยายตัวจากพายุแม่เหล็กโลก', q: 'ดาวเทียมวงโคจรต่ำจะเป็นอย่างไร',
+      o: ['ถูกแรงต้านของอากาศมากขึ้น วงโคจรต่ำลง อาจตกกลับสู่โลก', 'ลอยสูงขึ้นจนหลุดจากโลก', 'ไม่ได้รับผลใด ๆ', 'หมุนเร็วขึ้นสองเท่า'], a: 0,
+      w: 'เหตุการณ์จริง กุมภาพันธ์ พ.ศ. 2565 ดาวเทียม Starlink ที่เพิ่งปล่อยราว 38 ดวงตกกลับสู่โลกด้วยเหตุนี้' },
+    { L: 'R', h: 'ชั้นไอโอโนสเฟียร์เหนือประเทศไทยแปรปรวนจากพายุสุริยะ', q: 'คนไทยอาจพบปัญหาอะไร',
+      o: ['เห็นแสงออโรราทั่วกรุงเทพฯ', 'เกิดแผ่นดินไหว', 'GPS นำทางคลาดเคลื่อน สัญญาณดาวเทียมและวิทยุสะดุด', 'ฝนตกหนักทันที'], a: 2,
+      w: 'สัญญาณ GPS และดาวเทียมต้องผ่านชั้นไอโอโนสเฟียร์ เมื่อชั้นนี้แปรปรวน ตำแหน่งที่คำนวณได้จึงคลาดเคลื่อน ส่งผลต่อการบิน การเดินเรือ โดรน และแอปนำทาง' },
+    { L: 'A', h: 'คืนนี้ชาวนอร์เวย์และแคนาดาถามว่าจะเห็นอะไรบนท้องฟ้า', q: 'ควรตอบว่าอะไร',
+      o: ['สุริยุปราคาเต็มดวง', 'แสงออโรรา เพราะอนุภาคจากดวงอาทิตย์ถูกสนามแม่เหล็กโลกนำไปที่ขั้วโลก', 'ดาวหางดวงใหม่', 'รุ้งกินน้ำกลางคืน'], a: 1,
+      w: 'อนุภาคชนแก๊สออกซิเจนและไนโตรเจนในบรรยากาศชั้นบนจนเปล่งแสงสีเขียวและแดง ยิ่งพายุแรงยิ่งเห็นได้ไกลจากขั้วโลก' }
+  ];
+  function alertsUI() {
+    var h = '';
+    AL.forEach(function (a, i) {
+      var ok = S.al[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '" id="al' + i + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">ข่าวด่วน ' + (i + 1) + (ok ? ' · เตือนภัยแล้ว' : '') + '</div><div class="h">' + a.h + '</div><div class="q">' + a.q + '</div>';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      if (ok) h += '<div class="why">' + a.w + '</div>';
+      h += '</div>';
+    });
+    $('alerts').innerHTML = h;
+    Array.prototype.forEach.call($('alerts').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.al[i] === AL[i].a) return;
+        if (j === AL[i].a) { S.al[i] = j; save(); alertsUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    var code = AL.map(function (a, i) { return S.al[i] === a.a ? a.L : '_'; }).join(' ');
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + code + '</b>';
+    $('winC').classList.toggle('hide', !AL.every(function (a, i) { return S.al[i] === a.a; }));
+  }
+
+  // ================================================================ ภารกิจ C ขั้นที่ 4 คลังเหตุการณ์จริง
+  var EV = [
+    { y: '1–2 กันยายน พ.ศ. 2402 (ค.ศ. 1859)', n: 'พายุแคร์ริงตัน', d: 'พายุสุริยะรุนแรงที่สุดเท่าที่มีบันทึก ระบบโทรเลขในยุโรปและอเมริกาเหนือขัดข้อง บางแห่งเกิดประกายไฟ เห็นแสงออโรราได้ใกล้เขตร้อน', k: 'Carrington event 1859 พายุสุริยะ' },
+    { y: '13 มีนาคม พ.ศ. 2532 (ค.ศ. 1989)', n: 'ไฟดับทั้งรัฐควิเบก แคนาดา', d: 'พายุแม่เหล็กโลกทำให้ระบบไฟฟ้าของรัฐควิเบกล่มภายในไม่กี่นาที ประชาชนราว 6 ล้านคนไม่มีไฟฟ้าใช้ประมาณ 9 ชั่วโมง', k: 'Quebec blackout 1989 geomagnetic storm' },
+    { y: 'ตุลาคม–พฤศจิกายน พ.ศ. 2546 (ค.ศ. 2003)', n: 'พายุฮาโลวีน', d: 'เปลวสุริยะและ CME ต่อเนื่องหลายครั้ง ดาวเทียมหลายดวงเสียหาย เที่ยวบินเส้นทางขั้วโลกต้องเปลี่ยนเส้นทาง นักบินอวกาศบนสถานีอวกาศนานาชาติต้องหลบรังสี', k: 'Halloween solar storms 2003' },
+    { y: 'กุมภาพันธ์ พ.ศ. 2565 (ค.ศ. 2022)', n: 'ดาวเทียม Starlink ตกกลับสู่โลก', d: 'พายุแม่เหล็กโลกทำให้บรรยากาศชั้นบนหนาแน่นขึ้น ดาวเทียมที่เพิ่งปล่อยราว 38 ดวงถูกแรงต้านจนตกกลับสู่โลก', k: 'Starlink geomagnetic storm February 2022' },
+    { y: '10–11 พฤษภาคม พ.ศ. 2567 (ค.ศ. 2024)', n: 'พายุสุริยะรุนแรงในรอบกว่า 20 ปี', d: 'พายุแม่เหล็กโลกระดับรุนแรงที่สุด (G5) ผู้คนเห็นแสงออโรราไกลจากขั้วโลกกว่าปกติมาก ระบบ GPS ของรถแทรกเตอร์การเกษตรบางแห่งคลาดเคลื่อน', k: 'พายุสุริยะ พฤษภาคม 2567 / May 2024 solar storm' },
+    { y: 'ปัจจุบัน', n: 'ข่าวสภาพอวกาศของประเทศไทย', d: 'ติดตามข่าวพายุสุริยะและการแจ้งเตือนจากหน่วยงานไทย ผลต่อ GPS ดาวเทียม และการสื่อสารในประเทศไทย', k: 'พายุสุริยะ ประเทศไทย NARIT GISTDA สภาพอวกาศ' }
+  ];
+  $('events').innerHTML = EV.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="kw">คำค้น : ' + e.k + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawForm(); drawZone(); }
+    if (tab === 'B') drawLab();
+    if (tab === 'C') { drawSun(); drawTrip(); }
+  }
+  updForm(); updZone(); updB(); updSun(); updTrip(); alertsUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) bAnim = requestAnimationFrame(loopB);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_E6 = { STAGES: STAGES, ZONES: ZONES, SUN: SUN, TRIP: TRIP, temp: tempC, water: water,
+    stop: function () { if (bAnim) cancelAnimationFrame(bAnim); bAnim = null; fT = 3; },
+    setForm: function (k) { fStage = k; fPos = k; S.form[k] = 1; updForm(); drawForm(); },
+    setZone: function (z) { selZone = z; selObj = -1; updZone(); },
+    setB: function (d, a, m) { bD = d; bA = a; bM = m; updB(); drawLab(); },
+    setSun: function (i, p) { selS = i; selP = p; updSun(); },
+    setTrip: function (i, p) { selT = i; tProg = p; updTrip(); drawTrip(); },
+    recAll: function () { var i; for (i = 0; i < 5; i++) S.form[i] = 1; OBJ.forEach(function (o, j) { S.zone[j] = o.z; }); for (i = 0; i < 7; i++) S.recB[i] = 1;
+      for (i = 0; i < 6; i++) S.sun[i] = 1; for (i = 0; i < 3; i++) { S.sun['p' + i] = 1; S.recT[i] = 1; } AL.forEach(function (a, j) { S.al[j] = a.a; });
+      updForm(); updZone(); updB(); updSun(); updTrip(); alertsUI(); } };
+})();
+</script>
+</body>
+</html>

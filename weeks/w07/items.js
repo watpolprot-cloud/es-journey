@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(7, [
-  // { type: "worksheet", code: "E6", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E6", title: "สถานการณ์จำลอง ผู้พิทักษ์ระบบสุริยะ (ภารกิจ A B C)", file: "e6-sim-solar-guardian.html", note: "ใช้คู่กับใบงาน E6 · มีคลังเหตุการณ์พายุสุริยะจริงสำหรับสืบค้น · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e6-sim.png" },
+  { type: "worksheet", code: "E6", title: "ใบงาน E6 ผู้พิทักษ์ระบบสุริยะ (ภารกิจปลายทาง 1 แผ่น 2 หน้า)", file: "e6-worksheet.pdf", note: "5 คะแนน · ภารกิจปลายทาง ต้องทำครบทั้ง 4 ส่วน (ส่วนที่ 4 มีผู้ฟังลงชื่อ 2 คน) · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 7 E6 ระบบสุริยะ ดวงอาทิตย์ และลมสุริยะ", file: "w07-slides-e6-solar-guardian.pdf", note: "27 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
