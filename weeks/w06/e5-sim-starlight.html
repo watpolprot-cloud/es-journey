@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E5 หอสังเกตการณ์แสงดาว · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E5 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-E4) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #1c3a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 30px; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl .sp { flex: 1; min-width: 140px; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15.5px; line-height: 1.5; }
+.gauge .g { border-top: 1px dashed var(--line-hi); padding-top: 6px; margin-top: 4px; }
+.meter { font-family: var(--head); font-size: 40px; font-weight: 700; color: var(--ok); letter-spacing: .04em; text-shadow: 0 0 14px #5ef2a555; line-height: 1.1; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.read { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 16px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.stars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
+.st { font-family: var(--head); font-size: 15px; line-height: 1.2; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 8px; cursor: pointer; text-align: left; }
+.st small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.st.on { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px #4fd8ff33; }
+.st.done:not(.on) { border-color: var(--ok); }
+.st i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
+.mode { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.mode .btn { font-size: 14.5px; padding: 7px 10px; line-height: 1.25; }
+.mode .btn.on { background: var(--cyan); color: var(--ink); }
+.rank { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.rank ol { margin: 4px 0 0; padding-left: 22px; font-size: 15px; }
+.rank li b { color: var(--gold); font-family: var(--head); }
+.calc { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 6px; }
+select { font-family: var(--body); font-size: 15px; background: #0b1233; color: var(--text); border: 1.5px solid var(--line-hi); border-radius: 8px; padding: 5px 8px; }
+.calc .res { font-family: var(--head); font-size: 18px; color: var(--gold); }
+.ladder { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+.lad { border-radius: 10px; padding: 6px 4px; text-align: center; color: #06102A; font-family: var(--head); line-height: 1.15; }
+.lad b { display: block; font-size: 26px; }
+.lad span { font-size: 12.5px; display: block; }
+.mys { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 8px; }
+.my { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 8px 10px; background: #0b123388; display: grid; grid-template-columns: 320px 1fr; gap: 10px; align-items: center; }
+.my.ok { border-color: var(--ok); }
+.my canvas { border-radius: 8px; }
+.my .t { font-family: var(--head); font-size: 16px; color: var(--gold); }
+.my .r { font-size: 14.5px; color: var(--ok); min-height: 1.4em; }
+.cls { display: flex; gap: 5px; flex-wrap: wrap; margin: 4px 0; }
+.cls button { font-family: var(--head); font-weight: 700; font-size: 16px; width: 38px; height: 34px; border-radius: 8px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.cls button.ok { border-color: var(--ok); color: var(--ink); background: var(--ok); }
+.cls button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .rank { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .stars { grid-template-columns: 1fr 1fr 1fr; }
+  .read { grid-template-columns: 1fr 1fr; }
+  .info .v { font-size: 21px; }
+  .meter { font-size: 34px; }
+  .ladder { grid-template-columns: repeat(4, 1fr); }
+  .my { grid-template-columns: 1fr; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E5 <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>หอสังเกตการณ์<b>แสงดาว</b></h1>
+  <p class="lead">แสงดาวที่มาถึงตาเราบอกอะไรได้มากกว่าที่คิด ภารกิจนี้ให้นักบินวัดแสงดาวด้วยเครื่องวัดแสง เทียบความสว่างของดาวจริงบนท้องฟ้าด้วยโชติมาตร แล้วใช้เครื่องวิเคราะห์สเปกตรัมอ่านอุณหภูมิและชนิดของดาวจากสีของแสง จดผลลงใบงาน E5</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>เครื่องวัดแสงดาว<small>ความส่องสว่างขึ้นกับอะไร</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ไม้บรรทัดโชติมาตร<small>ดาวไหนสว่างจริง</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>เครื่องวิเคราะห์สเปกตรัม<small>สี อุณหภูมิ ชนิดของดาว</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> เครื่องวัดแสงดาว : ความส่องสว่างขึ้นกับอะไร</h2>
+    <p class="how">ห้องทดลองนี้มีดาวจำลอง (หลอดไฟ) กับเครื่องวัดแสงขนาด 1 ช่อง <b style="color:#FFD166">การทดลองที่ 1</b> ตั้งกำลังส่องสว่าง 1 เท่า แล้วเลื่อนเครื่องวัดไปที่ระยะ 1 2 3 4 · <b style="color:#4FD8FF">การทดลองที่ 2</b> ตั้งระยะ 2 แล้วเปลี่ยนกำลังส่องสว่าง 1 2 4 เท่า กด "บันทึกค่า" ทุกครั้ง แล้วจดลงใบงาน ส่วนที่ 1</p>
+    <div class="twin">
+      <canvas id="cvA" height="330" aria-label="ภาพแสงจากดาวจำลองกระจายออกไปถึงเครื่องวัดแสง"></canvas>
+      <div class="info gauge">
+        <div class="k">ค่าที่เครื่องวัดแสงอ่านได้ (ความส่องสว่าง)</div>
+        <div class="meter" id="aMeter">-</div>
+        <div class="k">หน่วยแสง</div>
+        <div class="g"><div class="k">ระยะห่างจากดาว</div><div class="v c" id="aDist">-</div></div>
+        <div class="g"><div class="k">กำลังส่องสว่างของดาว (แสงที่ดาวปล่อยออกมาทั้งหมด)</div><div class="v g" id="aLum">-</div></div>
+        <div class="g"><div class="k">แสงกระจายออกไปบนพื้นที่</div><div class="v p" id="aArea">-</div></div>
+      </div>
+    </div>
+    <div class="chips" id="distChips"></div>
+    <div class="chips" id="lumChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกค่า</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>การทดลอง</th><th>ระยะห่าง</th><th>กำลังส่องสว่าง</th><th>ค่าที่วัดได้ (หน่วยแสง)</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>สังเกต</b> แสงจากดาวแผ่ออกทุกทิศ ยิ่งไกลแสงยิ่งกระจายไปบนพื้นที่กว้าง ระยะห่าง 2 เท่า แสงกระจายบนพื้นที่ 2 × 2 = 4 ช่อง เครื่องวัด 1 ช่องจึงได้แสงเหลือ 1 ใน 4 · ดาวที่มีกำลังส่องสว่างมาก คือดาวที่ <b>มีขนาดใหญ่</b> หรือ <b>มีอุณหภูมิผิวสูง</b></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : จดค่าครบ 6 แถว แล้วตอบข้อ 1–3</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ไม้บรรทัดโชติมาตร : ดาวไหนสว่างจริง</h2>
+    <p class="how">โชติมาตร (แมกนิจูด) คือตัวเลขบอกความสว่างของดาว <b style="color:#FFD166">ยิ่งตัวเลขน้อย (หรือติดลบ) ยิ่งสว่าง</b> แตะชื่อดาวทีละดวง ดูค่าในโหมด "มองจากโลก" แล้วสลับเป็นโหมด "ย้ายไปที่ระยะ 32.6 ปีแสง" กด "บันทึกดาวดวงนี้" ให้ครบ 5 ดวง จดลงใบงาน ส่วนที่ 2</p>
+    <div class="mode"><button class="btn on" id="modeE">มองจากโลก<br><small>โชติมาตรปรากฏ (ความสว่างที่ตาเห็น)</small></button><button class="btn" id="modeT">ย้ายทุกดวงไปที่ระยะ 32.6 ปีแสง<br><small>โชติมาตรสัมบูรณ์ (ความสว่างจริง)</small></button></div>
+    <canvas id="cvSky" height="330" aria-label="ภาพท้องฟ้าแสดงดาวฤกษ์ 5 ดวง"></canvas>
+    <div class="stars" id="starBtns"></div>
+    <div class="read">
+      <div class="info"><div class="k">ดาว · สี</div><div class="v g" id="bName" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">โชติมาตรปรากฏ (มองจากโลก)</div><div class="v c" id="bApp" style="font-size:21px">-</div></div>
+      <div class="info"><div class="k">ระยะห่างจากโลก</div><div class="v p" id="bDist" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">โชติมาตรสัมบูรณ์ (ที่ระยะ 32.6 ปีแสง)</div><div class="v r" id="bAbs" style="font-size:21px">-</div></div>
+    </div>
+    <div class="note" id="bDesc" style="border-left-color:var(--cyan);background:#4fd8ff0d">-</div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกดาวดวงนี้</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ดาว</th><th>โชติมาตรปรากฏ</th><th>ระยะห่าง (ปีแสง)</th><th>โชติมาตรสัมบูรณ์</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="rank" id="rankBox"></div>
+    <h2 class="sub-h"><em>ไม้บรรทัดโชติมาตร</em> ต่างกัน 1 แมกนิจูด สว่างต่างกันประมาณ 2.5 เท่า</h2>
+    <canvas id="cvRuler" height="120" aria-label="ไม้บรรทัดโชติมาตรของวัตถุบนท้องฟ้า"></canvas>
+    <div class="calc"><span class="lbl">เครื่องเทียบ</span><select id="c1"></select><span class="lbl">สว่างกว่า</span><select id="c2"></select><select id="cm"><option value="m">เมื่อมองจากโลก</option><option value="M">เมื่ออยู่ที่ระยะเท่ากัน</option></select></div>
+    <div class="calc"><span class="res" id="cRes">-</span></div>
+    <div class="note">ความส่องสว่างที่เห็นจากโลก ขึ้นกับ <b>กำลังส่องสว่าง</b> ของดาว และ <b>ระยะห่าง</b> จากโลก ดาวบางดวงดูสว่างเพราะอยู่ใกล้ นักดาราศาสตร์จึงเทียบความสว่างจริงโดยสมมติให้ทุกดวงอยู่ที่ระยะเท่ากัน คือ 10 พาร์เซก (32.6 ปีแสง) เรียกว่า โชติมาตรสัมบูรณ์ · ต่างกัน 5 แมกนิจูด สว่างต่างกัน 100 เท่า · ตาเปล่ามองเห็นดาวได้ถึงโชติมาตรประมาณ +6</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 5 ดวง ตอบข้อ 4–5</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> เครื่องวิเคราะห์สเปกตรัม</h2>
+    <p class="how">ขั้นที่ 1 เลือกอุณหภูมิผิวของดาวทีละค่า (7 ค่า) สังเกตสีของดาว ยอดกราฟ และลายเส้นสเปกตรัม กด "บันทึกค่า" ให้ครบ 7 ค่า จดลงใบงาน ส่วนที่ 3 · ขั้นที่ 2 ไขรหัสดาวปริศนา 5 ดวง ระบุชนิดสเปกตรัมจากสีและลายเส้น ทำครบได้รหัสผ่าน จดลงใบงาน ส่วนที่ 4</p>
+    <canvas id="cvSpec" height="340" aria-label="กราฟสเปกตรัมของดาวฤกษ์ตามอุณหภูมิผิว"></canvas>
+    <div class="ctrl"><span class="lbl">อุณหภูมิผิว</span><input class="sp" id="slT" type="range" min="0" max="1000" step="1" value="500" aria-label="อุณหภูมิผิวของดาว"><span class="lbl" id="tTxt" style="min-width:90px;text-align:right">-</span></div>
+    <div class="chips" id="tChips"></div>
+    <div class="read">
+      <div class="info"><div class="k">อุณหภูมิผิว</div><div class="v r" id="cT" style="font-size:21px">-</div></div>
+      <div class="info"><div class="k">สีของดาว</div><div class="v g" id="cCol" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">ชนิดสเปกตรัม</div><div class="v c" id="cCls" style="font-size:21px">-</div></div>
+      <div class="info"><div class="k">ยอดกราฟ (แสงที่เปล่งมากที่สุด)</div><div class="v p" id="cPeak" style="font-size:17px">-</div></div>
+    </div>
+    <div class="ctrl"><button class="btn gold solid" id="recC">บันทึกค่า</button><span class="lbl" id="recCMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>อุณหภูมิผิว (K)</th><th>สีของดาว</th><th>ชนิดสเปกตรัม</th><th>ยอดกราฟอยู่ช่วง</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+    <div id="ladWrap" class="hide">
+      <h2 class="sub-h"><em>สรุป</em> ชนิดสเปกตรัมของดาวฤกษ์ เรียงจากร้อนที่สุดไปเย็นที่สุด</h2>
+      <div class="ladder" id="ladder"></div>
+    </div>
+    <div class="note">ดาวยิ่งร้อน สียิ่งไปทางน้ำเงิน ยอดกราฟเลื่อนไปทางความยาวคลื่นสั้น (สีม่วง อัลตราไวโอเลต) · ดาวยิ่งเย็น สียิ่งไปทางแดง ยอดกราฟเลื่อนไปทางความยาวคลื่นยาว (สีแดง อินฟราเรด) · เส้นมืดในแถบสเปกตรัมเกิดจากแก๊สในบรรยากาศของดาวดูดกลืนแสงบางสี ใช้บอกชนิดของดาวได้เหมือนลายนิ้วมือ</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ไขรหัสดาวปริศนา 5 ดวง</h2>
+    <p class="how" style="margin-bottom:4px">ดูสีของดาวและลายเส้นสเปกตรัม แล้วแตะชนิดสเปกตรัมที่ถูกต้อง (เทียบกับเครื่องวิเคราะห์ด้านบนได้)</p>
+    <div class="mys" id="mys"></div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">OBAFGKM</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 4 · รหัสนี้คือชนิดสเปกตรัมเรียงจากร้อนที่สุดไปเย็นที่สุด จำง่าย ๆ ด้วยประโยค "Oh Be A Fine Girl/Guy, Kiss Me"</div>
+    </div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 7 อุณหภูมิ ตอบข้อ 6 · <b>ส่วนที่ 4</b> : ดาวปริศนา 5 ดวงและรหัสผ่าน · <b>ส่วนที่ 5</b> : การ์ดเกมดาวฤกษ์</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ (ปัดให้จำง่าย) · ภาพดาวเป็นภาพจำลอง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e5_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.recC = S.recC || {}; S.quiz = S.quiz || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function mag(v) { return (v < 0 ? '−' : '+') + Math.abs(v).toFixed(1); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(99), a = []; for (var i = 0; i < 260; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k, x0) { x0 = x0 || 0; STARF.forEach(function (s) { var px = s[0] * W; if (px < x0) return; x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(px, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  // สีของดาวตามอุณหภูมิผิว (เคลวิน)
+  function tcol(T) {
+    var P = [[2500, [255, 110, 70]], [3000, [255, 128, 78]], [3700, [255, 160, 95]], [4500, [255, 196, 130]], [5800, [255, 236, 175]], [7000, [252, 248, 225]],
+      [9000, [238, 242, 255]], [12000, [208, 222, 255]], [20000, [180, 200, 255]], [40000, [150, 175, 255]]];
+    if (T <= P[0][0]) return P[0][1];
+    for (var i = 1; i < P.length; i++) if (T <= P[i][0]) { var t = (T - P[i - 1][0]) / (P[i][0] - P[i - 1][0]); return P[i - 1][1].map(function (c, j) { return Math.round(lerp(c, P[i][1][j], t)); }); }
+    return P[P.length - 1][1];
+  }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function ball(x, cx, cy, r, col, glow) {
+    if (glow) { var g = x.createRadialGradient(cx, cy, r * .6, cx, cy, r * glow); g.addColorStop(0, rgba(col, .55)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r * glow, 0, 6.283); x.fill(); }
+    var b = x.createRadialGradient(cx - r * .3, cy - r * .3, r * .1, cx, cy, r);
+    b.addColorStop(0, 'rgba(255,255,250,1)'); b.addColorStop(.35, rgba(col, 1)); b.addColorStop(1, rgba(col.map(function (c) { return Math.round(c * .6); }), 1));
+    x.fillStyle = b; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill();
+  }
+  // ชนิดสเปกตรัม (ค่าโดยประมาณ)
+  var CLS = [
+    { c: 'O', lo: 30000, hi: 50000, col: 'น้ำเงิน', rng: '30,000 K ขึ้นไป', T: 35000 },
+    { c: 'B', lo: 10000, hi: 30000, col: 'น้ำเงินแกมขาว', rng: '10,000–30,000 K', T: 20000 },
+    { c: 'A', lo: 7500, hi: 10000, col: 'ขาว', rng: '7,500–10,000 K', T: 9000 },
+    { c: 'F', lo: 6000, hi: 7500, col: 'ขาวแกมเหลือง', rng: '6,000–7,500 K', T: 7000 },
+    { c: 'G', lo: 5200, hi: 6000, col: 'เหลือง', rng: '5,200–6,000 K', T: 5800 },
+    { c: 'K', lo: 3700, hi: 5200, col: 'ส้ม', rng: '3,700–5,200 K', T: 4500 },
+    { c: 'M', lo: 2000, hi: 3700, col: 'แดง', rng: 'ต่ำกว่า 3,700 K', T: 3000 }
+  ];
+  function clsOf(T) { for (var i = 0; i < CLS.length; i++) if (T >= CLS[i].lo) return CLS[i]; return CLS[6]; }
+
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A เครื่องวัดแสงดาว
+  var BASE = 3600;           // ค่าที่วัดได้ที่ระยะ 1 กำลังส่องสว่าง 1 เท่า
+  var dA = 1, LA = 1;
+  var ROWS = [ // การทดลอง ระยะ กำลังส่องสว่าง
+    { e: 1, d: 1, L: 1 }, { e: 1, d: 2, L: 1 }, { e: 1, d: 3, L: 1 }, { e: 1, d: 4, L: 1 },
+    { e: 2, d: 2, L: 2 }, { e: 2, d: 2, L: 4 }];
+  function readA(d, L) { return BASE * L / (d * d); }
+  function rowKey(d, L) { for (var i = 0; i < ROWS.length; i++) if (ROWS[i].d === d && ROWS[i].L === L) return i; return -1; }
+  function drawA() {
+    var c = fit($('cvA')), x = c.x, W = c.W, H = c.H;
+    var g0 = x.createLinearGradient(0, 0, 0, H); g0.addColorStop(0, '#05081a'); g0.addColorStop(1, '#0a0b20'); x.fillStyle = g0; x.fillRect(0, 0, W, H);
+    starfield(x, W, H, .5);
+    var side = W < 520, sx = 40, sy = H * .44, step = (W * (side ? .86 : .62) - sx - 20) / 4, u = Math.min(22, H * .07);
+    var col = tcol(LA === 1 ? 5200 : LA === 2 ? 6500 : 9000);
+    // ลำแสงที่ผ่านช่อง 1 ช่องที่ระยะ 1 แล้วกระจายออก
+    var xd = sx + step * dA;
+    var gl = x.createLinearGradient(sx, 0, xd, 0); gl.addColorStop(0, rgba(col, .55)); gl.addColorStop(1, rgba(col, .12 + .1 * LA / 4));
+    x.fillStyle = gl; x.beginPath(); x.moveTo(sx, sy); x.lineTo(xd, sy - u * dA); x.lineTo(xd, sy + u * dA); x.closePath(); x.fill();
+    x.strokeStyle = rgba(col, .6); x.lineWidth = 1; x.setLineDash([4, 4]);
+    x.beginPath(); x.moveTo(sx, sy); x.lineTo(sx + step * 4, sy - u * 4); x.moveTo(sx, sy); x.lineTo(sx + step * 4, sy + u * 4); x.stroke(); x.setLineDash([]);
+    // แถบระยะ
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 2; x.beginPath(); x.moveTo(sx, H - 40); x.lineTo(sx + step * 4 + 10, H - 40); x.stroke();
+    x.font = '600 13px Sarabun, sans-serif'; x.textAlign = 'center';
+    for (var k = 1; k <= 4; k++) {
+      var xk = sx + step * k;
+      x.strokeStyle = '#3A4A85'; x.beginPath(); x.moveTo(xk, H - 46); x.lineTo(xk, H - 34); x.stroke();
+      x.fillStyle = k === dA ? '#FFD166' : '#9AA6CF'; x.fillText('ระยะ ' + k, xk, H - 18);
+      // ฉากรับแสง k × k ช่อง (มุมข้าง)
+      x.strokeStyle = k === dA ? 'rgba(255,209,102,.9)' : 'rgba(154,166,207,.25)'; x.lineWidth = k === dA ? 2 : 1;
+      for (var j = 0; j <= k; j++) { x.beginPath(); x.moveTo(xk - 3, sy - u * k + j * 2 * u); x.lineTo(xk + 3, sy - u * k + j * 2 * u); x.stroke(); }
+      x.beginPath(); x.moveTo(xk, sy - u * k); x.lineTo(xk, sy + u * k); x.stroke();
+    }
+    // เครื่องวัดแสง (1 ช่อง) ที่ระยะที่เลือก
+    var mh = 2 * u, my = sy - u;
+    x.fillStyle = '#5EF2A5'; x.fillRect(xd - 2, my, 9, mh);
+    x.fillStyle = '#0b1233'; x.strokeStyle = '#5EF2A5'; x.lineWidth = 1.5; x.fillRect(xd + 7, my - 2, 16, mh + 4); x.strokeRect(xd + 7, my - 2, 16, mh + 4);
+    x.fillStyle = '#5EF2A5'; x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('เครื่องวัด', xd + 15, my - 8);
+    // ดาวจำลอง
+    ball(x, sx, sy, 9 + 3 * Math.sqrt(LA), col, 3.2);
+    x.fillStyle = '#FFD166'; x.font = '600 13px Sarabun, sans-serif'; x.textAlign = 'left'; x.fillText('ดาวจำลอง', 10, 20);
+    // มุมหน้า : พื้นที่ที่แสงกระจาย d × d ช่อง
+    if (!side) {
+      var px0 = W * .66, pw = W * .31, ph = H - 80, cell = Math.min(pw, ph) / 4.3, gx = px0 + (pw - cell * 4) / 2, gy = 40 + (ph - cell * 4) / 2;
+      x.fillStyle = '#9AA6CF'; x.font = '600 13px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('มองจากด้านหน้าที่ระยะ ' + dA, px0 + pw / 2, 26);
+      var inten = clamp(LA / (dA * dA), 0, 4) / 4;
+      for (var r = 0; r < 4; r++) for (var q = 0; q < 4; q++) {
+        var inside = r < dA && q < dA, cx2 = gx + (q + (4 - dA) / 2) * cell, cy2 = gy + (r + (4 - dA) / 2) * cell;
+        if (!inside) continue;
+        x.fillStyle = rgba(col, .15 + .8 * inten); x.fillRect(cx2 + 1, cy2 + 1, cell - 2, cell - 2);
+      }
+      var mx = gx + (4 - dA) / 2 * cell, myy = gy + (4 - dA) / 2 * cell;
+      x.strokeStyle = '#5EF2A5'; x.lineWidth = 3; x.strokeRect(mx + 1.5, myy + 1.5, cell - 3, cell - 3);
+      x.strokeStyle = 'rgba(255,209,102,.8)'; x.lineWidth = 1.5; x.strokeRect(gx + (4 - dA) / 2 * cell, gy + (4 - dA) / 2 * cell, cell * dA, cell * dA);
+      x.fillStyle = '#E8EDFF'; x.font = '600 14px Sarabun, sans-serif';
+      x.fillText(dA + ' × ' + dA + ' = ' + (dA * dA) + ' ช่อง', px0 + pw / 2, H - 46);
+      x.fillStyle = '#5EF2A5'; x.font = '12.5px Sarabun, sans-serif'; x.fillText('กรอบเขียว = เครื่องวัด 1 ช่อง', px0 + pw / 2, H - 26);
+    }
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพจำลอง ไม่ตามมาตราส่วน', W - 8, H - 4); x.textAlign = 'left';
+  }
+  function updA() {
+    $('aMeter').textContent = fmt(readA(dA, LA));
+    $('aDist').textContent = dA + ' หน่วยระยะ';
+    $('aLum').textContent = LA + ' เท่า';
+    $('aArea').textContent = dA + ' × ' + dA + ' = ' + (dA * dA) + ' ช่อง';
+    var h = '<span class="lbl">ระยะห่าง</span>';
+    [1, 2, 3, 4].forEach(function (d) { h += '<button class="chip' + (d === dA ? ' on' : '') + '" data-d="' + d + '">ระยะ ' + d + '</button>'; });
+    $('distChips').innerHTML = h;
+    h = '<span class="lbl">กำลังส่องสว่าง</span>';
+    [1, 2, 4].forEach(function (L) { h += '<button class="chip' + (L === LA ? ' on' : '') + '" data-l="' + L + '">' + L + ' เท่า</button>'; });
+    $('lumChips').innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('#distChips .chip'), function (b) { b.onclick = function () { dA = +b.getAttribute('data-d'); updA(); }; });
+    Array.prototype.forEach.call(document.querySelectorAll('#lumChips .chip'), function (b) { b.onclick = function () { LA = +b.getAttribute('data-l'); updA(); }; });
+    var k = rowKey(dA, LA);
+    $('recA').disabled = k < 0;
+    if (k < 0) $('recAMsg').textContent = 'ค่านี้ไม่อยู่ในตาราง : การทดลองที่ 1 ใช้กำลังส่องสว่าง 1 เท่า · การทดลองที่ 2 ใช้ระยะ 2';
+    else { var n = Object.keys(S.recA).length; $('recAMsg').textContent = n ? 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' ครบแล้ว' : '') : ''; }
+    logA();
+    if (tab === 'A') drawA();
+  }
+  function logA() {
+    var h = '', k = rowKey(dA, LA);
+    ROWS.forEach(function (r, i) {
+      h += '<tr' + (i === k ? ' class="cur"' : '') + '><td class="n">การทดลองที่ ' + r.e + '</td><td>' + r.d + '</td><td>' + r.L + ' เท่า</td><td>' + (S.recA[i] ? fmt(readA(r.d, r.L)) : '-') + '</td></tr>';
+    });
+    $('logA').innerHTML = h;
+  }
+  $('recA').onclick = function () {
+    var k = rowKey(dA, LA); if (k < 0) return;
+    S.recA[k] = 1; save(); updA();
+    var n = Object.keys(S.recA).length;
+    $('recAMsg').textContent = 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' ครบแล้ว' : '');
+  };
+
+  // ================================================================ ภารกิจ B ไม้บรรทัดโชติมาตร
+  // ค่าโดยประมาณ · M คำนวณจาก m และระยะห่าง (M = m − 5 log(d/10 พาร์เซก))
+  var STARS = [
+    { n: 'ดวงอาทิตย์', m: -26.7, M: 4.8, dTxt: '8 นาทีแสง', dWs: '0.000016', T: 5800, where: 'ดาวฤกษ์ของเรา',
+      d: 'ดวงอาทิตย์สว่างที่สุดบนท้องฟ้าเพราะอยู่ใกล้มาก แสงใช้เวลาเดินทางมาถึงโลกเพียงราว 8 นาที แต่ถ้าย้ายไปไว้ที่ระยะ 32.6 ปีแสง จะเป็นเพียงดาวจาง ๆ โชติมาตร +4.8 ที่ตาเปล่าพอมองเห็นได้', px: .1, py: .3 },
+    { n: 'ซิริอุส', m: -1.5, M: 1.4, dTxt: '8.6 ปีแสง', dWs: '8.6', T: 9900, where: 'กลุ่มดาวสุนัขใหญ่',
+      d: 'ดาวฤกษ์ที่สว่างที่สุดบนท้องฟ้ายามค่ำคืน (ไม่นับดวงอาทิตย์) สีขาว แต่ที่ดูสว่างมากส่วนหนึ่งเพราะอยู่ใกล้โลกเพียง 8.6 ปีแสง หาได้ง่ายโดยลากแนวเข็มขัดนายพรานลงไปทางซ้าย', px: .3, py: .86 },
+    { n: 'ไรเจล', m: 0.1, M: -7.0, dTxt: '860 ปีแสง', dWs: '860', T: 12000, where: 'เท้าของกลุ่มดาวนายพราน',
+      d: 'ดาวยักษ์ใหญ่สีน้ำเงินแกมขาว อยู่ไกลถึงราว 860 ปีแสง แต่ยังเห็นสว่างมาก แปลว่ากำลังส่องสว่างสูงมาก ถ้าอยู่ที่ระยะเท่ากัน ไรเจลสว่างกว่าดวงอาทิตย์หลายหมื่นเท่า', px: .7, py: .76 },
+    { n: 'บีเทลจุส', m: 0.5, M: -5.6, dTxt: '550 ปีแสง', dWs: '550', T: 3600, where: 'ไหล่ของกลุ่มดาวนายพราน',
+      d: 'ดาวยักษ์ใหญ่สีแดง ผิวเย็น แต่มีขนาดใหญ่มาก (ราว 700 เท่าของดวงอาทิตย์) จึงมีกำลังส่องสว่างสูง ความสว่างเปลี่ยนขึ้นลงได้ (ใช้ค่าเฉลี่ยประมาณ +0.5) ระยะห่างแต่ละแหล่งต่างกันบ้าง', px: .47, py: .26 },
+    { n: 'อัลดิบาแรน', m: 0.9, M: -0.6, dTxt: '65 ปีแสง', dWs: '65', T: 3900, where: 'ตาของกลุ่มดาววัว',
+      d: 'ดาวยักษ์สีส้ม เป็น "ตาวัว" สีส้มแดงในกลุ่มดาววัว อยู่ห่าง 65 ปีแสง ลากแนวเข็มขัดนายพรานขึ้นไปทางขวาจะพบดาวดวงนี้', px: .9, py: .12 }
+  ];
+  var ORION = [[.47, .26], [.64, .29], [.53, .52], [.565, .54], [.6, .56], [.49, .78], [.7, .76]];
+  var curS = 1, modeK = 0, modeT = 0, animMode = null;
+  function rStar(v) { return clamp(2 + (6 - v) * .95, 1.6, 15); }
+  function drawSky() {
+    var c = fit($('cvSky')), x = c.x, W = c.W, H = c.H, k = smooth(modeK);
+    var dayW = W * .24 * (1 - k);
+    x.fillStyle = '#03050f'; x.fillRect(0, 0, W, H);
+    starfield(x, W, H, .55, dayW);
+    var nx = function (f) { return dayW + 14 + f * (W - dayW - 28); }, ny = function (f) { return 24 + f * (H - 60); };
+    // เส้นกลุ่มดาวนายพราน
+    x.strokeStyle = 'rgba(120,140,210,' + (.35 * (1 - k * .5)) + ')'; x.lineWidth = 1;
+    [[0, 1], [0, 2], [1, 4], [2, 3], [3, 4], [2, 5], [4, 6]].forEach(function (e) { var a = ORION[e[0]], b = ORION[e[1]]; x.beginPath(); x.moveTo(nx(a[0]), ny(a[1])); x.lineTo(nx(b[0]), ny(b[1])); x.stroke(); });
+    [1, 2, 3, 4, 5].forEach(function (i) { var p = ORION[i]; x.fillStyle = 'rgba(220,230,255,.8)'; x.beginPath(); x.arc(nx(p[0]), ny(p[1]), 1.8, 0, 6.283); x.fill(); });
+    // ฟ้ากลางวัน
+    if (dayW > 2) {
+      var gd = x.createLinearGradient(0, 0, 0, H); gd.addColorStop(0, '#2f6fc4'); gd.addColorStop(1, '#8fc3ef');
+      x.fillStyle = gd; x.fillRect(0, 0, dayW, H);
+      x.fillStyle = 'rgba(6,16,42,.75)'; x.font = '600 12.5px Sarabun, sans-serif'; x.textAlign = 'center'; if (dayW > 80) x.fillText('ท้องฟ้ากลางวัน', dayW / 2, H - 12);
+    }
+    STARS.forEach(function (s, i) {
+      var v = lerp(s.m, s.M, k), r = i === 0 ? lerp(Math.min(42, W * .07), rStar(s.M), k) : rStar(v), col = tcol(s.T);
+      var px = i === 0 ? lerp(Math.max(dayW / 2, 30), nx(.22), k) : nx(s.px), py = i === 0 ? lerp(H * .42, ny(.5), k) : ny(s.py);
+      ball(x, px, py, r, col, i === 0 ? lerp(2.2, 3, k) : 3);
+      if (i === curS) { x.strokeStyle = '#4FD8FF'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, r + 8, 0, 6.283); x.stroke(); }
+      x.font = '600 13px Sarabun, sans-serif'; x.textAlign = 'center';
+      x.fillStyle = (i === 0 && k < .5) ? '#06102A' : '#E8EDFF';
+      x.fillText(s.n + '  ' + mag(Math.round(v * 10) / 10), px, py + r + (i === 0 && k < .5 ? 16 : 18));
+      s._x = px; s._y = py; s._r = r;
+    });
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif';
+    x.fillText(modeT ? 'ทุกดวงอยู่ที่ระยะ 32.6 ปีแสง : โชติมาตรสัมบูรณ์' : 'มองจากโลก : โชติมาตรปรากฏ', dayW + 14, 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ขนาดจุด = ความสว่าง ไม่ใช่ขนาดจริงของดาว', W - 8, H - 6); x.textAlign = 'left';
+  }
+  $('cvSky').addEventListener('click', function (ev) {
+    var b = this.getBoundingClientRect(), mx = ev.clientX - b.left, my = ev.clientY - b.top, best = -1, bd = 1e9;
+    STARS.forEach(function (s, i) { var d = Math.hypot(mx - s._x, my - s._y); if (d < Math.max(24, s._r + 10) && d < bd) { bd = d; best = i; } });
+    if (best >= 0) { curS = best; updB(); }
+  });
+  function setMode(t) {
+    modeT = t; $('modeE').classList.toggle('on', !t); $('modeT').classList.toggle('on', !!t);
+    if (animMode) cancelAnimationFrame(animMode);
+    var from = modeK, t0 = performance.now(), dur = reduce ? 1 : 1400;
+    (function step(now) { var q = clamp((now - t0) / dur, 0, 1); modeK = lerp(from, t, smooth(q)); if (tab === 'B') drawSky(); if (q < 1) animMode = requestAnimationFrame(step); else animMode = null; })(t0);
+    updB();
+  }
+  $('modeE').onclick = function () { setMode(0); };
+  $('modeT').onclick = function () { setMode(1); };
+  function updB() {
+    var s = STARS[curS], cl = clsOf(s.T);
+    $('bName').textContent = s.n + ' · ' + cl.col;
+    $('bApp').textContent = mag(s.m);
+    $('bDist').textContent = s.dTxt;
+    $('bAbs').textContent = mag(s.M);
+    $('bDesc').textContent = s.where + ' · ' + s.d;
+    var h = '';
+    STARS.forEach(function (t, i) { var c = tcol(t.T); h += '<button class="st' + (i === curS ? ' on' : '') + (S.recB[i] ? ' done' : '') + '" data-i="' + i + '"><i style="background:' + rgba(c, 1) + '"></i>' + t.n + '<small>' + t.where + '</small></button>'; });
+    $('starBtns').innerHTML = h;
+    Array.prototype.forEach.call($('starBtns').children, function (b) { b.onclick = function () { curS = +b.getAttribute('data-i'); updB(); }; });
+    var n = Object.keys(S.recB).length;
+    $('recBMsg').textContent = S.recB[curS] ? 'บันทึก' + s.n + 'แล้ว · ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : '') : (n ? 'บันทึกแล้ว ' + n + '/5' : '');
+    logB(); rankB();
+    if (tab === 'B') { drawSky(); drawRuler(); }
+  }
+  function logB() {
+    var h = '';
+    STARS.forEach(function (s, i) { var r = S.recB[i]; h += '<tr' + (i === curS ? ' class="cur"' : '') + '><td class="n">' + s.n + '</td><td>' + (r ? mag(s.m) : '-') + '</td><td>' + (r ? (i === 0 ? '0.000016 (8 นาทีแสง)' : s.dWs) : '-') + '</td><td>' + (r ? mag(s.M) : '-') + '</td></tr>'; });
+    $('logB').innerHTML = h;
+  }
+  function rankB() {
+    if (Object.keys(S.recB).length < 5) { $('rankBox').innerHTML = '<div class="lbl">บันทึกครบ 5 ดวงแล้ว จะเห็นการเรียงลำดับความสว่าง 2 แบบ</div>'; return; }
+    var a = STARS.map(function (s, i) { return i; });
+    var byM = a.slice().sort(function (p, q) { return STARS[p].m - STARS[q].m; }), byA = a.slice().sort(function (p, q) { return STARS[p].M - STARS[q].M; });
+    var li = function (arr, f) { return arr.map(function (i) { return '<li>' + STARS[i].n + ' <b>' + mag(STARS[i][f]) + '</b></li>'; }).join(''); };
+    $('rankBox').innerHTML = '<div class="info"><div class="k">เรียงตามความสว่างที่เห็นจากโลก (สว่างไปจาง)</div><ol>' + li(byM, 'm') + '</ol></div>' +
+      '<div class="info"><div class="k">เรียงตามความสว่างจริง เมื่ออยู่ระยะเท่ากัน (สว่างไปจาง)</div><ol>' + li(byA, 'M') + '</ol></div>';
+  }
+  $('recB').onclick = function () { S.recB[curS] = 1; save(); var n = Object.keys(S.recB).length; if (n < 5) { for (var j = 1; j <= 5; j++) { var q = (curS + j) % 5; if (!S.recB[q]) { curS = q; break; } } } updB(); $('recBMsg').textContent = 'บันทึกแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : ' · ดวงถัดไป'); };
+  var RULER = [[-26.7, 'ดวงอาทิตย์'], [-12.7, 'ดวงจันทร์เต็มดวง'], [-4.6, 'ดาวศุกร์'], [-1.5, 'ซิริอุส'], [0.5, 'บีเทลจุส'], [2, 'ดาวเหนือ'], [6, 'จางสุดที่ตาเปล่าเห็น']];
+  function drawRuler() {
+    var c = fit($('cvRuler')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#060a1c'; x.fillRect(0, 0, W, H);
+    var x0 = 24, x1 = W - 24, X = function (v) { return x0 + (v + 28) / 36 * (x1 - x0); }, y = 62;
+    var g = x.createLinearGradient(x0, 0, x1, 0); g.addColorStop(0, '#FFE9A8'); g.addColorStop(.6, '#4a5a9a'); g.addColorStop(1, '#141a3a');
+    x.fillStyle = g; x.fillRect(x0, y - 5, x1 - x0, 10);
+    x.font = '11.5px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillStyle = '#9AA6CF';
+    [-25, -20, -15, -10, -5, 0, 5].forEach(function (v) { x.fillText((v < 0 ? '−' : v > 0 ? '+' : '') + Math.abs(v), X(v), y + 22); });
+    RULER.forEach(function (r, i) {
+      var px = X(r[0]), up = i % 2 === 0;
+      x.strokeStyle = '#FFD166'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(px, y - 6); x.lineTo(px, up ? y - 20 : y + 30); x.stroke();
+      x.fillStyle = '#E8EDFF'; x.font = '600 12px Sarabun, sans-serif';
+      x.textAlign = px < 70 ? 'left' : (px > W - 70 ? 'right' : 'center');
+      x.fillText(r[1] + ' ' + mag(r[0]), px, up ? y - 26 : y + 44);
+    });
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '600 12.5px Sarabun, sans-serif'; x.fillText('สว่างมาก', x0, 14);
+    x.textAlign = 'right'; x.fillText('จางมาก', x1, 14); x.textAlign = 'left';
+  }
+  function calcUI() {
+    var o = STARS.map(function (s, i) { return '<option value="' + i + '">' + s.n + '</option>'; }).join('');
+    $('c1').innerHTML = o; $('c2').innerHTML = o; $('c1').value = 1; $('c2').value = 4;
+    ['c1', 'c2', 'cm'].forEach(function (id) { $(id).onchange = calc; }); calc();
+  }
+  function calc() {
+    var a = STARS[+$('c1').value], b = STARS[+$('c2').value], f = $('cm').value, dm = b[f] - a[f], r = Math.pow(100, dm / 5);
+    var big = function (v) { if (v >= 1e8) return 'ประมาณ ' + fmt(v / 1e8) + ' ร้อยล้าน'; if (v >= 1e4) return 'ประมาณ ' + fmt(Math.round(v / 1000) * 1000); if (v >= 10) return 'ประมาณ ' + fmt(v); return 'ประมาณ ' + (Math.round(v * 10) / 10); };
+    if (Math.abs(dm) < .05) { $('cRes').textContent = 'สว่างเท่ากัน'; return; }
+    $('cRes').textContent = 'ต่างกัน ' + Math.abs(dm).toFixed(1) + ' แมกนิจูด → ' + (dm > 0 ? a.n + ' สว่างกว่า ' + b.n + ' ' + big(r) + ' เท่า' : b.n + ' สว่างกว่า ' + a.n + ' ' + big(1 / r) + ' เท่า');
+  }
+
+  // ================================================================ ภารกิจ C เครื่องวิเคราะห์สเปกตรัม
+  var TLIST = [3000, 4500, 5800, 7000, 9000, 20000, 35000];
+  var TMIN = 2500, TMAX = 40000, curT = 5800;
+  function t2s(T) { return Math.round(1000 * Math.log(T / TMIN) / Math.log(TMAX / TMIN)); }
+  function s2t(s) { return TMIN * Math.pow(TMAX / TMIN, s / 1000); }
+  function planck(l, T) { return 1 / (Math.pow(l / 1000, 5) * (Math.exp(1.4388e7 / (l * T)) - 1)); }
+  function peakNm(T) { return 2897800 / T; }
+  function peakTxt(T) { var p = peakNm(T); return p > 700 ? 'อินฟราเรด' : p > 580 ? 'แดง-ส้ม' : p > 480 ? 'เขียว-เหลือง' : p > 400 ? 'น้ำเงิน-ม่วง' : 'อัลตราไวโอเลต'; }
+  function wl2rgb(l) {
+    var r = 0, g = 0, b = 0;
+    if (l < 440) { r = -(l - 440) / 60; b = 1; } else if (l < 490) { g = (l - 440) / 50; b = 1; } else if (l < 510) { g = 1; b = -(l - 510) / 20; }
+    else if (l < 580) { r = (l - 510) / 70; g = 1; } else if (l < 645) { r = 1; g = -(l - 645) / 65; } else r = 1;
+    var f = l < 420 ? .3 + .7 * (l - 380) / 40 : l > 700 ? .3 + .7 * (750 - l) / 50 : 1;
+    return [Math.round(255 * r * f), Math.round(255 * g * f), Math.round(255 * b * f)];
+  }
+  // เส้นดูดกลืน [ความยาวคลื่น nm, ความเข้มตามอุณหภูมิ]
+  function gaussLog(T, T0, w) { var q = Math.log(T / T0) / w; return Math.exp(-q * q); }
+  function lines(T) {
+    var L = [], H = .15 + .85 * gaussLog(T, 9500, .45), cool = clamp((7000 - T) / 3000, 0, 1), vcool = clamp((4200 - T) / 900, 0, 1);
+    [656.3, 486.1, 434.0, 410.2].forEach(function (l) { L.push([l, H * .95, 2.2]); });
+    [447.1, 492.2, 501.6].forEach(function (l) { L.push([l, gaussLog(T, 22000, .35) * .8, 1.6]); });
+    [454.1, 468.6].forEach(function (l) { L.push([l, gaussLog(T, 40000, .3) * .8, 1.6]); });
+    [393.4, 396.8].forEach(function (l) { L.push([l, clamp((9500 - T) / 4000, 0, 1) * .95, 2.6]); });
+    L.push([589.3, cool * .85, 2.4]); L.push([430.8, cool * .7, 2.4]); L.push([517.0, cool * .6, 2]); L.push([527.0, cool * .5, 1.6]); L.push([438.4, cool * .45, 1.4]);
+    [476, 496, 517, 545, 559, 616, 659, 705].forEach(function (l) { L.push([l, vcool * .75, 7]); });
+    return L;
+  }
+  function strip(x, X0, Y0, w, h, T) {
+    var vmax = 0, l, k, n = Math.max(60, Math.round(w));
+    for (k = 0; k <= 40; k++) { l = 380 + k * 370 / 40; vmax = Math.max(vmax, planck(l, T)); }
+    for (k = 0; k < n; k++) {
+      l = 380 + 370 * k / n; var c = wl2rgb(l), it = .25 + .75 * Math.pow(planck(l, T) / vmax, .8);
+      x.fillStyle = 'rgb(' + Math.round(c[0] * it) + ',' + Math.round(c[1] * it) + ',' + Math.round(c[2] * it) + ')'; x.fillRect(X0 + w * k / n, Y0, w / n + .6, h);
+    }
+    lines(T).forEach(function (q) { if (q[1] < .04) return; var px = X0 + (q[0] - 380) / 370 * w; x.fillStyle = 'rgba(0,0,0,' + clamp(q[1], 0, .95) + ')'; x.fillRect(px - q[2] / 2, Y0, q[2], h); });
+  }
+  function drawSpec() {
+    var c = fit($('cvSpec')), x = c.x, W = c.W, H = c.H, T = curT, col = tcol(T), cl = clsOf(T), narrow = W < 560;
+    x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H);
+    // ดาว
+    var bx = narrow ? 30 : 90, by = narrow ? 30 : H * .38, br = narrow ? 14 : 40;
+    ball(x, bx, by, br, col, 2.6);
+    x.textAlign = 'center'; x.fillStyle = '#E8EDFF'; x.font = '700 15px "Chakra Petch", Sarabun, sans-serif';
+    if (narrow) { x.textAlign = 'left'; x.fillText('ชนิด ' + cl.c + ' · ' + cl.col, bx + br + 14, by + 5); } else x.fillText('ชนิด ' + cl.c + ' · ' + cl.col, bx, by + br + 34);
+    // กราฟ
+    var gx0 = narrow ? 16 : 200, gx1 = W - 16, gy0 = narrow ? 84 : 30, gy1 = H - 92, L0 = 50, L1 = 1600, X = function (l) { return gx0 + (l - L0) / (L1 - L0) * (gx1 - gx0); };
+    x.fillStyle = 'rgba(167,123,255,.08)'; x.fillRect(gx0, gy0, X(380) - gx0, gy1 - gy0);
+    x.fillStyle = 'rgba(255,107,138,.06)'; x.fillRect(X(750), gy0, gx1 - X(750), gy1 - gy0);
+    for (var l = 380; l < 750; l += 4) { var cc = wl2rgb(l); x.fillStyle = 'rgba(' + cc[0] + ',' + cc[1] + ',' + cc[2] + ',.16)'; x.fillRect(X(l), gy0, X(l + 4) - X(l) + .5, gy1 - gy0); }
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(gx0, gy0); x.lineTo(gx0, gy1); x.lineTo(gx1, gy1); x.stroke();
+    var pk = peakNm(T), vm = planck(pk, T);
+    // เส้นอ้างอิงดวงอาทิตย์
+    if (Math.abs(T - 5800) > 50) { x.strokeStyle = 'rgba(255,236,175,.35)'; x.setLineDash([4, 4]); x.lineWidth = 1.5; x.beginPath(); var sm = planck(peakNm(5800), 5800);
+      for (var q = L0; q <= L1; q += 6) { var yy = gy1 - planck(q, 5800) / sm * (gy1 - gy0 - 14); if (q === L0) x.moveTo(X(q), yy); else x.lineTo(X(q), yy); } x.stroke(); x.setLineDash([]); }
+    x.strokeStyle = rgba(col, 1); x.lineWidth = 3; x.beginPath();
+    for (q = L0; q <= L1; q += 4) { var y2 = gy1 - planck(q, T) / vm * (gy1 - gy0 - 14); if (q === L0) x.moveTo(X(q), y2); else x.lineTo(X(q), y2); }
+    x.stroke();
+    if (pk >= L0) { x.strokeStyle = '#FFD166'; x.setLineDash([3, 3]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(X(pk), gy0 + 10); x.lineTo(X(pk), gy1); x.stroke(); x.setLineDash([]);
+      x.fillStyle = '#FFD166'; x.font = '700 13px Sarabun, sans-serif'; x.textAlign = X(pk) > gx1 - 70 ? 'right' : 'left'; x.fillText('ยอดกราฟ ' + fmt(pk) + ' nm', X(pk) + (x.textAlign === 'left' ? 5 : -5), gy0 + 10); }
+    x.font = '12px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillStyle = '#C9B3FF'; x.fillText(narrow ? 'UV' : 'อัลตราไวโอเลต', (gx0 + X(380)) / 2, gy1 + 16);
+    x.fillStyle = '#E8EDFF'; x.fillText(narrow ? 'มองเห็น' : 'แสงที่ตามองเห็น', (X(380) + X(750)) / 2, gy1 + 16);
+    x.fillStyle = '#FF9F9F'; x.fillText('อินฟราเรด', (X(750) + gx1) / 2, gy1 + 16);
+    x.textAlign = 'left'; x.fillStyle = '#9AA6CF'; x.fillText('ความเข้มแสง (ปรับยอดให้สูงเท่ากัน)', gx0 + 4, gy0 - 8);
+    x.textAlign = 'right'; if (!narrow) x.fillText('ความยาวคลื่น (นาโนเมตร) →', gx1, gy1 + 32);
+    if (Math.abs(T - 5800) > 50) { x.fillStyle = 'rgba(255,236,175,.7)'; x.fillText('เส้นประ = ดวงอาทิตย์ 5,800 K', gx1, narrow ? gy0 - 24 : gy0 + 28); }
+    // แถบสเปกตรัม
+    var sy = H - 52, sx0 = 16, sw = W - 32;
+    x.textAlign = 'left'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText(narrow ? 'แถบสเปกตรัม (เส้นมืด = แสงที่ถูกดูดกลืน)' : 'แถบสเปกตรัมของดาว (เส้นมืด = แสงที่ถูกดูดกลืน)  ม่วง 380 nm → แดง 750 nm', sx0, sy - 6);
+    strip(x, sx0, sy, sw, 34, T);
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 1; x.strokeRect(sx0, sy, sw, 34);
+  }
+  function updC() {
+    var T = curT, cl = clsOf(T);
+    $('tTxt').textContent = fmt(T) + ' K';
+    $('cT').textContent = fmt(T) + ' K';
+    $('cCol').textContent = cl.col;
+    $('cCls').textContent = 'ชนิด ' + cl.c;
+    $('cPeak').textContent = peakTxt(T) + ' (' + fmt(peakNm(T)) + ' nm)';
+    var idx = TLIST.indexOf(T), h = '<span class="lbl">เลือกอุณหภูมิ</span>';
+    TLIST.forEach(function (t) { h += '<button class="chip' + (t === T ? ' on' : '') + (S.recC[t] ? ' done' : '') + '" data-t="' + t + '">' + fmt(t) + ' K</button>'; });
+    $('tChips').innerHTML = h;
+    Array.prototype.forEach.call($('tChips').querySelectorAll('.chip'), function (b) { b.onclick = function () { curT = +b.getAttribute('data-t'); $('slT').value = t2s(curT); updC(); }; });
+    $('recC').disabled = idx < 0;
+    var n = Object.keys(S.recC).length;
+    $('recCMsg').textContent = idx < 0 ? 'แตะปุ่มอุณหภูมิ 7 ค่าด้านบน แล้วจึงบันทึก' : (n ? 'บันทึกแล้ว ' + n + '/7' + (n === 7 ? ' ครบแล้ว' : '') : '');
+    logC();
+    if (tab === 'C') drawSpec();
+  }
+  function logC() {
+    var h = '';
+    TLIST.forEach(function (t) { var r = S.recC[t], cl = clsOf(t); h += '<tr' + (t === curT ? ' class="cur"' : '') + '><td>' + fmt(t) + '</td><td>' + (r ? cl.col : '-') + '</td><td>' + (r ? cl.c : '-') + '</td><td>' + (r ? peakTxt(t) : '-') + '</td></tr>'; });
+    $('logC').innerHTML = h;
+    var all = Object.keys(S.recC).length === 7;
+    $('ladWrap').classList.toggle('hide', !all);
+    if (all) $('ladder').innerHTML = CLS.map(function (k) { var c = tcol(k.T); return '<div class="lad" style="background:' + rgba(c, 1) + '"><b>' + k.c + '</b><span>' + k.col + '</span><span>' + k.rng + '</span></div>'; }).join('');
+  }
+  $('slT').oninput = function () { var t = s2t(+this.value), near = null; TLIST.forEach(function (q) { if (Math.abs(Math.log(t / q)) < .03) near = q; }); curT = near || Math.round(t / 100) * 100; updC(); };
+  $('recC').onclick = function () {
+    if (TLIST.indexOf(curT) < 0) return; S.recC[curT] = 1; save();
+    var n = Object.keys(S.recC).length;
+    if (n < 7) { var i = TLIST.indexOf(curT); for (var j = 1; j <= 7; j++) { var q = TLIST[(i + j) % 7]; if (!S.recC[q]) { curT = q; $('slT').value = t2s(q); break; } } }
+    updC(); $('recCMsg').textContent = 'บันทึกแล้ว ' + n + '/7' + (n === 7 ? ' ครบแล้ว' : ' · ค่าถัดไป');
+  };
+  // ดาวปริศนา
+  var MYS = [{ n: 'ไรเจล', T: 12000, c: 'B' }, { n: 'อัลดิบาแรน', T: 3900, c: 'K' }, { n: 'ซิริอุส', T: 9900, c: 'A' }, { n: 'บีเทลจุส', T: 3600, c: 'M' }, { n: 'ดวงอาทิตย์', T: 5800, c: 'G' }];
+  function mysUI() {
+    var h = '';
+    MYS.forEach(function (m, i) {
+      var ok = S.quiz[i] === m.c;
+      h += '<div class="my' + (ok ? ' ok' : '') + '"><canvas id="my' + i + '" height="84"></canvas><div><div class="t">ดาวปริศนา ' + (i + 1) + '</div><div class="cls">' +
+        CLS.map(function (k) { return '<button data-i="' + i + '" data-c="' + k.c + '" class="' + (ok && k.c === m.c ? 'ok' : '') + '">' + k.c + '</button>'; }).join('') +
+        '</div><div class="r">' + (ok ? 'ถูกต้อง : ชนิด ' + m.c + ' (' + clsOf(m.T).col + ') คือดาว' + m.n + ' อุณหภูมิผิวประมาณ ' + fmt(m.T) + ' K' : '') + '</div></div></div>';
+    });
+    $('mys').innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('#mys .cls button'), function (b) {
+      b.onclick = function () {
+        var i = +b.getAttribute('data-i'), cc = b.getAttribute('data-c');
+        if (cc === MYS[i].c) { S.quiz[i] = cc; save(); mysUI(); checkWin(); }
+        else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); b.parentNode.parentNode.querySelector('.r').textContent = 'ยังไม่ใช่ ลองเทียบสีและเส้นมืดกับเครื่องวิเคราะห์ด้านบน'; }
+      };
+    });
+    drawMys();
+  }
+  function drawMys() {
+    MYS.forEach(function (m, i) {
+      var cv = $('my' + i); if (!cv || !cv.clientWidth) return;
+      var c = fit(cv), x = c.x, W = c.W, H = c.H;
+      x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H);
+      ball(x, 34, H / 2, 17, tcol(m.T), 2.2);
+      strip(x, 70, 14, W - 80, H - 28, m.T);
+    });
+  }
+  function checkWin() { $('winC').classList.toggle('hide', !MYS.every(function (m, i) { return S.quiz[i] === m.c; })); }
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawA();
+    if (tab === 'B') { drawSky(); drawRuler(); }
+    if (tab === 'C') { drawSpec(); drawMys(); }
+  }
+  $('slT').value = t2s(curT);
+  updA(); updB(); calcUI(); updC(); mysUI(); checkWin();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_E5 = { STARS: STARS, CLS: CLS, TLIST: TLIST,
+    setA: function (d, L) { dA = d; LA = L; updA(); },
+    setB: function (i, k) { curS = i; modeT = k; modeK = k; $('modeE').classList.toggle('on', !k); $('modeT').classList.toggle('on', !!k); updB(); },
+    setC: function (T) { curT = T; $('slT').value = t2s(T); updC(); },
+    recAll: function () { for (var i = 0; i < 6; i++) S.recA[i] = 1; for (i = 0; i < 5; i++) { S.recB[i] = 1; S.quiz[i] = MYS[i].c; } TLIST.forEach(function (t) { S.recC[t] = 1; }); updA(); updB(); updC(); mysUI(); checkWin(); } };
+})();
+</script>
+</body>
+</html>

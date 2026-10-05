@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(6, [
-  // { type: "worksheet", code: "E5", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E5", title: "สถานการณ์จำลอง หอสังเกตการณ์แสงดาว (ภารกิจ A B C)", file: "e5-sim-starlight.html", note: "ใช้คู่กับใบงาน E5 · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e5-sim.png" },
+  { type: "worksheet", code: "E5", title: "ใบงาน E5 หอสังเกตการณ์แสงดาว (1 แผ่น 2 หน้า)", file: "e5-worksheet.pdf", note: "4 คะแนน · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 6 E5 สมบัติของดาวฤกษ์", file: "w06-slides-e5-starlight.pdf", note: "25 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
