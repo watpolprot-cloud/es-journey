@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(5, [
-  // { type: "worksheet", code: "E4", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E4", title: "สถานการณ์จำลอง ห้องทดลองชีวิตดาวฤกษ์ (ภารกิจ A B C)", file: "e4-sim-starlife.html", note: "ใช้คู่กับใบงาน E4 · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e4-sim.png" },
+  { type: "worksheet", code: "E4", title: "ใบงาน E4 ห้องทดลองชีวิตดาวฤกษ์ (1 แผ่น 2 หน้า)", file: "e4-worksheet.pdf", note: "4 คะแนน · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 5 E4 กำเนิดและวิวัฒนาการดาวฤกษ์", file: "w05-slides-e4-stars.pdf", note: "25 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);

@@ -1,0 +1,617 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E4 ห้องทดลองชีวิตดาวฤกษ์ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E4 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1 E2 E3) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A; --blue: #8EC5FF;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #5a1c3a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.solid { background: var(--cyan); color: var(--ink); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+input[type=range] { width: 100%; accent-color: var(--gold); height: 30px; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.ctrl .sp { flex: 1; min-width: 140px; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 4px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); }
+.scan h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.scan .d { font-size: 15.5px; line-height: 1.5; }
+.gauge { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 4px; }
+.gauge .g { border-top: 1px dashed var(--line-hi); padding-top: 6px; }
+.bar5 { display: flex; gap: 4px; margin-top: 4px; }
+.bar5 i { flex: 1; height: 10px; border-radius: 3px; background: #1c2655; }
+.bar5 i.on { background: var(--orange); box-shadow: 0 0 8px #ff9f6b66; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--ok); }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.masses { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 4px; }
+.mass { font-family: var(--head); font-size: 15px; line-height: 1.2; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 6px; cursor: pointer; text-align: left; }
+.mass small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.mass.on { border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 12px #4fd8ff33; }
+.mass.done:not(.on) { border-color: var(--ok); }
+.read { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 16px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.qq { margin-top: 12px; }
+.qq .t { font-weight: 600; }
+.opts { display: grid; gap: 6px; margin-top: 6px; grid-template-columns: 1fr; }
+.opt { text-align: left; font-family: var(--body); font-size: 16px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 10px; padding: 7px 10px; cursor: pointer; }
+.opt.ok { border-color: var(--ok); color: var(--ok); background: #5ef2a512; }
+.opt.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 8px; }
+.card { font-family: var(--head); font-size: 15.5px; text-align: left; line-height: 1.25; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 12px; padding: 8px 10px; cursor: pointer; }
+.card small { display: block; font-family: var(--body); color: var(--muted); font-size: 12.5px; margin-top: 3px; }
+.card.bad { border-color: var(--err); animation: shake .35s; }
+.lane { margin-top: 10px; border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 8px 12px; background: #0b123388; }
+.lane.cur { border-color: var(--gold); box-shadow: 0 0 14px #ffd16622; }
+.lane.ok { border-color: var(--ok); }
+.lane h4 { font-family: var(--head); margin: 0 0 6px; font-size: 16px; color: var(--gold); }
+.lane.ok h4 { color: var(--ok); }
+.slots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.slot { font-family: var(--head); font-size: 13.5px; line-height: 1.2; min-height: 44px; border: 1.5px dashed var(--line-hi); border-radius: 10px; padding: 4px 6px; display: flex; align-items: center; justify-content: center; text-align: center; color: #ffffff30; }
+.slot.f { border-style: solid; border-color: var(--cyan); color: var(--text); background: #4fd8ff10; }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .1em; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .masses { grid-template-columns: 1fr 1fr 1fr; }
+  .read { grid-template-columns: 1fr 1fr; }
+  .info .v { font-size: 21px; }
+  .slots { grid-template-columns: repeat(3, 1fr); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E4 <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ห้องทดลอง<b>ชีวิตดาวฤกษ์</b></h1>
+  <p class="lead">ดาวฤกษ์ทุกดวงมีวันเกิดและวันจบชีวิต เหมือนกับสิ่งมีชีวิต ภารกิจนี้ให้นักบินเฝ้าดูดาวถือกำเนิดจากเมฆแก๊สในอวกาศ ทดลองเร่งเวลาดูชีวิตของดาวที่มีมวลต่างกัน แล้วไขคดีชีวิตดาวจริงบนท้องฟ้า จดผลลงใบงาน E4</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>กำเนิดดาวฤกษ์<small>จากเนบิวลาสู่ดาวฤกษ์</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>เครื่องเร่งเวลา<small>มวลต่างกัน ชีวิตต่างกัน</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ไขคดีชีวิตดาว<small>เส้นทางชีวิต และดาวจริงบนฟ้า</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> กำเนิดดาวฤกษ์ : จากเนบิวลาสู่ดาวฤกษ์</h2>
+    <p class="how">เลื่อนแถบเวลา (หรือแตะปุ่ม "ไปขั้นถัดไป") ดูเมฆแก๊สยุบตัวเป็นดาวฤกษ์ สังเกตลูกศร <b style="color:#FF6B8A">แรงโน้มถ่วง</b> กับ <b style="color:#4FD8FF">แรงดัน</b> เมื่อถึงแต่ละขั้น กด "บันทึกค่า" ให้ครบ 5 ขั้น แล้วจดขนาด อุณหภูมิแก่น และความดันแก่นลงใบงาน ส่วนที่ 1</p>
+    <div class="twin">
+      <canvas id="cvForm" height="380" aria-label="ภาพเมฆแก๊สยุบตัวเป็นดาวฤกษ์"></canvas>
+      <div class="info scan">
+        <div class="k" id="aStageK">ขั้นที่ 1 จาก 5</div>
+        <h3 id="aName">เนบิวลา</h3>
+        <div class="d" id="aDesc"></div>
+        <div class="gauge">
+          <div class="g"><div class="k">ขนาด (เทียบกับดวงอาทิตย์ปัจจุบัน)</div><div class="v c" id="aSize">-</div></div>
+          <div class="g"><div class="k">อุณหภูมิที่แก่น</div><div class="v r" id="aTemp">-</div></div>
+          <div class="g"><div class="k">ความดันที่แก่น</div><div class="v g" id="aPres" style="font-size:20px">-</div><div class="bar5" id="aBar"><i></i><i></i><i></i><i></i><i></i></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ctrl">
+      <span class="lbl">เวลา</span>
+      <input class="sp" id="slA" type="range" min="0" max="400" step="1" value="0" aria-label="เวลาการยุบตัวของเมฆแก๊ส">
+      <span class="lbl" id="aTime" style="min-width:130px;text-align:right">เริ่มต้น</span>
+    </div>
+    <div class="chips" id="stageChips"></div>
+    <div class="ctrl"><button class="btn" id="nextA">ไปขั้นถัดไป</button><button class="btn gold solid" id="recA">บันทึกค่า</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ขั้น</th><th>ขนาด (เท่าดวงอาทิตย์)</th><th>อุณหภูมิแก่น (เคลวิน)</th><th>ความดันแก่น</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>สังเกต</b> ยิ่งยุบตัว ขนาดยิ่งเล็กลง แต่อุณหภูมิและความดันที่แก่นยิ่งสูงขึ้น ดาวฤกษ์ "เกิด" เมื่อแก่นร้อนพอให้เกิดปฏิกิริยาเทอร์มอนิวเคลียร์ หลอมไฮโดรเจนเป็นฮีเลียม แล้วแรงดันจากแก่นจะสมดุลกับแรงโน้มถ่วง · เคลวิน (K) คือหน่วยอุณหภูมิ 0 K = −273 องศาเซลเซียส</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : จดค่าครบ 5 ขั้น แล้วตอบข้อ 1–3</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> เครื่องเร่งเวลา : มวลต่างกัน ชีวิตต่างกัน</h2>
+    <p class="how">เลือกมวลตั้งต้นของดาว (เทียบกับมวลดวงอาทิตย์) แล้วกด "เร่งเวลา" ดูชีวิตของดาวจนจบ หรือแตะชื่อช่วงชีวิตทีละช่วง เมื่อดูถึงช่วงสุดท้ายแล้ว กด "บันทึกผล" ให้ครบ 5 ดวง จดลงใบงาน ส่วนที่ 2 · ดูดาวมวล 1 เท่า (แบบดวงอาทิตย์) ให้ละเอียด เพื่อจดสมบัติลงส่วนที่ 3</p>
+    <div class="masses" id="massBtns"></div>
+    <canvas id="cvLife" height="320" style="margin-top:10px" aria-label="ภาพดาวฤกษ์ในช่วงชีวิตต่าง ๆ"></canvas>
+    <div class="chips" id="phaseChips"></div>
+    <div class="read">
+      <div class="info"><div class="k">ช่วงชีวิต</div><div class="v g" id="bPhase" style="font-size:18px">-</div></div>
+      <div class="info"><div class="k">ขนาด (เท่าดวงอาทิตย์)</div><div class="v c" id="bSize" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">อุณหภูมิผิว · สี</div><div class="v r" id="bTemp" style="font-size:19px">-</div></div>
+      <div class="info"><div class="k">อายุของดาว</div><div class="v p" id="bAge" style="font-size:18px">-</div></div>
+    </div>
+    <div class="note" id="bDesc" style="border-left-color:var(--cyan);background:#4fd8ff0d">-</div>
+    <div class="ctrl"><button class="btn" id="playB">เร่งเวลา</button><button class="btn gold solid" id="recB">บันทึกผล</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>มวลตั้งต้น</th><th>อายุในช่วงลำดับหลัก</th><th>ช่วงขยายตัวเป็น</th><th>ซากสุดท้าย</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>เปรียบเทียบ</em> อายุในช่วงลำดับหลักของดาวที่บันทึกแล้ว</h2>
+    <canvas id="cvBars" height="190" aria-label="กราฟแท่งเปรียบเทียบอายุของดาวมวลต่าง ๆ"></canvas>
+    <div class="note">มวลตั้งต้นเป็นตัวกำหนดชีวิตของดาว · มวลน้อยกว่าประมาณ 8 เท่าของดวงอาทิตย์ : จบเป็นดาวแคระขาว · มวลมากกว่าประมาณ 8 เท่า : ระเบิดเป็นซูเปอร์โนวา เหลือซากเป็นดาวนิวตรอน หรือถ้ามวลมากกว่าประมาณ 25 เท่า เหลือเป็นหลุมดำ (ตัวเลขขอบเขตเป็นค่าประมาณ แต่ละแหล่งต่างกันเล็กน้อย)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 5 ดวง ตอบข้อ 4–5 · <b>ส่วนที่ 3</b> : สมบัติของดาวมวล 1 เท่า 3 ช่วง ตอบข้อ 6</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ไขคดีชีวิตดาว</h2>
+    <p class="how">ขั้นที่ 1 เรียงเส้นทางชีวิตของดาว 2 แบบ แตะการ์ดตามลำดับ เริ่มจากดาวมวลน้อยก่อน แล้วต่อด้วยดาวมวลมาก (การ์ด 3 ใบแรกใช้ซ้ำได้) · ขั้นที่ 2 ไขคดีดาวจริงบนท้องฟ้า 3 คดี ทำครบได้รหัสผ่าน จดลงใบงาน ส่วนที่ 4</p>
+    <div class="cards" id="cards"></div>
+    <div class="lane" id="lane0"><h4>เส้นทางที่ 1 : ดาวมวลน้อย เช่น ดวงอาทิตย์ (น้อยกว่าประมาณ 8 เท่า)</h4><div class="slots" id="slots0"></div></div>
+    <div class="lane" id="lane1"><h4>เส้นทางที่ 2 : ดาวมวลมาก (มากกว่าประมาณ 8 เท่า)</h4><div class="slots" id="slots1"></div></div>
+    <div class="ctrl"><button class="btn" id="resetC" style="font-size:14px">เรียงใหม่</button><span class="lbl" id="cMsg"></span></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> คดีดาวจริงบนท้องฟ้า</h2>
+    <div id="quizC"></div>
+    <div class="win hide" id="winC">
+      <div>ไขคดีครบแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">NOVA-1054</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 4 (NOVA = ซูเปอร์โนวา, 1054 = ปี ค.ศ. ที่นักดาราศาสตร์จีนบันทึก "ดาวรับเชิญ" ซึ่งกลายเป็นเนบิวลาปู)</div>
+    </div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 4</b> : เขียนเส้นทางชีวิตดาว 2 แบบและรหัสผ่าน · <b>ส่วนที่ 5</b> : บัตรประจำตัวดาวฤกษ์</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · ภาพดาวและเนบิวลาเป็นภาพจำลอง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e4_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.seen = S.seen || {}; S.quiz = S.quiz || {}; S.lane = S.lane || [[], []];
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function gauss(r) { var u = r() || 1e-9, v = r(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.2832 * v); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function smooth(t) { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(99), a = []; for (var i = 0; i < 260; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k) { STARF.forEach(function (s) { x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  // สีของดาวตามอุณหภูมิผิว (เคลวิน)
+  function tcol(T) {
+    var P = [[2500, [255, 110, 70]], [3500, [255, 150, 90]], [4500, [255, 196, 130]], [5800, [255, 236, 175]], [7500, [250, 248, 235]],
+      [10000, [235, 240, 255]], [20000, [200, 215, 255]], [40000, [160, 185, 255]]];
+    if (T <= P[0][0]) return P[0][1];
+    for (var i = 1; i < P.length; i++) if (T <= P[i][0]) { var t = (T - P[i - 1][0]) / (P[i][0] - P[i - 1][0]); return P[i - 1][1].map(function (c, j) { return Math.round(lerp(c, P[i][1][j], t)); }); }
+    return P[P.length - 1][1];
+  }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function ball(x, cx, cy, r, col, glow) {
+    if (glow) { var g = x.createRadialGradient(cx, cy, r * .6, cx, cy, r * glow); g.addColorStop(0, rgba(col, .55)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r * glow, 0, 6.283); x.fill(); }
+    var b = x.createRadialGradient(cx - r * .3, cy - r * .3, r * .1, cx, cy, r);
+    b.addColorStop(0, 'rgba(255,255,250,1)'); b.addColorStop(.35, rgba(col, 1)); b.addColorStop(1, rgba(col.map(function (c) { return Math.round(c * .55); }), 1));
+    x.fillStyle = b; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill();
+  }
+
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A กำเนิดดาวฤกษ์ (มวลเท่าดวงอาทิตย์)
+  var STG = [
+    { n: 'เนบิวลา', size: 3000000, T: 10, P: 1, Pn: 'ต่ำมาก', bal: .05, time: 'เริ่มต้น',
+      d: 'เมฆแก๊สไฮโดรเจนและฝุ่นที่เย็นมาก อยู่ในแขนกังหันของกาแล็กซี กว้างราวครึ่งปีแสง บริเวณที่หนาแน่นกว่ารอบข้างเริ่มถูกแรงโน้มถ่วงดึงแก๊สเข้าหากัน' },
+    { n: 'เมฆแก๊สยุบตัว', size: 20000, T: 2000, P: 2, Pn: 'ต่ำ', bal: .3, time: 'ประมาณ 1 แสนปี',
+      d: 'แก๊สตกเข้าหาศูนย์กลาง ก้อนแก๊สเล็กลง หมุนเร็วขึ้น และแบนเป็นจานรอบ ๆ พลังงานจากการยุบตัวกลายเป็นความร้อน อุณหภูมิและความดันที่แก่นเริ่มสูงขึ้น' },
+    { n: 'ดาวฤกษ์ก่อนเกิด', size: 10, T: 1000000, P: 3, Pn: 'ปานกลาง', bal: .65, time: 'ประมาณ 1 ล้านปี',
+      d: 'ก้อนแก๊สร้อนจนเรืองแสง แต่ยังไม่มีปฏิกิริยานิวเคลียร์ แสงมาจากความร้อนของการยุบตัว มักพ่นแก๊สออกเป็นลำ 2 ข้าง แรงดันยังสู้แรงโน้มถ่วงไม่ได้ จึงยุบตัวต่อ' },
+    { n: 'ดาวฤกษ์เกิดใหม่', size: 1.2, T: 10000000, P: 4, Pn: 'สูง', bal: .95, time: 'ประมาณ 30 ล้านปี',
+      d: 'อุณหภูมิที่แก่นสูงถึงประมาณ 10 ล้านเคลวิน เกิดปฏิกิริยาเทอร์มอนิวเคลียร์ หลอมไฮโดรเจนเป็นฮีเลียม ปล่อยพลังงานมหาศาล ดาวฤกษ์ถือกำเนิดขึ้น' },
+    { n: 'ดาวฤกษ์ในลำดับหลัก', size: 1, T: 15000000, P: 5, Pn: 'สูงมาก คงที่', bal: 1, time: 'ประมาณ 50 ล้านปี',
+      d: 'แรงดันจากแก่นที่ร้อนจัดสมดุลกับแรงโน้มถ่วง ดาวจึงไม่ยุบตัวต่อ ขนาดคงที่ ส่องสว่างสม่ำเสมอ ดวงอาทิตย์อยู่ในช่วงนี้มาแล้วประมาณ 4,600 ล้านปี' }
+  ];
+  var pA = 0;   // 0..4
+  function valA(p) {
+    var i = Math.min(3, Math.floor(p)), t = p - i, a = STG[i], b = STG[i + 1];
+    var L = function (u, v) { return Math.pow(10, lerp(Math.log(u) / Math.LN10, Math.log(v) / Math.LN10, t)); };
+    return { size: L(a.size, b.size), T: L(a.T, b.T), P: lerp(a.P, b.P, t), bal: lerp(a.bal, b.bal, t) };
+  }
+  function sizeTxt(v) { return v >= 100 ? fmt(Number(v.toPrecision(2))) : v >= 2 ? Math.round(v).toString() : (Math.round(v * 10) / 10).toString(); }
+  function tempTxt(v) { return fmt(v >= 1000 ? Number(v.toPrecision(2)) : v); }
+  var CLOUD = (function () { var r = rnd(17), a = []; for (var i = 0; i < 900; i++) { var ang = r() * 6.283, rr = Math.pow(r(), .55), n = .7 + .5 * Math.sin(ang * 3 + 1.3) * .3; a.push([Math.cos(ang) * rr * n, Math.sin(ang) * rr, 1 + r() * 3.5, r(), r()]); } return a; })();
+  function drawForm() {
+    var c = fit($('cvForm')), x = c.x, W = c.W, H = c.H, p = pA, v = valA(p);
+    var g0 = x.createLinearGradient(0, 0, 0, H); g0.addColorStop(0, '#05081a'); g0.addColorStop(1, '#0a0618'); x.fillStyle = g0; x.fillRect(0, 0, W, H);
+    starfield(x, W, H);
+    var cx = W * .5, cy = H * .54, Rmax = Math.min(W, H) * .44;
+    var Lz = Math.log(v.size) / Math.LN10;               // 0..6.48
+    var rpx = 14 + (Rmax - 14) * Math.pow(Lz / 6.48, .9);
+    var flat = lerp(1, .22, smooth(p - .8)), fade = 1 - smooth((p - 1.6) / 1.6);
+    // เมฆแก๊สและฝุ่น
+    CLOUD.forEach(function (q) {
+      var ox = q[0] * rpx * (1 + .25 * (1 - smooth(p))), oy = q[1] * rpx * flat;
+      var al = (.07 + .14 * q[3]) * fade;
+      if (al <= .01) return;
+      x.fillStyle = q[4] > .55 ? 'rgba(120,70,110,' + al + ')' : (q[4] > .25 ? 'rgba(190,90,140,' + (al * .8) + ')' : 'rgba(90,110,190,' + (al * .7) + ')');
+      x.beginPath(); x.arc(cx + ox, cy + oy, q[2] * (1 + 2 * (1 - smooth(p))), 0, 6.283); x.fill();
+    });
+    // จานรอบดาวฤกษ์ก่อนเกิด
+    if (p > 1 && p < 3.6) {
+      var da = Math.sin(Math.PI * clamp((p - 1) / 2.6, 0, 1)) * .8, dr = Math.max(40, rpx * 1.1);
+      var gd = x.createRadialGradient(cx, cy, 0, cx, cy, dr); gd.addColorStop(0, 'rgba(255,190,120,' + da + ')'); gd.addColorStop(.5, 'rgba(200,110,90,' + (da * .5) + ')'); gd.addColorStop(1, 'rgba(120,60,80,0)');
+      x.save(); x.translate(cx, cy); x.scale(1, .18); x.fillStyle = gd; x.beginPath(); x.arc(0, 0, dr, 0, 6.283); x.fill(); x.restore();
+    }
+    // ลำแก๊ส 2 ข้าง
+    if (p > 1.7 && p < 3.4) {
+      var ja = Math.sin(Math.PI * (p - 1.7) / 1.7) * .7;
+      [-1, 1].forEach(function (s) { var gj = x.createLinearGradient(cx, cy, cx, cy + s * H * .45); gj.addColorStop(0, 'rgba(140,220,255,' + ja + ')'); gj.addColorStop(1, 'rgba(140,220,255,0)');
+        x.fillStyle = gj; x.beginPath(); x.moveTo(cx - 3, cy); x.lineTo(cx - 14, cy + s * H * .45); x.lineTo(cx + 14, cy + s * H * .45); x.lineTo(cx + 3, cy); x.fill(); });
+    }
+    // แก่นที่ร้อนขึ้น
+    var Tvis = p < 3 ? lerp(1800, 6000, smooth(p / 3)) : 5800;
+    var col = tcol(Tvis), coreR = p < 2 ? rpx * lerp(.12, .35, smooth(p - 1)) : lerp(26, 22, smooth(p - 3));
+    var lum = smooth(p / 2.2);
+    if (p > .5) { x.globalAlpha = lum; ball(x, cx, cy, Math.max(4, coreR), col, p > 2.8 ? 2.6 : 2); x.globalAlpha = 1; }
+    // จุดระเบิดนิวเคลียร์ (ขั้น 4)
+    if (p > 2.85 && p < 3.5) {
+      var k = (p - 2.85) / .65, rr = 24 + k * Math.min(W, H) * .4;
+      x.strokeStyle = 'rgba(255,240,180,' + (1 - k) * .9 + ')'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, rr, 0, 6.283); x.stroke();
+    }
+    // ลูกศรแรง
+    var Ra = Math.max(rpx * .95, p > 2 ? 62 : 70);
+    Ra = Math.min(Ra, Math.min(W, H) * .36);
+    for (var i = 0; i < 8; i++) {
+      var an = i * Math.PI / 4 + .2, ca = Math.cos(an), sa = Math.sin(an);
+      arrow(x, cx + ca * (Ra + 34), cy + sa * (Ra + 34), cx + ca * (Ra + 6), cy + sa * (Ra + 6), '#FF6B8A');
+      var ln = 8 + 22 * v.bal;
+      if (v.bal > .1) { var an2 = an + Math.PI / 8, c2 = Math.cos(an2), s2 = Math.sin(an2); arrow(x, cx + c2 * (Ra - 2 - ln * .1), cy + s2 * (Ra - 2 - ln * .1), cx + c2 * (Ra - 2 + ln), cy + s2 * (Ra - 2 + ln), '#4FD8FF'); }
+    }
+    x.font = '600 13px Sarabun, sans-serif'; x.textAlign = 'left';
+    x.fillStyle = '#FF6B8A'; x.fillText('แรงโน้มถ่วง (ดึงเข้า)', 10, 20);
+    x.fillStyle = '#4FD8FF'; x.fillText('แรงดันของแก๊ส (ดันออก)', 10, 38);
+    var st = Math.round(p * 100) % 100 === 0 ? Math.round(p) : -1;
+    if (p >= 3.99) { x.fillStyle = '#5EF2A5'; x.font = '700 16px "Chakra Petch", Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('แรงดัน สมดุลกับ แรงโน้มถ่วง', cx, H - 14); }
+    else if (p > 2.85 && p < 3.25) { x.fillStyle = '#FFD166'; x.font = '700 16px "Chakra Petch", Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText('จุดระเบิดนิวเคลียร์ : หลอมไฮโดรเจนเป็นฮีเลียม', cx, H - 14); }
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพจำลอง ไม่ตามมาตราส่วน', W - 8, 18); x.textAlign = 'left';
+  }
+  function arrow(x, x1, y1, x2, y2, col) {
+    var a = Math.atan2(y2 - y1, x2 - x1);
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = 2.4;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * 6, y2 - Math.sin(a) * 6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * 10, y2 - Math.sin(a - .45) * 10); x.lineTo(x2 - Math.cos(a + .45) * 10, y2 - Math.sin(a + .45) * 10); x.closePath(); x.fill();
+  }
+  function atStage() { var r = Math.round(pA); return Math.abs(pA - r) < .005 ? r : -1; }
+  function updA() {
+    var v = valA(pA), i = Math.min(4, Math.round(pA)), s = atStage(), near = STG[Math.min(4, Math.floor(pA + .5))];
+    $('aStageK').textContent = s >= 0 ? 'ขั้นที่ ' + (s + 1) + ' จาก 5' : 'กำลังเปลี่ยนแปลง ระหว่างขั้นที่ ' + (Math.floor(pA) + 1) + ' กับ ' + (Math.floor(pA) + 2);
+    $('aName').textContent = s >= 0 ? (s + 1) + '. ' + STG[s].n : near.n;
+    $('aDesc').textContent = (s >= 0 ? STG[s] : near).d;
+    $('aSize').textContent = (s >= 0 ? sizeTxt(STG[s].size) : sizeTxt(v.size)) + ' เท่า';
+    $('aTemp').textContent = (s >= 0 ? fmt(STG[s].T) : tempTxt(v.T)) + ' K';
+    var lv = s >= 0 ? STG[s].P : Math.round(v.P);
+    $('aPres').textContent = s >= 0 ? STG[s].Pn : STG[clamp(lv - 1, 0, 4)].Pn;
+    Array.prototype.forEach.call($('aBar').children, function (b, k) { b.classList.toggle('on', k < lv); });
+    $('aTime').textContent = s >= 0 ? STG[s].time : 'เวลาผ่านไป...';
+    $('recA').disabled = s < 0;
+    $('nextA').disabled = pA >= 4;
+    chipsA(); logA();
+    if (tab === 'A') drawForm();
+  }
+  function chipsA() {
+    var h = '', s = atStage();
+    STG.forEach(function (g, k) { h += '<button class="chip' + (k === s ? ' on' : '') + (S.recA[k] ? ' done' : '') + '" data-k="' + k + '">' + (k + 1) + ' ' + g.n + '</button>'; });
+    $('stageChips').innerHTML = h;
+    Array.prototype.forEach.call($('stageChips').children, function (b) { b.onclick = function () { goA(+b.getAttribute('data-k')); }; });
+  }
+  function logA() {
+    var h = '';
+    STG.forEach(function (g, k) { var r = S.recA[k]; h += '<tr><td class="n">' + (k + 1) + '. ' + g.n + '</td><td>' + (r ? sizeTxt(g.size) : '-') + '</td><td>' + (r ? fmt(g.T) : '-') + '</td><td>' + (r ? g.Pn : '-') + '</td></tr>'; });
+    $('logA').innerHTML = h;
+    var n = Object.keys(S.recA).length;
+    $('recAMsg').textContent = n ? 'บันทึกแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : '') : '';
+  }
+  var animA = null;
+  function goA(target) {
+    if (animA) cancelAnimationFrame(animA);
+    var from = pA, t0 = performance.now(), dur = reduce ? 1 : Math.min(2600, 700 + Math.abs(target - from) * 1300);
+    (function step(now) {
+      var k = clamp((now - t0) / dur, 0, 1); pA = lerp(from, target, smooth(k)); if (k >= 1) pA = target;
+      $('slA').value = Math.round(pA * 100); updA();
+      if (k < 1) animA = requestAnimationFrame(step); else animA = null;
+    })(t0);
+  }
+  $('slA').oninput = function () { if (animA) cancelAnimationFrame(animA); animA = null; pA = this.value / 100; var r = Math.round(pA); if (Math.abs(pA - r) < .04) pA = r; updA(); };
+  $('nextA').onclick = function () { goA(Math.min(4, Math.floor(pA + .001) + 1)); };
+  $('recA').onclick = function () { var s = atStage(); if (s < 0) return; S.recA[s] = 1; save(); if (s < 4 && Object.keys(S.recA).length < 5) goA(s + 1); else updA(); };
+
+  // ================================================================ ภารกิจ B เครื่องเร่งเวลา
+  // ค่าโดยประมาณ (ปัดให้จำง่าย) · R = รัศมีเทียบดวงอาทิตย์ · T = อุณหภูมิผิว (K)
+  var MASSES = [
+    { m: '0.5', kind: 'ดาวแคระแดง', ms: 56000, msTxt: '56,000 ล้านปี', grow: 'ดาวยักษ์แดง', end: 'ดาวแคระขาว',
+      ph: [
+        { k: 'ms', n: 'ดาวฤกษ์ในลำดับหลัก', R: .5, T: 3800, col: 'แดงส้ม', age: 'อายุ 0 – 56,000 ล้านปี', d: 'ดาวมวลน้อยเผาไฮโดรเจนช้ามาก จึงอยู่ในลำดับหลักได้นานถึงราว 56,000 ล้านปี นานกว่าอายุของเอกภพ (13,800 ล้านปี) ดาวแคระแดงจึงยังไม่มีดวงใดหมดอายุ' },
+        { k: 'giant', n: 'ดาวยักษ์แดง', R: 40, T: 3600, col: 'แดง', age: 'อายุราว 60,000 ล้านปี (อนาคต)', d: 'เมื่อไฮโดรเจนที่แก่นหมด แก่นยุบตัว เปลือกนอกขยายตัวและเย็นลง กลายเป็นดาวยักษ์แดง' },
+        { k: 'pn', n: 'ปลดเปลือกแก๊สออก', R: 0, T: 0, col: '', age: 'อนาคตอันไกลมาก', d: 'เปลือกแก๊สชั้นนอกค่อย ๆ หลุดออกสู่อวกาศ เหลือแก่นร้อนอยู่ตรงกลาง' },
+        { k: 'wd', n: 'ดาวแคระขาว', R: .013, T: 15000, col: 'ขาว', age: 'อนาคตอันไกลมาก', d: 'แก่นที่เหลือเป็นดาวแคระขาว ขนาดประมาณโลก ไม่มีปฏิกิริยานิวเคลียร์แล้ว ค่อย ๆ เย็นลง' }] },
+    { m: '1', kind: 'แบบดวงอาทิตย์', ms: 10000, msTxt: '10,000 ล้านปี', grow: 'ดาวยักษ์แดง', end: 'ดาวแคระขาว',
+      ph: [
+        { k: 'ms', n: 'ดาวฤกษ์ในลำดับหลัก', R: 1, T: 5800, col: 'เหลือง', age: 'อายุ 0 – 10,000 ล้านปี', d: 'หลอมไฮโดรเจนเป็นฮีเลียมที่แก่น แรงดันสมดุลกับแรงโน้มถ่วง ดวงอาทิตย์ตอนนี้อายุประมาณ 4,600 ล้านปี อยู่ช่วงกลางของลำดับหลัก' },
+        { k: 'giant', n: 'ดาวยักษ์แดง', R: 100, T: 3500, col: 'แดงส้ม', age: 'อายุราว 10,000–11,000 ล้านปี', d: 'ไฮโดรเจนที่แก่นหมด แก่นยุบตัวและร้อนขึ้น เปลือกนอกขยายตัวใหญ่ขึ้นราว 100 เท่าและเย็นลงจนเห็นเป็นสีแดงส้ม ดวงอาทิตย์จะกลืนดาวพุธและดาวศุกร์ ความส่องสว่างเพิ่มขึ้นหลายพันเท่า' },
+        { k: 'pn', n: 'เนบิวลาดาวเคราะห์', R: 0, T: 0, col: '', age: 'อายุราว 11,000 ล้านปี', d: 'เปลือกแก๊สชั้นนอกหลุดออกเป็นวงแก๊สเรืองแสงสวยงาม เรียกว่าเนบิวลาดาวเคราะห์ (ไม่เกี่ยวกับดาวเคราะห์ แต่กล้องรุ่นเก่าเห็นเป็นดวงกลมคล้ายดาวเคราะห์) อยู่ได้ราวหมื่นปี' },
+        { k: 'wd', n: 'ดาวแคระขาว', R: .01, T: 20000, col: 'ขาว', age: 'อายุ 11,000 ล้านปีขึ้นไป', d: 'แก่นที่เหลือคือดาวแคระขาว ขนาดเท่าโลก (0.01 เท่าของดวงอาทิตย์) แต่หนาแน่นมาก ร้อนจัดเป็นสีขาว ไม่มีปฏิกิริยานิวเคลียร์แล้ว จึงค่อย ๆ เย็นลงและหรี่ลง' }] },
+    { m: '4', kind: 'มวลปานกลาง', ms: 200, msTxt: '200 ล้านปี', grow: 'ดาวยักษ์แดง', end: 'ดาวแคระขาว',
+      ph: [
+        { k: 'ms', n: 'ดาวฤกษ์ในลำดับหลัก', R: 2.5, T: 15000, col: 'ขาวอมน้ำเงิน', age: 'อายุ 0 – 200 ล้านปี', d: 'มวลมากกว่าดวงอาทิตย์ 4 เท่า แก่นร้อนกว่า เผาไฮโดรเจนเร็วกว่ามาก อยู่ในลำดับหลักได้เพียงราว 200 ล้านปี' },
+        { k: 'giant', n: 'ดาวยักษ์แดง', R: 150, T: 4000, col: 'ส้ม', age: 'อายุราว 200–230 ล้านปี', d: 'ไฮโดรเจนที่แก่นหมด เปลือกนอกขยายตัวเป็นดาวยักษ์แดง' },
+        { k: 'pn', n: 'เนบิวลาดาวเคราะห์', R: 0, T: 0, col: '', age: 'อายุราว 230 ล้านปี', d: 'เปลือกแก๊สหลุดออกเป็นเนบิวลาดาวเคราะห์' },
+        { k: 'wd', n: 'ดาวแคระขาว', R: .008, T: 40000, col: 'ขาว', age: 'อายุ 230 ล้านปีขึ้นไป', d: 'เหลือแก่นเป็นดาวแคระขาว เพราะมวลตั้งต้นยังน้อยกว่าประมาณ 8 เท่าของดวงอาทิตย์' }] },
+    { m: '15', kind: 'มวลมาก', ms: 15, msTxt: '15 ล้านปี', grow: 'ดาวยักษ์ใหญ่แดง', end: 'ดาวนิวตรอน',
+      ph: [
+        { k: 'ms', n: 'ดาวฤกษ์ในลำดับหลัก', R: 7, T: 30000, col: 'น้ำเงิน', age: 'อายุ 0 – 15 ล้านปี', d: 'ดาวมวลมาก ร้อนจัด สีน้ำเงิน สว่างกว่าดวงอาทิตย์หลายหมื่นเท่า ใช้เชื้อเพลิงเร็วมาก อยู่ในลำดับหลักได้เพียงราว 15 ล้านปี' },
+        { k: 'sgiant', n: 'ดาวยักษ์ใหญ่แดง', R: 800, T: 3600, col: 'แดง', age: 'อายุราว 15–16 ล้านปี', d: 'ขยายตัวเป็นดาวยักษ์ใหญ่แดง ใหญ่กว่าดวงอาทิตย์หลายร้อยเท่า แก่นหลอมธาตุหนักขึ้นเรื่อย ๆ จนเป็นเหล็ก ซึ่งหลอมต่อไม่ได้แล้ว' },
+        { k: 'sn', n: 'ซูเปอร์โนวา', R: 0, T: 0, col: '', age: 'อายุราว 16 ล้านปี', d: 'แก่นเหล็กยุบตัวในพริบตา แล้วเกิดการระเบิดรุนแรงเรียกว่าซูเปอร์โนวา สว่างเท่ากับดาวทั้งกาแล็กซีอยู่หลายสัปดาห์ สร้างและกระจายธาตุหนักออกสู่อวกาศ' },
+        { k: 'ns', n: 'ดาวนิวตรอน', R: .000015, T: 1000000, col: 'ขาวอมน้ำเงิน', age: 'หลังการระเบิด', d: 'แก่นที่เหลือยุบตัวเป็นดาวนิวตรอน กว้างเพียงราว 20 กิโลเมตร แต่มวลมากกว่าดวงอาทิตย์ หนาแน่นมาก บางดวงหมุนเร็วและส่งคลื่นวิทยุเป็นจังหวะ (พัลซาร์)' }] },
+    { m: '40', kind: 'มวลมากที่สุด', ms: 5, msTxt: '5 ล้านปี', grow: 'ดาวยักษ์ใหญ่แดง', end: 'หลุมดำ',
+      ph: [
+        { k: 'ms', n: 'ดาวฤกษ์ในลำดับหลัก', R: 12, T: 42000, col: 'น้ำเงิน', age: 'อายุ 0 – 5 ล้านปี', d: 'ดาวมวลมากที่สุดในห้องทดลอง ร้อนและสว่างที่สุด อายุสั้นที่สุด อยู่ในลำดับหลักเพียงราว 5 ล้านปี' },
+        { k: 'sgiant', n: 'ดาวยักษ์ใหญ่แดง', R: 1000, T: 3500, col: 'แดง', age: 'อายุราว 5–5.5 ล้านปี', d: 'ขยายตัวเป็นดาวยักษ์ใหญ่ ใหญ่กว่าดวงอาทิตย์ราวพันเท่า แก่นหลอมธาตุจนเป็นเหล็ก' },
+        { k: 'sn', n: 'ซูเปอร์โนวา', R: 0, T: 0, col: '', age: 'อายุราว 5.5 ล้านปี', d: 'แก่นยุบตัวและระเบิดเป็นซูเปอร์โนวา (ดาวที่มวลมากมากอาจยุบตัวเป็นหลุมดำโดยแทบไม่ระเบิด)' },
+        { k: 'bh', n: 'หลุมดำ', R: 0, T: 0, col: '', age: 'หลังการระเบิด', d: 'แก่นที่เหลือมีมวลมากจนไม่มีแรงใดต้านการยุบตัวได้ กลายเป็นหลุมดำ แรงโน้มถ่วงสูงมากจนแม้แต่แสงก็หนีออกมาไม่ได้ เห็นได้จากแก๊สร้อนที่หมุนวนรอบ ๆ' }] }
+  ];
+  var curM = 1, curP = 0, tPh = 0, animB = null;
+  function lifeSize(R) { return clamp(16 * Math.pow(R, .36), 9, 132); }
+  function drawLife(now) {
+    var c = fit($('cvLife')), x = c.x, W = c.W, H = c.H, M = MASSES[curM], P = M.ph[curP];
+    var t = (now || performance.now()) / 1000;
+    x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .8);
+    var cx = W * .5, cy = H * .43;
+    if (P.k === 'ms' || P.k === 'giant' || P.k === 'sgiant') {
+      var r = lifeSize(P.R), col = tcol(P.T);
+      ball(x, cx, cy, r, col, P.k === 'ms' ? 2.2 : 1.5);
+      if (P.k !== 'ms') { var rr = rnd(5); for (var i = 0; i < 70; i++) { var a = rr() * 6.283, d = Math.sqrt(rr()) * r * .9; x.fillStyle = 'rgba(120,30,20,' + (.05 + rr() * .07) + ')'; x.beginPath(); x.arc(cx + Math.cos(a) * d, cy + Math.sin(a) * d, r * (.06 + rr() * .1), 0, 6.283); x.fill(); } }
+    } else if (P.k === 'pn') {
+      for (var j = 0; j < 3; j++) {
+        var R2 = 40 + j * 22 + Math.sin(t + j) * 2;
+        var g = x.createRadialGradient(cx, cy, R2 * .55, cx, cy, R2);
+        g.addColorStop(0, 'rgba(80,220,255,0)'); g.addColorStop(.75, j === 1 ? 'rgba(255,120,170,.45)' : 'rgba(80,220,255,.35)'); g.addColorStop(1, 'rgba(80,220,255,0)');
+        x.save(); x.translate(cx, cy); x.scale(1, .82 + j * .05); x.translate(-cx, -cy); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R2, 0, 6.283); x.fill(); x.restore();
+      }
+      ball(x, cx, cy, 4, [240, 245, 255], 4);
+    } else if (P.k === 'sn') {
+      var k = (t % 3) / 3, R3 = 20 + k * Math.min(W, H) * .5;
+      var gs = x.createRadialGradient(cx, cy, 0, cx, cy, R3); gs.addColorStop(0, 'rgba(255,255,240,' + (1 - k * .6) + ')'); gs.addColorStop(.3, 'rgba(255,200,120,' + (.7 - k * .4) + ')'); gs.addColorStop(1, 'rgba(255,80,60,0)');
+      x.fillStyle = gs; x.beginPath(); x.arc(cx, cy, R3, 0, 6.283); x.fill();
+      var rs = rnd(3); for (var q = 0; q < 60; q++) { var aa = rs() * 6.283, l1 = R3 * (.5 + rs() * .5); x.strokeStyle = 'rgba(255,' + Math.round(140 + rs() * 100) + ',120,' + (.6 - k * .4) + ')'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(cx + Math.cos(aa) * l1 * .6, cy + Math.sin(aa) * l1 * .6); x.lineTo(cx + Math.cos(aa) * l1, cy + Math.sin(aa) * l1); x.stroke(); }
+    } else if (P.k === 'wd') {
+      ball(x, cx, cy, 5, tcol(P.T), 6);
+    } else if (P.k === 'ns') {
+      var an = t * 3;
+      [0, Math.PI].forEach(function (o) { var a2 = an + o, gb = x.createLinearGradient(cx, cy, cx + Math.cos(a2) * 160, cy + Math.sin(a2) * 160); gb.addColorStop(0, 'rgba(140,220,255,.75)'); gb.addColorStop(1, 'rgba(140,220,255,0)');
+        x.fillStyle = gb; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + Math.cos(a2 - .12) * 160, cy + Math.sin(a2 - .12) * 160); x.lineTo(cx + Math.cos(a2 + .12) * 160, cy + Math.sin(a2 + .12) * 160); x.fill(); });
+      ball(x, cx, cy, 4, [200, 225, 255], 5);
+    } else if (P.k === 'bh') {
+      x.save(); x.translate(cx, cy); x.scale(1, .32);
+      var ga = x.createRadialGradient(0, 0, 26, 0, 0, 110); ga.addColorStop(0, 'rgba(255,230,170,.95)'); ga.addColorStop(.4, 'rgba(255,150,70,.7)'); ga.addColorStop(1, 'rgba(255,90,40,0)');
+      x.fillStyle = ga; x.beginPath(); x.arc(0, 0, 110, 0, 6.283); x.fill(); x.restore();
+      x.strokeStyle = 'rgba(255,220,160,.8)'; x.lineWidth = 2.5; x.beginPath(); x.arc(cx, cy, 30, 0, 6.283); x.stroke();
+      x.fillStyle = '#000'; x.beginPath(); x.arc(cx, cy, 27, 0, 6.283); x.fill();
+    }
+    // ดวงอาทิตย์ปัจจุบันเทียบขนาด
+    if (P.k === 'ms' || P.k === 'giant' || P.k === 'sgiant') { ball(x, W - 34, 34, lifeSize(1), tcol(5800), 0); x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.textAlign = 'right'; x.fillText('ดวงอาทิตย์ปัจจุบัน (เทียบขนาด)', W - 56, 38); }
+    // แถบเวลา
+    var y0 = H - 54, x0 = 12, ww = W - 24, F = [.56, .2, .1, .14], xs = x0;
+    x.textAlign = 'center'; x.font = '12px Sarabun, sans-serif';
+    M.ph.forEach(function (ph, k) {
+      var w = ww * F[k];
+      x.fillStyle = k === curP ? '#FFD166' : (k < curP ? '#3b4f8f' : '#1c2655'); x.fillRect(xs + 1, y0, w - 2, 14);
+      x.fillStyle = k === curP ? '#FFD166' : '#9AA6CF'; x.fillText(ph.n, xs + w / 2, y0 + 30);
+      xs += w;
+    });
+    x.fillStyle = '#9AA6CF'; x.textAlign = 'left'; x.fillText('มวลตั้งต้น ' + M.m + ' เท่าของดวงอาทิตย์ · แถบเวลาไม่ตามสัดส่วนจริง', 12, 18);
+    x.textAlign = 'left';
+  }
+  function massUI() {
+    var h = '';
+    MASSES.forEach(function (M, i) { h += '<button class="mass' + (i === curM ? ' on' : '') + (S.recB[i] ? ' done' : '') + '" data-i="' + i + '">' + M.m + ' เท่า<small>' + M.kind + '</small></button>'; });
+    $('massBtns').innerHTML = h;
+    Array.prototype.forEach.call($('massBtns').children, function (b) { b.onclick = function () { stopB(); curM = +b.getAttribute('data-i'); curP = 0; seen(); updB(); }; });
+  }
+  function phaseUI() {
+    var h = '', M = MASSES[curM];
+    M.ph.forEach(function (p, k) { h += '<button class="chip' + (k === curP ? ' on' : '') + ((S.seen[curM] || 0) >= k ? ' done' : '') + '" data-k="' + k + '">' + (k + 1) + ' ' + p.n + '</button>'; });
+    $('phaseChips').innerHTML = h;
+    Array.prototype.forEach.call($('phaseChips').children, function (b) { b.onclick = function () { stopB(); curP = +b.getAttribute('data-k'); seen(); updB(); }; });
+  }
+  function seen() { S.seen[curM] = Math.max(S.seen[curM] || 0, curP); save(); }
+  function sizeB(P) {
+    if (P.k === 'ns') return 'ราว 20 km';
+    if (P.k === 'bh') return 'ไม่มีพื้นผิว';
+    if (!P.R) return 'เปลือกแก๊สฟุ้งออก';
+    return (P.R < 1 ? P.R.toString() : fmt(P.R)) + ' เท่า';
+  }
+  function updB() {
+    var M = MASSES[curM], P = M.ph[curP];
+    $('bPhase').textContent = P.n;
+    $('bSize').textContent = sizeB(P);
+    $('bTemp').textContent = P.T ? fmt(P.T) + ' K · ' + P.col : (P.k === 'bh' ? 'แสงหนีออกมาไม่ได้' : 'สว่างวาบ');
+    $('bAge').textContent = P.age;
+    $('bDesc').textContent = P.d;
+    var done = (S.seen[curM] || 0) >= 3;
+    $('recB').disabled = !done;
+    $('recBMsg').textContent = S.recB[curM] ? 'บันทึกดาวมวล ' + M.m + ' เท่าแล้ว' : (done ? '' : 'ดูให้ถึงช่วงสุดท้ายก่อนบันทึก');
+    massUI(); phaseUI(); logB(); if (tab === 'B') { drawLife(); drawBars(); }
+  }
+  function logB() {
+    var h = '';
+    MASSES.forEach(function (M, i) { var r = S.recB[i]; h += '<tr><td class="n">' + M.m + ' เท่า (' + M.kind + ')</td><td>' + (r ? M.msTxt : '-') + '</td><td>' + (r ? M.grow : '-') + '</td><td>' + (r ? M.end : '-') + '</td></tr>'; });
+    $('logB').innerHTML = h;
+  }
+  function drawBars() {
+    var c = fit($('cvBars')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#060a1c'; x.fillRect(0, 0, W, H);
+    var L0 = 0, L1 = 5, x0 = 110, x1 = W - 16, X = function (myr) { return x0 + (Math.log(myr) / Math.LN10 - L0) / (L1 - L0) * (x1 - x0); };
+    x.font = '11.5px Sarabun, sans-serif'; x.textAlign = 'center';
+    [[1, '1 ล้าน'], [10, '10 ล้าน'], [100, '100 ล้าน'], [1000, '1,000 ล้าน'], [10000, '10,000 ล้าน'], [100000, '100,000 ล้านปี']].forEach(function (g) {
+      var gx = X(g[0]); x.strokeStyle = '#1c2655'; x.lineWidth = 1; x.beginPath(); x.moveTo(gx, 22); x.lineTo(gx, H - 24); x.stroke();
+      x.fillStyle = '#9AA6CF'; x.fillText(g[1], Math.min(gx, W - 40), H - 8);
+    });
+    var ux = X(13800); x.strokeStyle = '#A77BFF'; x.setLineDash([4, 3]); x.beginPath(); x.moveTo(ux, 4); x.lineTo(ux, H - 24); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#A77BFF'; x.textAlign = 'left'; x.fillText('อายุเอกภพ 13,800 ล้านปี', Math.min(ux + 4, W - 130), 16);
+    var bh = (H - 50) / 5;
+    MASSES.forEach(function (M, i) {
+      var y = 22 + i * bh; x.textAlign = 'right'; x.fillStyle = '#E8EDFF'; x.font = '13px Sarabun, sans-serif'; x.fillText('มวล ' + M.m + ' เท่า', x0 - 8, y + bh * .62);
+      if (S.recB[i]) { var col = tcol(M.ph[0].T); x.fillStyle = rgba(col, .9); x.fillRect(x0, y + bh * .18, X(M.ms) - x0, bh * .62); var xe = X(M.ms); if (xe + 110 > W) { x.fillStyle = '#06102A'; x.textAlign = 'right'; x.fillText(M.msTxt, xe - 6, y + bh * .62); } else { x.fillStyle = '#E8EDFF'; x.textAlign = 'left'; x.fillText(M.msTxt, xe + 6, y + bh * .62); } }
+      else { x.fillStyle = '#3A4A85'; x.textAlign = 'left'; x.fillText('ยังไม่บันทึก', x0 + 6, y + bh * .62); }
+    });
+  }
+  function stopB() { if (animB) clearTimeout(animB); animB = null; $('playB').textContent = 'เร่งเวลา'; }
+  $('playB').onclick = function () {
+    if (animB) { stopB(); return; }
+    if (curP >= 3) curP = 0;
+    $('playB').textContent = 'หยุด';
+    seen(); updB();
+    (function next() { animB = setTimeout(function () { if (curP < 3) { curP++; seen(); updB(); next(); } else stopB(); }, reduce ? 600 : 1900); })();
+  };
+  $('recB').onclick = function () {
+    S.recB[curM] = 1; save();
+    var n = Object.keys(S.recB).length;
+    updB(); $('recBMsg').textContent = 'บันทึกแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : ' · เลือกมวลถัดไป');
+  };
+  (function loop(now) { if (tab === 'B') { var P = MASSES[curM].ph[curP]; if (P.k === 'pn' || P.k === 'sn' || P.k === 'ns') drawLife(now); } requestAnimationFrame(loop); })(performance.now());
+
+  // ================================================================ ภารกิจ C ไขคดีชีวิตดาว
+  var CARDS = [['เนบิวลา', 'เมฆแก๊สและฝุ่นเย็น'], ['ดาวฤกษ์ก่อนเกิด', 'เรืองแสงจากการยุบตัว'], ['ดาวฤกษ์ในลำดับหลัก', 'หลอมไฮโดรเจนเป็นฮีเลียม'],
+    ['ดาวยักษ์แดง', 'ขยายตัว ผิวเย็นลง'], ['เนบิวลาดาวเคราะห์', 'เปลือกแก๊สหลุดออก'], ['ดาวแคระขาว', 'ขนาดเท่าโลก ค่อย ๆ เย็นลง'],
+    ['ดาวยักษ์ใหญ่แดง', 'ใหญ่กว่าดวงอาทิตย์หลายร้อยเท่า'], ['ซูเปอร์โนวา', 'การระเบิดครั้งใหญ่'], ['ดาวนิวตรอน หรือ <span style="white-space:nowrap">หลุมดำ</span>', 'ซากที่หนาแน่นที่สุด']];
+  var SEQ = [[0, 1, 2, 3, 4, 5], [0, 1, 2, 6, 7, 8]];
+  var SHUF = [7, 2, 5, 0, 8, 3, 1, 6, 4];
+  var QC = [
+    { t: 'คดีที่ 1 : เนบิวลาปู (กลุ่มดาววัว) มีดาวนิวตรอนหมุนเร็วอยู่ตรงกลาง นักดาราศาสตร์จีนบันทึกว่าเมื่อ ค.ศ. 1054 มี "ดาวรับเชิญ" สว่างจนเห็นได้ในเวลากลางวัน ดาวดวงเดิมเป็นดาวแบบใด',
+      o: ['ดาวมวลน้อยแบบดวงอาทิตย์ ที่ขยายตัวเป็นดาวยักษ์แดง', 'ดาวมวลมาก ที่ระเบิดเป็นซูเปอร์โนวา', 'ดาวฤกษ์ก่อนเกิด ที่เพิ่งเริ่มปฏิกิริยานิวเคลียร์'], a: 1 },
+    { t: 'คดีที่ 2 : ดาวบีเทลจุส (ไหล่ของกลุ่มดาวนายพราน) สีแดง ใหญ่กว่าดวงอาทิตย์ราว 700 เท่า มีมวลราว 15–20 เท่าของดวงอาทิตย์ ดาวดวงนี้อยู่ช่วงใดของชีวิต และน่าจะจบชีวิตอย่างไร',
+      o: ['ดาวฤกษ์ก่อนเกิด ต่อไปจะกลายเป็นดาวในลำดับหลัก', 'ดาวแคระขาว ต่อไปจะเย็นลงเรื่อย ๆ', 'ดาวยักษ์ใหญ่แดง ต่อไปจะระเบิดเป็นซูเปอร์โนวา'], a: 2 },
+    { t: 'คดีที่ 3 : อีกประมาณ 5,000 ล้านปี ดวงอาทิตย์ของเราจะเป็นอย่างไร',
+      o: ['ระเบิดเป็นซูเปอร์โนวา แล้วกลายเป็นหลุมดำ', 'ขยายตัวเป็นดาวยักษ์แดง แล้วเหลือแก่นเป็นดาวแคระขาว', 'ยุบตัวกลับไปเป็นเนบิวลาเหมือนตอนเกิด'], a: 1 }
+  ];
+  function curLane() { return S.lane[0].length < 6 ? 0 : (S.lane[1].length < 6 ? 1 : 2); }
+  function cardsUI() {
+    var h = '';
+    SHUF.forEach(function (k) { h += '<button class="card" data-k="' + k + '">' + CARDS[k][0] + '<small>' + CARDS[k][1] + '</small></button>'; });
+    $('cards').innerHTML = h;
+    Array.prototype.forEach.call($('cards').children, function (b) {
+      b.onclick = function () {
+        var L = curLane(); if (L > 1) return;
+        var k = +b.getAttribute('data-k');
+        if (k === SEQ[L][S.lane[L].length]) { S.lane[L].push(k); save(); lanesUI(); checkWin(); }
+        else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); $('cMsg').textContent = 'ยังไม่ใช่ ลองคิดว่าช่วงถัดไปของดาวคืออะไร'; }
+      };
+    });
+  }
+  function lanesUI() {
+    var L = curLane();
+    [0, 1].forEach(function (i) {
+      var h = '';
+      for (var j = 0; j < 6; j++) h += j < S.lane[i].length ? '<div class="slot f">' + CARDS[S.lane[i][j]][0] + '</div>' : '<div class="slot">' + (j + 1) + '</div>';
+      $('slots' + i).innerHTML = h;
+      $('lane' + i).className = 'lane' + (L === i ? ' cur' : '') + (S.lane[i].length === 6 ? ' ok' : '');
+    });
+    $('cMsg').textContent = L === 0 ? 'กำลังเรียงเส้นทางที่ 1 (' + S.lane[0].length + '/6)' : (L === 1 ? 'กำลังเรียงเส้นทางที่ 2 (' + S.lane[1].length + '/6)' : 'เรียงครบทั้ง 2 เส้นทางแล้ว');
+  }
+  $('resetC').onclick = function () { S.lane = [[], []]; save(); lanesUI(); checkWin(); };
+  function quizC() {
+    var h = '';
+    QC.forEach(function (q, i) {
+      h += '<div class="qq"><div class="t">' + q.t + '</div><div class="opts">';
+      q.o.forEach(function (o, j) { var cl = S.quiz[i] === j ? (j === q.a ? ' ok' : ' bad') : ''; h += '<button class="opt' + cl + '" data-q="' + i + '" data-o="' + j + '">' + o + '</button>'; });
+      h += '</div></div>';
+    });
+    $('quizC').innerHTML = h;
+    Array.prototype.forEach.call(document.querySelectorAll('#quizC .opt'), function (b) {
+      b.onclick = function () { S.quiz[+b.getAttribute('data-q')] = +b.getAttribute('data-o'); save(); quizC(); checkWin(); };
+    });
+  }
+  function checkWin() {
+    var q = QC.every(function (qq, i) { return S.quiz[i] === qq.a; }), o = curLane() === 2;
+    $('winC').classList.toggle('hide', !(q && o));
+  }
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawForm();
+    if (tab === 'B') { drawLife(); drawBars(); }
+  }
+  updA(); updB(); cardsUI(); lanesUI(); quizC(); checkWin();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_E4 = { STG: STG, MASSES: MASSES,
+    setA: function (p) { if (animA) cancelAnimationFrame(animA); animA = null; pA = p; $('slA').value = Math.round(p * 100); updA(); },
+    setB: function (m, p) { stopB(); curM = m; curP = p; seen(); updB(); },
+    recAll: function () { for (var i = 0; i < 5; i++) { S.recA[i] = 1; S.recB[i] = 1; S.seen[i] = 3; } updA(); updB(); } };
+})();
+</script>
+</body>
+</html>
