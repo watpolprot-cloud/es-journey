@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>E7 ศูนย์บัญชาการสำรวจอวกาศ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง E7 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-E6) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #1c3a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.star-tag { display: inline-block; font-family: var(--head); font-size: 13px; color: var(--ink); background: var(--gold); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15.5px; line-height: 1.5; }
+.info canvas { border-radius: 10px; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.meter { font-family: var(--head); font-size: 34px; font-weight: 700; color: var(--ok); letter-spacing: .04em; text-shadow: 0 0 14px #5ef2a555; line-height: 1.1; }
+.bar { height: 10px; border-radius: 5px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--cyan), var(--ok)); transition: width .4s; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.note.c { border-left-color: var(--cyan); background: #4fd8ff0d; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .h { font-family: var(--head); font-size: 16px; color: var(--gold); line-height: 1.3; margin: 2px 0 2px; }
+.al .q { font-size: 14.5px; color: var(--muted); margin-bottom: 4px; }
+.al button { display: block; width: 100%; text-align: left; font-family: var(--body); font-size: 14.5px; line-height: 1.35; margin-top: 5px; padding: 5px 9px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.obj { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 8px 11px; background: #0b123388; }
+.obj.ok { border-color: var(--ok); }
+.obj .ty { font-family: var(--head); font-size: 12.5px; color: var(--cyan); letter-spacing: .03em; }
+.obj .nm { font-family: var(--head); font-size: 16px; color: var(--gold); line-height: 1.25; }
+.obj .zs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 6px; }
+.obj .zs button { font-family: var(--head); font-size: 13px; line-height: 1.15; padding: 5px 4px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.obj .zs button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.obj .zs button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.obj .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+.legend div { border: 1px solid var(--line); border-radius: 10px; padding: 5px 8px; font-size: 13.5px; line-height: 1.3; background: #0b1233aa; }
+.legend b { font-family: var(--head); color: var(--gold); display: block; font-size: 14.5px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.ev .kw { color: var(--muted); font-size: 13.5px; margin-top: 4px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .legend { grid-template-columns: 1fr 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 21px; }
+  .meter { font-size: 30px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · E7 <span class="star-tag">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ศูนย์บัญชาการ<b>สำรวจอวกาศ</b></h1>
+  <p class="lead">นักบินเข้าประจำศูนย์บัญชาการสำรวจอวกาศ ภารกิจนี้เลือกกล้องโทรทรรศน์ให้เหมาะกับช่วงคลื่น ส่งดาวเทียม ยานอวกาศ และสถานีอวกาศขึ้นสู่วงโคจรที่ถูกต้อง แล้วสืบหาว่าของใช้รอบตัวเรามาจากเทคโนโลยีอวกาศอะไร เพื่อออกแบบนวัตกรรมของตัวเอง จดผลลงใบงาน E7</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>หอดูดาวหลายช่วงคลื่น<small>กล้องโทรทรรศน์ควรอยู่ที่ไหน</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ศูนย์ควบคุมวงโคจร<small>ดาวเทียม ยานอวกาศ สถานีอวกาศ</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>แฟ้มลับของใช้จากอวกาศ<small>สืบค้น + คลังเทคโนโลยีอวกาศ</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> หอดูดาวหลายช่วงคลื่น : กล้องโทรทรรศน์ควรอยู่ที่ไหน</h2>
+    <p class="how">เลือกช่วงคลื่น 5 ช่วงทีละช่วง แล้วสลับที่ตั้งกล้อง <b style="color:#FFD166">กล้องบนพื้นโลก</b> กับ <b style="color:#4FD8FF">กล้องในอวกาศ</b> ดูว่าคลื่นผ่านบรรยากาศลงมาถึงกล้องได้เท่าไร และกล้องเห็นอะไรในเนบิวลาเดียวกัน ดูครบทั้ง 2 ที่แล้วกด "บันทึกค่า" ให้ครบ 5 ช่วงคลื่น จดลงใบงาน ส่วนที่ 1</p>
+    <div class="twin">
+      <canvas id="cvAtm" height="340" aria-label="ภาพจำลองคลื่นแม่เหล็กไฟฟ้าช่วงต่าง ๆ ผ่านบรรยากาศโลก"></canvas>
+      <div class="info">
+        <div class="k" id="aLam">-</div>
+        <h3 id="aName">-</h3>
+        <canvas id="cvView" height="190" aria-label="ภาพเนบิวลาที่กล้องถ่ายได้ในช่วงคลื่นที่เลือก"></canvas>
+        <div class="k" id="aWhere" style="margin-top:2px">-</div>
+        <div class="meter" id="aPct">-</div>
+        <div class="bar"><i id="aBar"></i></div>
+        <div><span class="lvl" id="aLvl">-</span></div>
+      </div>
+    </div>
+    <div class="chips" id="bandChips"></div>
+    <div class="chips" id="locChips"></div>
+    <div class="note c" id="aSee">-</div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกค่า</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ช่วงคลื่น</th><th>ถึงกล้องบนพื้นโลก (%)</th><th>ผ่านบรรยากาศ</th><th>ตัวอย่างกล้องจริง</th><th>สิ่งที่เห็นเด่น</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>สังเกต</b> แสงที่ตามองเห็นเป็นเพียงส่วนเล็ก ๆ ของคลื่นแม่เหล็กไฟฟ้า วัตถุในอวกาศปล่อยคลื่นออกมาหลายช่วง แต่บรรยากาศโลกยอมให้ผ่านลงมาถึงพื้นได้ดีเพียง 2 "หน้าต่าง" คือ <b>แสงที่มองเห็น</b> และ <b>คลื่นวิทยุ</b> กล้องที่รับช่วงคลื่นอื่นจึงต้องขึ้นไปอยู่เหนือบรรยากาศ · ภาพในช่วงคลื่นที่ตามองไม่เห็นใช้ <b>สีเทียม</b> แทนความเข้มของคลื่น</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 5 ช่วงคลื่น ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ศูนย์ควบคุมวงโคจร : ดาวเทียม ยานอวกาศ สถานีอวกาศ</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1 (การทดลอง)</b> ปรับความสูงของวงโคจรด้วยปุ่ม 4 ค่า (หรือเลื่อนแถบ) ดูว่าดาวเทียมโคจรรอบละนานเท่าไร เร็วเท่าไร จุดสีทองบนโลกคือประเทศไทย กด "บันทึกค่า" ให้ครบ 4 แถว · <b style="color:#4FD8FF">ขั้นที่ 2</b> ส่งวัตถุ 8 ชิ้นขึ้นสู่วงโคจรที่ถูกต้อง จดลงใบงาน ส่วนที่ 2</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ยิ่งสูง ยิ่งโคจรช้าหรือเร็ว</h2>
+    <div class="twin">
+      <canvas id="cvOrb" height="340" aria-label="ภาพจำลองดาวเทียมโคจรรอบโลกที่ความสูงต่าง ๆ ตามมาตราส่วนจริง"></canvas>
+      <div class="info">
+        <div class="k">ความสูงจากผิวโลก</div>
+        <div class="v g" id="oAlt">-</div>
+        <div class="k" id="oCls" style="color:#4FD8FF;font-size:15px">-</div>
+        <div class="g2" style="margin-top:6px">
+          <div><div class="k">คาบการโคจร (1 รอบ)</div><div class="v c" id="oT" style="font-size:20px">-</div></div>
+          <div><div class="k">ความเร็ว</div><div class="v o" id="oV" style="font-size:20px">-</div></div>
+          <div><div class="k">โคจรรอบโลกต่อวัน</div><div class="v p" id="oN" style="font-size:20px">-</div></div>
+          <div><div class="k">เวลาจำลอง</div><div class="v r" id="oClock" style="font-size:20px">-</div></div>
+        </div>
+        <div class="d" id="oUse" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <input type="range" id="altR" min="0" max="1000" step="1" aria-label="ความสูงของวงโคจร">
+    <div class="chips" id="altChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกค่า</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ความสูง (กม.)</th><th>คาบการโคจร</th><th>ความเร็ว (กม./วินาที)</th><th>ชนิดวงโคจร</th><th>ตัวอย่างการใช้งาน</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="note c"><b>ทำไมดาวเทียมไม่ตก</b> ดาวเทียมกำลังตกเข้าหาโลกตลอดเวลาด้วยแรงโน้มถ่วง แต่เคลื่อนที่ไปด้านข้างเร็วมากจนผิวโลกโค้งหนีไปพอดี จึงวนรอบโลกไม่สิ้นสุด · ยิ่งอยู่สูง แรงโน้มถ่วงยิ่งน้อย ความเร็วที่ต้องใช้จึงน้อยลงและทางโคจรยาวขึ้น · ดาวเทียมที่โคจรรอบละ 1 วันพอดีจะหมุนไปพร้อมกับโลก มองจากพื้นเหมือนลอยนิ่งเหนือจุดเดิม เรียกว่า <b>วงโคจรค้างฟ้า</b></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ส่งวัตถุ 8 ชิ้นขึ้นสู่วงโคจร</h2>
+    <p class="how" style="margin-bottom:4px">อ่านชื่อและหน้าที่ของวัตถุ แล้วแตะวงโคจรที่วัตถุนั้นอยู่ (ก ข ค ง ตามคำอธิบายด้านล่าง) ตอบถูกจะเห็นข้อมูลจริงของวัตถุ</p>
+    <div class="legend">
+      <div><b>ก วงโคจรต่ำ</b>สูงราว 300–2,000 กม.</div>
+      <div><b>ข วงโคจรปานกลาง</b>สูงราว 20,000 กม.</div>
+      <div><b>ค วงโคจรค้างฟ้า</b>สูง 35,786 กม.</div>
+      <div><b>ง ออกจากโลก</b>ยานอวกาศเดินทางไปดาวดวงอื่น</div>
+    </div>
+    <div class="cards" id="objs"></div>
+    <div class="prog" id="objProg">-</div>
+    <div class="note"><b>ดาวเทียม</b> คือวัตถุที่โคจรรอบดาวเคราะห์ ดาวเทียมที่มนุษย์สร้าง (ดาวเทียมประดิษฐ์) ใช้สื่อสาร นำทาง พยากรณ์อากาศ สำรวจโลก · <b>สถานีอวกาศ</b> คือดาวเทียมขนาดใหญ่ที่มีมนุษย์อยู่อาศัยและทำการทดลอง · <b>ยานอวกาศ</b> คือยานที่เดินทางไปสำรวจดวงจันทร์ ดาวเคราะห์ หรือไกลออกไป มีทั้งแบบมีคนขับและไร้คนขับ · <b>กล้องโทรทรรศน์อวกาศ</b> คือกล้องที่ส่งขึ้นไปโคจรเหนือบรรยากาศ</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 4 ความสูง ตอบข้อ 3 และจัดวงโคจรวัตถุ 8 ชิ้น (ข้อ 4)</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> แฟ้มลับของใช้จากอวกาศ</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> เปิดแฟ้มลับ 6 แฟ้ม ของใช้รอบตัวแต่ละชิ้นมาจากเทคโนโลยีอวกาศอะไร ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว · <b style="color:#4FD8FF">ขั้นที่ 2</b> จับข่าวลือ · <b style="color:#5EF2A5">ขั้นที่ 3</b> เลือกเทคโนโลยีอวกาศจากคลัง (หรือหาเอง) ไปสืบค้นต่อ แล้วออกแบบนวัตกรรมในใบงาน ส่วนที่ 4</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> แฟ้มลับ 6 แฟ้ม</h2>
+    <div class="cards" id="cases"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขแฟ้มลับครบทุกแฟ้มแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">ROCKET</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · เทคโนโลยีที่สร้างขึ้นเพื่อสำรวจอวกาศ แล้วถูกนำมาใช้บนโลก เรียกว่า "สิ่งประดิษฐ์ต่อยอดจากอวกาศ" (spinoff) มีหลายพันชิ้น</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> จับข่าวลือ</h2>
+    <div class="cards" id="myth" style="grid-template-columns:1fr"></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> คลังเทคโนโลยีอวกาศ : เริ่มสืบค้นภารกิจปลายทาง</h2>
+    <p class="how" style="margin-bottom:4px">เลือก 1 เทคโนโลยี (หรือหาเอง) สืบค้นเพิ่มจากเว็บไซต์ ข่าว หรือ AI ว่าใช้สำรวจอวกาศอย่างไร แล้วคิดต่อยอดเป็นนวัตกรรมที่ใช้ในชีวิตประจำวันหรือในอนาคต วาดและเขียนในใบงาน ส่วนที่ 4 แล้วนำเสนอให้เพื่อนฟัง</p>
+    <div class="events" id="lib"></div>
+    <div class="note"><b>สืบค้นอย่างนักบินมืออาชีพ</b> ใช้ AI ช่วยค้นได้ แต่ AI ตอบผิดได้ (เหมือนข่าวลือเรื่องเวลโคร) ให้ตรวจกับแหล่งที่น่าเชื่อถืออย่างน้อย 1 แหล่ง เช่น NASA สถาบันวิจัยดาราศาสตร์แห่งชาติ (NARIT) สำนักงานพัฒนาเทคโนโลยีอวกาศและภูมิสารสนเทศ (GISTDA) หรือ สสวท. แล้วเขียนแหล่งข้อมูลลงใบงาน</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตารางของใช้ 6 ชิ้น รหัสผ่าน ข่าวลือ · <b>ส่วนที่ 4 (ภารกิจปลายทาง)</b> : สืบค้น ออกแบบ นำเสนอ นวัตกรรมจากอวกาศ</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · ร้อยละของคลื่นที่ผ่านบรรยากาศในภารกิจ A มาจากแบบจำลองอย่างง่าย · ภาพเนบิวลาเป็นภาพจำลอง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_e7_sim_v1';
+  var S = load() || {};
+  S.seen = S.seen || {}; S.recA = S.recA || {}; S.recB = S.recB || {}; S.obj = S.obj || {}; S.cs = S.cs || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(77), a = []; for (var i = 0; i < 240; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k) { STARF.forEach(function (s) { x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr)); }; }); }
+
+  var tab = 'A';
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A หอดูดาวหลายช่วงคลื่น
+  // g = ร้อยละของคลื่นที่ผ่านบรรยากาศถึงกล้องบนพื้นโลก (แบบจำลองอย่างง่าย) · stop = ความสูงที่ถูกดูดกลืน (กม.)
+  var BANDS = [
+    { k: 'radio', n: 'คลื่นวิทยุ', s: 'วิทยุ', lam: 'ความยาวคลื่นยาวที่สุด ตั้งแต่ราว 1 มิลลิเมตรขึ้นไป', g: 90, stop: 0, col: [255, 120, 110], wl: 46,
+      lv: 'ผ่านได้ดี', lc: 'y', tel: 'กล้องโทรทรรศน์วิทยุแห่งชาติ 40 เมตร (เชียงใหม่)', at: 'พื้นโลก', see: 'แก๊สเย็น',
+      d: 'เห็น <b>กลุ่มแก๊สไฮโดรเจนเย็น</b> ที่เป็นวัตถุดิบสร้างดาวดวงใหม่ (ตาและกล้องแสงธรรมดามองไม่เห็น) คลื่นวิทยุผ่านบรรยากาศและเมฆได้ กล้องวิทยุจึงตั้งบนพื้นโลกได้และใช้ได้แม้ตอนกลางวัน ตัวอย่างกล้องจริง <b>กล้องโทรทรรศน์วิทยุแห่งชาติ 40 เมตร</b> ของ NARIT ที่จังหวัดเชียงใหม่ (เชื่อมกับ E2 ไมโครเวฟพื้นหลังก็รับด้วยเสาอากาศวิทยุ)' },
+    { k: 'ir', n: 'อินฟราเรด', s: 'อินฟราเรด', lam: 'ยาวกว่าแสงสีแดง ราว 0.0007–1 มิลลิเมตร', g: 20, stop: 8, col: [255, 160, 70], wl: 26,
+      lv: 'ผ่านได้น้อย', lc: 'm', tel: 'กล้องโทรทรรศน์อวกาศเจมส์ เว็บบ์', at: 'อวกาศ', see: 'ดาวเกิดใหม่ในฝุ่น',
+      d: 'อินฟราเรด <b>ทะลุฝุ่นได้</b> จึงเห็น <b>กระจุกดาวเกิดใหม่</b> ที่ซ่อนอยู่หลังแถบฝุ่น และฝุ่นอุ่นเรืองแสง แต่ไอน้ำในอากาศดูดกลืนอินฟราเรดไปเกือบหมด กล้องอินฟราเรดจึงต้องอยู่บนยอดเขาสูงมากหรือในอวกาศ ตัวอย่างกล้องจริง <b>กล้องโทรทรรศน์อวกาศเจมส์ เว็บบ์</b> (กระจก 6.5 เมตร ส่งขึ้นอวกาศ 25 ธ.ค. 2564)' },
+    { k: 'vis', n: 'แสงที่มองเห็น', s: 'มองเห็น', lam: 'ราว 400–700 นาโนเมตร (ม่วงถึงแดง)', g: 80, stop: 0, col: [255, 240, 150], wl: 16,
+      lv: 'ผ่านได้ดี', lc: 'y', tel: 'กล้องโทรทรรศน์แห่งชาติ 2.4 เมตร (ดอยอินทนนท์)', at: 'พื้นโลก', see: 'ดาวฤกษ์ เนบิวลาเรืองแสง',
+      d: 'เห็น <b>ดาวฤกษ์และเนบิวลาเรืองแสง</b> แบบที่ตาเห็น แต่ <b>แถบฝุ่นบังดาวที่อยู่ข้างหลัง</b> แสงที่มองเห็นผ่านบรรยากาศได้ดี จึงตั้งกล้องบนพื้นโลกได้ (เลือกยอดเขาสูง ฟ้ามืด อากาศนิ่ง) ตัวอย่างกล้องจริง <b>กล้องโทรทรรศน์แห่งชาติ 2.4 เมตร</b> บนดอยอินทนนท์ จังหวัดเชียงใหม่ · ในอวกาศภาพคมกว่าเพราะไม่มีอากาศทำให้ภาพไหว' },
+    { k: 'uv', n: 'อัลตราไวโอเลต', s: 'UV', lam: 'สั้นกว่าแสงสีม่วง ราว 10–400 นาโนเมตร', g: 0, stop: 30, col: [180, 140, 255], wl: 10,
+      lv: 'ไม่ผ่าน', lc: 'n', tel: 'กล้องโทรทรรศน์อวกาศฮับเบิล', at: 'อวกาศ', see: 'ดาวอายุน้อยที่ร้อนจัด',
+      d: 'เห็นเฉพาะ <b>ดาวอายุน้อยที่ร้อนจัด</b> (ดาวสีน้ำเงิน เชื่อมกับ E5) เพราะดาวร้อนมากปล่อยอัลตราไวโอเลตออกมามาก <b>ชั้นโอโซน</b> ดูดกลืนอัลตราไวโอเลตไว้เกือบหมด (ดีต่อสิ่งมีชีวิต) กล้องจึงต้องอยู่ในอวกาศ ตัวอย่างกล้องจริง <b>กล้องโทรทรรศน์อวกาศฮับเบิล</b> (รับได้ทั้งอัลตราไวโอเลตและแสงที่มองเห็น)' },
+    { k: 'x', n: 'รังสีเอกซ์', s: 'เอกซ์', lam: 'สั้นมาก ราว 0.01–10 นาโนเมตร', g: 0, stop: 100, col: [90, 230, 255], wl: 6,
+      lv: 'ไม่ผ่าน', lc: 'n', tel: 'กล้องโทรทรรศน์รังสีเอกซ์จันทรา', at: 'อวกาศ', see: 'แก๊สร้อนจัด ซากซูเปอร์โนวา',
+      d: 'เห็น <b>แก๊สร้อนนับล้านองศา</b> เป็นวงฟองของ <b>ซากซูเปอร์โนวา</b> (เชื่อมกับ E4) และจุดสว่างจัดของดาวนิวตรอนหรือหลุมดำที่กำลังดูดแก๊ส บรรยากาศชั้นบนดูดกลืนรังสีเอกซ์หมดตั้งแต่สูงราว 100 กิโลเมตร กล้องจึงต้องอยู่ในอวกาศ ตัวอย่างกล้องจริง <b>กล้องโทรทรรศน์รังสีเอกซ์จันทรา</b> ของ NASA' }
+  ];
+  var selBand = 2, selLoc = 'g';
+  // องค์ประกอบของเนบิวลาจำลอง (คงที่ทุกครั้ง)
+  var NEB = (function () {
+    var r = rnd(2026), o = { stars: [], clus: [], dust: [], hot: [], gas: [] }, i;
+    for (i = 0; i < 170; i++) o.stars.push([r(), r(), .3 + r() * .7]);
+    for (i = 0; i < 16; i++) { var a = r() * 6.283, d = Math.sqrt(-2 * Math.log(r() + 1e-6)) * .035; o.clus.push([.55 + Math.cos(a) * d, .5 + Math.sin(a) * d, .5 + r() * .5]); }
+    for (i = 0; i < 30; i++) { var t = i / 29; o.dust.push([.08 + .88 * t + (r() - .5) * .05, .8 - .56 * t + (r() - .5) * .07, .045 + r() * .05]); }
+    for (i = 0; i < 9; i++) o.hot.push([.12 + r() * .8, .1 + r() * .35, .5 + r() * .5]);
+    o.hot.push([.3, .78, .9], [.82, .62, .7], [.2, .55, .6]);
+    for (i = 0; i < 14; i++) o.gas.push([.15 + r() * .75, .2 + r() * .65, .1 + r() * .14]);
+    return o;
+  })();
+  function drawScene(x, W, H, b, q, space) {
+    x.fillStyle = '#02030a'; x.fillRect(0, 0, W, H);
+    var S2 = Math.min(W, H), ox = (W - S2) / 2, oy = (H - S2) / 2, P = function (p) { return [ox + p[0] * S2, oy + p[1] * S2]; };
+    if (q > 0) {
+      x.save(); x.globalAlpha = q; x.globalCompositeOperation = 'lighter';
+      if (b === 'vis') {
+        var c = P([.5, .45]); glow(x, c[0], c[1], S2 * .5, [255, 70, 120], .32); c = P([.4, .58]); glow(x, c[0], c[1], S2 * .32, [255, 120, 90], .22);
+        NEB.stars.forEach(function (s) { var p = P(s); x.fillStyle = 'rgba(255,255,255,' + s[2] + ')'; x.fillRect(p[0], p[1], s[2] > .85 ? 2 : 1.2, s[2] > .85 ? 2 : 1.2); });
+        NEB.clus.forEach(function (s) { var p = P(s); glow(x, p[0], p[1], 5, [255, 255, 255], .9); });
+        x.globalCompositeOperation = 'source-over';
+        NEB.dust.forEach(function (d) { var p = P(d), g = x.createRadialGradient(p[0], p[1], 0, p[0], p[1], d[2] * S2); g.addColorStop(0, 'rgba(4,2,8,.97)'); g.addColorStop(.6, 'rgba(4,2,8,.85)'); g.addColorStop(1, 'rgba(4,2,8,0)'); x.fillStyle = g; x.beginPath(); x.arc(p[0], p[1], d[2] * S2, 0, 6.283); x.fill(); });
+        NEB.hot.forEach(function (s, i) { if (i % 3) return; var p = P(s); glow(x, p[0], p[1], 6, [200, 220, 255], .9); });
+      } else if (b === 'ir') {
+        NEB.stars.forEach(function (s) { var p = P(s); x.fillStyle = 'rgba(255,170,120,' + s[2] * .55 + ')'; x.fillRect(p[0], p[1], 1.3, 1.3); });
+        NEB.dust.forEach(function (d) { var p = P(d); glow(x, p[0], p[1], d[2] * S2 * 1.3, [255, 120, 40], .3); });
+        NEB.clus.forEach(function (s) { var p = P(s); glow(x, p[0], p[1], 7 + s[2] * 5, [255, 235, 200], .95); x.fillStyle = '#fff'; x.fillRect(p[0] - 1, p[1] - 1, 2.2, 2.2); });
+      } else if (b === 'radio') {
+        NEB.dust.concat(NEB.gas).forEach(function (d) { var p = P(d); glow(x, p[0], p[1], d[2] * S2 * 1.7, [70, 150, 255], .22); });
+        NEB.dust.forEach(function (d, i) { if (i % 4) return; var p = P(d); glow(x, p[0], p[1], d[2] * S2 * .8, [120, 255, 230], .25); });
+        x.strokeStyle = 'rgba(160,230,255,.35)'; x.lineWidth = 1;
+        [[.5, .52, .2], [.5, .52, .32], [.45, .55, .43]].forEach(function (e) { var p = P(e); x.beginPath(); x.ellipse(p[0], p[1], e[2] * S2, e[2] * S2 * .62, -.5, 0, 6.283); x.stroke(); });
+      } else if (b === 'uv') {
+        c = P([.5, .45]); glow(x, c[0], c[1], S2 * .45, [140, 90, 255], .12);
+        NEB.hot.forEach(function (s) { var p = P(s); glow(x, p[0], p[1], 9 + s[2] * 8, [170, 150, 255], .9); x.fillStyle = '#fff'; x.fillRect(p[0] - 1, p[1] - 1, 2.4, 2.4); });
+      } else if (b === 'x') {
+        var cc = P([.36, .36]), rr = S2 * .2, g2 = x.createRadialGradient(cc[0], cc[1], rr * .55, cc[0], cc[1], rr * 1.15);
+        g2.addColorStop(0, 'rgba(60,200,255,0)'); g2.addColorStop(.6, 'rgba(90,230,255,.55)'); g2.addColorStop(.8, 'rgba(200,250,255,.35)'); g2.addColorStop(1, 'rgba(60,200,255,0)');
+        x.fillStyle = g2; x.beginPath(); x.arc(cc[0], cc[1], rr * 1.15, 0, 6.283); x.fill();
+        glow(x, cc[0], cc[1], rr, [60, 150, 255], .18);
+        var pp = P([.78, .7]); glow(x, pp[0], pp[1], 26, [180, 240, 255], .9); glow(x, pp[0], pp[1], 6, [255, 255, 255], 1);
+      }
+      x.restore();
+    }
+    // สัญญาณรบกวนเมื่อคลื่นผ่านบรรยากาศได้น้อย
+    if (!space && q < 1) {
+      var nr = rnd(9 + Math.floor((performance.now() / 120) % 50)), n = Math.round((1 - q) * 900);
+      for (var i = 0; i < n; i++) { x.fillStyle = 'rgba(170,180,210,' + (.12 + nr() * .3) + ')'; x.fillRect(nr() * W, nr() * H, 1.4, 1.4); }
+    }
+    x.textAlign = 'left'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillStyle = '#FFD166';
+    var bb = BANDS.filter(function (z) { return z.k === b; })[0];
+    x.fillText(bb.n + (b === 'vis' ? '' : ' (สีเทียม)'), 8, 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText(space ? 'กล้องในอวกาศ' : 'กล้องบนพื้นโลก', W - 8, H - 7);
+    if (q === 0) {
+      x.textAlign = 'center'; x.fillStyle = '#FF6B8A'; x.font = '700 18px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ไม่มีสัญญาณ', W / 2, H / 2);
+      x.font = '13px Sarabun, sans-serif'; x.fillStyle = '#E8EDFF'; x.fillText('บรรยากาศดูดกลืนไปหมด', W / 2, H / 2 + 20);
+    }
+    x.textAlign = 'left';
+  }
+  var tA = 0;
+  function yAlt(alt, y0, yG) { return yG - (yG - y0) * Math.log(1 + alt) / Math.log(1 + 160); }
+  function drawAtm() {
+    var c = fit($('cvAtm')), x = c.x, W = c.W, H = c.H, y0 = 46, yG = H - 56, L = 58;
+    var g = x.createLinearGradient(0, 0, 0, yG);
+    g.addColorStop(0, '#02030c'); g.addColorStop(.22, '#050a24'); g.addColorStop(.6, '#0f2a66'); g.addColorStop(1, '#2a66b8');
+    x.fillStyle = g; x.fillRect(0, 0, W, yG);
+    starfield(x, W, y0 + 40, .7);
+    // ชั้นโอโซน
+    var yo1 = yAlt(40, y0, yG), yo2 = yAlt(20, y0, yG);
+    x.fillStyle = 'rgba(167,123,255,.16)'; x.fillRect(L, yo1, W - L, yo2 - yo1);
+    x.fillStyle = 'rgba(200,180,255,.85)'; x.font = '12px Sarabun, sans-serif'; x.textAlign = 'right'; x.fillText('ชั้นโอโซน', W - 6, yo1 + 13);
+    // ป้ายความสูง
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif';
+    [[150, 'อวกาศ'], [100, '100 กม.'], [30, '30 กม.'], [10, '10 กม.'], [1, '1 กม.']].forEach(function (a) {
+      var y = yAlt(a[0], y0, yG); x.fillText(a[1], L - 6, y + 4); x.strokeStyle = 'rgba(154,166,207,.2)'; x.beginPath(); x.moveTo(L, y); x.lineTo(W, y); x.stroke();
+    });
+    // พื้นโลก
+    var gg = x.createLinearGradient(0, yG, 0, H); gg.addColorStop(0, '#2c4a2a'); gg.addColorStop(1, '#162414');
+    x.fillStyle = gg; x.fillRect(0, yG, W, H - yG);
+    x.fillStyle = '#9AA6CF'; x.textAlign = 'left'; x.fillText('พื้นโลก', 6, yG + 16);
+    var cw = (W - L) / 5;
+    BANDS.forEach(function (b, i) {
+      var cx = L + cw * (i + .5), on = i === selBand;
+      if (on) { x.fillStyle = 'rgba(255,209,102,.08)'; x.fillRect(L + cw * i + 2, 0, cw - 4, yG); x.strokeStyle = 'rgba(255,209,102,.6)'; x.lineWidth = 1.2; x.strokeRect(L + cw * i + 2, 1, cw - 4, yG - 2); }
+      var yStop = b.stop ? yAlt(b.stop, y0, yG) : yG - 4, amp = Math.min(cw * .22, 3 + b.wl * .22);
+      function wave(yA, yB, alpha, wid) {
+        x.strokeStyle = rgba(b.col, alpha); x.lineWidth = wid; x.beginPath();
+        for (var y = yA; y <= yB; y += 1.5) { var xx = cx + Math.sin((y - tA * 60) / b.wl * 6.283) * amp; if (y === yA) x.moveTo(xx, y); else x.lineTo(xx, y); }
+        x.stroke();
+      }
+      wave(y0 - 12, yStop, on ? .95 : .55, on ? 2.4 : 1.6);
+      if (b.k === 'ir') wave(yStop, yG - 4, on ? .35 : .2, 1.2);
+      if (b.stop) {  // จุดที่ถูกดูดกลืน
+        x.strokeStyle = rgba(b.col, on ? .95 : .6); x.lineWidth = 2;
+        x.beginPath(); x.moveTo(cx - 7, yStop - 7); x.lineTo(cx + 7, yStop + 7); x.moveTo(cx + 7, yStop - 7); x.lineTo(cx - 7, yStop + 7); x.stroke();
+      }
+      x.textAlign = 'center'; x.font = (on ? '700 ' : '') + (W < 520 ? '11px' : '13px') + ' "Chakra Petch", Sarabun, sans-serif'; x.fillStyle = on ? '#FFD166' : '#E8EDFF';
+      x.fillText(W < 520 && b.k === 'ir' ? 'IR' : b.s, cx, yG + 34);
+      x.font = '11px Sarabun, sans-serif'; x.fillStyle = b.g >= 50 ? '#5EF2A5' : (b.g > 0 ? '#FFD166' : '#FF6B8A'); x.fillText(b.g >= 50 ? 'ถึงพื้น' : (b.g > 0 ? 'ถึงน้อย' : 'ไม่ถึง'), cx, yG + 49);
+      if (on) {
+        if (selLoc === 'g') {  // กล้องบนพื้นโลก
+          x.fillStyle = '#E8EDFF'; x.beginPath(); x.arc(cx, yG + 2, 9, Math.PI, 0); x.fill(); x.fillStyle = '#9AA6CF'; x.fillRect(cx - 2, yG - 16, 4, 9);
+          x.save(); x.translate(cx, yG - 13); x.rotate(-.5); x.fillStyle = '#FFD166'; x.fillRect(-3, -12, 6, 14); x.restore();
+        } else {  // กล้องในอวกาศ
+          var sy = y0 + 2; x.fillStyle = '#4FD8FF'; x.fillRect(cx - 18, sy - 3, 11, 6); x.fillRect(cx + 7, sy - 3, 11, 6);
+          x.fillStyle = '#E8EDFF'; x.fillRect(cx - 5, sy - 7, 10, 14); x.fillStyle = '#FFD166'; x.fillRect(cx - 3, sy + 5, 6, 5);
+        }
+      }
+    });
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ซ้าย คลื่นยาว · ขวา คลื่นสั้น', 8, 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; if (W > 520) x.fillText('ภาพจำลอง ไม่ตามมาตราส่วน', W - 6, 18); x.textAlign = 'left';
+  }
+  function drawView() { var c = fit($('cvView')), b = BANDS[selBand], sp = selLoc === 's'; drawScene(c.x, c.W, c.H, b.k, sp ? 1 : b.g / 100, sp); }
+  function updA() {
+    var b = BANDS[selBand], sp = selLoc === 's', pct = sp ? 100 : b.g;
+    S.seen[selBand] = S.seen[selBand] || {}; S.seen[selBand][selLoc] = 1; save();
+    $('aLam').textContent = 'ความยาวคลื่น : ' + b.lam;
+    $('aName').textContent = b.n;
+    $('aWhere').textContent = (sp ? 'กล้องในอวกาศ' : 'กล้องบนพื้นโลก') + ' · คลื่นที่ผ่านลงมาถึงกล้อง';
+    $('aPct').textContent = pct + ' %';
+    $('aPct').style.color = pct >= 50 ? '#5EF2A5' : (pct > 0 ? '#FFD166' : '#FF6B8A');
+    $('aBar').style.width = pct + '%';
+    var lv = sp ? { t: 'อยู่เหนือบรรยากาศ รับได้เต็มที่', c: 'y' } : { t: 'ผ่านบรรยากาศ : ' + b.lv, c: b.lc };
+    $('aLvl').textContent = lv.t; $('aLvl').className = 'lvl ' + lv.c;
+    $('aSee').innerHTML = b.d;
+    var h = '<span class="lbl">ช่วงคลื่น (ยาว → สั้น)</span>';
+    BANDS.forEach(function (z, i) { h += '<button class="chip' + (i === selBand ? ' on' : '') + (S.recA[i] ? ' done' : '') + '" data-b="' + i + '">' + z.n + '</button>'; });
+    $('bandChips').innerHTML = h; bindChips($('bandChips'), 'b', function (v) { selBand = +v; selLoc = 'g'; updA(); });
+    h = '<span class="lbl">ที่ตั้งกล้อง</span>';
+    [['g', 'กล้องบนพื้นโลก'], ['s', 'กล้องในอวกาศ']].forEach(function (l) { h += '<button class="chip' + (l[0] === selLoc ? ' on' : '') + '" data-l="' + l[0] + '">' + l[1] + '</button>'; });
+    $('locChips').innerHTML = h; bindChips($('locChips'), 'l', function (v) { selLoc = v; updA(); });
+    var both = S.seen[selBand].g && S.seen[selBand].s, n = Object.keys(S.recA).length;
+    $('recA').disabled = !both;
+    $('recAMsg').textContent = !both ? 'ดูให้ครบทั้งกล้องบนพื้นโลกและกล้องในอวกาศก่อนบันทึก' : (n ? 'บันทึกแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : '') : '');
+    var lg = '';
+    BANDS.forEach(function (z, i) {
+      var r = S.recA[i];
+      lg += '<tr' + (i === selBand ? ' class="cur"' : '') + '><td class="n">' + z.n + '</td><td>' + (r ? z.g : '-') + '</td><td>' + (r ? z.lv : '-') + '</td><td>' + (r ? z.tel : '-') + '</td><td>' + (r ? z.see : '-') + '</td></tr>';
+    });
+    $('logA').innerHTML = lg;
+    if (tab === 'A') { drawAtm(); drawView(); }
+  }
+  $('recA').onclick = function () {
+    S.recA[selBand] = 1; save(); var n = Object.keys(S.recA).length;
+    if (n < 5) { for (var j = 1; j <= 5; j++) { var q = (selBand + j) % 5; if (!S.recA[q]) { selBand = q; selLoc = 'g'; break; } } }
+    updA(); $('recAMsg').textContent = 'บันทึกแล้ว ' + n + '/5' + (n === 5 ? ' ครบแล้ว' : ' · ช่วงคลื่นถัดไป ดูทั้ง 2 ที่แล้วบันทึก');
+  };
+
+  // ================================================================ ภารกิจ B ศูนย์ควบคุมวงโคจร
+  var GM = 398600.4418, RE = 6371, SID = 86164;
+  var ALT = [
+    { h: 400, u: 'สถานีอวกาศนานาชาติ' }, { h: 700, u: 'ดาวเทียมสำรวจโลก' },
+    { h: 20200, u: 'ดาวเทียมนำทาง GPS' }, { h: 35786, u: 'ดาวเทียมสื่อสาร ดาวเทียมอุตุนิยมวิทยา' }
+  ];
+  var AMIN = 200, AMAX = 40000, alt = 400, tSim = 0, lastT = 0;
+  function period(h) { var a = RE + h; return 2 * Math.PI * Math.sqrt(a * a * a / GM); }
+  function speed(h) { return Math.sqrt(GM / (RE + h)); }
+  function cls(h) { return h < 2000 ? 'วงโคจรต่ำ' : (h < 35000 ? 'วงโคจรปานกลาง' : (h <= 36500 ? 'วงโคจรค้างฟ้า' : 'สูงกว่าวงโคจรค้างฟ้า')); }
+  function tTxt(T) { var m = T / 60; if (m < 180) return fmt(m) + ' นาที'; return fmt(T / 3600) + ' ชั่วโมง'; }
+  function tFine(T) { var m = T / 60; if (m < 180) return ''; var hh = Math.floor(m / 60), mm = Math.round(m - hh * 60); return 'ประมาณ · ' + hh + ' ชม. ' + mm + ' นาที'; }
+  function presetIdx() { for (var i = 0; i < ALT.length; i++) if (ALT[i].h === alt) return i; return -1; }
+  function sliderFromAlt(h) { return Math.round(1000 * Math.log(h / AMIN) / Math.log(AMAX / AMIN)); }
+  function drawOrb() {
+    var c = fit($('cvOrb')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#03050f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .6);
+    var cx = W / 2, cy = H / 2 + 6, Rm = Math.min(W, H) / 2 - 22, k = Rm / (RE + AMAX), re = RE * k;
+    // วงโคจรอ้างอิง 3 ระดับ
+    x.setLineDash([4, 5]); x.lineWidth = 1;
+    [[700, 'วงโคจรต่ำ'], [20200, 'ปานกลาง'], [35786, 'ค้างฟ้า']].forEach(function (o) {
+      var r = (RE + o[0]) * k; x.strokeStyle = 'rgba(154,166,207,.35)'; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.stroke();
+      if (o[0] > 1000) { x.fillStyle = 'rgba(154,166,207,.85)'; x.font = '11px Sarabun, sans-serif'; x.textAlign = 'center'; x.fillText(o[1], cx, cy - r - 4); }
+    });
+    x.setLineDash([]);
+    // โลก (มองจากเหนือขั้วโลกเหนือ) หมุนรอบละ 1 วัน
+    var eA = -Math.PI / 2 + 6.283 * tSim / SID;
+    var eg = x.createRadialGradient(cx - re * .3, cy - re * .3, re * .1, cx, cy, re);
+    eg.addColorStop(0, '#9fd8ff'); eg.addColorStop(.6, '#2f73d8'); eg.addColorStop(1, '#123a7a');
+    x.fillStyle = eg; x.beginPath(); x.arc(cx, cy, re, 0, 6.283); x.fill();
+    x.fillStyle = 'rgba(110,190,120,.8)';
+    [[.6, .5], [2.2, .35], [3.6, .55], [5.0, .4]].forEach(function (l) { var a = eA + l[0]; x.beginPath(); x.arc(cx + Math.cos(a) * re * .55, cy + Math.sin(a) * re * .55, re * l[1] * .5, 0, 6.283); x.fill(); });
+    var tx = cx + Math.cos(eA) * re, ty = cy + Math.sin(eA) * re;
+    x.strokeStyle = 'rgba(255,209,102,.45)'; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + Math.cos(eA) * Rm * 1.05, cy + Math.sin(eA) * Rm * 1.05); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#FFD166'; x.beginPath(); x.arc(tx, ty, 3.2, 0, 6.283); x.fill();
+    // วงโคจรที่เลือก + ดาวเทียม
+    var r = (RE + alt) * k, T = period(alt), sA = -Math.PI / 2 + 6.283 * tSim / T;
+    x.strokeStyle = '#4FD8FF'; x.lineWidth = 1.8; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.stroke();
+    var sx = cx + Math.cos(sA) * r, sy = cy + Math.sin(sA) * r;
+    x.save(); x.translate(sx, sy); x.rotate(sA + Math.PI / 2);
+    x.fillStyle = '#4FD8FF'; x.fillRect(-13, -2.5, 8, 5); x.fillRect(5, -2.5, 8, 5); x.fillStyle = '#E8EDFF'; x.fillRect(-4, -4, 8, 8); x.restore();
+    glow(x, sx, sy, 12, [79, 216, 255], .35);
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif';
+    x.fillText('ความสูง ' + fmt(alt) + ' กม.', 12, 22);
+    x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF';
+    x.fillText('จุดสีทอง = ประเทศไทย · 1 วินาที = 1 ชั่วโมง', 12, 40);
+    x.textAlign = 'right'; x.fillText('ระยะตามมาตราส่วนจริง มองจากเหนือขั้วโลก', W - 8, H - 7);
+    if (Math.abs(T - SID) < 600) { x.textAlign = 'left'; x.fillStyle = '#5EF2A5'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ดาวเทียมอยู่เหนือจุดเดิมตลอด', 12, H - 10); }
+    x.textAlign = 'left';
+  }
+  function updB() {
+    var T = period(alt), v = speed(alt), pi = presetIdx();
+    $('oAlt').textContent = fmt(alt) + ' กม.';
+    $('oCls').textContent = cls(alt);
+    $('oT').innerHTML = tTxt(T) + (tFine(T) ? '<div class="k" style="font-family:Sarabun;font-weight:400">' + tFine(T) + '</div>' : '');
+    $('oV').textContent = fmt(v, 1) + ' กม./วินาที';
+    $('oN').textContent = fmt(86400 / T, 1) + ' รอบ';
+    $('oUse').innerHTML = pi >= 0 ? 'ตัวอย่างการใช้งาน : <b style="color:#FFD166">' + ALT[pi].u + '</b>' : 'เลือกความสูง 1 ใน 4 ค่าด้วยปุ่มด้านล่างเพื่อบันทึก';
+    $('altR').value = sliderFromAlt(alt);
+    var h = '<span class="lbl">ความสูง (กม.)</span>';
+    ALT.forEach(function (a, i) { h += '<button class="chip' + (i === pi ? ' on' : '') + (S.recB[i] ? ' done' : '') + '" data-a="' + i + '">' + fmt(a.h) + '</button>'; });
+    $('altChips').innerHTML = h; bindChips($('altChips'), 'a', function (v2) { alt = ALT[+v2].h; tSim = 0; updB(); });
+    $('recB').disabled = pi < 0;
+    var n = Object.keys(S.recB).length;
+    $('recBMsg').textContent = pi < 0 ? 'บันทึกได้เฉพาะความสูง 4 ค่าในปุ่ม' : (n ? 'บันทึกแล้ว ' + n + '/4' + (n === 4 ? ' ครบแล้ว' : '') : '');
+    var lg = '';
+    ALT.forEach(function (a, i) {
+      var r = S.recB[i], Ti = period(a.h);
+      lg += '<tr' + (i === pi ? ' class="cur"' : '') + '><td>' + fmt(a.h) + '</td><td>' + (r ? tTxt(Ti) : '-') + '</td><td>' + (r ? fmt(speed(a.h), 1) : '-') + '</td><td>' + (r ? cls(a.h) : '-') + '</td><td' + (r ? ' class="n"' : '') + '>' + (r ? a.u : '-') + '</td></tr>';
+    });
+    $('logB').innerHTML = lg;
+    if (tab === 'B') drawOrb();
+  }
+  $('altR').oninput = function () {
+    var v2 = AMIN * Math.pow(AMAX / AMIN, +this.value / 1000), snap = -1;
+    ALT.forEach(function (a, i) { if (Math.abs(Math.log(v2 / a.h)) < .025) snap = i; });
+    alt = snap >= 0 ? ALT[snap].h : Math.round(v2 / (v2 < 2000 ? 10 : 100)) * (v2 < 2000 ? 10 : 100);
+    tSim = 0; updB();
+  };
+  $('recB').onclick = function () {
+    var pi = presetIdx(); if (pi < 0) return; S.recB[pi] = 1; save(); var n = Object.keys(S.recB).length;
+    if (n < 4) { for (var j = 1; j <= 4; j++) { var q = (pi + j) % 4; if (!S.recB[q]) { alt = ALT[q].h; tSim = 0; break; } } }
+    updB(); $('recBMsg').textContent = 'บันทึกแล้ว ' + n + '/4' + (n === 4 ? ' ครบแล้ว' : ' · ดูความสูงถัดไปแล้วบันทึก');
+  };
+  // ขั้นที่ 2 ส่งวัตถุ 8 ชิ้นขึ้นวงโคจร
+  var ZN = ['ก วงโคจรต่ำ', 'ข ปานกลาง', 'ค ค้างฟ้า', 'ง ออกจากโลก'];
+  var OBJ = [
+    { n: 'สถานีอวกาศนานาชาติ (ISS)', t: 'สถานีอวกาศ', z: 0, w: 'สูงราว 400 กม. โคจรรอบโลกราว 90 นาที มีนักบินอวกาศอยู่ประจำตลอดตั้งแต่ปี 2543 ทำการทดลองในสภาพไร้น้ำหนัก' },
+    { n: 'ไทยโชต-2 (THEOS-2)', t: 'ดาวเทียมสำรวจโลกของไทย', z: 0, w: 'ส่งขึ้นอวกาศ ต.ค. 2566 สูงราว 600 กม. ถ่ายภาพละเอียดสูงเพื่อติดตามน้ำท่วม ไฟป่า และพื้นที่เกษตร ดูแลโดย GISTDA' },
+    { n: 'กล้องโทรทรรศน์อวกาศฮับเบิล', t: 'กล้องโทรทรรศน์อวกาศ', z: 0, w: 'สูงราว 500 กม. อยู่เหนือบรรยากาศ ภาพจึงคมชัด รับได้ทั้งแสงที่มองเห็นและอัลตราไวโอเลต ทำงานมาตั้งแต่ปี 2533' },
+    { n: 'ดาวเทียมนำทาง GPS', t: 'ดาวเทียมนำทาง', z: 1, w: 'สูงราว 20,200 กม. โคจรรอบละ 12 ชั่วโมง มีราว 30 ดวงรอบโลก มือถือรับสัญญาณหลายดวงพร้อมกันเพื่อคำนวณตำแหน่ง' },
+    { n: 'ดาวเทียมไทยคม', t: 'ดาวเทียมสื่อสาร', z: 2, w: 'อยู่วงโคจรค้างฟ้าเหนือเส้นศูนย์สูตร โคจรรอบละ 1 วันพร้อมกับโลก จึงลอยนิ่งเหนือจุดเดิม จานรับสัญญาณโทรทัศน์ตั้งค้างไว้ได้ไม่ต้องหมุนตาม' },
+    { n: 'ดาวเทียมอุตุนิยมวิทยาฮิมาวาริ', t: 'ดาวเทียมอุตุนิยมวิทยา', z: 2, w: 'ของญี่ปุ่น อยู่วงโคจรค้างฟ้า ถ่ายภาพเมฆเห็นเอเชียทั้งซีกทุก 10 นาที กรมอุตุนิยมวิทยาของไทยใช้ภาพนี้ติดตามพายุ' },
+    { n: 'ยานวอยเอจเจอร์ 1', t: 'ยานอวกาศไร้คนขับ', z: 3, w: 'ส่งขึ้นปี 2520 ผ่านดาวพฤหัสบดีและดาวเสาร์ แล้วเดินทางออกนอกระบบสุริยะ เป็นวัตถุฝีมือมนุษย์ที่อยู่ไกลโลกที่สุด' },
+    { n: 'ยานโอไรออน โครงการอาร์เทมิส', t: 'ยานอวกาศสำหรับมนุษย์', z: 3, w: 'โครงการพามนุษย์กลับไปดวงจันทร์ เที่ยวบินทดสอบไร้คนขับอาร์เทมิส 1 บินรอบดวงจันทร์และกลับโลกในปี 2565' }
+  ];
+  function objUI() {
+    var h = '';
+    OBJ.forEach(function (o, i) {
+      var ok = S.obj[i] === o.z;
+      h += '<div class="obj' + (ok ? ' ok' : '') + '"><div class="ty">' + o.t + '</div><div class="nm">' + o.n + '</div><div class="zs">';
+      ZN.forEach(function (z, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === o.z ? 'ok' : '') + '">' + z + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + o.w + '</div>' : '') + '</div>';
+    });
+    $('objs').innerHTML = h;
+    Array.prototype.forEach.call($('objs').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.obj[i] === OBJ[i].z) return;
+        if (j === OBJ[i].z) { S.obj[i] = j; save(); objUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    var n = OBJ.filter(function (o, i) { return S.obj[i] === o.z; }).length;
+    $('objProg').innerHTML = 'ส่งขึ้นวงโคจรถูกต้องแล้ว <b>' + n + ' / 8</b>' + (n === 8 ? ' · ครบแล้ว จดลงใบงาน ข้อ 4' : '');
+  }
+
+  // ================================================================ ภารกิจ C แฟ้มลับของใช้จากอวกาศ
+  var CS = [
+    { L: 'R', h: 'เทอร์โมมิเตอร์วัดไข้ทางหู', q: 'วัดไข้ได้ใน 1–2 วินาที มาจากเทคโนโลยีอวกาศอะไร', s: 'เซ็นเซอร์อินฟราเรด',
+      o: ['จรวดเชื้อเพลิงเหลว', 'เซ็นเซอร์อินฟราเรดที่ใช้วัดอุณหภูมิของดาว', 'ชุดนักบินอวกาศ', 'กล้องรังสีเอกซ์'], a: 1,
+      w: 'ร่างกายแผ่รังสีอินฟราเรดตามอุณหภูมิ เทคโนโลยีเซ็นเซอร์อินฟราเรดจากห้องปฏิบัติการ JPL ของ NASA จึงนำมาวัดไข้ได้โดยแทบไม่ต้องสัมผัส (เชื่อมกับภารกิจ A)' },
+    { L: 'O', h: 'กล้องถ่ายรูปในโทรศัพท์มือถือ', q: 'ชิ้นส่วนรับภาพขนาดเล็กมาจากอะไร', s: 'เซ็นเซอร์รับภาพ CMOS',
+      o: ['เลนส์ของกล้องฮับเบิล', 'แผงโซลาร์เซลล์ของสถานีอวกาศ', 'เซ็นเซอร์รับภาพ CMOS ที่ทำให้กล้องบนยานอวกาศเล็กและประหยัดไฟ', 'เสาอากาศดาวเทียมไทยคม'], a: 2,
+      w: 'ช่วงปี 2533–2542 วิศวกรของ JPL พัฒนาเซ็นเซอร์ภาพแบบ CMOS ให้กล้องบนยานอวกาศมีขนาดเล็ก ใช้ไฟน้อย ปัจจุบันอยู่ในกล้องมือถือเกือบทุกเครื่อง' },
+    { L: 'C', h: 'แอปแผนที่และแอปเรียกรถรู้ตำแหน่งเรา', q: 'ข้อมูลตำแหน่งมาจากอะไรเป็นหลัก', s: 'ดาวเทียมนำทาง GPS',
+      o: ['สัญญาณจากดาวเทียมนำทาง GPS หลายดวง', 'ดาวเทียมอุตุนิยมวิทยา', 'กล้องโทรทรรศน์วิทยุ', 'ยานวอยเอจเจอร์'], a: 0,
+      w: 'มือถือรับสัญญาณเวลาจากดาวเทียมนำทางอย่างน้อย 4 ดวง แล้วคำนวณระยะห่างจากแต่ละดวงเพื่อหาตำแหน่ง ดาวเทียมเหล่านี้อยู่วงโคจรปานกลาง (เชื่อมกับภารกิจ B)' },
+    { L: 'K', h: 'ภาพเมฆและเส้นทางพายุในข่าวพยากรณ์อากาศ', q: 'ภาพเหล่านี้ถ่ายจากที่ใด', s: 'ดาวเทียมอุตุนิยมวิทยา',
+      o: ['สถานีอวกาศนานาชาติ', 'ดาวเทียมนำทาง GPS', 'เครื่องบินโดยสาร', 'ดาวเทียมอุตุนิยมวิทยาในวงโคจรค้างฟ้า'], a: 3,
+      w: 'ดาวเทียมอุตุนิยมวิทยา เช่น ฮิมาวาริ ลอยนิ่งเหนือจุดเดิมจึงถ่ายภาพเมฆบริเวณเดิมได้ต่อเนื่อง ใช้ติดตามพายุและพยากรณ์ฝน' },
+    { L: 'E', h: 'หมอนและที่นอนเมมโมรีโฟม', q: 'วัสดุนี้พัฒนาขึ้นครั้งแรกเพื่ออะไร', s: 'โฟมรองรับแรงกระแทกของเบาะที่นั่ง',
+      o: ['ฉนวนกันความร้อนของจรวด', 'อาหารของนักบินอวกาศ', 'โฟมรองรับแรงกระแทกสำหรับเบาะที่นั่งในโครงการของ NASA', 'ฝาครอบกระจกกล้องโทรทรรศน์'], a: 2,
+      w: 'พัฒนาราวปี 2509 ให้เบาะนั่งรองรับแรงกระแทกและกระจายน้ำหนัก ปัจจุบันใช้ในหมอน ที่นอน รองเท้า หมวกกันน็อก' },
+    { L: 'T', h: 'ผ้าห่มฟอยล์ฉุกเฉินสีเงิน', q: 'ผ้าห่มที่ใช้ห่มนักวิ่งมาราธอนและผู้ประสบภัยมาจากอะไร', s: 'ฟิล์มสะท้อนความร้อนของยานอวกาศ',
+      o: ['ร่มชูชีพของแคปซูล', 'ฟิล์มบางเคลือบโลหะที่ใช้สะท้อนความร้อนให้ยานอวกาศและดาวเทียม', 'ผ้าของธงบนดวงจันทร์', 'แผ่นกรองแสงของกล้อง'], a: 1,
+      w: 'NASA พัฒนาฟิล์มพลาสติกบางเคลือบโลหะเพื่อสะท้อนความร้อนและรักษาอุณหภูมิของยานอวกาศ ผ้าห่มแบบนี้สะท้อนความร้อนจากร่างกายกลับมา ช่วยไม่ให้ตัวเย็นเกินไป' }
+  ];
+  function casesUI() {
+    var h = '';
+    CS.forEach(function (a, i) {
+      var ok = S.cs[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '" id="cs' + i + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">แฟ้มลับ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="h">' + a.h + '</div><div class="q">' + a.q + '</div>';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      if (ok) h += '<div class="why">' + a.w + '</div>';
+      h += '</div>';
+    });
+    $('cases').innerHTML = h;
+    Array.prototype.forEach.call($('cases').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cs[i] === CS[i].a) return;
+        if (j === CS[i].a) { S.cs[i] = j; save(); casesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CS.map(function (a, i) { return S.cs[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CS.every(function (a, i) { return S.cs[i] === a.a; }));
+  }
+  var MY = { h: '"NASA ประดิษฐ์เวลโคร (ตีนตุ๊กแก) ขึ้นเพื่อนักบินอวกาศ" จริงหรือข่าวลือ', o: ['จริง', 'ข่าวลือ'], a: 1,
+    w: 'ข่าวลือ วิศวกรชาวสวิสคิดค้นเวลโครก่อนยุคอวกาศ (ได้แนวคิดจากเมล็ดพืชที่ติดขนสุนัข) NASA เพียงนำไปใช้ยึดสิ่งของในยาน · บทเรียน : ข้อมูลที่คนแชร์กันมาก หรือที่ AI ตอบ อาจผิดได้ ต้องตรวจกับแหล่งที่น่าเชื่อถือทุกครั้ง' };
+  function mythUI() {
+    var ok = S.myth === MY.a, h = '<div class="al' + (ok ? ' ok' : '') + '"><div class="t">ตรวจข่าวลือ' + (ok ? ' · จับได้แล้ว' : '') + '</div><div class="h">' + MY.h + '</div><div class="g2">';
+    MY.o.forEach(function (o, j) { h += '<button data-j="' + j + '" class="' + (ok && j === MY.a ? 'ok' : '') + '">' + o + '</button>'; });
+    h += '</div>' + (ok ? '<div class="why">' + MY.w + '</div>' : '') + '</div>';
+    $('myth').innerHTML = h;
+    Array.prototype.forEach.call($('myth').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var j = +b.getAttribute('data-j'); if (S.myth === MY.a) return;
+        if (j === MY.a) { S.myth = j; save(); mythUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+  }
+  var LIB = [
+    { c: 'กล้องโทรทรรศน์', n: 'กล้องโทรทรรศน์อวกาศเจมส์ เว็บบ์', d: 'กล้องอินฟราเรดกระจก 6.5 เมตร ส่งขึ้นอวกาศ 25 ธ.ค. 2564 ถ่ายภาพกาแล็กซีที่อยู่ไกลมากและดาวเกิดใหม่ในฝุ่น', i: 'กล้องอินฟราเรดมองผ่านควันและความมืดได้', k: 'James Webb Space Telescope' },
+    { c: 'กล้องโทรทรรศน์', n: 'กล้องโทรทรรศน์วิทยุแห่งชาติ 40 เมตร', d: 'ของสถาบันวิจัยดาราศาสตร์แห่งชาติ (NARIT) ที่จังหวัดเชียงใหม่ รับคลื่นวิทยุจากอวกาศ ร่วมเครือข่ายกล้องวิทยุทั่วโลก', i: 'จานรับสัญญาณ การสื่อสารระยะไกล', k: 'กล้องโทรทรรศน์วิทยุแห่งชาติ NARIT' },
+    { c: 'ดาวเทียม', n: 'ดาวเทียมไทยโชต-2 (THEOS-2)', d: 'ดาวเทียมสำรวจโลกของไทย ถ่ายภาพพื้นที่ละเอียดสูง ใช้ติดตามน้ำท่วม ไฟป่า พื้นที่เพาะปลูก ดูแลโดย GISTDA', i: 'ช่วยเกษตรกร วางผังเมือง เตือนภัย', k: 'THEOS-2 GISTDA' },
+    { c: 'ดาวเทียม', n: 'ดาวเทียมนำทาง (GPS / GNSS)', d: 'ดาวเทียมหลายสิบดวงในวงโคจรปานกลาง ส่งสัญญาณเวลาให้เครื่องรับคำนวณตำแหน่ง', i: 'รถไร้คนขับ โดรนส่งของ ติดตามสัตว์เลี้ยง', k: 'GNSS ทำงานอย่างไร' },
+    { c: 'ดาวเทียม', n: 'ดาวเทียมอุตุนิยมวิทยาฮิมาวาริ', d: 'ดาวเทียมค้างฟ้าของญี่ปุ่น ถ่ายภาพเมฆทุก 10 นาที ใช้พยากรณ์อากาศและติดตามพายุในประเทศไทย', i: 'แอปเตือนฝน วางแผนเดินทางและเกษตร', k: 'Himawari ภาพถ่ายดาวเทียม กรมอุตุนิยมวิทยา' },
+    { c: 'สถานีอวกาศ', n: 'สถานีอวกาศนานาชาติ (ISS)', d: 'ห้องทดลองลอยฟ้าสูงราว 400 กม. นักบินอวกาศอยู่ได้นานหลายเดือน นำน้ำกลับมาใช้ใหม่ได้เกือบทั้งหมด และทดลองปลูกผักในอวกาศ', i: 'รีไซเคิลน้ำ ปลูกผักในพื้นที่จำกัด', k: 'ISS water recycling ปลูกผักในอวกาศ' },
+    { c: 'ยานอวกาศ', n: 'ยานวอยเอจเจอร์ 1', d: 'ยานไร้คนขับที่ส่งขึ้นปี 2520 ยังส่งสัญญาณกลับมาจากนอกระบบสุริยะ ใช้พลังงานจากแหล่งพลังงานนิวเคลียร์ขนาดเล็ก', i: 'อุปกรณ์ที่ทนทาน ใช้งานได้ยาวนาน', k: 'Voyager 1' },
+    { c: 'ยานอวกาศ', n: 'โครงการอาร์เทมิส', d: 'โครงการพามนุษย์กลับไปดวงจันทร์และเตรียมตั้งฐาน ต้องคิดเรื่องอาหาร น้ำ อากาศ และที่อยู่อาศัยในสภาพแวดล้อมสุดขั้ว', i: 'บ้านและอาหารสำหรับพื้นที่ภัยพิบัติ', k: 'Artemis program' },
+    { c: 'ของใช้จากอวกาศ', n: 'ฐานข้อมูล NASA Spinoff', d: 'รวมสิ่งประดิษฐ์ที่ต่อยอดจากงานอวกาศหลายพันชิ้น เช่น อุปกรณ์การแพทย์ เครื่องกรองน้ำ วัสดุกันความร้อน', i: 'หาไอเดียจากของจริงแล้วดัดแปลงต่อ', k: 'NASA spinoff' }
+  ];
+  $('lib').innerHTML = LIB.map(function (e) { return '<div class="ev"><div class="y">' + e.c + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">ชวนคิดต่อยอด : ' + e.i + '</div><div class="kw">คำค้น : ' + e.k + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawAtm(); drawView(); }
+    if (tab === 'B') drawOrb();
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now;
+    tA += dt; tSim += dt * 3600;
+    if (tab === 'A') { drawAtm(); if (BANDS[selBand].g < 100 && selLoc === 'g') drawView(); }
+    if (tab === 'B') { drawOrb(); $('oClock').textContent = fmt(tSim / 3600, 1) + ' ชม.'; }
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); objUI(); casesUI(); mythUI();
+  $('oClock').textContent = '0.0 ชม.';
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_E7 = { BANDS: BANDS, ALT: ALT, OBJ: OBJ, CS: CS, period: period, speed: speed, cls: cls,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; tA = 0; },
+    setA: function (b, l) { selBand = b; selLoc = l; updA(); },
+    setB: function (h, t) { alt = h; tSim = t || 0; updB(); drawOrb(); $('oClock').textContent = fmt(tSim / 3600, 1) + ' ชม.'; },
+    recAll: function () { var i; for (i = 0; i < 5; i++) { S.seen[i] = { g: 1, s: 1 }; S.recA[i] = 1; } for (i = 0; i < 4; i++) S.recB[i] = 1;
+      OBJ.forEach(function (o, j) { S.obj[j] = o.z; }); CS.forEach(function (a, j) { S.cs[j] = a.a; }); S.myth = MY.a;
+      updA(); updB(); objUI(); casesUI(); mythUI(); } };
+})();
+</script>
+</body>
+</html>

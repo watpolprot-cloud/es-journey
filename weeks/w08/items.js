@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(8, [
-  // { type: "worksheet", code: "E7", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "E7", title: "สถานการณ์จำลอง ศูนย์บัญชาการสำรวจอวกาศ (ภารกิจ A B C)", file: "e7-sim-mission-control.html", note: "ใช้คู่กับใบงาน E7 · มีคลังเทคโนโลยีอวกาศสำหรับสืบค้น · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e7-sim.png" },
+  { type: "worksheet", code: "E7", title: "ใบงาน E7 ศูนย์บัญชาการสำรวจอวกาศ (ภารกิจปลายทาง 1 แผ่น 2 หน้า)", file: "e7-worksheet.pdf", note: "5 คะแนน · ภารกิจปลายทาง ต้องทำครบทั้ง 4 ส่วน (ส่วนที่ 4 มีภาพร่างและผู้ฟังลงชื่อ 2 คน) · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 8 E7 เทคโนโลยีอวกาศกับชีวิตประจำวัน", file: "w08-slides-e7-space-tech.pdf", note: "27 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
