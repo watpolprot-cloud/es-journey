@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>G4 ภารกิจศูนย์เฝ้าระวังภูเขาไฟ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง G4 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-G3) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #5e1b1b44, transparent), radial-gradient(900px 500px at 0% 110%, #1c4a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--orange); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+.star-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--gold); border-radius: 999px; padding: 0 10px; margin-left: 4px; letter-spacing: 0; vertical-align: 1px; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip:disabled { opacity: .35; cursor: default; }
+.chip.al0 { border-color: #3fbf7f; } .chip.al1 { border-color: #FFD166; } .chip.al2 { border-color: #FF9F6B; } .chip.al3 { border-color: #FF4D5E; }
+.chip.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.chip.ok { background: #5ef2a51f; border-color: var(--ok); color: var(--ok); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 8px; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+.leg i.box { width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 4px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FFD166, #FF6B8A); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.ev.good .n { color: var(--ok); }
+.guide { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+.guide div { border-radius: 10px; padding: 6px 9px; font-size: 14px; line-height: 1.35; background: #0b1233aa; border: 1.5px solid var(--line); }
+.guide b { font-family: var(--head); display: block; font-size: 15px; }
+.guide .lv0 { border-color: #3fbf7f; } .guide .lv0 b { color: #5EF2A5; }
+.guide .lv1 { border-color: #FFD166; } .guide .lv1 b { color: #FFD166; }
+.guide .lv2 { border-color: #FF9F6B; } .guide .lv2 b { color: #FF9F6B; }
+.guide .lv3 { border-color: #FF4D5E; } .guide .lv3 b { color: #FF6B8A; }
+.risk { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .guide { grid-template-columns: 1fr 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .pick { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · G4 <span class="unit-tag">หน่วยที่ 2</span><span class="star-tag">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจศูนย์<b>เฝ้าระวังภูเขาไฟ</b></h1>
+  <p class="lead">ทดลองว่าภูเขาไฟปะทุแบบใด ตามหาพื้นที่เสี่ยงภัยทั่วโลก แล้วประจำการที่ศูนย์เฝ้าระวัง ตัดสินใจประกาศเตือนภัยให้ทันเวลา</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองแมกมา<small>แมกมา 3 ชนิด × แก๊ส</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>แผนที่ภูเขาไฟโลก<small>ตามหา 6 ภูเขาไฟ + ภัย</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์เฝ้าระวัง<small>เตือนภัย พื้นที่เสี่ยง ไขรหัส</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองแมกมา : ภูเขาไฟปะทุแบบไหน</h2>
+    <p class="how">เลือกชนิดแมกมาและปริมาณแก๊ส แล้วกด "เดินเวลา" ดูแมกมาเคลื่อนขึ้นและปะทุ จนสุดแถบเวลาจึงบันทึกผลได้</p>
+    <div class="chips" id="magChips"></div>
+    <div class="chips" id="gasChips"></div>
+    <div class="twin">
+      <canvas id="cvA" height="380" aria-label="ภาพตัดขวางภูเขาไฟ แสดงห้องแมกมา ปล่องภูเขาไฟ ฟองแก๊ส และลักษณะการปะทุ"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="aCase">-</div>
+        <div class="k" id="aProp">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความหนืดของแมกมา</div><div><span class="lvl" id="aVis">-</span></div></div>
+          <div><div class="k" id="aTime">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px">แรงดันแก๊สที่สะสม</div>
+        <div class="bar"><i id="aBar"></i></div>
+        <div class="k" style="margin-top:6px">ลักษณะการปะทุ</div>
+        <h3 id="aErupt">-</h3>
+        <div class="k" style="margin-top:4px">รูปร่างภูเขาไฟ</div>
+        <div class="d" id="aShape" style="color:#FFD166;font-weight:600">-</div>
+        <div class="k" style="margin-top:4px">ตัวอย่างจริง</div>
+        <div class="d" id="aEx" style="color:#4FD8FF">-</div>
+        <div class="d" id="aWhy" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tR" min="0" max="100" step="1" value="0" aria-label="เดินเวลา">
+    <div class="ctrl"><button class="btn" id="playA">เดินเวลา</button><button class="btn" id="resetA">เริ่มใหม่</button><span class="lbl">เลื่อนแถบไปทางขวา = เวลาผ่านไป</span></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกผล</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>แมกมา · แก๊ส</th><th>ความหนืด</th><th>ลักษณะการปะทุ</th><th>รูปร่างภูเขาไฟ</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note">แมกมา = หินหลอมเหลวใต้ผิวโลก · เมื่อออกมาบนผิวโลก เรียกว่า ลาวา · ซิลิกามาก → หนืดมาก → แก๊สหนีออกยาก → แรงดันสะสม → ระเบิดรุนแรง</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 4 กรณี ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> แผนที่ภูเขาไฟโลก : ตามหา 6 ภูเขาไฟและภัยที่เกิด</h2>
+    <p class="how">เปิด-ปิดชั้นข้อมูล เลือกภูเขาไฟ อ่านคำใบ้ แล้วตอบว่าตั้งอยู่ที่ใด ตอบถูกจะเปิดแฟ้มภัยของภูเขาไฟนั้น</p>
+    <div class="chips" id="layChips"></div>
+    <canvas id="cvB" height="420" aria-label="แผนที่โลกแสดงรอยต่อแผ่นธรณี ภูเขาไฟ จุดร้อน และภูเขาไฟที่ต้องตามหา 6 ลูก"></canvas>
+    <div class="leg"><span><i style="background:#4FD8FF"></i>แยกออกจากกัน</span><span><i style="background:#FF6B8A"></i>เคลื่อนเข้าหากัน</span><span><i style="background:#FFD166"></i>เฉือนผ่านกัน</span>
+      <span><i class="dot" style="background:#FF4D2E;border-radius:0"></i>ภูเขาไฟ</span><span><i class="dot" style="background:transparent;border:2px solid #C9A2FF"></i>จุดร้อน</span><span><i class="dot" style="background:#FFD166"></i>ประเทศไทย</span></div>
+    <div class="chips" id="siteChips"></div>
+    <div class="info" style="margin-top:6px">
+      <div class="k">ภูเขาไฟที่ตามหา</div>
+      <div class="v g" id="bName">-</div>
+      <div class="d" id="bClue">-</div>
+      <div class="g2" style="margin-top:2px" id="bData"></div>
+      <div><div class="k" style="margin-top:6px">ภูเขาไฟลูกนี้ตั้งอยู่ที่ใด ?</div><div class="pick" id="bAsk"></div></div>
+      <div class="d" id="bStory" style="color:#5EF2A5"></div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ภูเขาไฟ</th><th>ตั้งอยู่ที่</th><th>ภัยเด่นจากการปะทุ</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="prog" id="progB">-</div>
+    <h2 class="sub-h"><em>คลังข้อมูล</em> ภัยและประโยชน์จากภูเขาไฟ</h2>
+    <div class="events" id="haz"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 ภูเขาไฟ ตอบข้อ 3</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์เฝ้าระวังภูเขาไฟ "ภูผาเพลิง"</h2>
+    <p class="how">ภูผาเพลิงเป็นภูเขาไฟสมมติ มีหมู่บ้าน 4 แห่งอยู่รอบ ๆ นักบินประจำการที่ศูนย์เฝ้าระวัง อ่านข้อมูลจากเครื่องมือ แล้วประกาศระดับเตือนภัยให้ถูกต้อง</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> อ่านสัญญาณเตือน ประกาศระดับเตือนภัย</h2>
+    <div class="chips" id="dayChips"></div>
+    <div class="twin">
+      <canvas id="cvC1" height="330" aria-label="แผงข้อมูลเฝ้าระวัง กล้องดูภูเขาไฟ กราฟแผ่นดินไหว การโป่งพองของพื้นดิน และแก๊สกำมะถันไดออกไซด์"></canvas>
+      <div class="info">
+        <div class="k">รายงานประจำวัน</div>
+        <div class="v g" id="cDay">-</div>
+        <div class="g3" style="margin-top:4px">
+          <div><div class="k">แผ่นดินไหว<br>(ครั้ง/วัน)</div><div class="v c" id="cEq">-</div></div>
+          <div><div class="k">พื้นดินโป่ง<br>(ซม.)</div><div class="v o" id="cInf">-</div></div>
+          <div><div class="k">แก๊ส SO₂<br>(ตัน/วัน)</div><div class="v r" id="cSo2">-</div></div>
+        </div>
+        <div class="d" id="cNote" style="margin-top:4px">-</div>
+        <div class="k" style="margin-top:6px">ประกาศระดับเตือนภัย</div>
+        <div class="chips" id="lvChips" style="margin:2px 0"></div>
+        <div class="d" id="cMsg">-</div>
+      </div>
+    </div>
+    <div class="guide">
+      <div class="lv0"><b>เขียว · ปกติ</b>แผ่นดินไหวน้อยกว่า 10 ครั้ง/วัน พื้นดินไม่โป่ง แก๊สปกติ</div>
+      <div class="lv1"><b>เหลือง · เฝ้าระวัง</b>แผ่นดินไหว 10–50 ครั้ง/วัน พื้นดินเริ่มโป่ง แก๊สเพิ่มขึ้น</div>
+      <div class="lv2"><b>ส้ม · เตรียมพร้อม</b>แผ่นดินไหว 50–200 ครั้ง/วัน โป่งเร็ว แก๊สสูงมาก ปิดเขตใกล้ปล่อง เตรียมอพยพ</div>
+      <div class="lv3"><b>แดง · อพยพ</b>แผ่นดินไหวเกิน 200 ครั้ง/วัน หรือสั่นต่อเนื่อง เริ่มพ่นเถ้า อพยพทันที</div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>วันที่</th><th>แผ่นดินไหว (ครั้ง/วัน)</th><th>พื้นดินโป่ง (ซม.)</th><th>แก๊ส SO₂ (ตัน/วัน)</th><th>ระดับเตือนภัย</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+    <div class="prog" id="progC">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> แผนที่พื้นที่เสี่ยงภัยรอบภูผาเพลิง</h2>
+    <p class="how" style="margin-bottom:4px">เปิดชั้นข้อมูลภัยทีละชั้น เปลี่ยนทิศลม แล้วแตะหมู่บ้านเพื่อดูว่าเสี่ยงภัยอะไร (1 ช่องตาราง = 5 กม.)</p>
+    <div class="chips" id="windChips"></div>
+    <div class="chips" id="zoneChips"></div>
+    <div class="twin">
+      <canvas id="cvC2" height="360" aria-label="แผนที่พื้นที่เสี่ยงภัยรอบภูเขาไฟ แสดงเขตห้ามเข้า หินร้อนไหลหลาก เถ้าตามทิศลม ลาฮาร์ตามลำน้ำ และเส้นทางอพยพ"></canvas>
+      <div class="info">
+        <div class="k">หมู่บ้าน</div>
+        <div class="chips" id="vilChips" style="margin:2px 0"></div>
+        <div class="v g" id="vName">-</div>
+        <div class="k" id="vDist">-</div>
+        <div class="k" style="margin-top:6px">ภัยที่เสี่ยง (ตามชั้นข้อมูลและทิศลมตอนนี้)</div>
+        <div class="risk" id="vRisk"></div>
+        <div class="d" id="vAdv" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <div class="leg"><span><i class="box" style="background:#FF4D5E88;border:1.5px solid #FF4D5E"></i>เขตห้ามเข้า 5 กม.</span><span><i class="box" style="background:#FF9F6B66"></i>หินร้อนไหลหลาก</span>
+      <span><i class="box" style="background:#9aa3b588"></i>เถ้าตกหนัก</span><span><i style="background:#B07A4A;height:6px"></i>ลาฮาร์ตามลำน้ำ</span><span><i style="background:#5EF2A5"></i>เส้นทางอพยพ</span></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ไขรหัสศูนย์เฝ้าระวัง</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">CRATER</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · crater = ปากปล่องภูเขาไฟ</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 4</em> คลังภูเขาไฟสำหรับภารกิจปลายทาง (ส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">เลือก 1 ภูเขาไฟ (จากคลังนี้ จากภารกิจ B หรือหาเอง) แล้วสืบค้นต่อจากเว็บไซต์ ข่าว หรือ AI เพื่อออกแบบแผนเฝ้าระวังและการปฏิบัติตน</p>
+    <div class="events" id="lib"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 วัน รหัสผ่าน ข้อ 4 · <b>ส่วนที่ 4</b> : ภารกิจปลายทาง แผนเฝ้าระวังภูเขาไฟ (สืบค้น ออกแบบ นำเสนอ)</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · ภาพตัดขวางในภารกิจ A ขยายความสูงเกินจริงเพื่อให้เห็นชัด · แผนที่ภารกิจ B เป็นภาพอย่างง่าย · ภูผาเพลิงและข้อมูลในภารกิจ C เป็นสถานการณ์สมมติ · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+/*GEO-START*/var GEO = {"NA":[[[-166,68],[-156,71],[-140,70],[-125,70],[-110,68],[-95,72],[-85,70],[-80,66],[-90,63],[-94,59],[-88,56],[-82,54],[-78,58],[-77,62],[-70,61],[-64,60],[-60,55],[-56,52],[-53,47],[-60,47],[-66,45],[-70,42],[-74,40],[-76,35],[-81,31],[-80,26],[-82,28],[-84,30],[-89,30],[-95,29],[-97,26],[-97,21],[-94,18.3],[-91,18.6],[-90.4,21],[-87,21.5],[-87.5,18.5],[-88.3,17.8],[-92.2,14.6],[-96,16],[-102,18],[-105,21],[-109,25],[-112,29],[-114,31],[-110,23],[-112,25],[-115,28],[-117,32],[-120,34.5],[-123,38],[-124,42],[-124,47],[-127,50],[-131,54],[-135,57],[-140,59.8],[-147,61],[-152,59],[-158,57],[-163,55],[-158,58.5],[-162,60],[-165,62],[-166,65]],[[-73,78],[-60,82],[-30,83.5],[-20,82],[-20,75],[-22,70],[-32,68],[-40,65],[-43,60],[-48,61],[-52,65],[-54,69],[-58,75],[-66,77]]],"CA":[[[-88.3,17.8],[-88,16],[-84,15],[-83,10],[-79,9],[-77.5,8],[-80,7.5],[-85,10],[-88,13],[-92.2,14.6]]],"SA":[[[-77,8],[-72,12],[-62,10.7],[-60,8.5],[-57,6.5],[-52,5],[-50,0],[-44,-2.5],[-35,-5.5],[-35,-9],[-39,-14],[-39,-18],[-41,-22],[-48,-26],[-48.6,-28],[-53,-34],[-58,-34.5],[-57,-38],[-62,-39],[-65,-42],[-64,-47],[-68,-50],[-69,-53],[-68,-55],[-72,-54],[-75,-50],[-74,-44],[-73,-38],[-71.5,-30],[-70,-18],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-77,4]]],"EU":[[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48.5],[2,51],[5,53],[8.5,54],[8,57],[10.5,57.7],[12,55.5],[14,54],[21,55],[23,59.5],[28,60],[22,60.5],[21.5,65],[24,66],[21,63],[17,61],[19,60],[16,56],[12.5,56.3],[11,59],[5.5,58.5],[5,62],[10,64],[14,67],[19,70],[26,71],[31,70],[41,67],[43,68.5],[53,68],[60,69.5],[70,73],[80,73.5],[88,75.5],[100,78],[113,73.5],[130,72],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[178,62],[165,60],[162,55],[156,51],[155,58],[143,59],[137,54],[141,52],[140,48],[135,43],[130,42.5],[129,35.5],[126,34.5],[126,37.5],[125,39.5],[121,40],[122,37],[119,35],[121,32],[122,29],[119,25],[114,22.3],[109,21.5],[106,20],[108,16],[109,12],[105,8.6],[103,10.5],[100,13.5],[99,10],[102.5,6],[103.5,1.5],[101,2.8],[98,8],[98.5,13],[97.5,16.5],[94.5,16],[94,19],[92,21],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27],[67,24],[62,25],[57,25.7],[56.5,27],[54,26.6],[51.5,24],[51.5,26],[50,30],[48,30],[50,26],[51.5,24],[56,24],[56.4,26.3],[59.8,22.5],[55,17],[52,16],[43.5,12.7],[42.5,15],[39,21.5],[35,28],[34.5,31.5],[35.5,34.5],[36,36.8],[32,36.2],[28,36.6],[26.5,39.5],[29,41],[31,41.2],[35,42],[41,41],[41.5,42.5],[37.5,45],[34,44.5],[33,46],[30,45.5],[28.5,43.5],[28,41.5],[24,40.5],[23,39],[22.5,36.5],[21,38.5],[19.5,41.5],[16,43.5],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40],[16,38],[15.5,40],[12.5,42],[10.5,43.5],[8,44],[5,43.2],[3.2,42],[0,39.5],[-0.5,38],[-2,36.7],[-5.5,36],[-7,37]],[[-5.5,50],[1.5,51],[1.7,52.8],[0,53.5],[-2,55.8],[-1.8,57.6],[-3,58.6],[-5,58.6],[-6.2,56.5],[-5,55],[-3.2,54.5],[-4.5,53.3],[-5,51.7]],[[130,31],[132,33.5],[135,34],[140,35],[141,38],[141.5,41.5],[145,43.5],[142,45.5],[140,42],[139.5,39],[137,37],[133,35.5],[130,33.5]]],"AF":[[[-17,21],[-16,15],[-17,14.7],[-15,11],[-13,8],[-8,4.5],[-2,5],[4,6.3],[9,4],[9.5,1],[9,-1],[12,-6],[13.5,-11],[12,-17],[14.5,-23],[15.5,-27],[18,-32],[18.5,-34.5],[20,-35],[25,-34],[28,-33],[32,-28.5],[33,-26],[35.5,-24],[35,-19],[40,-15.5],[40.5,-10],[39,-6],[42,-1],[46,2],[51,11.8],[44,11],[43,13],[39,16],[37,20],[35,24],[33.5,28],[32,31],[29,31],[25,31.8],[20,30.5],[19,32],[15,32.5],[11,33.5],[10,37],[3,36.7],[-2,35.1],[-6,35.8],[-9,32],[-10,29],[-13,27.5]]],"MG":[[[44,-25],[47,-25],[50,-15],[49.3,-12],[46,-15.5],[44,-16.5],[43.5,-22]]],"IN":[[[67,24],[70,21],[72.8,19],[73.5,15.5],[75,12],[76.5,8.5],[77.5,8],[80,10],[80.3,13.5],[82,16.5],[86.5,20],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27]]],"AU":[[[113,-22],[114,-26],[115,-34],[118,-35],[123,-34],[129,-31.5],[132,-32],[135,-34.5],[138,-35.5],[140,-38],[144,-38.5],[147,-38],[150,-37],[153,-31],[153,-25],[149,-21],[146,-19],[145,-15],[143,-11],[141.5,-13],[141,-17],[138,-16.5],[136,-12],[132,-11.5],[130,-13],[127,-14],[125,-15],[122,-18],[117,-20.5]],[[131,-1],[138,-1.5],[141,-2.6],[147,-6],[150,-10.5],[144,-8],[141,-9],[138,-8],[135,-4]],[[144.6,-40.7],[148.3,-40.9],[148,-43.2],[146,-43.6],[145,-42]]],"AN":[[[-180,-78],[-165,-78.5],[-158,-77.5],[-150,-76.5],[-140,-75.5],[-120,-74],[-100,-74.5],[-90,-73],[-80,-73],[-75,-72],[-70,-69],[-66,-66.5],[-63,-64.5],[-58,-63.3],[-60,-65.5],[-62,-68],[-62,-71],[-60,-74],[-55,-77],[-45,-78],[-35,-77.5],[-28,-75.5],[-20,-73],[-10,-71],[0,-70],[15,-70],[30,-69.5],[40,-69],[45,-67.5],[55,-66.5],[60,-67],[70,-68],[75,-69.5],[80,-68],[90,-66.5],[100,-66],[110,-66],[120,-66.5],[130,-66.2],[140,-66.5],[150,-68.5],[160,-70],[165,-71],[170,-73],[167,-77],[170,-78],[180,-78],[180,-90],[-180,-90]]]};/*GEO-END*/
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_g4_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.recC = S.recC || {}; S.cl = S.cl || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return (+n).toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function frac(v) { return v - Math.floor(v); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var FONT = '"Sarabun", sans-serif', HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function lvl(el, txt, cls) { el.textContent = txt; el.className = 'lvl ' + cls; }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ห้องทดลองแมกมา
+  var MAG = [
+    { n: 'บะซอลต์', si: 'ซิลิกาน้อย ~50%', temp: '1,100–1,200 °C', col: [255, 92, 32] },
+    { n: 'แอนดีไซต์', si: 'ซิลิกาปานกลาง ~60%', temp: '900–1,000 °C', col: [255, 140, 60] },
+    { n: 'ไรโอไลต์', si: 'ซิลิกามาก ~70%', temp: '700–850 °C', col: [255, 190, 110] }
+  ];
+  var GAS = ['แก๊สน้อย', 'แก๊สมาก'];
+  var VIS = [['ต่ำ (ไหลง่าย)', 'y'], ['ปานกลาง', 'm'], ['สูง (ไหลยาก)', 'n']];
+  // ผลของแต่ละกรณี : k = ชนิดแมกมา + แก๊ส (0 น้อย 1 มาก) · ws = กรณีที่จดลงใบงาน
+  var OUT = {
+    B0: { er: 'ลาวาไหลหลาก ไม่รุนแรง', shape: 'ภูเขาไฟรูปโล่ (กว้าง ลาดชันน้อย)', mode: 'flow', p: .16, g0: .3, g1: 1, ws: 1,
+      ex: 'คีเลาเวีย และเมานาโลอา ฮาวาย',
+      why: 'แมกมาบะซอลต์ร้อนและเหลว แก๊สลอยหนีออกได้ง่าย แรงดันจึงไม่สะสม ลาวาไหลออกมาเรื่อย ๆ แผ่ไปไกล ซ้อนกันเป็นภูเขาไฟกว้างลาดเอียงน้อยคล้ายโล่คว่ำ' },
+    B1: { er: 'น้ำพุลาวา พ่นเศษหินเป็นช่วง ๆ', shape: 'กรวยกรวดภูเขาไฟ (เล็ก ชัน)', mode: 'fountain', p: .38, g0: .15, g1: 1, ws: 1,
+      ex: 'ปาริคูติน เม็กซิโก (เกิดกลางไร่ข้าวโพด พ.ศ. 2486)',
+      why: 'แมกมาเหลวแต่มีแก๊สมาก แก๊สดันลาวาพุ่งเป็นน้ำพุ ลาวาเย็นตัวกลางอากาศเป็นเศษหินพรุน ตกกองรอบปล่องเป็นกรวยเล็กลาดชัน' },
+    A0: { er: 'ลาวาไหลสลับกับพ่นเถ้าเล็กน้อย', shape: 'ภูเขาไฟสลับชั้น', mode: 'mixed', p: .4, g0: .6, g1: 1, ws: 0,
+      ex: 'มายอน ฟิลิปปินส์',
+      why: 'แมกมาหนืดปานกลาง บางครั้งลาวาไหลออกมา บางครั้งพ่นเถ้า ชั้นลาวาและชั้นเถ้าซ้อนสลับกันเป็นภูเขาไฟสูงชัน (กรณีนี้ทดลองเพิ่มได้ ไม่ต้องจดลงใบงาน)' },
+    A1: { er: 'ระเบิด พ่นเถ้า และหินร้อนไหลหลาก', shape: 'ภูเขาไฟสลับชั้น (กรวยสูงชัน)', mode: 'explosive', p: .72, g0: .7, g1: 1, ws: 1,
+      ex: 'ฟูจิ ญี่ปุ่น · เมราปี อินโดนีเซีย',
+      why: 'แมกมาหนืด แก๊สหนีออกยาก แรงดันสะสมจนระเบิด พ่นเถ้าเป็นกลุ่มสูงหลายกิโลเมตร ส่วนที่หนักไหลลงตามลาดเขาเป็นหินร้อนไหลหลาก ชั้นเถ้าสลับชั้นลาวาสร้างภูเขาไฟสลับชั้น' },
+    R0: { er: 'ลาวาหนืดค่อย ๆ ดันพอกเป็นโดม', shape: 'โดมลาวา (บนยอดภูเขาไฟ)', mode: 'dome', p: .55, g0: .8, g1: .8, ws: 0,
+      ex: 'เซนต์เฮเลนส์ สหรัฐฯ (หลังการระเบิด พ.ศ. 2523)',
+      why: 'แมกมาหนืดมากแต่แก๊สน้อย ลาวาไหลไม่ไป ดันพอกขึ้นเป็นกองเหนือปล่อง ถ้าโดมถล่มอาจเกิดหินร้อนไหลหลากได้ (กรณีนี้ทดลองเพิ่มได้ ไม่ต้องจดลงใบงาน)' },
+    R1: { er: 'ระเบิดรุนแรงมาก กลุ่มเถ้าสูงหลายสิบกิโลเมตร', shape: 'ภูเขาไฟสลับชั้น ยอดระเบิดหายเป็นแอ่ง', mode: 'plinian', p: 1, g0: 1, g1: 1, ws: 1,
+      ex: 'ปินาตูโบ ฟิลิปปินส์ พ.ศ. 2534 · เซนต์เฮเลนส์ สหรัฐฯ พ.ศ. 2523',
+      why: 'แมกมาหนืดมากและมีแก๊สมาก แก๊สถูกขังไว้จนแรงดันสูงที่สุด เมื่อหินที่ปิดปล่องแตก แก๊สขยายตัวทันที ฉีกแมกมาเป็นเถ้าพุ่งสูงกว่า 30 กม. หินร้อนไหลหลากไปไกล ยอดเขาอาจหายไป' }
+  };
+  var WSK = ['B0', 'B1', 'A1', 'R1'];
+  var mA = 0, gA = 0, pA = 0, playing = 0, shakeA = 0;
+  function keyA() { return 'BAR'[mA] + gA; }
+  function caseLabel(k) { return MAG['BAR'.indexOf(k[0])].n + ' · ' + GAS[+k[1]]; }
+  function pressure(o, t) { var up = o.p * smooth(0, .5, t); if (o.mode === 'explosive' || o.mode === 'plinian') up *= 1 - .75 * smooth(.5, .62, t); if (o.mode === 'fountain') up *= 1 - .35 * smooth(.5, .6, t); return up; }
+  function updA() {
+    var k = keyA(), o = OUT[k], M = MAG[mA];
+    var h = '<span class="lbl">ชนิดแมกมา</span>';
+    MAG.forEach(function (m, i) { h += '<button class="chip' + (i === mA ? ' on' : '') + '" data-m="' + i + '">' + m.n + '</button>'; });
+    $('magChips').innerHTML = h; bindChips($('magChips'), 'm', function (v) { mA = +v; pA = 0; playing = 0; updA(); drawA(); });
+    h = '<span class="lbl">แก๊สในแมกมา</span>';
+    GAS.forEach(function (g, i) { h += '<button class="chip' + (i === gA ? ' on' : '') + '" data-g="' + i + '">' + g + '</button>'; });
+    $('gasChips').innerHTML = h; bindChips($('gasChips'), 'g', function (v) { gA = +v; pA = 0; playing = 0; updA(); drawA(); });
+    $('aCase').textContent = caseLabel(k);
+    $('aProp').textContent = M.si + ' · อุณหภูมิ ' + M.temp;
+    lvl($('aVis'), VIS[mA][0], VIS[mA][1]);
+    $('aTime').innerHTML = pA < .5 ? 'ระยะที่ 1<br><span style="color:#E8EDFF">แมกมาเคลื่อนขึ้น แก๊สสะสม</span>' : (pA < 1 ? 'ระยะที่ 2<br><span style="color:#FF9F6B">กำลังปะทุ</span>' : 'ปะทุครบแล้ว<br><span style="color:#5EF2A5">บันทึกผลได้</span>');
+    $('aBar').style.width = Math.round(pressure(o, pA) * 100) + '%';
+    var done = pA >= .5;
+    $('aErupt').textContent = done ? o.er : (pA > 0 ? 'แมกมากำลังเคลื่อนขึ้น ...' : 'กด "เดินเวลา" เพื่อเริ่ม');
+    $('aShape').textContent = pA >= 1 ? o.shape : '-';
+    $('aEx').textContent = pA >= 1 ? o.ex : '-';
+    $('aWhy').innerHTML = pA >= 1 ? o.why : 'สังเกตฟองแก๊สในปล่อง ฟองลอยหนีออกได้ง่ายหรือถูกขังไว้ และแถบแรงดันแก๊ส';
+    $('tR').value = Math.round(pA * 100);
+    $('playA').textContent = playing ? 'หยุด' : 'เดินเวลา';
+    $('recA').disabled = !(pA >= 1 && o.ws);
+    $('recAMsg').textContent = pA < 1 ? 'เดินเวลาจนสุดก่อนจึงบันทึกได้' : (o.ws ? (S.recA[k] ? 'บันทึกแล้ว' : 'กดบันทึกผล') : 'กรณีนี้ทดลองเพิ่มได้ ไม่ต้องจดลงใบงาน ลองกรณีอื่น');
+    var n = 0, rows = '';
+    WSK.forEach(function (z) { var r = S.recA[z], O = OUT[z]; if (r) n++;
+      rows += '<tr' + (z === k ? ' class="cur"' : '') + '><td class="n">' + caseLabel(z) + '</td><td>' + (r ? VIS['BAR'.indexOf(z[0])][0] : '-') + '</td><td>' + (r ? O.er : '-') + '</td><td>' + (r ? O.shape : '-') + '</td></tr>'; });
+    $('logA').innerHTML = rows;
+    if (pA >= 1 && o.ws && S.recA[k]) $('recAMsg').textContent = 'บันทึกแล้ว ' + n + '/4' + (n === 4 ? ' · ครบแล้ว ไปภารกิจ B ได้' : '');
+  }
+  $('tR').oninput = function () { pA = +this.value / 100; playing = 0; updA(); drawA(); };
+  $('playA').onclick = function () { if (pA >= 1) pA = 0; playing = playing ? 0 : 1; updA(); };
+  $('resetA').onclick = function () { pA = 0; playing = 0; updA(); drawA(); };
+  $('recA').onclick = function () { var k = keyA(); if (!OUT[k].ws || pA < 1) return; S.recA[k] = 1; save(); updA(); };
+  function stepPlay(dt) {
+    if (!playing) return;
+    var was = pA; pA = Math.min(1, pA + dt / 9);
+    if (was < .5 && pA >= .5) { var md = OUT[keyA()].mode; if (md === 'explosive' || md === 'plinian') shakeA = md === 'plinian' ? 1.2 : .6; }
+    if (pA >= 1) playing = 0;
+    updA();
+  }
+  // โปรไฟล์ภูเขาไฟ : ความสูง (px) ที่ระยะ d จากปล่อง
+  function profA(o, W, H, d, te) {
+    var mode = o.mode, g = o.g0 + (o.g1 - o.g0) * smooth(0, 1, te), ad = Math.abs(d), hw, h, y;
+    if (mode === 'flow') { hw = W * .44; h = H * .2 * g; y = ad < hw ? h * Math.pow(Math.cos(ad / hw * Math.PI / 2), 1.1) : 0; if (ad < 9) y -= 4 * g; return Math.max(0, y); }
+    if (mode === 'fountain') { hw = W * (.06 + .1 * g); h = H * .24 * g; var top = 9 + 5 * g; y = ad < top ? h - (top - ad) * .5 : (ad < hw ? h * (hw - ad) / (hw - top) : 0); return Math.max(0, y); }
+    hw = W * .32; h = H * .42 * g; y = ad < hw ? h * Math.pow(1 - ad / hw, 1.7) : 0;
+    if (ad < 8) y = h * Math.pow(1 - 8 / hw, 1.7) - (8 - ad) * .4;
+    if (mode === 'plinian') { var cut = smooth(.02, .25, te), cap = h * (1 - .3 * cut); if (y > cap) y = cap - (y - cap) * .5 * cut; }
+    return Math.max(0, y);
+  }
+  function drawA() {
+    var cv = $('cvA'), c = fit(cv), x = c.x, W = c.W, H = c.H, k = keyA(), o = OUT[k], M = MAG[mA], col = M.col;
+    var te = smooth(.5, 1, pA), erupted = pA >= .5, sh = shakeA > 0 ? (Math.sin(tA * 70) * 4 * shakeA) : 0;
+    x.save(); x.translate(sh, 0);
+    var y0 = H * .64, cx = W / 2;
+    // ฟ้า
+    var sky = x.createLinearGradient(0, 0, 0, y0); sky.addColorStop(0, '#0a1030'); sky.addColorStop(1, '#2a2346'); x.fillStyle = sky; x.fillRect(-10, 0, W + 20, y0 + 2);
+    // ใต้ดิน
+    var gr = x.createLinearGradient(0, y0, 0, H); gr.addColorStop(0, '#5a4636'); gr.addColorStop(1, '#2b1f19'); x.fillStyle = gr; x.fillRect(-10, y0, W + 20, H - y0);
+    x.strokeStyle = 'rgba(255,255,255,.07)'; x.lineWidth = 1;
+    for (var ly = y0 + 22; ly < H; ly += 24) { x.beginPath(); x.moveTo(-10, ly); x.lineTo(W + 10, ly); x.stroke(); }
+    // ห้องแมกมา + ปล่อง
+    var chY = H - 46, chR = Math.min(W * .17, 110), topY = y0 - profA(o, W, H, 0, te);
+    var lev = smooth(0, .5, pA), magTop = (chY - 22) - lev * ((chY - 22) - topY);
+    x.fillStyle = 'rgba(40,20,14,.9)'; x.fillRect(cx - 8, topY, 16, chY - topY);
+    glow(x, cx, chY, chR * 1.3, col, .35);
+    x.fillStyle = rgba(col, .95); x.beginPath(); x.ellipse(cx, chY, chR, 26, 0, 0, 6.283); x.fill();
+    x.fillStyle = rgba(col, .95); x.fillRect(cx - 6, magTop, 12, chY - magTop);
+    // ฟองแก๊ส
+    var speed = [.55, .22, .07][mA], nb = gA ? 16 : 7;
+    for (var b = 0; b < nb; b++) {
+      var ph = frac(hash(b, 1) + tA * speed), by;
+      if (mA === 2 && gA) ph = Math.pow(ph, .45);   // หนืดมาก ฟองค้างอัดแน่นใต้ฝาปล่อง
+      by = chY - 10 - ph * (chY - 10 - magTop);
+      var br = 1.6 + gA * 1.2 + mA * ph * (1.2 + gA * 1.6);
+      x.strokeStyle = 'rgba(255,255,255,.85)'; x.lineWidth = 1; x.beginPath(); x.arc(cx + (hash(b, 2) - .5) * 7, by, br, 0, 6.283); x.stroke();
+    }
+    for (var cb = 0; cb < (gA ? 10 : 4); cb++) { x.strokeStyle = 'rgba(255,255,255,.6)'; x.beginPath(); x.arc(cx + (hash(cb, 5) - .5) * chR * 1.5, chY + (hash(cb, 6) - .5) * 30, 1.5 + gA + mA * .6, 0, 6.283); x.stroke(); }
+    // ตัวภูเขาไฟ (ชั้นสลับ)
+    x.beginPath(); x.moveTo(-10, y0);
+    for (var px = -10; px <= W + 10; px += 3) x.lineTo(px, y0 - profA(o, W, H, px - cx, te));
+    x.lineTo(W + 10, y0); x.closePath();
+    var vg = x.createLinearGradient(0, topY, 0, y0); vg.addColorStop(0, '#6d6170'); vg.addColorStop(1, '#3e3646'); x.fillStyle = vg; x.fill();
+    if (o.mode !== 'flow' && o.mode !== 'fountain') {   // ลายชั้นลาวาสลับชั้นเถ้า
+      x.save(); x.clip();
+      for (var s = 1; s < 7; s++) { x.strokeStyle = s % 2 ? 'rgba(160,80,60,.35)' : 'rgba(200,200,210,.18)'; x.lineWidth = 3; x.beginPath();
+        for (var qx = -10; qx <= W + 10; qx += 4) { var yy = y0 - profA(o, W, H, qx - cx, te) * (1 - s / 7); if (qx === -10) x.moveTo(qx, yy); else x.lineTo(qx, yy); } x.stroke(); }
+      x.restore();
+    }
+    x.fillStyle = 'rgba(40,20,14,.95)'; x.fillRect(cx - 6, topY, 12, y0 - topY);
+    x.fillStyle = rgba(col, .95); x.fillRect(cx - 4, Math.max(topY, magTop), 8, y0 - Math.max(topY, magTop));
+    x.strokeStyle = '#1b1422'; x.lineWidth = 1.2; x.beginPath();
+    for (var lx = -10; lx <= W + 10; lx += 3) { var ly2 = y0 - profA(o, W, H, lx - cx, te); if (lx === -10) x.moveTo(lx, ly2); else x.lineTo(lx, ly2); } x.stroke();
+    // การปะทุ
+    if (erupted) eruptA(x, o, W, H, cx, y0, topY, te, col);
+    // ป้ายชื่อ
+    label(x, 'ห้องแมกมา', cx + chR + 8, chY + 5, '#FFD166', 12, 'left');
+    label(x, 'แมกมา', cx + 12, (topY + chY) / 2 + 30, rgba(col, 1), 12, 'left');
+    if (pA > 0 && !erupted) label(x, 'ฟองแก๊ส' + (mA === 2 ? 'ถูกขังไว้ ...' : 'ลอยหนีออก'), cx - 14, Math.max(magTop + 14, topY + 30), '#E8EDFF', 12, 'right');
+    label(x, 'ภาพตัดขวาง (ขยายความสูงเกินจริง)', W - 8, H - 8, 'rgba(232,237,255,.6)', 11, 'right');
+    x.restore();
+  }
+  function eruptA(x, o, W, H, cx, y0, topY, te, col) {
+    var md = o.mode, i, a, L;
+    function flowSide(dir, len, wdt) {
+      x.strokeStyle = rgba(col, .95); x.lineWidth = wdt; x.lineCap = 'round'; x.beginPath();
+      for (var d = 4; d <= len; d += 3) { var yy = y0 - profA(o, W, H, d * dir, te) - 1; if (d === 4) x.moveTo(cx + d * dir, yy); else x.lineTo(cx + d * dir, yy); }
+      x.stroke(); var ex = cx + len * dir; glow(x, ex, y0 - profA(o, W, H, len * dir, te), 14, col, .5);
+    }
+    if (md === 'flow' || md === 'mixed' || md === 'fountain') {
+      L = te * W * (md === 'flow' ? .46 : (md === 'mixed' ? .22 : .14));
+      flowSide(-1, L, md === 'flow' ? 7 : 5); flowSide(1, L * .8, md === 'flow' ? 7 : 5);
+      glow(x, cx, topY, 26, col, .55);
+      if (md === 'flow') { for (i = 0; i < 8; i++) { a = frac(tA * 1.2 + i / 8); x.fillStyle = rgba(col, 1 - a); x.beginPath(); x.arc(cx + (hash(i, 3) - .5) * 14 * a, topY - 22 * a * (1 - a) * 4, 2.2, 0, 6.283); x.fill(); } label(x, 'ลาวาไหลหลาก', cx - L * .6, y0 - profA(o, W, H, -L * .6, te) - 16, '#FF9F6B', 13); }
+    }
+    if (md === 'fountain') {
+      for (i = 0; i < 46; i++) { a = frac(tA * .9 + i / 46); var vx = (hash(i, 7) - .5) * W * .22, vy = -(90 + 110 * hash(i, 8));
+        var px = cx + vx * a, py = topY + vy * a + 230 * a * a; if (py > y0 + 4) continue;
+        x.fillStyle = a < .5 ? rgba(col, 1) : 'rgba(80,60,60,' + (1.2 - a) + ')'; x.beginPath(); x.arc(px, py, 2.2, 0, 6.283); x.fill(); }
+      glow(x, cx, topY - 30, 40, col, .35);
+      label(x, 'น้ำพุลาวา เศษหินตกกองรอบปล่อง', cx, Math.max(topY - 96, 18), '#FF9F6B', 13);
+    }
+    if (md === 'mixed' || md === 'explosive' || md === 'plinian') {
+      var colH = md === 'mixed' ? H * .18 : (md === 'explosive' ? (topY - 26) * smooth(0, .3, te) : (topY - 4) * smooth(0, .2, te));
+      for (i = 0; i < 26; i++) { var f = i / 25, yy = topY - colH * f, rr = (md === 'plinian' ? 14 : 9) + f * (md === 'plinian' ? 26 : 16);
+        var jx = Math.sin(tA * 1.5 + i * 1.7) * 5 * f; x.fillStyle = 'rgba(' + (120 - f * 30) + ',' + (110 - f * 30) + ',' + (115 - f * 30) + ',.8)'; x.beginPath(); x.arc(cx + jx, yy, rr, 0, 6.283); x.fill(); }
+      if (md !== 'mixed') { var uw = (md === 'plinian' ? W * .5 : W * .26) * smooth(.15, 1, te), uy = topY - colH;
+        x.fillStyle = 'rgba(105,98,108,.85)'; x.beginPath(); x.ellipse(cx, uy + 6, Math.max(20, uw), md === 'plinian' ? 20 : 13, 0, 0, 6.283); x.fill();
+        label(x, md === 'plinian' ? 'กลุ่มเถ้าสูงกว่า 30 กม.' : 'กลุ่มเถ้าสูงหลายกิโลเมตร', cx + Math.max(20, uw) * .4, Math.max(uy + 30, 16), '#E8EDFF', 13); }
+      else label(x, 'พ่นเถ้าเล็กน้อย', cx + 30, topY - colH + 8, '#E8EDFF', 12, 'left');
+      if (md !== 'mixed') {   // หินร้อนไหลหลาก
+        var reach = (md === 'plinian' ? W * .5 : W * .3) * smooth(.1, .7, te);
+        for (var sd = -1; sd <= 1; sd += 2) for (var s = 6; s <= reach; s += 5) {   // กลุ่มเถ้าร้อนไหลเกาะลาดเขา
+          var fr = s / Math.max(reach, 1), rr2 = 5 + fr * 12 + Math.sin(tA * 3 + s * .3) * 1.5, py2 = y0 - profA(o, W, H, s * sd, te) - rr2 * .55;
+          x.fillStyle = 'rgba(' + Math.round(170 - fr * 40) + ',' + Math.round(125 - fr * 20) + ',110,' + (.75 - fr * .25) + ')'; x.beginPath(); x.arc(cx + s * sd, py2, rr2, 0, 6.283); x.fill();
+          if (s + 5 > reach) glow(x, cx + s * sd, py2, rr2 * 1.8, [255, 120, 60], .35); }
+        if (te > .3) label(x, 'หินร้อนไหลหลาก', cx - reach * .55, y0 - profA(o, W, H, -reach * .55, te) - 26, '#FF9F6B', 13);
+      }
+    }
+    if (md === 'dome') {
+      var dr = 6 + 22 * te, dh = 4 + 18 * te; glow(x, cx, topY, dr * 1.6, col, .35);
+      x.fillStyle = '#7a5a52'; x.beginPath(); x.ellipse(cx, topY + 2, dr, dh, 0, Math.PI, 0); x.fill();
+      x.strokeStyle = rgba(col, .9); x.lineWidth = 1.5; for (i = 0; i < 4; i++) { x.beginPath(); x.moveTo(cx - dr * .6 + i * dr * .4, topY + 1); x.lineTo(cx - dr * .5 + i * dr * .4, topY - dh * .6); x.stroke(); }
+      var rf = frac(tA * .25); if (te > .4) { var rs = rf * W * .2; x.fillStyle = 'rgba(150,120,110,' + (.7 - rf * .6) + ')'; x.beginPath(); x.arc(cx + rs + dr, y0 - profA(o, W, H, rs + dr, te) - 6, 6 + rf * 8, 0, 6.283); x.fill(); }
+      label(x, 'โดมลาวาค่อย ๆ ดันพอก', cx, topY - dh - 12, '#FF9F6B', 13);
+    }
+  }
+
+  // ================================================================ ภารกิจ B แผนที่ภูเขาไฟโลก
+  var D2R = Math.PI / 180;
+  function eqe(lon, lat) {
+    var A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    var th = Math.asin(M * Math.sin(lat * D2R)), t2 = th * th, t6 = t2 * t2 * t2;
+    return [lon * D2R * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
+  }
+  // แนวรอยต่อแผ่นธรณีอย่างง่าย (ชุดเดียวกับสถานการณ์จำลอง G3)  D แยก · C มุดตัว · K ทวีปชน · T เฉือน
+  var BND = [
+    ['D', [[-1, -54], [-14, -48], [-15, -40], [-13, -30], [-14, -20], [-13, -10], [-15, -2], [-25, 0], [-32, 3], [-38, 8], [-45, 15], [-46, 23], [-42, 30], [-33, 37], [-29, 43], [-28, 50], [-32, 55], [-30, 58], [-24, 62], [-18, 65], [-16, 68], [-5, 71], [5, 74], [10, 79]]],
+    ['D', [[-109, 23], [-106, 16], [-103, 9], [-104, 0], [-110, -10], [-112, -20], [-113, -30], [-112, -36], [-115, -45], [-118, -55], [-135, -58], [-150, -62], [-165, -64], [-180, -63]]],
+    ['D', [[180, -63], [160, -61], [150, -57], [140, -51], [125, -50], [110, -48], [95, -42], [80, -35], [70, -26]]],
+    ['D', [[70, -26], [67, -17], [66, -8], [66, 0], [62, 7], [58, 13], [52, 14], [45, 12], [40, 16], [37, 21], [34, 27]]],
+    ['D', [[70, -26], [57, -33], [45, -40], [32, -45], [18, -50], [5, -53], [-1, -54]]],
+    ['D', [[42, 11.5], [40, 8], [38, 4], [36.5, 0], [35.5, -4], [34, -9], [34.5, -14]]],
+    ['C', [[-150, 57], [-158, 54], [-168, 51.5], [-180, 51]]],
+    ['C', [[180, 51], [172, 52], [164, 54]]],
+    ['C', [[164, 54], [160, 51], [155, 47], [150, 44], [146, 41], [143.5, 38], [142, 35]]],
+    ['C', [[142, 35], [142, 30], [143, 24], [145, 18], [147, 13], [144, 11]]],
+    ['C', [[138, 34], [134, 32.5], [131, 30], [128, 27], [124, 24], [122, 22]]],
+    ['C', [[122, 22], [119.5, 18], [119.5, 14], [120.5, 12]]],
+    ['C', [[127, 14], [127, 8], [126.5, 4]]],
+    ['C', [[93, 15], [92.5, 10], [93.5, 6], [95.5, 2], [98, -2], [101, -5.5], [105, -8], [110, -10], [115, -11], [120, -11], [125, -10]]],
+    ['C', [[147, -7], [153, -7], [158, -9], [163, -11], [167, -14], [169, -20], [171, -23]]],
+    ['C', [[-173, -15], [-174, -21], [-176, -27], [-178, -33], [-180, -37]]],
+    ['C', [[180, -37], [178, -40], [176, -42]]],
+    ['C', [[-128, 50], [-126, 46], [-125, 41]]],
+    ['C', [[-106, 20], [-102, 17], [-97, 15], [-93, 14], [-89, 12.5], [-86, 10.5], [-83, 8]]],
+    ['C', [[-79, 4], [-81, -3], [-80, -8], [-77, -13], [-73, -17.5], [-71.5, -23], [-72, -30], [-74, -37], [-75.5, -44], [-76, -48]]],
+    ['C', [[-62, 19], [-59.5, 15], [-61, 11]]],
+    ['C', [[12, 38.5], [16, 40], [18, 38.5], [16, 37]]],
+    ['K', [[-9, 36], [2, 36.5], [12, 38], [22, 37], [28, 36], [36, 37], [44, 38], [48, 34], [53, 29], [58, 26], [63, 25.5], [67, 26], [69, 30], [72, 34], [75, 35], [80, 31], [85, 28.5], [90, 27.5], [95, 28], [97, 26]]],
+    ['T', [[-125, 41], [-123, 38.5], [-121, 36], [-118, 34.5], [-116, 33], [-114.5, 31.5], [-109, 23]]],
+    ['T', [[97, 26], [96, 23], [96.2, 19], [95.8, 16], [93, 15]]],
+    ['T', [[166, -47], [168.5, -44.5], [172, -42.5], [176, -42]]],
+    ['T', [[34, 27], [35.5, 33], [36.5, 36]]],
+    ['T', [[-88, 15.5], [-80, 19], [-70, 19.5], [-62, 19]]]
+  ];
+  var VOLC = [[[-77, 1], [-78, -2], [-75, -15], [-69, -18], [-68, -24], [-70, -35], [-72, -41]], [[-122, 49], [-122, 42]], [[-103, 19], [-97, 19], [-90, 14], [-86, 12], [-84, 10]],
+    [[-155, 59], [-165, 55], [-178, 52]], [[160, 56], [155, 50], [148, 45], [141, 42], [139, 36], [138, 35]], [[140, 32], [141, 25], [145, 18], [145, 15]], [[124, 13], [125, 8]], [[120.4, 15.1]],
+    [[96, 4], [100, -1], [105, -6], [110, -7.5], [115, -8.3], [120, -8.5], [125, -8]], [[-175, -19], [-176, -25]], [[175.5, -39]], [[-19, 64.5]], [[36, -3], [37, 0], [39, 8], [41, 12]],
+    [[15, 38], [14, 40.8]], [[-61, 15]], [[168, -16]], [[150, -5]], [[130, 31]], [[-155.3, 19.4]], [[-110.5, 44.5]], [[-91, -.5]], [[55.6, -21.2]]];
+  var HOT = [[-155.3, 19.4, 'ฮาวาย'], [-110.5, 44.5, 'เยลโลว์สโตน'], [-19, 64.5, 'ไอซ์แลนด์'], [-91, -.5, 'กาลาปากอส'], [55.6, -21.2, 'เรอูนียง']];
+  var BTYPE = ['รอยต่อแบบแยกออกจากกัน', 'รอยต่อแบบเคลื่อนเข้าหากัน (มุดตัว)', 'จุดร้อน (กลางแผ่นธรณี)'];
+  var BSHORT = ['แยกออกจากกัน', 'เคลื่อนเข้าหากัน', 'จุดร้อน'];
+  var SITES = [
+    { n: 'คีเลาเวีย', c: 'ฮาวาย สหรัฐฯ', lon: -155.3, lat: 19.4, a: 2, mag: 'บะซอลต์ (หนืดต่ำ)', shape: 'รูปโล่', haz: 'ลาวาไหลหลากทับบ้านเรือน',
+      clue: 'อยู่กลางมหาสมุทรแปซิฟิก ห่างจากขอบแผ่นธรณีหลายพันกิโลเมตร แมกมาร้อนพุ่งขึ้นจากเนื้อโลกลึกเป็นจุดเดียว แผ่นแปซิฟิกเลื่อนผ่านจุดนี้จนเกิดเกาะเรียงเป็นแนว',
+      story: 'พ.ศ. 2561 ลาวาไหลออกจากรอยแยกนานหลายเดือน ทับบ้านเรือนกว่า 700 หลัง แต่ลาวาไหลช้า คนส่วนใหญ่อพยพทัน' },
+    { n: 'เอยาฟยาลาโยกุลล์', c: 'ไอซ์แลนด์', lon: -19.6, lat: 63.6, a: 0, mag: 'บะซอลต์–แอนดีไซต์', shape: 'สลับชั้น ใต้ธารน้ำแข็ง', haz: 'เถ้าลอยปิดน่านฟ้า เครื่องบินบินไม่ได้',
+      clue: 'ภูเขาไฟใต้ธารน้ำแข็ง บนเกาะที่ตั้งอยู่บนสันเขากลางมหาสมุทรแอตแลนติกพอดี แผ่นอเมริกาเหนือกับแผ่นยูเรเชียค่อย ๆ แยกจากกันราวปีละ 2 ซม.',
+      story: 'เม.ย. 2553 เถ้าลอยไปทั่วยุโรป เถ้าทำให้เครื่องยนต์เครื่องบินขัดข้องได้ จึงยกเลิกเที่ยวบินราว 100,000 เที่ยว ผู้โดยสารตกค้างหลายล้านคน' },
+    { n: 'วิสุเวียส', c: 'อิตาลี', lon: 14.4, lat: 40.8, a: 1, mag: 'แมกมาหนืด แก๊สมาก', shape: 'สลับชั้น', haz: 'หินร้อนไหลหลากและเถ้าฝังเมือง',
+      clue: 'ภูเขาไฟริมอ่าวเนเปิลส์ ทางใต้ของยุโรป แผ่นแอฟริกาเคลื่อนเข้าหาแผ่นยูเรเชีย พื้นทะเลส่วนหนึ่งมุดลงใต้คาบสมุทรอิตาลี',
+      story: 'ค.ศ. 79 (พ.ศ. 622) หินร้อนไหลหลากและเถ้าฝังเมืองปอมเปอี ปัจจุบันมีผู้คนหลายแสนคนอาศัยในเขตเสี่ยง อิตาลีจึงมีแผนอพยพและเฝ้าระวังตลอดเวลา' },
+    { n: 'ปินาตูโบ', c: 'ฟิลิปปินส์', lon: 120.35, lat: 15.13, a: 1, mag: 'แมกมาหนืดมาก แก๊สมาก', shape: 'สลับชั้น ยอดยุบเป็นแอ่ง', haz: 'เถ้า ลาฮาร์ และโลกเย็นลง',
+      clue: 'ภูเขาไฟบนเกาะลูซอน ห่างประเทศไทยไปทางตะวันออกราว 2,100 กม. แผ่นทะเลจีนใต้มุดลงที่ร่องลึกมะนิลา',
+      story: 'มิ.ย. 2534 ระเบิดรุนแรงมาก กลุ่มเถ้าสูงราว 35 กม. ละอองกำมะถันบังแสงอาทิตย์ อุณหภูมิเฉลี่ยของโลกลดลงราว 0.5 °C ฝนพาเถ้าเป็นลาฮาร์อยู่หลายปี · นักวิทยาศาสตร์เตือนล่วงหน้า อพยพทันหลายหมื่นคน' },
+    { n: 'กรากะตัว', c: 'อินโดนีเซีย', lon: 105.42, lat: -6.1, a: 1, mag: 'แมกมาหนืด', shape: 'เกาะภูเขาไฟกลางทะเล', haz: 'สึนามิ',
+      clue: 'ภูเขาไฟกลางช่องแคบซุนดา ระหว่างเกาะชวาและสุมาตรา แผ่นอินเดีย-ออสเตรเลียมุดลงใต้แผ่นซุนดาที่ร่องลึกซุนดา',
+      story: 'ส.ค. 2426 ระเบิดครั้งใหญ่ เกิดสึนามิ มีผู้เสียชีวิตกว่า 36,000 คน · ธ.ค. 2561 ภูเขาไฟอะนักกรากะตัว (ลูกของกรากะตัว) ถล่มลงทะเล เกิดสึนามิอีกครั้ง' },
+    { n: 'ฟูจิ', c: 'ญี่ปุ่น', lon: 138.73, lat: 35.36, a: 1, mag: 'บะซอลต์–แอนดีไซต์', shape: 'สลับชั้น กรวยสวย', haz: 'เถ้าตกไกลถึงเมืองใหญ่',
+      clue: 'ภูเขาไฟรูปกรวยสวย ใกล้จุดที่แผ่นธรณี 3–4 แผ่นมาพบกัน แผ่นฟิลิปปินและแผ่นแปซิฟิกมุดลงใต้ญี่ปุ่น',
+      story: 'ปะทุครั้งล่าสุด พ.ศ. 2250 เถ้าตกถึงเมืองเอโดะ (โตเกียว) ห่างราว 100 กม. วันนี้ญี่ปุ่นมีแผนที่พื้นที่เสี่ยงภัยและเฝ้าระวังตลอด 24 ชั่วโมง นักท่องเที่ยวไทยนิยมไปเที่ยว' }
+  ];
+  var HAZ = [
+    { n: 'ลาวาไหลหลาก', y: 'ภัย', d: 'ลาวาร้อน 700–1,200 °C ส่วนใหญ่ไหลช้า คนเดินหนีทัน แต่เผาและทับบ้าน ถนน ไร่นา' },
+    { n: 'หินร้อนไหลหลาก', y: 'ภัยร้ายแรงที่สุด', d: 'เถ้า หิน และแก๊สร้อนหลายร้อย °C ไหลลงตามลาดเขาเร็วกว่า 100 กม./ชม. หนีไม่ทัน ต้องอพยพก่อนเกิด' },
+    { n: 'เถ้าภูเขาไฟ', y: 'ภัย', d: 'เศษหินและแก้วละเอียดคม ลมพัดไปได้หลายร้อยกิโลเมตร ทำร้ายปอดและตา หลังคาถล่ม เครื่องบินบินไม่ได้' },
+    { n: 'ลาฮาร์ (โคลนภูเขาไฟไหลหลาก)', y: 'ภัย', d: 'เถ้าผสมน้ำฝนหรือหิมะที่ละลาย ไหลไปตามลำน้ำไกลหลายสิบกิโลเมตร แม้ภูเขาไฟสงบแล้วก็ยังเกิดได้' },
+    { n: 'แก๊สภูเขาไฟ', y: 'ภัย', d: 'ไอน้ำ คาร์บอนไดออกไซด์ กำมะถันไดออกไซด์ (SO₂) อันตรายในที่ลุ่ม ทำให้เกิดฝนกรด' },
+    { n: 'สึนามิและภูมิอากาศ', y: 'ภัย', d: 'ภูเขาไฟใต้ทะเลหรือภูเขาไฟที่ถล่มลงทะเลทำให้เกิดสึนามิ ละอองกำมะถันในบรรยากาศบังแสงอาทิตย์ทำให้โลกเย็นลง' },
+    { n: 'ดินอุดมสมบูรณ์ และความร้อนใต้พิภพ', y: 'ประโยชน์', d: 'ดินภูเขาไฟมีแร่ธาตุมาก ปลูกพืชได้ดี ความร้อนใต้พิภพใช้ผลิตไฟฟ้า (เช่น ไอซ์แลนด์) และเป็นน้ำพุร้อน แหล่งท่องเที่ยว', good: 1 },
+    { n: 'แร่และอัญมณี', y: 'ประโยชน์', d: 'พลอยในจันทบุรีและตราดพบร่วมกับหินบะซอลต์ที่เกิดจากภูเขาไฟในอดีต หินภูเขาไฟใช้ในงานก่อสร้าง', good: 1 },
+    { n: 'ประเทศไทยกับภูเขาไฟ', y: 'ใกล้ตัว', d: 'ไทยไม่มีภูเขาไฟที่ยังมีพลัง มีแต่ภูเขาไฟที่ดับแล้ว เช่น เขาพนมรุ้ง เขากระโดง บุรีรัมย์ และดอยผาคอกหินฟู ลำปาง แต่คนไทยเดินทางไปประเทศที่มีภูเขาไฟบ่อย', good: 1 }
+  ];
+  $('haz').innerHTML = HAZ.map(function (e) { return '<div class="ev' + (e.good ? ' good' : '') + '"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '</div>'; }).join('');
+  var BCOL = { D: '#4FD8FF', C: '#FF6B8A', K: '#FF6B8A', T: '#FFD166' };
+  var lay = { b: 1, v: 1, h: 1 }, selB = 0, mapT = null;
+  var VOLP = (function () { var out = []; VOLC.forEach(function (v) { if (v.length === 1) { out.push(v[0]); return; }
+    for (var i = 0; i < v.length - 1; i++) { var a = v[i], c = v[i + 1], n = Math.max(1, Math.round(Math.hypot(c[0] - a[0], c[1] - a[1]) / 3)); for (var k = 0; k < n; k++) out.push([a[0] + (c[0] - a[0]) * k / n, a[1] + (c[1] - a[1]) * k / n]); }
+    out.push(v[v.length - 1]); }); return out; })();
+  function drawB() {
+    var cv = $('cvB'), w = cv.clientWidth || 600; cv.dataset.h = Math.round(clamp(w * .52, 200, 440));
+    var c = fit(cv), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var sc = Math.min((W - 10) / 5.45, (H - 10) / 2.66), cx = W / 2, cy = H / 2;
+    var P = function (lon, lat) { var q = eqe(lon, lat); return [cx + q[0] * sc, cy - q[1] * sc]; };
+    mapT = P;
+    x.beginPath(); for (var la = -90; la <= 90; la += 3) { var q = P(-180, la); if (la === -90) x.moveTo(q[0], q[1]); else x.lineTo(q[0], q[1]); }
+    for (var lb = 90; lb >= -90; lb -= 3) { var q2 = P(180, lb); x.lineTo(q2[0], q2[1]); } x.closePath(); x.fillStyle = '#0c1c4a'; x.fill();
+    x.strokeStyle = 'rgba(120,150,220,.12)'; x.lineWidth = 1;
+    for (var lo = -150; lo <= 150; lo += 30) { x.beginPath(); for (var l2 = -90; l2 <= 90; l2 += 5) { var g = P(lo, l2); if (l2 === -90) x.moveTo(g[0], g[1]); else x.lineTo(g[0], g[1]); } x.stroke(); }
+    for (var lt = -60; lt <= 60; lt += 30) { x.beginPath(); for (var o2 = -180; o2 <= 180; o2 += 5) { var g2 = P(o2, lt); if (o2 === -180) x.moveTo(g2[0], g2[1]); else x.lineTo(g2[0], g2[1]); } x.stroke(); }
+    if (GEO) Object.keys(GEO).forEach(function (k) { GEO[k].forEach(function (ring) {
+      x.beginPath(); ring.forEach(function (p, i) { var q3 = P(p[0], p[1]); if (i) x.lineTo(q3[0], q3[1]); else x.moveTo(q3[0], q3[1]); }); x.closePath();
+      x.fillStyle = '#2f3d68'; x.fill(); x.strokeStyle = '#4c5d96'; x.lineWidth = .8; x.stroke(); }); });
+    if (lay.b) BND.forEach(function (b) {
+      x.beginPath(); b[1].forEach(function (p, i) { var q5 = P(p[0], p[1]); if (i) x.lineTo(q5[0], q5[1]); else x.moveTo(q5[0], q5[1]); });
+      x.strokeStyle = BCOL[b[0]]; x.lineWidth = W < 500 ? 1.6 : 2.4; if (b[0] === 'T') x.setLineDash([6, 4]); x.stroke(); x.setLineDash([]);
+    });
+    if (lay.h) HOT.forEach(function (h) { var q9 = P(h[0], h[1]), r = (W < 500 ? 7 : 10) + Math.sin(tA * 3) * 1.5; x.strokeStyle = '#C9A2FF'; x.lineWidth = 2; x.beginPath(); x.arc(q9[0], q9[1], r, 0, 6.283); x.stroke();
+      if (W > 600) label(x, h[2], q9[0], q9[1] + r + 12, '#C9A2FF', 11); });
+    if (lay.v) VOLP.forEach(function (v) { var q6 = P(v[0], v[1]), r = W < 500 ? 3 : 4.2; x.fillStyle = '#FF4D2E'; x.strokeStyle = '#05081a'; x.lineWidth = .8;
+      x.beginPath(); x.moveTo(q6[0], q6[1] - r); x.lineTo(q6[0] + r * .9, q6[1] + r * .7); x.lineTo(q6[0] - r * .9, q6[1] + r * .7); x.closePath(); x.fill(); x.stroke(); });
+    if (lay.v && W > 520) { var rf = P(-160, 32); label(x, 'วงแหวนแห่งไฟ', rf[0], rf[1], '#FF8FA6', 13); var rf2 = P(160, 30); label(x, 'วงแหวนแห่งไฟ', rf2[0], rf2[1], '#FF8FA6', 13); }
+    var bk = P(100.5, 13.75); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(bk[0], bk[1], 3.4, 0, 6.283); x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.stroke();
+    label(x, 'ไทย', bk[0] - 4, bk[1] + (W < 500 ? 12 : 15), '#FFD166', W < 500 ? 10 : 12, 'right');
+    SITES.forEach(function (s, i) {
+      var q8 = P(s.lon, s.lat), on = i === selB, done = S.recB[i];
+      if (on) { var pr = 12 + 4 * Math.sin(tA * 4); x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.arc(q8[0], q8[1], pr, 0, 6.283); x.stroke(); }
+      x.fillStyle = done ? '#5EF2A5' : '#E8EDFF'; x.strokeStyle = '#05081a'; x.lineWidth = 2; x.beginPath(); x.arc(q8[0], q8[1], W < 500 ? 7 : 9, 0, 6.283); x.fill(); x.stroke();
+      x.font = '700 ' + (W < 500 ? 9 : 11) + 'px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(String(i + 1), q8[0], q8[1] + (W < 500 ? 3 : 4));
+      if (on && W > 420) label(x, s.n, q8[0], q8[1] - 18, '#FFD166', 12);
+    });
+  }
+  function updB() {
+    var h = '<span class="lbl">ชั้นข้อมูล</span>';
+    [['b', 'รอยต่อแผ่นธรณี'], ['v', 'ภูเขาไฟ'], ['h', 'จุดร้อน']].forEach(function (z) { h += '<button class="chip' + (lay[z[0]] ? ' on' : '') + '" data-l="' + z[0] + '">' + z[1] + '</button>'; });
+    $('layChips').innerHTML = h; bindChips($('layChips'), 'l', function (v) { lay[v] = lay[v] ? 0 : 1; updB(); drawB(); });
+    h = '<span class="lbl">ภูเขาไฟ</span>';
+    SITES.forEach(function (s, i) { h += '<button class="chip' + (i === selB ? ' on' : '') + (S.recB[i] ? ' done' : '') + '" data-s="' + i + '">' + (i + 1) + ' ' + s.n + '</button>'; });
+    $('siteChips').innerHTML = h; bindChips($('siteChips'), 's', function (v) { selB = +v; updB(); drawB(); });
+    var s = SITES[selB], ok = S.recB[selB];
+    $('bName').textContent = (selB + 1) + ' ' + s.n + ' (' + s.c + ')';
+    $('bClue').textContent = s.clue;
+    $('bData').innerHTML = '<div><div class="k">แมกมา</div><div class="d">' + s.mag + '</div></div><div><div class="k">รูปร่าง</div><div class="d">' + s.shape + '</div></div>';
+    $('bAsk').innerHTML = BTYPE.map(function (b, j) { return '<button data-j="' + j + '" class="' + (ok && j === s.a ? 'ok' : '') + '">' + b + '</button>'; }).join('');
+    Array.prototype.forEach.call($('bAsk').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.recB[selB]) return; var j = +b.getAttribute('data-j');
+        if (j === SITES[selB].a) { S.recB[selB] = 1; save(); updB(); drawB(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('bStory').innerHTML = ok ? 'ถูกต้อง : ตั้งอยู่ที่<b>' + BTYPE[s.a] + '</b><br><b>ภัยเด่น : ' + s.haz + '</b> · ' + s.story : '';
+    var n = 0, rows = '';
+    SITES.forEach(function (z, i) { var r = S.recB[i]; if (r) n++;
+      rows += '<tr' + (i === selB ? ' class="cur"' : '') + '><td class="n">' + (i + 1) + ' ' + z.n + '</td><td>' + (r ? BSHORT[z.a] : '-') + '</td><td>' + (r ? z.haz : '-') + '</td></tr>'; });
+    $('logB').innerHTML = rows;
+    $('progB').innerHTML = 'ตามหาแล้ว <b>' + n + '/6</b>' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ C ได้' : '');
+  }
+  $('cvB').onclick = function (ev) {
+    if (!mapT) return; var r = this.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, best = -1, bd = 22;
+    SITES.forEach(function (s, i) { var q = mapT(s.lon, s.lat), d = Math.hypot(q[0] - mx, q[1] - my); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) { selB = best; updB(); drawB(); }
+  };
+
+  // ================================================================ ภารกิจ C ศูนย์เฝ้าระวัง
+  // ข้อมูลสมมติ : จุดอ้างอิง [วัน, ค่า] แล้วประมาณค่าระหว่างจุด
+  var KEQ = [[1, 3], [5, 5], [10, 25], [15, 60], [20, 120], [24, 250], [27, 400], [30, 650]];
+  var KINF = [[1, 0], [5, .3], [10, 2], [15, 4.5], [20, 8], [24, 12], [27, 15], [30, 18]];
+  var KSO2 = [[1, 100], [5, 150], [10, 400], [15, 900], [20, 2000], [24, 3500], [27, 5000], [30, 8000]];
+  function interp(K, d) { for (var i = 0; i < K.length - 1; i++) if (d <= K[i + 1][0]) { var f = (d - K[i][0]) / (K[i + 1][0] - K[i][0]); return K[i][1] + (K[i + 1][1] - K[i][1]) * f; } return K[K.length - 1][1]; }
+  var DAYS = [{ d: 1, lv: 0, note: 'ภูเขาไฟสงบ มีไอน้ำบาง ๆ ที่ปากปล่อง' }, { d: 10, lv: 1, note: 'แผ่นดินไหวเล็ก ๆ ถี่ขึ้น พื้นดินเริ่มโป่ง' },
+    { d: 20, lv: 2, note: 'แผ่นดินไหวถี่มาก พื้นดินโป่งเร็ว แก๊สพุ่งสูง' }, { d: 27, lv: 3, note: 'สั่นต่อเนื่องแทบไม่หยุด เริ่มพ่นเถ้าเป็นระยะ' }];
+  var LV = [['เขียว · ปกติ', '#5EF2A5'], ['เหลือง · เฝ้าระวัง', '#FFD166'], ['ส้ม · เตรียมพร้อม', '#FF9F6B'], ['แดง · อพยพ', '#FF4D5E']];
+  var LVHINT = ['ดูจำนวนแผ่นดินไหวเทียบกับคู่มือด้านล่าง', 'ลองเทียบตัวเลขแผ่นดินไหวกับคู่มือระดับเตือนภัย', 'ค่าทุกอย่างสูงขึ้นเร็ว ยังไม่ปะทุแต่ต้องเตรียมพร้อม', 'สั่นต่อเนื่องและเริ่มพ่นเถ้า ต้องอพยพทันที'];
+  var selD = 0, eruptC = 0;
+  function vals(d) { return { eq: Math.round(interp(KEQ, d)), inf: Math.round(interp(KINF, d) * 10) / 10, so2: Math.round(interp(KSO2, d) / 50) * 50 }; }
+  function allC() { return DAYS.every(function (z, i) { return S.recC[i]; }); }
+  function updC1() {
+    var h = '<span class="lbl">รายงาน</span>';
+    DAYS.forEach(function (z, i) { h += '<button class="chip' + (i === selD && !eruptC ? ' on' : '') + (S.recC[i] ? ' done' : '') + '" data-d="' + i + '">วันที่ ' + z.d + '</button>'; });
+    h += '<button class="chip' + (eruptC ? ' on' : '') + '" data-d="E"' + (allC() ? '' : ' disabled') + '>วันที่ 30</button>';
+    $('dayChips').innerHTML = h; bindChips($('dayChips'), 'd', function (v) { if (v === 'E') { eruptC = 1; } else { eruptC = 0; selD = +v; } updC1(); drawC1(); });
+    var Dd = eruptC ? { d: 30 } : DAYS[selD], V = vals(Dd.d);
+    $('cDay').textContent = 'วันที่ ' + Dd.d + ' จาก 30';
+    $('cEq').textContent = fmt(V.eq); $('cInf').textContent = fmt(V.inf); $('cSo2').textContent = fmt(V.so2);
+    if (eruptC) {
+      $('cNote').textContent = 'ภูผาเพลิงปะทุ พ่นเถ้าสูงและเกิดหินร้อนไหลหลากลงทางทิศใต้';
+      $('lvChips').innerHTML = ''; $('cMsg').innerHTML = '<b style="color:#5EF2A5">ทุกคนอพยพออกจากเขตเสี่ยงทันเวลา เพราะศูนย์เฝ้าระวังประกาศเตือนตามสัญญาณ</b> · บทเรียน : การเฝ้าระวังอย่างต่อเนื่องช่วยชีวิตได้ เช่น ปินาตูโบ พ.ศ. 2534';
+      return;
+    }
+    $('cNote').textContent = Dd.note;
+    var got = S.recC[selD];
+    h = '';
+    LV.forEach(function (l, i) { h += '<button class="chip al' + i + (got && i === Dd.lv ? ' ok' : '') + '" data-v="' + i + '">' + l[0] + '</button>'; });
+    $('lvChips').innerHTML = h;
+    bindChips($('lvChips'), 'v', function (v, b) { if (S.recC[selD]) return;
+      if (+v === DAYS[selD].lv) { S.recC[selD] = 1; save(); updC1(); drawC1(); }
+      else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); $('cMsg').textContent = 'ยังไม่ถูก ' + LVHINT[selD]; } });
+    $('cMsg').innerHTML = got ? '<span style="color:#5EF2A5">ประกาศถูกต้อง : ' + LV[Dd.lv][0] + '</span>' : 'เลือกระดับเตือนภัยที่เหมาะสมกับข้อมูลวันนี้';
+    var rows = '', n = 0;
+    DAYS.forEach(function (z, i) { var r = S.recC[i], v = vals(z.d); if (r) n++;
+      rows += '<tr' + (i === selD ? ' class="cur"' : '') + '><td>' + z.d + '</td><td>' + fmt(v.eq) + '</td><td>' + fmt(v.inf) + '</td><td>' + fmt(v.so2) + '</td><td>' + (r ? '<b style="color:' + LV[z.lv][1] + '">' + LV[z.lv][0] + '</b>' : '-') + '</td></tr>'; });
+    $('logC').innerHTML = rows;
+    $('progC').innerHTML = 'ประกาศถูกแล้ว <b>' + n + '/4</b>' + (n === 4 ? ' · ครบแล้ว กด "วันที่ 30" ดูผล แล้วไปขั้นที่ 2' : '');
+  }
+  function drawC1() {
+    var cv = $('cvC1'), w = cv.clientWidth || 600; cv.dataset.h = w < 520 ? 400 : 330;
+    var c = fit(cv), x = c.x, W = c.W, H = c.H, day = eruptC ? 30 : DAYS[selD].d, lvNow = eruptC ? 3 : DAYS[selD].lv;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var narrow = W < 520, cam = narrow ? { x: 8, y: 8, w: W - 16, h: 120 } : { x: 8, y: 8, w: W * .38, h: H - 16 };
+    // กล้องเฝ้าดูภูเขาไฟ
+    x.save(); x.beginPath(); x.rect(cam.x, cam.y, cam.w, cam.h); x.clip();
+    var sk = x.createLinearGradient(0, cam.y, 0, cam.y + cam.h); sk.addColorStop(0, '#13204d'); sk.addColorStop(1, '#3a2d4a'); x.fillStyle = sk; x.fillRect(cam.x, cam.y, cam.w, cam.h);
+    var bx = cam.x + cam.w / 2, by = cam.y + cam.h * .86, vh = cam.h * .5, vw = Math.min(cam.w * .42, vh * 1.25);
+    var plume = [6, 14, 26, 40][lvNow] * (cam.h / 160) + (eruptC ? cam.h * .5 : 0);
+    for (var i = 0; i < 14; i++) { var f = i / 13, yy = by - vh - plume * f, rr = 3 + f * (6 + lvNow * 3) + (eruptC ? f * 12 : 0);
+      x.fillStyle = lvNow >= 3 ? 'rgba(130,120,125,.85)' : 'rgba(220,225,240,' + (.35 + .1 * lvNow) + ')'; x.beginPath(); x.arc(bx + Math.sin(tA * 1.3 + i) * 3 * f + f * 10, yy, rr, 0, 6.283); x.fill(); }
+    x.fillStyle = '#4a3f52'; x.beginPath(); x.moveTo(bx - vw, by); x.lineTo(bx - 7, by - vh); x.lineTo(bx + 7, by - vh); x.lineTo(bx + vw, by); x.closePath(); x.fill();
+    if (lvNow >= 2) glow(x, bx, by - vh, 10 + lvNow * 6, [255, 110, 50], .25 + .15 * (lvNow - 2));
+    if (eruptC) { for (var k = 0; k < 3; k++) { var s = frac(tA * .35 + k / 3) * vw; x.fillStyle = 'rgba(150,120,110,' + (.8 - s / vw * .5) + ')'; x.beginPath(); x.arc(bx + s * .9, by - vh + s * vh / vw * .95 - 4, 5 + s / vw * 9, 0, 6.283); x.fill(); } }
+    x.fillStyle = '#1d2a1f'; x.fillRect(cam.x, by, cam.w, cam.h);
+    x.restore();
+    x.strokeStyle = LV[lvNow][1]; x.lineWidth = 2; x.strokeRect(cam.x + 1, cam.y + 1, cam.w - 2, cam.h - 2);
+    label(x, 'กล้องเฝ้าระวัง · วันที่ ' + day, cam.x + 8, cam.y + 18, '#E8EDFF', 12, 'left');
+    var known = eruptC || S.recC[selD];
+    label(x, eruptC ? 'ภูเขาไฟปะทุ' : 'ระดับ : ' + (known ? LV[lvNow][0] : '?'), cam.x + 8, cam.y + cam.h - 10, known ? LV[lvNow][1] : '#9AA6CF', 12, 'left');
+    // กราฟ 3 ชุด
+    var gx = narrow ? 8 : cam.x + cam.w + 14, gw = narrow ? W - 16 : W - gx - 8, gy0 = narrow ? cam.y + cam.h + 12 : 8, gh = ((narrow ? H - gy0 - 8 : H - 16) - 16) / 3;
+    var SER = [['แผ่นดินไหว (ครั้ง/วัน)', KEQ, 700, '#4FD8FF', 'bar'], ['พื้นดินโป่ง (ซม.)', KINF, 20, '#5EF2A5', 'line'], ['แก๊ส SO₂ (ตัน/วัน)', KSO2, 8500, '#FF9F6B', 'line']];
+    SER.forEach(function (se, j) {
+      var y = gy0 + j * (gh + 8), px = function (d) { return gx + 4 + (d - 1) / 29 * (gw - 8); }, py = function (v) { return y + gh - 4 - v / se[2] * (gh - 22); };
+      x.fillStyle = 'rgba(17,26,61,.8)'; x.fillRect(gx, y, gw, gh); x.strokeStyle = '#2C3A73'; x.lineWidth = 1; x.strokeRect(gx + .5, y + .5, gw - 1, gh - 1);
+      if (j === 0) [10, 50, 200].forEach(function (t, ti) { var ty = py(t); x.strokeStyle = [LV[1][1], LV[2][1], LV[3][1]][ti]; x.globalAlpha = .45; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(gx + 2, ty); x.lineTo(gx + gw - 2, ty); x.stroke(); x.setLineDash([]); x.globalAlpha = 1; });
+      if (se[4] === 'bar') { for (var d = 1; d <= day; d++) { var v = interp(se[1], d) * (.8 + .4 * hash(d, 9)), bh = v / se[2] * (gh - 22); x.fillStyle = se[3]; x.fillRect(px(d) - 2, y + gh - 4 - bh, 4, bh); } }
+      else { x.strokeStyle = se[3]; x.lineWidth = 2; x.beginPath(); for (var d2 = 1; d2 <= day; d2 += .5) { var yy2 = py(interp(se[1], d2)); if (d2 === 1) x.moveTo(px(d2), yy2); else x.lineTo(px(d2), yy2); } x.stroke();
+        x.fillStyle = se[3]; x.beginPath(); x.arc(px(day), py(interp(se[1], day)), 3.5, 0, 6.283); x.fill(); }
+      label(x, se[0], gx + 8, y + 15, se[3], 12, 'left');
+      label(x, 'ค่าวันที่ ' + day + ' : ' + fmt(j === 0 ? vals(day).eq : (j === 1 ? vals(day).inf : vals(day).so2)), gx + gw - 6, y + 15, '#E8EDFF', 12, 'right');
+    });
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 2 แผนที่พื้นที่เสี่ยง (หน่วย กม. : x ตะวันออก y เหนือ)
+  var VIL = [{ k: 'ก', x: 1, y: 4 }, { k: 'ข', x: 13, y: -12 }, { k: 'ค', x: 24, y: 3 }, { k: 'ง', x: -20, y: 2 }];
+  var SAFE = { x: -30, y: -9 };
+  var RIVER = [[2, -2], [6, -6], [10, -9.5], [13, -12], [18, -16], [24, -21], [30, -26]];
+  var WIND = [['ลมพัดไปทางตะวันออก', 1, 0], ['ลมพัดไปทางตะวันตก', -1, 0], ['ลมพัดไปทางใต้', 0, -1]];
+  var ZN = [['x', 'เขตห้ามเข้า'], ['p', 'หินร้อนไหลหลาก'], ['a', 'เถ้าตกหนัก'], ['l', 'ลาฮาร์'], ['e', 'เส้นทางอพยพ']];
+  var zon = { x: 1, p: 1, a: 1, l: 1, e: 1 }, wind = 0, selV = 0, mapC = null;
+  function nearRiver(px, py) { var best = 99; for (var i = 0; i < RIVER.length - 1; i++) { var a = RIVER[i], b = RIVER[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], t = clamp(((px - a[0]) * dx + (py - a[1]) * dy) / (dx * dx + dy * dy), 0, 1);
+    best = Math.min(best, Math.hypot(px - a[0] - dx * t, py - a[1] - dy * t)); } return best; }
+  function inAsh(px, py) { var w = WIND[wind], al = px * w[1] + py * w[2], lat = -px * w[2] + py * w[1]; return Math.pow((al - 20) / 23, 2) + Math.pow(lat / 7, 2) <= 1; }
+  function risks(v) { var r = [], d = Math.hypot(v.x, v.y);
+    if (d <= 5) r.push(['เขตห้ามเข้า', 'n']); if (d <= 10 || (nearRiver(v.x, v.y) < 2 && d <= 14)) r.push(['หินร้อนไหลหลาก', 'n']);
+    if (inAsh(v.x, v.y)) r.push(['เถ้าตกหนัก', 'm']); if (nearRiver(v.x, v.y) < 2.5) r.push(['ลาฮาร์', 'm']); return r; }
+  var ADV = { 'ก': 'อยู่ใกล้ปล่องเพียง 4 กม. อยู่ในเขตห้ามเข้า ต้องอพยพเป็นหมู่บ้านแรกตั้งแต่ระดับเตรียมพร้อม',
+    'ข': 'อยู่ริมแม่น้ำที่ไหลจากภูเขาไฟ เมื่อฝนตกหนัก เถ้าบนลาดเขากลายเป็นลาฮาร์ไหลมาตามลำน้ำ ต้องเฝ้าระวังแม้ภูเขาไฟสงบแล้ว',
+    'ค': 'อยู่ห่าง 24 กม. ปลอดภัยจากหินร้อนไหลหลาก แต่ถ้าลมพัดไปทางตะวันออก เถ้าจะตกหนัก ต้องเตรียมหน้ากาก ปิดบ้าน กวาดเถ้าบนหลังคา',
+    'ง': 'อยู่ห่าง 20 กม. บนเนินทางตะวันตก ปลอดภัยเกือบทุกภัย ยกเว้นเมื่อลมพัดไปทางตะวันตก เถ้าจะตกมาที่หมู่บ้านนี้' };
+  function drawC2() {
+    var cv = $('cvC2'), c = fit(cv), x = c.x, W = c.W, H = c.H, cx = W * .46, cy = H * .44, s = Math.min(W, H) / 70;
+    var P = function (kx, ky) { return [cx + kx * s, cy - ky * s]; }; mapC = P;
+    x.fillStyle = '#16261d'; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(255,255,255,.06)'; x.lineWidth = 1;
+    for (var gx = -60; gx <= 60; gx += 5) { var a = P(gx, -60), b = P(gx, 60); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); var e = P(-60, gx), f = P(60, gx); x.beginPath(); x.moveTo(e[0], e[1]); x.lineTo(f[0], f[1]); x.stroke(); }
+    for (var r = 12; r >= 2; r -= 2.5) { var q = P(0, 0); x.fillStyle = 'rgba(' + (90 + (12 - r) * 6) + ',' + (80 + (12 - r) * 3) + ',' + (75 + (12 - r) * 4) + ',.9)'; x.beginPath(); x.arc(q[0], q[1], r * s, 0, 6.283); x.fill(); }
+    // แม่น้ำ
+    x.strokeStyle = '#3d7fd0'; x.lineWidth = 2.5; x.beginPath(); RIVER.forEach(function (p, i) { var q1 = P(p[0], p[1]); if (i) x.lineTo(q1[0], q1[1]); else x.moveTo(q1[0], q1[1]); }); x.stroke();
+    if (zon.a) { var w = WIND[wind], ang = Math.atan2(-w[2], w[1]), ac = P(w[1] * 20, w[2] * 20); x.save(); x.translate(ac[0], ac[1]); x.rotate(ang); x.fillStyle = 'rgba(154,163,181,.45)'; x.beginPath(); x.ellipse(0, 0, 23 * s, 7 * s, 0, 0, 6.283); x.fill(); x.restore(); }
+    if (zon.l) { x.strokeStyle = 'rgba(176,122,74,.85)'; x.lineWidth = 2.5 * 2 * s; x.lineCap = 'round'; x.beginPath(); RIVER.forEach(function (p, i) { var q2 = P(p[0], p[1]); if (i) x.lineTo(q2[0], q2[1]); else x.moveTo(q2[0], q2[1]); }); x.stroke(); x.lineCap = 'butt';
+      x.strokeStyle = '#3d7fd0'; x.lineWidth = 2; x.beginPath(); RIVER.forEach(function (p, i) { var q3 = P(p[0], p[1]); if (i) x.lineTo(q3[0], q3[1]); else x.moveTo(q3[0], q3[1]); }); x.stroke(); }
+    if (zon.p) { var q4 = P(0, 0); x.fillStyle = 'rgba(255,159,107,.38)'; x.beginPath(); x.arc(q4[0], q4[1], 10 * s, 0, 6.283); x.fill();
+      x.strokeStyle = 'rgba(255,159,107,.38)'; x.lineWidth = 4 * s; x.lineCap = 'round'; x.beginPath(); var r0 = P(RIVER[0][0], RIVER[0][1]); x.moveTo(r0[0], r0[1]); for (var ri = 1; ri < 4; ri++) { var rq = P(RIVER[ri][0], RIVER[ri][1]); x.lineTo(rq[0], rq[1]); } x.stroke(); x.lineCap = 'butt'; }
+    if (zon.x) { var q5 = P(0, 0); x.fillStyle = 'rgba(255,77,94,.3)'; x.strokeStyle = '#FF4D5E'; x.lineWidth = 2; x.setLineDash([6, 4]); x.beginPath(); x.arc(q5[0], q5[1], 5 * s, 0, 6.283); x.fill(); x.stroke(); x.setLineDash([]); }
+    var vq = P(0, 0); x.fillStyle = '#2a1c1c'; x.beginPath(); x.arc(vq[0], vq[1], 1.2 * s + 2, 0, 6.283); x.fill(); glow(x, vq[0], vq[1], 2.5 * s + 6, [255, 110, 50], .7);
+    label(x, 'ภูผาเพลิง', vq[0] - 2.4 * s - 6, vq[1] + 4, '#FFD166', 13, 'right');
+    if (zon.e) { x.strokeStyle = '#5EF2A5'; x.lineWidth = 2.5; x.setLineDash([7, 5]);
+      VIL.forEach(function (v) { var a1 = P(v.x, v.y), m = v.k === 'ข' ? P(0, -22) : (v.k === 'ค' ? P(20, 20) : (v.k === 'ก' ? P(-8, 14) : null)), sf = P(SAFE.x, SAFE.y);
+        x.beginPath(); x.moveTo(a1[0], a1[1]); if (m) x.quadraticCurveTo(m[0], m[1], sf[0], sf[1]); else x.lineTo(sf[0], sf[1]); x.stroke(); });
+      x.setLineDash([]); }
+    var sq = P(SAFE.x, SAFE.y); x.fillStyle = '#5EF2A5'; x.fillRect(sq[0] - 7, sq[1] - 7, 14, 14); label(x, 'ศูนย์อพยพ', sq[0], sq[1] + 22, '#5EF2A5', 12);
+    VIL.forEach(function (v, i) { var q6 = P(v.x, v.y), on = i === selV;
+      if (on) { x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.arc(q6[0], q6[1], 13 + 2 * Math.sin(tA * 4), 0, 6.283); x.stroke(); }
+      x.fillStyle = '#E8EDFF'; x.strokeStyle = '#05081a'; x.lineWidth = 2; x.beginPath(); x.arc(q6[0], q6[1], 9, 0, 6.283); x.fill(); x.stroke();
+      x.font = '700 12px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(v.k, q6[0], q6[1] + 4); });
+    var w2 = WIND[wind], wc = [W - 44, 40]; x.strokeStyle = 'rgba(255,255,255,.2)'; x.lineWidth = 1; x.beginPath(); x.arc(wc[0], wc[1], 26, 0, 6.283); x.stroke();
+    arrow(x, wc[0] - w2[1] * 20, wc[1] + w2[2] * 20, wc[0] + w2[1] * 20, wc[1] - w2[2] * 20, '#E8EDFF', 3, 10);
+    label(x, 'ทิศลม', wc[0], wc[1] + 42, '#E8EDFF', 11); label(x, 'N', wc[0], wc[1] - 30, '#9AA6CF', 11);
+    var sb = P(-30, -27), sb2 = P(-20, -27); x.strokeStyle = '#E8EDFF'; x.lineWidth = 2; x.beginPath(); x.moveTo(sb[0], sb[1]); x.lineTo(sb2[0], sb2[1]); x.stroke(); label(x, '10 กม.', (sb[0] + sb2[0]) / 2, sb[1] - 6, '#E8EDFF', 11);
+  }
+  function updC2() {
+    var h = '<span class="lbl">ทิศลม</span>';
+    WIND.forEach(function (w, i) { h += '<button class="chip' + (i === wind ? ' on' : '') + '" data-w="' + i + '">' + w[0] + '</button>'; });
+    $('windChips').innerHTML = h; bindChips($('windChips'), 'w', function (v) { wind = +v; updC2(); drawC2(); });
+    h = '<span class="lbl">ชั้นข้อมูลภัย</span>';
+    ZN.forEach(function (z) { h += '<button class="chip' + (zon[z[0]] ? ' on' : '') + '" data-z="' + z[0] + '">' + z[1] + '</button>'; });
+    $('zoneChips').innerHTML = h; bindChips($('zoneChips'), 'z', function (v) { zon[v] = zon[v] ? 0 : 1; updC2(); drawC2(); });
+    h = ''; VIL.forEach(function (v, i) { h += '<button class="chip' + (i === selV ? ' on' : '') + '" data-v="' + i + '">หมู่บ้าน ' + v.k + '</button>'; });
+    $('vilChips').innerHTML = h; bindChips($('vilChips'), 'v', function (v) { selV = +v; updC2(); drawC2(); });
+    var V = VIL[selV], R = risks(V);
+    $('vName').textContent = 'หมู่บ้าน ' + V.k;
+    $('vDist').textContent = 'ห่างจากปากปล่องราว ' + Math.round(Math.hypot(V.x, V.y)) + ' กม.';
+    $('vRisk').innerHTML = R.length ? R.map(function (z) { return '<span class="lvl ' + z[1] + '">' + z[0] + '</span>'; }).join('') : '<span class="lvl y">ค่อนข้างปลอดภัย (ตอนนี้)</span>';
+    $('vAdv').textContent = ADV[V.k];
+  }
+  $('cvC2').onclick = function (ev) {
+    if (!mapC) return; var r = this.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, best = -1, bd = 24;
+    VIL.forEach(function (v, i) { var q = mapC(v.x, v.y), d = Math.hypot(q[0] - mx, q[1] - my); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) { selV = best; updC2(); drawC2(); }
+  };
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส
+  var CL = [
+    { L: 'C', q: 'เครื่องวัดพบแผ่นดินไหวถี่ขึ้นมากใต้ภูเขาไฟ และพื้นดินโป่งพองขึ้น แสดงว่าอะไรกำลังเกิดขึ้น', o: ['ภูเขาไฟกำลังดับ', 'แมกมากำลังเคลื่อนขึ้นมา', 'แผ่นธรณีหยุดเคลื่อนที่', 'ฝนกำลังจะตกหนัก'], a: 1,
+      w: 'แมกมาที่ดันขึ้นมาทำให้หินแตก (แผ่นดินไหว) และดันพื้นดินให้โป่ง แก๊สที่แยกตัวออกมาจึงเพิ่มขึ้นด้วย' },
+    { L: 'R', q: 'ภัยใดร้อนหลายร้อยองศา ไหลลงลาดเขาเร็วกว่ารถยนต์ จนหนีไม่ทัน ต้องอพยพก่อนเกิด', o: ['ลาวาไหลหลาก', 'เถ้าภูเขาไฟ', 'หินร้อนไหลหลาก', 'แก๊สกำมะถัน'], a: 2,
+      w: 'หินร้อนไหลหลากเร็วได้กว่า 100 กม./ชม. เป็นภัยที่คร่าชีวิตคนมากที่สุด ส่วนลาวาส่วนใหญ่ไหลช้า' },
+    { L: 'A', q: 'หมู่บ้าน ข อยู่ริมแม่น้ำที่ไหลจากภูเขาไฟ หลังการปะทุมีฝนตกหนัก หมู่บ้านนี้เสี่ยงภัยใดมากที่สุด', o: ['ลาฮาร์ (โคลนภูเขาไฟไหลหลาก)', 'สึนามิ', 'ลาวาไหลหลาก', 'ไม่มีภัยใดเลย'], a: 0,
+      w: 'ฝนชะเถ้าบนลาดเขากลายเป็นโคลนไหลไปตามลำน้ำ ไกลหลายสิบกิโลเมตร เช่น ปินาตูโบหลังปี 2534' },
+    { L: 'T', q: 'วันที่ภูผาเพลิงปะทุ ลมพัดไปทางตะวันออก หมู่บ้านใดได้รับเถ้ามากที่สุด', o: ['หมู่บ้าน ค', 'หมู่บ้าน ง', 'ศูนย์อพยพ', 'ทุกหมู่บ้านเท่ากัน'], a: 0,
+      w: 'เถ้าลอยไปตามลม หมู่บ้าน ค อยู่ทางตะวันออก จึงอยู่ใต้ลม การวางแผนจึงต้องดูทิศลมด้วย' },
+    { L: 'E', q: 'เถ้าภูเขาไฟตกลงมาในเมืองที่เราอยู่ ควรปฏิบัติตนอย่างไร', o: ['ออกไปถ่ายรูปกลางแจ้ง', 'สวมหน้ากาก N95 อยู่ในอาคาร ปิดประตูหน้าต่าง', 'ฉีดน้ำล้างเถ้าลงท่อระบายน้ำ', 'ใส่คอนแทกต์เลนส์ป้องกันตา'], a: 1,
+      w: 'เถ้าละเอียดและคม ทำร้ายปอดและตา ควรอยู่ในอาคาร ใส่หน้ากาก แว่นตา (ไม่ใส่คอนแทกต์เลนส์) และไม่ล้างเถ้าลงท่อเพราะจะอุดตัน' },
+    { L: 'R', q: 'ศูนย์เฝ้าระวังประกาศ "ระดับแดง" ประชาชนในเขตเสี่ยงควรทำอย่างไร', o: ['ขึ้นไปดูปากปล่องใกล้ ๆ', 'รอให้เห็นลาวาก่อนค่อยหนี', 'อพยพตามเส้นทางที่กำหนดไปศูนย์อพยพทันที', 'หลบในบ้านริมแม่น้ำ'], a: 2,
+      w: 'ทำตามประกาศทันที ใช้เส้นทางอพยพที่กำหนด ไม่ข้ามลำน้ำ ไม่เข้าใกล้ภูเขาไฟ ติดตามข่าวจากหน่วยงานทางการ' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- ขั้นที่ 4 คลังภูเขาไฟสำหรับสืบค้น
+  var LIB = [
+    { y: 'ญี่ปุ่น', n: 'ฟูจิ และซากุระจิมะ', d: 'ซากุระจิมะพ่นเถ้าลงเมืองคาโงชิมะบ่อยครั้ง คนในเมืองมีถุงเก็บเถ้าและซ้อมอพยพ ฟูจิมีแผนที่พื้นที่เสี่ยงภัย', i: 'หน่วยเฝ้าระวัง : สำนักอุตุนิยมวิทยาญี่ปุ่น (JMA)' },
+    { y: 'อินโดนีเซีย', n: 'อากุง (บาหลี) และเมราปี (ชวา)', d: 'อากุงปะทุ พ.ศ. 2560 สนามบินบาหลีปิดหลายวัน เมราปีปะทุ พ.ศ. 2553 หินร้อนไหลหลาก มีผู้เสียชีวิตราว 350 คน', i: 'หน่วยเฝ้าระวัง : PVMBG (ระดับเตือนภัย 4 ระดับ)' },
+    { y: 'ฟิลิปปินส์', n: 'ตาอาล และมายอน', d: 'ตาอาลอยู่ใกล้กรุงมะนิลา ปะทุ พ.ศ. 2563 อพยพหลายแสนคน มายอนเป็นกรวยสวยที่ปะทุบ่อย', i: 'หน่วยเฝ้าระวัง : PHIVOLCS' },
+    { y: 'อิตาลี', n: 'เอตนา และวิสุเวียส', d: 'เอตนาปะทุบ่อย ลาวาไหลเป็นประจำ วิสุเวียสมีผู้คนหลายแสนอาศัยในเขตเสี่ยง มีแผนอพยพเขตแดง', i: 'หน่วยเฝ้าระวัง : INGV' },
+    { y: 'ตองกา', n: 'ฮุงกาตองกา-ฮุงกาฮาอะไป', d: 'ภูเขาไฟใต้ทะเลระเบิด ม.ค. 2565 เกิดสึนามิทั่วแปซิฟิก และคลื่นความดันอากาศเดินทางรอบโลก', i: 'ตัวอย่างภัยสึนามิจากภูเขาไฟ' },
+    { y: 'สหรัฐอเมริกา', n: 'เซนต์เฮเลนส์ และคีเลาเวีย', d: 'เซนต์เฮเลนส์ระเบิดด้านข้าง พ.ศ. 2523 ยอดเขาหายไปราว 400 ม. คีเลาเวียลาวาไหลบ่อย', i: 'หน่วยเฝ้าระวัง : USGS (ระดับเตือนภัย 4 ระดับ)' }
+  ];
+  $('lib').innerHTML = LIB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawA();
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (shakeA > 0) shakeA = Math.max(0, shakeA - dt);
+    if (tab === 'A') { stepPlay(dt); drawA(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC1(); updC2(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_G4 = { OUT: OUT, SITES: SITES, DAYS: DAYS, vals: vals, CL: CL, VIL: VIL, risks: risks,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; shakeA = 0; },
+    setA: function (m, g, p, t) { playing = 0; mA = m; gA = g; pA = p; if (t != null) tA = t; updA(); drawA(); },
+    setB: function (i) { selB = i; updB(); drawB(); },
+    setC1: function (i, er) { selD = i; eruptC = er ? 1 : 0; updC1(); drawC1(); },
+    setC2: function (v, w) { selV = v; wind = w; updC2(); drawC2(); },
+    recAll: function () { WSK.forEach(function (z) { S.recA[z] = 1; }); SITES.forEach(function (s, i) { S.recB[i] = 1; }); DAYS.forEach(function (z, i) { S.recC[i] = 1; });
+      CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA(); updB(); updC1(); updC2(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
