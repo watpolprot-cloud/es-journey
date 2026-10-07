@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(12, [
-  // { type: "worksheet", code: "G3", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "G3", title: "สถานการณ์จำลอง ภารกิจสำรวจรอยต่อแผ่นธรณี (ภารกิจ A B C)", file: "g3-sim-plate-boundaries.html", note: "ใช้คู่กับใบงาน G3 · รอยต่อ 3 แบบ แผนที่รอยต่อทั่วโลก ห้องทดลองรอยเลื่อนและแผ่นดินไหว · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-g3-sim.png" },
+  { type: "worksheet", code: "G3", title: "ใบงาน G3 ภารกิจสำรวจรอยต่อแผ่นธรณี (1 แผ่น 2 หน้า)", file: "g3-worksheet.pdf", note: "3 คะแนน · ส่งครบ = ได้คะแนน · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 12 G3 แนวรอยต่อแผ่นธรณีและธรณีสัณฐาน", file: "w12-slides-g3-plate-boundaries.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);

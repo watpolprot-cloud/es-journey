@@ -1,0 +1,974 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>G3 ภารกิจสำรวจรอยต่อแผ่นธรณี · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง G3 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-G2) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #1c4a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--orange); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); font-weight: 700; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip:disabled { opacity: .35; cursor: default; }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 9px; height: 9px; border-radius: 50%; vertical-align: 0; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.yes { color: var(--ok); font-weight: 600; } .no { color: var(--err); font-weight: 600; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.note.c { border-left-color: var(--cyan); background: #4fd8ff0d; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 4px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FFD166, #FF6B8A); transition: width .15s; }
+.seis { height: 64px; border-radius: 8px; margin-top: 2px; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · G3 <span class="unit-tag">หน่วยที่ 2</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจสำรวจ<b>รอยต่อแผ่นธรณี</b></h1>
+  <p class="lead">ราว พ.ศ. 2510 นักวิทยาศาสตร์รวมทฤษฎีทวีปเลื่อนกับการแผ่ขยายของพื้นสมุทร (G2) เป็น <b style="color:#FFD166">ทฤษฎีธรณีแปรสัณฐาน</b> : ธรณีภาคแบ่งเป็นแผ่นธรณีหลายแผ่น (แผ่นใหญ่ราว 7 แผ่น) ลอยอยู่บนฐานธรณีภาคและเคลื่อนที่ช้า ๆ ด้วยการพาความร้อน เรื่องสำคัญเกิดที่ <b style="color:#FFD166">ขอบของแผ่น</b> ซึ่งเรียกว่ารอยต่อแผ่นธรณี ภารกิจของนักบินคือทดลองดูว่ารอยต่อแต่ละแบบสร้างภูมิประเทศ (ธรณีสัณฐาน) อะไร ตามหารอยต่อบนแผนที่โลก และทดลองให้หินแตกจนเกิดแผ่นดินไหว จดผลลงใบงาน G3</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองรอยต่อ<small>แยกออก ชนกัน เฉือนผ่าน</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>แผนที่รอยต่อทั่วโลก<small>ตามหา 6 สถานที่</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ห้องทดลองรอยเลื่อน<small>ชั้นหินคดโค้ง + ไขรหัส</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองรอยต่อแผ่นธรณี : แผ่นธรณีเคลื่อนแล้วเกิดอะไร</h2>
+    <p class="how">เลือกการเคลื่อนที่ของแผ่นธรณี (แยกออก ชนกัน เฉือนผ่าน) และชนิดของแผ่น แล้วกด "เดินเวลา" (หรือเลื่อนแถบเวลาจนสุด) ดูภาพตัดขวางว่าเกิดธรณีสัณฐานอะไร มีภูเขาไฟหรือไม่ แผ่นดินไหวลึกแค่ไหน กด "บันทึกผล" ให้ครบ 6 กรณี (ต้องเดินเวลาจนสุดจึงบันทึกได้) จดลงใบงาน ส่วนที่ 1</p>
+    <div class="chips" id="motChips"></div>
+    <div class="chips" id="pairChips"></div>
+    <div class="twin">
+      <canvas id="cvA" height="380" aria-label="ภาพตัดขวางแผ่นธรณีบริเวณรอยต่อ แสดงการเคลื่อนที่ ธรณีสัณฐาน ภูเขาไฟ และตำแหน่งแผ่นดินไหว"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="aCase">-</div>
+        <div class="k" id="aTime">-</div>
+        <div class="k" style="margin-top:6px">ธรณีสัณฐานที่เกิด</div>
+        <h3 id="aLand">-</h3>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ภูเขาไฟ</div><div><span class="lvl" id="aVol">-</span></div></div>
+          <div><div class="k">แผ่นดินไหว</div><div><span class="lvl" id="aEq">-</span></div></div>
+        </div>
+        <div class="k" style="margin-top:6px">ตัวอย่างจริง</div>
+        <div class="d" id="aEx" style="color:#4FD8FF">-</div>
+        <div class="d" id="aWhy" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tR" min="0" max="100" step="1" value="0" aria-label="เดินเวลา">
+    <div class="ctrl"><button class="btn" id="playA">เดินเวลา</button><button class="btn" id="resetA">เริ่มใหม่</button><span class="lbl">เลื่อนแถบไปทางขวา = เวลาผ่านไป</span></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกผล</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>กรณี</th><th>ธรณีสัณฐานที่เกิด</th><th>ภูเขาไฟ</th><th>แผ่นดินไหว</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>รอยต่อแผ่นธรณี 3 แบบ</b> : <b>แยกออกจากกัน</b> แมกมาดันขึ้นมาเป็นเปลือกโลกใหม่ (สันเขากลางมหาสมุทร หุบเขาทรุด) · <b>เคลื่อนเข้าหากัน</b> ถ้ามีแผ่นมหาสมุทร แผ่นที่หนาแน่นกว่าจะ <b>มุดลง</b> เกิดร่องลึกก้นสมุทรและแนวภูเขาไฟ ถ้าเป็นทวีปชนทวีป จะดันกันจนเกิดเทือกเขาสูง · <b>เคลื่อนผ่านกัน (เฉือน)</b> เกิดรอยเลื่อนแนวระดับ ไม่มีภูเขาไฟ</div>
+    <div class="note c"><b>ทำไมแผ่นมหาสมุทรจึงมุดลง ?</b> เปลือกโลกมหาสมุทรเป็นหินบะซอลต์ หนาแน่นราว 3.0 g/cm³ ส่วนเปลือกโลกทวีปเป็นหินแกรนิต หนาแน่นราว 2.7 g/cm³ แผ่นที่หนาแน่นกว่า (และเก่ากว่า เย็นกว่า) จึงจมลงสู่เนื้อโลก เมื่อลงไปลึกราว 100 กม. น้ำในแผ่นที่มุดลงทำให้เนื้อโลกด้านบนหลอมเป็น <b>แมกมา</b> ลอยขึ้นไปเป็นภูเขาไฟ · ทวีปชนทวีปไม่มีแผ่นไหนมุดลงลึก จึงแทบไม่มีภูเขาไฟ</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 6 กรณี ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> แผนที่รอยต่อแผ่นธรณีทั่วโลก : ตามหา 6 สถานที่</h2>
+    <p class="how">เปิด-ปิดชั้นข้อมูล (รอยต่อ แผ่นดินไหว ภูเขาไฟ) สังเกตว่าแผ่นดินไหวและภูเขาไฟเกิดที่ไหน จากนั้นเลือกสถานที่ทีละแห่ง (แตะปุ่มหรือแตะจุดบนแผนที่) อ่านคำบอกใบ้ แล้วตอบว่าเป็นรอยต่อแบบใด ตอบถูกจะบันทึกให้อัตโนมัติ ให้ครบ 6 แห่ง จดลงใบงาน ส่วนที่ 2</p>
+    <div class="chips" id="layChips"></div>
+    <canvas id="cvB" height="420" aria-label="แผนที่โลกแสดงรอยต่อแผ่นธรณี จุดแผ่นดินไหว ภูเขาไฟ และสถานที่สำรวจ 6 แห่ง"></canvas>
+    <div class="leg"><span><i style="background:#4FD8FF"></i>แยกออกจากกัน</span><span><i style="background:#FF6B8A"></i>เคลื่อนเข้าหากัน</span><span><i style="background:#FFD166"></i>เฉือนผ่านกัน</span>
+      <span><i class="dot" style="background:#FFE38A"></i>แผ่นดินไหวตื้น</span><span><i class="dot" style="background:#FF9F6B"></i>ปานกลาง</span><span><i class="dot" style="background:#E0457B"></i>ลึก</span><span><i class="dot" style="background:#FF4D2E;border-radius:0"></i>ภูเขาไฟ</span></div>
+    <div class="chips" id="siteChips"></div>
+    <div class="info" style="margin-top:6px">
+      <div class="k">สถานที่สำรวจ</div>
+      <div class="v g" id="bName">-</div>
+      <div class="d" id="bClue">-</div>
+      <div class="g2" style="margin-top:2px" id="bData"></div>
+      <div id="bAskWrap"><div class="k" style="margin-top:6px">ที่นี่เป็นรอยต่อแบบใด ?</div><div class="pick" id="bAsk"></div></div>
+      <div class="d" id="bLand" style="color:#5EF2A5"></div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สถานที่</th><th>รอยต่อแบบ</th><th>ธรณีสัณฐานเด่น</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="prog" id="progB">-</div>
+    <div class="note"><b>วงแหวนแห่งไฟ</b> : แนวแผ่นดินไหวและภูเขาไฟเรียงเป็นวงรอบมหาสมุทรแปซิฟิก เพราะขอบมหาสมุทรแปซิฟิกเกือบทั้งหมดเป็นรอยต่อแบบเคลื่อนเข้าหากันที่แผ่นมหาสมุทรมุดลง · จุดบนแผนที่เป็นจุดตัวอย่างที่วางตามแนวรอยต่อ ไม่ใช่ข้อมูลแผ่นดินไหวจริงรายครั้ง</div>
+    <div class="note c"><b>ประเทศไทยอยู่ตรงไหน ?</b> ประเทศไทยอยู่บนแผ่นยูเรเชีย (ส่วนที่เรียกว่าแผ่นซุนดา) <b>ไม่ได้อยู่บนรอยต่อ</b> แต่ทางทิศตะวันตกมี <b>ร่องลึกซุนดา</b> ที่แผ่นอินเดีย-ออสเตรเลียมุดลง (ต้นเหตุสึนามิ พ.ศ. 2547) และในเมียนมามี <b>รอยเลื่อนสะกาย</b> ที่เฉือนผ่านกัน (แผ่นดินไหว พ.ศ. 2568 ที่กรุงเทพฯ รู้สึกได้)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 สถานที่ ตอบข้อ 3–4</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ห้องทดลองรอยเลื่อน : ธรณีโครงสร้างและแผ่นดินไหว</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> ทดลองออกแรงกับชั้นหิน เลือกชนิดแรงและสภาพหิน แล้วค่อย ๆ เพิ่มแรง ดูว่าหินโค้งงอหรือแตกเลื่อน บันทึกให้ครบ 4 ผล · <b style="color:#4FD8FF">ขั้นที่ 2</b> ไขรหัสรอยต่อ 6 ข้อ · <b style="color:#5EF2A5">ขั้นที่ 3</b> แฟ้มรอยต่อใกล้ประเทศไทย จดลงใบงาน ส่วนที่ 3–4</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ออกแรงกับชั้นหิน</h2>
+    <div class="chips" id="forceChips"></div>
+    <div class="chips" id="rockChips"></div>
+    <div class="twin">
+      <canvas id="cvC" height="340" aria-label="ภาพตัดขวางชั้นหินที่ถูกแรงกระทำ แสดงการคดโค้งหรือการเกิดรอยเลื่อน"></canvas>
+      <div class="info">
+        <div class="k">แรงที่กระทำ · สภาพหิน</div>
+        <div class="v r" id="cSet">-</div>
+        <div class="k" style="margin-top:4px">พลังงานที่สะสมในหิน</div>
+        <div class="bar"><i id="cBar"></i></div>
+        <div class="k" style="margin-top:6px">ผลที่เกิด (ธรณีโครงสร้าง)</div>
+        <h3 id="cRes">-</h3>
+        <div><span class="lvl" id="cEq">-</span></div>
+        <div class="k" style="margin-top:4px">เครื่องวัดแผ่นดินไหว</div>
+        <canvas id="cvSeis" class="seis" height="64" aria-label="กราฟคลื่นไหวสะเทือนจำลอง"></canvas>
+        <div class="d" id="cWhy">-</div>
+      </div>
+    </div>
+    <input type="range" id="fR" min="0" max="100" step="1" value="0" aria-label="แรงที่กระทำต่อชั้นหิน">
+    <div class="ctrl"><span class="lbl">เลื่อนแถบไปทางขวา = เพิ่มแรง</span><button class="btn" id="resetC">คลายแรง (เริ่มใหม่)</button></div>
+    <div class="ctrl"><button class="btn gold solid" id="recC">บันทึกผล</button><span class="lbl" id="recCMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>แรงที่กระทำ</th><th>สภาพหิน</th><th>ผลที่เกิด</th><th>เกิดแผ่นดินไหวทันทีไหม</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+    <div class="note"><b>ธรณีโครงสร้าง</b> คือร่องรอยที่หินถูกแรงกระทำจนเปลี่ยนรูป · หินที่ลึกและร้อนจะ <b>อ่อนตัว</b> ค่อย ๆ โค้งงอเป็น <b>ชั้นหินคดโค้ง</b> (ส่วนโค้งขึ้นเรียกประทุนคว่ำ ส่วนโค้งลงเรียกประทุนหงาย) · หินใกล้ผิวโลกเย็นและ <b>เปราะ</b> จะสะสมพลังงานจนแตกแล้วเลื่อน เกิด <b>รอยเลื่อน</b> : แรงดึง → รอยเลื่อนปกติ (หินด้านบนเลื่อนลง) · แรงบีบอัด → รอยเลื่อนย้อน (หินด้านบนเลื่อนขึ้น) · แรงเฉือน → รอยเลื่อนแนวระดับ</div>
+    <div class="note c"><b>แผ่นดินไหวเกิดได้อย่างไร ?</b> แผ่นธรณีเคลื่อนตลอดเวลา แต่หินสองฝั่งรอยเลื่อนยึดติดกันไว้ หินจึงค่อย ๆ บิดงอสะสมพลังงาน เมื่อเกินกว่าที่หินทนได้ หินจะ <b>แตกและเลื่อนอย่างฉับพลัน</b> ปล่อยพลังงานออกมาเป็นคลื่นไหวสะเทือน (คลื่น P และ S ใน G1) แล้วเริ่มสะสมใหม่ (เรียนเรื่องการรับมือใน G5)</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ไขรหัสรอยต่อแผ่นธรณี</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำบอกใบ้ แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">PLATES</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · plates = แผ่นธรณี (plate tectonics = ธรณีแปรสัณฐาน)</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> แฟ้มรอยต่อใกล้ประเทศไทย</h2>
+    <p class="how" style="margin-bottom:4px">ประเทศไทยไม่ได้อยู่บนรอยต่อ แต่ได้รับผลจากการเคลื่อนที่ของแผ่นธรณีมาตลอด ใช้ประกอบใบงาน ส่วนที่ 3–4</p>
+    <div class="events" id="evid"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 ผลการทดลอง รหัสผ่าน ข้อ 5 · <b>ส่วนที่ 4</b> : โปสเตอร์ทัวร์รอยต่อแผ่นธรณี</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · ภาพตัดขวางในภารกิจ A และ C ขยายความสูงเกินจริงเพื่อให้เห็นชัด · แผนที่ภารกิจ B เป็นภาพอย่างง่าย แนวรอยต่อและจุดแผ่นดินไหว/ภูเขาไฟเป็นตำแหน่งโดยประมาณ · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+/*GEO-START*/var GEO = {"NA":[[[-166,68],[-156,71],[-140,70],[-125,70],[-110,68],[-95,72],[-85,70],[-80,66],[-90,63],[-94,59],[-88,56],[-82,54],[-78,58],[-77,62],[-70,61],[-64,60],[-60,55],[-56,52],[-53,47],[-60,47],[-66,45],[-70,42],[-74,40],[-76,35],[-81,31],[-80,26],[-82,28],[-84,30],[-89,30],[-95,29],[-97,26],[-97,21],[-94,18.3],[-91,18.6],[-90.4,21],[-87,21.5],[-87.5,18.5],[-88.3,17.8],[-92.2,14.6],[-96,16],[-102,18],[-105,21],[-109,25],[-112,29],[-114,31],[-110,23],[-112,25],[-115,28],[-117,32],[-120,34.5],[-123,38],[-124,42],[-124,47],[-127,50],[-131,54],[-135,57],[-140,59.8],[-147,61],[-152,59],[-158,57],[-163,55],[-158,58.5],[-162,60],[-165,62],[-166,65]],[[-73,78],[-60,82],[-30,83.5],[-20,82],[-20,75],[-22,70],[-32,68],[-40,65],[-43,60],[-48,61],[-52,65],[-54,69],[-58,75],[-66,77]]],"CA":[[[-88.3,17.8],[-88,16],[-84,15],[-83,10],[-79,9],[-77.5,8],[-80,7.5],[-85,10],[-88,13],[-92.2,14.6]]],"SA":[[[-77,8],[-72,12],[-62,10.7],[-60,8.5],[-57,6.5],[-52,5],[-50,0],[-44,-2.5],[-35,-5.5],[-35,-9],[-39,-14],[-39,-18],[-41,-22],[-48,-26],[-48.6,-28],[-53,-34],[-58,-34.5],[-57,-38],[-62,-39],[-65,-42],[-64,-47],[-68,-50],[-69,-53],[-68,-55],[-72,-54],[-75,-50],[-74,-44],[-73,-38],[-71.5,-30],[-70,-18],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-77,4]]],"EU":[[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48.5],[2,51],[5,53],[8.5,54],[8,57],[10.5,57.7],[12,55.5],[14,54],[21,55],[23,59.5],[28,60],[22,60.5],[21.5,65],[24,66],[21,63],[17,61],[19,60],[16,56],[12.5,56.3],[11,59],[5.5,58.5],[5,62],[10,64],[14,67],[19,70],[26,71],[31,70],[41,67],[43,68.5],[53,68],[60,69.5],[70,73],[80,73.5],[88,75.5],[100,78],[113,73.5],[130,72],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[178,62],[165,60],[162,55],[156,51],[155,58],[143,59],[137,54],[141,52],[140,48],[135,43],[130,42.5],[129,35.5],[126,34.5],[126,37.5],[125,39.5],[121,40],[122,37],[119,35],[121,32],[122,29],[119,25],[114,22.3],[109,21.5],[106,20],[108,16],[109,12],[105,8.6],[103,10.5],[100,13.5],[99,10],[102.5,6],[103.5,1.5],[101,2.8],[98,8],[98.5,13],[97.5,16.5],[94.5,16],[94,19],[92,21],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27],[67,24],[62,25],[57,25.7],[56.5,27],[54,26.6],[51.5,24],[51.5,26],[50,30],[48,30],[50,26],[51.5,24],[56,24],[56.4,26.3],[59.8,22.5],[55,17],[52,16],[43.5,12.7],[42.5,15],[39,21.5],[35,28],[34.5,31.5],[35.5,34.5],[36,36.8],[32,36.2],[28,36.6],[26.5,39.5],[29,41],[31,41.2],[35,42],[41,41],[41.5,42.5],[37.5,45],[34,44.5],[33,46],[30,45.5],[28.5,43.5],[28,41.5],[24,40.5],[23,39],[22.5,36.5],[21,38.5],[19.5,41.5],[16,43.5],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40],[16,38],[15.5,40],[12.5,42],[10.5,43.5],[8,44],[5,43.2],[3.2,42],[0,39.5],[-0.5,38],[-2,36.7],[-5.5,36],[-7,37]],[[-5.5,50],[1.5,51],[1.7,52.8],[0,53.5],[-2,55.8],[-1.8,57.6],[-3,58.6],[-5,58.6],[-6.2,56.5],[-5,55],[-3.2,54.5],[-4.5,53.3],[-5,51.7]],[[130,31],[132,33.5],[135,34],[140,35],[141,38],[141.5,41.5],[145,43.5],[142,45.5],[140,42],[139.5,39],[137,37],[133,35.5],[130,33.5]]],"AF":[[[-17,21],[-16,15],[-17,14.7],[-15,11],[-13,8],[-8,4.5],[-2,5],[4,6.3],[9,4],[9.5,1],[9,-1],[12,-6],[13.5,-11],[12,-17],[14.5,-23],[15.5,-27],[18,-32],[18.5,-34.5],[20,-35],[25,-34],[28,-33],[32,-28.5],[33,-26],[35.5,-24],[35,-19],[40,-15.5],[40.5,-10],[39,-6],[42,-1],[46,2],[51,11.8],[44,11],[43,13],[39,16],[37,20],[35,24],[33.5,28],[32,31],[29,31],[25,31.8],[20,30.5],[19,32],[15,32.5],[11,33.5],[10,37],[3,36.7],[-2,35.1],[-6,35.8],[-9,32],[-10,29],[-13,27.5]]],"MG":[[[44,-25],[47,-25],[50,-15],[49.3,-12],[46,-15.5],[44,-16.5],[43.5,-22]]],"IN":[[[67,24],[70,21],[72.8,19],[73.5,15.5],[75,12],[76.5,8.5],[77.5,8],[80,10],[80.3,13.5],[82,16.5],[86.5,20],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27]]],"AU":[[[113,-22],[114,-26],[115,-34],[118,-35],[123,-34],[129,-31.5],[132,-32],[135,-34.5],[138,-35.5],[140,-38],[144,-38.5],[147,-38],[150,-37],[153,-31],[153,-25],[149,-21],[146,-19],[145,-15],[143,-11],[141.5,-13],[141,-17],[138,-16.5],[136,-12],[132,-11.5],[130,-13],[127,-14],[125,-15],[122,-18],[117,-20.5]],[[131,-1],[138,-1.5],[141,-2.6],[147,-6],[150,-10.5],[144,-8],[141,-9],[138,-8],[135,-4]],[[144.6,-40.7],[148.3,-40.9],[148,-43.2],[146,-43.6],[145,-42]]],"AN":[[[-180,-78],[-165,-78.5],[-158,-77.5],[-150,-76.5],[-140,-75.5],[-120,-74],[-100,-74.5],[-90,-73],[-80,-73],[-75,-72],[-70,-69],[-66,-66.5],[-63,-64.5],[-58,-63.3],[-60,-65.5],[-62,-68],[-62,-71],[-60,-74],[-55,-77],[-45,-78],[-35,-77.5],[-28,-75.5],[-20,-73],[-10,-71],[0,-70],[15,-70],[30,-69.5],[40,-69],[45,-67.5],[55,-66.5],[60,-67],[70,-68],[75,-69.5],[80,-68],[90,-66.5],[100,-66],[110,-66],[120,-66.5],[130,-66.2],[140,-66.5],[150,-68.5],[160,-70],[165,-71],[170,-73],[167,-77],[170,-78],[180,-78],[180,-90],[-180,-90]]]};/*GEO-END*/
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_g3_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.recC = S.recC || {}; S.cl = S.cl || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr)); }; }); }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var FONT = '"Sarabun", sans-serif', HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = Math.min(px, cw - tw - 4); else px = Math.max(px, tw + 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function poly(x, pts) { x.beginPath(); pts.forEach(function (p, i) { if (i) x.lineTo(p[0], p[1]); else x.moveTo(p[0], p[1]); }); x.closePath(); }
+  function line(x, pts) { x.beginPath(); pts.forEach(function (p, i) { if (i) x.lineTo(p[0], p[1]); else x.moveTo(p[0], p[1]); }); }
+  function lvl(el, txt, cls) { el.textContent = txt; el.className = 'lvl ' + cls; }
+  var EQC = ['#FFE38A', '#FF9F6B', '#E0457B'];   // แผ่นดินไหวตื้น ปานกลาง ลึก
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ห้องทดลองรอยต่อแผ่นธรณี
+  var MOT = ['แยกออกจากกัน', 'เคลื่อนเข้าหากัน', 'เฉือนผ่านกัน'];
+  var CASES = [
+    { k: 'DO', m: 0, pair: 'มหาสมุทร – มหาสมุทร', land: 'สันเขากลางมหาสมุทร', short: 'สันเขากลางมหาสมุทร', vol: 1, eq: 0, tmax: 10, unit: 'ล้านปี',
+      ex: 'สันเขากลางมหาสมุทรแอตแลนติก ไอซ์แลนด์',
+      why: 'แผ่นมหาสมุทรสองแผ่นแยกออกจากกัน แมกมาจากฐานธรณีภาคดันขึ้นมาเย็นตัวเป็นหินบะซอลต์ใหม่ตรงกลาง พื้นสมุทรจึงขยายกว้างขึ้น (หลักฐานใน G2) ภูเขาไฟอยู่ใต้ทะเล แผ่นดินไหวตื้น' },
+    { k: 'DC', m: 0, pair: 'ทวีป – ทวีป', land: 'หุบเขาทรุด (ต่อไปกลายเป็นทะเลแคบ)', short: 'หุบเขาทรุด', vol: 1, eq: 0, tmax: 10, unit: 'ล้านปี',
+      ex: 'หุบเขาทรุดแอฟริกาตะวันออก ทะเลแดง',
+      why: 'แผ่นทวีปถูกดึงแยก เปลือกโลกบางลง ตรงกลางทรุดตัวลงเป็นหุบเขายาว มีภูเขาไฟตามขอบ ถ้าแยกต่อไปน้ำทะเลจะไหลเข้ามา กลายเป็นทะเลแคบ และในที่สุดเป็นมหาสมุทรใหม่' },
+    { k: 'OO', m: 1, pair: 'มหาสมุทร – มหาสมุทร', land: 'ร่องลึกก้นสมุทร + หมู่เกาะภูเขาไฟรูปโค้ง', short: 'ร่องลึก + หมู่เกาะภูเขาไฟ', vol: 1, eq: 2, tmax: 20, unit: 'ล้านปี',
+      ex: 'ร่องลึกมาเรียนา หมู่เกาะมาเรียนา ญี่ปุ่น',
+      why: 'แผ่นมหาสมุทรที่เก่ากว่า เย็นและหนาแน่นกว่า มุดลงใต้อีกแผ่น ตรงที่มุดลงเกิดร่องลึกก้นสมุทร เมื่อแผ่นที่มุดลงลึกราว 100 กม. เนื้อโลกด้านบนหลอมเป็นแมกมา ลอยขึ้นเป็นภูเขาไฟกลางทะเลเรียงเป็นแนวโค้ง' },
+    { k: 'OC', m: 1, pair: 'มหาสมุทร – ทวีป', land: 'ร่องลึกก้นสมุทร + เทือกเขาภูเขาไฟบนทวีป', short: 'ร่องลึก + เทือกเขาภูเขาไฟ', vol: 1, eq: 2, tmax: 20, unit: 'ล้านปี',
+      ex: 'เทือกเขาแอนดีส ร่องลึกเปรู-ชิลี',
+      why: 'แผ่นมหาสมุทรหนาแน่นกว่าแผ่นทวีป จึงมุดลงใต้ทวีป เกิดร่องลึกนอกชายฝั่ง แมกมาที่เกิดจากแผ่นที่มุดลงลอยขึ้นเป็นแนวภูเขาไฟบนเทือกเขาริมทวีป แผ่นดินไหวเกิดตามแผ่นที่มุดลง ตั้งแต่ตื้นจนลึกหลายร้อยกิโลเมตร' },
+    { k: 'CC', m: 1, pair: 'ทวีป – ทวีป', land: 'เทือกเขาสูง (ชั้นหินคดโค้ง)', short: 'เทือกเขาสูง', vol: 0, eq: 1, tmax: 50, unit: 'ล้านปี',
+      ex: 'เทือกเขาหิมาลัย (อินเดียชนยูเรเชีย)',
+      why: 'แผ่นทวีปทั้งสองเบา ไม่มีแผ่นไหนมุดลงลึก จึงดันอัดกันจนเปลือกโลกหนาขึ้น ชั้นหินคดโค้งและยกตัวเป็นเทือกเขาสูง แทบไม่มีภูเขาไฟ แต่มีแผ่นดินไหวบ่อย ยอดเอเวอเรสต์มีซากดึกดำบรรพ์สัตว์ทะเล' },
+    { k: 'TF', m: 2, pair: 'มองจากด้านบน', land: 'รอยเลื่อนแนวระดับ (ถนน ลำธาร หักเหแนว)', short: 'รอยเลื่อนแนวระดับ', vol: 0, eq: 0, tmax: 400, unit: 'ปี',
+      ex: 'รอยเลื่อนซานแอนเดรียส รอยเลื่อนสะกาย (เมียนมา)',
+      why: 'แผ่นธรณีเลื่อนผ่านกันในแนวระดับ ไม่เกิดและไม่ทำลายเปลือกโลก ไม่มีภูเขาไฟ ช่วงที่รอยเลื่อนติดกัน หินบิดงอสะสมพลังงาน (ถนนโค้ง) แล้วเลื่อนฉับพลันเป็นแผ่นดินไหว ถนนและลำธารจึงขาดเหลื่อมกัน' }
+  ];
+  var EQT = ['ตื้น', 'ตื้นถึงปานกลาง', 'ตื้นถึงลึก'];
+  var cA = 0, pA = 0, playing = 0, shakeA = 0, tfCount = 0;
+  function caseName(c) { return MOT[c.m] + (c.m === 2 ? '' : ' : ' + c.pair); }
+  function updA() {
+    var c = CASES[cA];
+    var h = '<span class="lbl">การเคลื่อนที่</span>';
+    MOT.forEach(function (m, i) { h += '<button class="chip' + (c.m === i ? ' on' : '') + '" data-m="' + i + '">' + m + '</button>'; });
+    $('motChips').innerHTML = h; bindChips($('motChips'), 'm', function (v) { var i = CASES.findIndex(function (z) { return z.m === +v; }); setCase(i); });
+    h = '<span class="lbl">ชนิดของแผ่น</span>';
+    CASES.forEach(function (z, i) { if (z.m === c.m) h += '<button class="chip' + (i === cA ? ' on' : '') + (S.recA[z.k] ? ' done' : '') + '" data-c="' + i + '">' + z.pair + '</button>'; });
+    $('pairChips').innerHTML = h; bindChips($('pairChips'), 'c', function (v) { setCase(+v); });
+    $('aCase').textContent = caseName(c);
+    $('aTime').textContent = 'เวลาผ่านไป ' + fmt(pA * c.tmax) + ' ' + c.unit + (c.k === 'TF' ? ' (ภาพขยายการเลื่อนเกินจริง)' : '');
+    var show = pA >= .5;
+    $('aLand').textContent = show ? c.land : 'เดินเวลาต่อเพื่อดูผล ...';
+    if (show) { lvl($('aVol'), c.vol ? 'มี' : 'ไม่มี', c.vol ? 'n' : 'y'); lvl($('aEq'), EQT[c.eq], ['m', 'm', 'n'][c.eq]); }
+    else { lvl($('aVol'), '?', 'm'); lvl($('aEq'), '?', 'm'); }
+    $('aEx').textContent = show ? c.ex : '-';
+    $('aWhy').innerHTML = show ? c.why : 'สังเกตทิศของลูกศรสีทองบนแผ่นธรณี และสิ่งที่เกิดขึ้นตรงรอยต่อ';
+    $('tR').value = Math.round(pA * 100);
+    $('playA').textContent = playing ? 'หยุด' : 'เดินเวลา';
+    $('recA').disabled = pA < 1;
+    var n = 0, rows = '';
+    CASES.forEach(function (z, i) { var r = S.recA[z.k]; if (r) n++;
+      rows += '<tr' + (i === cA ? ' class="cur"' : '') + '><td class="n">' + caseName(z) + '</td><td>' + (r ? z.short : '-') + '</td><td>' + (r ? (z.vol ? '<span class="no">มี</span>' : '<span class="yes">ไม่มี</span>') : '-') + '</td><td>' + (r ? EQT[z.eq] : '-') + '</td></tr>'; });
+    $('logA').innerHTML = rows;
+    $('recAMsg').textContent = pA < 1 ? 'เดินเวลาจนสุดก่อนจึงบันทึกได้' : 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ B ได้' : '');
+  }
+  function setCase(i) { cA = i; pA = 0; playing = 0; tfCount = 0; updA(); drawA(); }
+  $('tR').oninput = function () { playing = 0; pA = +this.value / 100; tfCheck(); updA(); drawA(); };
+  $('playA').onclick = function () { if (playing) { playing = 0; } else { if (pA >= 1) { pA = 0; tfCount = 0; } playing = 1; } updA(); if (reduce && playing) { pA = 1; playing = 0; tfCheck(); updA(); } drawA(); };
+  $('resetA').onclick = function () { playing = 0; pA = 0; tfCount = 0; updA(); drawA(); };
+  $('recA').onclick = function () { if (pA < 1) return; S.recA[CASES[cA].k] = 1; save(); updA(); };
+  var TFQ = [.24, .49, .74, .99];
+  function tfStep(p) { var n = 0; TFQ.forEach(function (q) { if (p >= q) n++; }); return n; }
+  function tfCheck() { if (CASES[cA].k !== 'TF') return; var n = tfStep(pA); if (n > tfCount) shakeA = .7; tfCount = n; }
+  function stepPlay(dt) { if (!playing) return; var c = CASES[cA]; pA = Math.min(1, pA + dt / (c.k === 'TF' ? 8 : 6)); tfCheck(); if (pA >= 1) playing = 0; updA(); }
+
+  // ---------- วาดภาพตัดขวาง
+  var SEA = 100;
+  var MAGX = [1, 2, 3, 5, 6, 8, 9.5, 11, 12, 14, 15.5, 17, 18, 20];   // จุดกลับขั้ว (แบบจำลอง)
+  function polA(age) { var n = 0; MAGX.forEach(function (b) { if (age >= b * .5) n++; }); return n % 2 === 0; }
+  function skySea(x, W, H, seaTo) {
+    var g = x.createLinearGradient(0, 0, 0, SEA); g.addColorStop(0, '#081233'); g.addColorStop(1, '#16306a');
+    x.fillStyle = g; x.fillRect(0, 0, W, SEA);
+    var s = x.createLinearGradient(0, SEA, 0, seaTo || 260); s.addColorStop(0, '#1d5fa8'); s.addColorStop(1, '#0d2a5c');
+    x.fillStyle = s; x.fillRect(0, SEA, W, (seaTo || 260) - SEA);
+  }
+  function asth(x, W, H, y) {
+    var g = x.createLinearGradient(0, y, 0, H); g.addColorStop(0, '#7a2f17'); g.addColorStop(1, '#c0501c');
+    x.fillStyle = g; x.fillRect(0, y, W, H - y);
+  }
+  function convLoops(x, cx, cy, rx, ry, dir, t) {   // dir +1 = ลอยขึ้นตรงกลาง (ฝั่งขวาหมุนตามเข็ม)
+    [-1, 1].forEach(function (sg) {
+      var ox = cx + sg * rx * 1.05;
+      x.strokeStyle = 'rgba(255,220,170,.35)'; x.lineWidth = 2; x.beginPath(); x.ellipse(ox, cy, rx, ry, 0, 0, 6.283); x.stroke();
+      [0, Math.PI].forEach(function (a0) {
+        var a = a0 + sg * dir * (t * .5 % 6.283), ax = ox + Math.cos(a) * rx, ay = cy + Math.sin(a) * ry, dx = -Math.sin(a) * sg * dir, dy = Math.cos(a) * sg * dir * ry / rx;
+        var n = Math.hypot(dx, dy) || 1; dx /= n; dy /= n;
+        arrow(x, ax - dx * 9, ay - dy * 9, ax + dx * 6, ay + dy * 6, 'rgba(255,230,180,.8)', 2, 8);
+      });
+    });
+  }
+  function quakeDots(x, pts, t) {
+    pts.forEach(function (q, i) { var a = .35 + .65 * Math.max(0, Math.sin(t * 2.2 + i * 1.7));
+      x.globalAlpha = a; x.fillStyle = EQC[q[2]]; x.beginPath(); x.arc(q[0], q[1], 3.2, 0, 6.283); x.fill(); x.globalAlpha = 1; });
+  }
+  function volcano(x, cx, base, h, w, erupt, t) {
+    if (h <= 1) return;
+    x.fillStyle = '#5b4a44'; x.beginPath(); x.moveTo(cx - w, base); x.lineTo(cx - w * .14, base - h); x.lineTo(cx + w * .14, base - h); x.lineTo(cx + w, base); x.closePath(); x.fill();
+    x.fillStyle = '#7a6258'; x.beginPath(); x.moveTo(cx - w * .14, base - h); x.lineTo(cx + w * .14, base - h); x.lineTo(cx + w * .4, base - h * .55); x.lineTo(cx - w * .05, base - h * .7); x.closePath(); x.fill();
+    if (erupt) { glow(x, cx, base - h, 14, [255, 140, 60], .9); x.fillStyle = 'rgba(120,110,120,.5)';
+      for (var k = 0; k < 3; k++) { var yy = base - h - 10 - ((t * 14 + k * 9) % 30); x.beginPath(); x.arc(cx + Math.sin(t + k) * 4, yy, 4 + k, 0, 6.283); x.fill(); } }
+  }
+  function magmaRise(x, x0, y0, y1, t) {
+    for (var k = 0; k < 5; k++) { var f = ((t * .35 + k / 5) % 1), yy = y0 + (y1 - y0) * f;
+      x.fillStyle = 'rgba(255,' + Math.round(150 + 60 * f) + ',60,' + (.85 - .5 * f) + ')'; x.beginPath(); x.arc(x0 + Math.sin(k * 2 + t) * 3, yy, 3.5 - f * 1.2, 0, 6.283); x.fill(); }
+  }
+  function drawA() {
+    var cv = $('cvA'), c = fit(cv), x = c.x, W = c.W, H = c.H, cs = CASES[cA], p = pA, t = tA;
+    x.save();
+    if (shakeA > 0) x.translate(Math.sin(t * 60) * 5 * shakeA, Math.cos(t * 47) * 3 * shakeA);
+    x.fillStyle = '#05081a'; x.fillRect(-10, -10, W + 20, H + 20);
+    var mid = W / 2, f = drawCaseFns[cs.k];
+    f(x, W, H, mid, p, t);
+    x.restore();
+    if (cs.k !== 'TF') { x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText('ภาพตัดขวาง · ความสูงขยายเกินจริง', W - 8, H - 6); }
+    if (shakeA > 0) label(x, 'แผ่นดินไหว !', W / 2, 30, '#FF6B8A', 22);
+  }
+  var drawCaseFns = {
+    DO: function (x, W, H, mid, p, t) {
+      skySea(x, W, H, 260); x.fillStyle = '#E8EDFF'; x.font = '700 12px ' + HFONT; x.textAlign = 'left'; x.fillText('ระดับน้ำทะเล', 8, SEA - 6);
+      asth(x, W, H, 200);
+      convLoops(x, mid, 305, W * .22, 48, 1, t);
+      var half = W / 2, vpx = half * .9;   // ระยะที่ขยายได้เมื่อ p = 1
+      var top = function (dx) { return 178 - 38 * Math.exp(-Math.abs(dx) / (W * .11)); };
+      var bot = function (dx) { return top(dx) + 10 + 55 * Math.pow(Math.min(1, Math.abs(dx) / (W * .4)), .5); };
+      // แผ่นธรณีสองข้าง
+      [-1, 1].forEach(function (sg) {
+        var pts = [];
+        for (var dx = 2; dx <= half + 4; dx += 4) pts.push([mid + sg * dx, top(dx)]);
+        for (var dx2 = half + 4; dx2 >= 2; dx2 -= 4) pts.push([mid + sg * dx2, bot(dx2)]);
+        poly(x, pts); x.fillStyle = '#4a4560'; x.fill();
+        // เปลือกโลกมหาสมุทร (แถบแม่เหล็ก : ส่วนที่เกิดใหม่ระหว่างการทดลอง)
+        for (var d = 2; d <= half; d += 2) {
+          var age = (p * vpx - d) / vpx * 10;   // ล้านปี
+          x.fillStyle = age < 0 ? '#2c3550' : (polA(age) ? '#3FA9F5' : '#1b2552');
+          x.fillRect(mid + sg * d - (sg < 0 ? 2 : 0), top(d), 2.2, 9);
+        }
+        arrow(x, mid + sg * 40, top(40) - 16, mid + sg * 110, top(110) - 16, '#FFD166', 3, 10);
+      });
+      // แมกมาใต้สันเขา
+      var mg = x.createRadialGradient(mid, 200, 4, mid, 200, 70); mg.addColorStop(0, 'rgba(255,200,90,.95)'); mg.addColorStop(1, 'rgba(255,120,40,0)');
+      x.fillStyle = mg; x.beginPath(); x.ellipse(mid, 205, 70, 42, 0, 0, 6.283); x.fill();
+      x.fillStyle = 'rgba(255,175,70,.95)'; x.beginPath(); x.moveTo(mid - 5, 210); x.quadraticCurveTo(mid, top(0) - 4, mid + 5, 210); x.closePath(); x.fill();
+      magmaRise(x, mid, 240, top(0) + 4, t);
+      glow(x, mid, top(0) - 4, 12, [255, 150, 60], .6 + .3 * Math.sin(t * 3));
+      quakeDots(x, [[mid - 18, 152, 0], [mid + 22, 156, 0], [mid - 6, 162, 0], [mid + 38, 160, 0]], t);
+      label(x, 'สันเขากลางมหาสมุทร', mid, top(0) - 26, '#FFD166', 13);
+      label(x, 'แผ่นมหาสมุทร', mid - W * .34, top(W * .34) + 38, '#E8EDFF', 12);
+      label(x, 'แผ่นมหาสมุทร', mid + W * .34, top(W * .34) + 38, '#E8EDFF', 12);
+      label(x, 'ฐานธรณีภาค', 50, 248, '#ffd7b0', 12, 'left');
+      if (W > 520) label(x, 'เปลือกโลกใหม่ (แถบแม่เหล็ก)', mid + 60, top(60) + 22, '#9ED8FF', 11, 'left');
+    },
+    DC: function (x, W, H, mid, p, t) {
+      var sk = x.createLinearGradient(0, 0, 0, 140); sk.addColorStop(0, '#081233'); sk.addColorStop(1, '#1e3d7a'); x.fillStyle = sk; x.fillRect(0, 0, W, 160);
+      var g = 46 * smooth(0, .75, p), wg = 30 + 120 * p, y0 = 92;
+      var surf = function (dx) { var a = Math.abs(dx);
+        if (a < wg / 2) return y0 + g;
+        if (a < wg / 2 + 34) return y0 + g * .5;
+        return y0 - 10 * p * Math.exp(-(a - wg / 2 - 34) / 80); };
+      var bump = function (dx) { return Math.exp(-Math.pow(dx / (W * .16), 2)); };
+      var crustB = function (dx) { return 175 - 48 * p * bump(dx); }, lithB = function (dx) { return 245 - 85 * p * bump(dx); };
+      asth(x, W, H, 160);
+      convLoops(x, mid, 310, W * .2, 40, 1, t);
+      var top = [], cb = [], lb = [];
+      for (var X = 0; X <= W; X += 3) { var dx = X - mid; top.push([X, surf(dx)]); cb.push([X, crustB(dx)]); lb.push([X, lithB(dx)]); }
+      // ชั้นเนื้อโลกส่วนบนของธรณีภาค
+      poly(x, cb.concat(lb.slice().reverse())); x.fillStyle = '#5a4a5f'; x.fill();
+      poly(x, top.concat(cb.slice().reverse())); x.fillStyle = '#9a7650'; x.fill();
+      // ทะเลไหลเข้า
+      if (p > .8) { x.fillStyle = 'rgba(40,110,200,' + (.85 * smooth(.8, 1, p)) + ')'; x.fillRect(mid - wg / 2, y0 + g * .45, wg, g * .55); }
+      // ผิวดิน
+      line(x, top); x.strokeStyle = '#5d8a5a'; x.lineWidth = 4; x.stroke();
+      // รอยเลื่อนปกติขอบหุบเขา
+      if (p > .1) [-1, 1].forEach(function (sg) { [wg / 2, wg / 2 + 34].forEach(function (e) {
+        x.strokeStyle = 'rgba(30,20,10,.8)'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(mid + sg * e, surf(sg * (e - 1)) ); x.lineTo(mid + sg * (e - 26), 172); x.stroke(); }); });
+      // แมกมา
+      if (p > .15) { var mg = x.createRadialGradient(mid, lithB(0) - 10, 4, mid, lithB(0) - 20, 70); mg.addColorStop(0, 'rgba(255,200,90,' + (.9 * p) + ')'); mg.addColorStop(1, 'rgba(255,120,40,0)');
+        x.fillStyle = mg; x.beginPath(); x.ellipse(mid, lithB(0) - 20, 80, 50, 0, 0, 6.283); x.fill(); }
+      var vh = 34 * smooth(.3, .8, p);
+      [-1, 1].forEach(function (sg) { var vx = mid + sg * (wg / 2 + 70); volcano(x, vx, surf(sg * (wg / 2 + 70)) + 1, vh, 26, p > .5, t);
+        if (p > .3) magmaRise(x, vx, lithB(sg * (wg / 2 + 70)) - 30, surf(sg * (wg / 2 + 70)) - vh + 6, t); });
+      [-1, 1].forEach(function (sg) { arrow(x, mid + sg * (wg / 2 + 110), 60, mid + sg * (wg / 2 + 175), 60, '#FFD166', 3, 10); });
+      quakeDots(x, [[mid - wg / 2 + 6, 128, 0], [mid + wg / 2 - 4, 136, 0], [mid + 10, 150, 0]], t);
+      label(x, p > .8 ? 'น้ำทะเลเริ่มไหลเข้า (ทะเลแคบ)' : 'หุบเขาทรุด', mid, y0 + g + 22, '#FFD166', 13);
+      label(x, 'แผ่นทวีป', mid - W * .36, 130, '#E8EDFF', 12); label(x, 'แผ่นทวีป', mid + W * .36, 130, '#E8EDFF', 12);
+      label(x, 'ฐานธรณีภาค', 50, 290, '#ffd7b0', 12, 'left');
+      if (vh > 10 && W > 480) label(x, 'ภูเขาไฟ', mid + wg / 2 + 70, surf(wg / 2 + 70) - vh - 14, '#FFB86B', 12);
+    },
+    OO: function (x, W, H, mid, p, t) { subduct(x, W, H, p, t, false); },
+    OC: function (x, W, H, mid, p, t) { subduct(x, W, H, p, t, true); },
+    CC: function (x, W, H, mid, p, t) {
+      var sk = x.createLinearGradient(0, 0, 0, 140); sk.addColorStop(0, '#081233'); sk.addColorStop(1, '#1e3d7a'); x.fillStyle = sk; x.fillRect(0, 0, W, 160);
+      asth(x, W, H, 230);
+      convLoops(x, W / 2, 320, W * .2, 34, -1, t);
+      var close = smooth(0, .35, p), gap = (1 - close) * W * .32, xc = W / 2, Hm = 74 * smooth(.35, 1, p), wm = W * .1 + W * .08 * p, y0 = 108;
+      var bell = function (dx) { return Math.exp(-Math.pow(dx / wm, 2)); };
+      var surf = function (X) { var dx = X - xc; return y0 - Hm * bell(dx) * (1 + .12 * Math.sin(dx * .21) + .08 * Math.sin(dx * .53)); };
+      var cbot = function (X) { return 175 + Hm * 1.1 * bell(X - xc); }, lbot = function (X) { return 235 + Hm * .5 * bell(X - xc); };
+      // แผ่นมหาสมุทรที่เหลือ มุดลงแล้วหลุดจม
+      var sx = xc + gap / 2, slabLen = 60 + 120 * p;
+      x.save(); x.translate(sx, 180); x.rotate(1.0); x.fillStyle = '#46557a'; x.fillRect(0, -14, slabLen, 34); x.restore();
+      if (gap > 4) { x.fillStyle = '#1d5fa8'; x.fillRect(xc - gap / 2, 100, gap, 70); x.fillStyle = '#2c3550'; x.fillRect(xc - gap / 2, 170, gap, 10); }
+      [-1, 1].forEach(function (sg) {
+        var xa = sg < 0 ? 0 : xc + gap / 2, xb = sg < 0 ? xc - gap / 2 : W, top = [], cb = [], lb = [];
+        for (var X = xa; X <= xb + .1; X += 3) { var sh = gap > 4 ? 0 : 1; top.push([X, sh ? surf(X) : y0]); cb.push([X, sh ? cbot(X) : 175]); lb.push([X, sh ? lbot(X) : 235]); }
+        poly(x, cb.concat(lb.slice().reverse())); x.fillStyle = '#5a4a5f'; x.fill();
+        poly(x, top.concat(cb.slice().reverse())); x.fillStyle = sg < 0 ? '#9a7650' : '#8a6d58'; x.fill();
+        line(x, top); x.strokeStyle = '#5d8a5a'; x.lineWidth = 4; x.stroke();
+        // ชั้นหินคดโค้งในแนวชน
+        if (gap <= 4 && p > .4) for (var L = 1; L <= 3; L++) { var pts = [];
+          for (var X2 = xa; X2 <= xb; X2 += 3) { var b = bell(X2 - xc); pts.push([X2, y0 + L * 20 - Hm * .75 * b + Math.sin((X2 - xc) * .09) * 9 * b * smooth(.4, 1, p) + Hm * .4 * b * L / 3]); }
+          line(x, pts); x.strokeStyle = 'rgba(60,35,20,.55)'; x.lineWidth = 1.4; x.stroke(); }
+        arrow(x, xc + sg * (W * .44), 60, xc + sg * (W * .34), 60, '#FFD166', 3, 10);
+      });
+      // หิมะบนยอดเขา
+      if (Hm > 45) { x.fillStyle = 'rgba(255,255,255,.9)'; x.beginPath(); for (var X3 = xc - wm * .5; X3 <= xc + wm * .5; X3 += 3) { var yy = surf(X3); if (X3 === xc - wm * .5) x.moveTo(X3, yy); else x.lineTo(X3, yy); } x.lineTo(xc, surf(xc) + 18); x.closePath(); x.fill(); }
+      if (gap <= 4) { x.setLineDash([5, 4]); x.strokeStyle = 'rgba(255,107,138,.8)'; x.lineWidth = 2; x.beginPath(); x.moveTo(xc, surf(xc) + 8); x.lineTo(xc + 20, cbot(xc)); x.stroke(); x.setLineDash([]); }
+      if (p > .35) quakeDots(x, [[xc - 30, 120, 0], [xc + 25, 135, 0], [xc - 8, 160, 0], [xc + 40, 175, 1], [xc - 45, 190, 1]], t);
+      label(x, 'แผ่นทวีป', W * .14, 140, '#E8EDFF', 12); label(x, 'แผ่นทวีป', W * .86, 140, '#E8EDFF', 12);
+      label(x, gap > 4 ? 'มหาสมุทรแคบลงเรื่อย ๆ' : 'เทือกเขาสูง', xc, gap > 4 ? 92 : surf(xc) - 14, '#FFD166', 13);
+      if (gap <= 4 && W > 480) label(x, 'ไม่มีภูเขาไฟ (ไม่มีแผ่นใดมุดลงลึก)', xc, 300, '#ffd7b0', 12);
+      if (gap <= 4 && W > 480) label(x, 'รากเทือกเขา (เปลือกโลกหนาขึ้น)', xc, cbot(xc) + 14, '#E8EDFF', 11);
+    },
+    TF: function (x, W, H, mid, p, t) {
+      x.fillStyle = '#3f5a36'; x.fillRect(0, 0, W, H);
+      var dmax = 54, step = dmax * tfStep(p) / 4, far = dmax * p;
+      var off = function (d) { return step + (far - step) * (1 - Math.exp(-d / 90)); };   // ทฤษฎีการดีดกลับ
+      // ทุ่งนาสองฝั่ง
+      x.fillStyle = '#4b6b3e'; for (var r = 0; r < 12; r++) x.fillRect(0, r * 34 + 4, W, 14);
+      var feat = function (y0, col, w, wave) {
+        [-1, 1].forEach(function (sg) {
+          x.beginPath();
+          for (var d = 0; d <= W / 2 + 4; d += 4) { var X = mid + sg * d, Y = y0 - sg * off(d) / 2 + (wave ? Math.sin(X * .05) * 5 : 0); if (d) x.lineTo(X, Y); else x.moveTo(X, Y); }
+          x.strokeStyle = col; x.lineWidth = w; x.stroke();
+        });
+      };
+      feat(H * .32, '#5c5c64', 18, false); feat(H * .32, '#FFD166', 1.6, false);
+      feat(H * .62, '#3FA9F5', 9, true);
+      // แนวรั้ว
+      [-1, 1].forEach(function (sg) { for (var d = 14; d <= W / 2; d += 26) { var X = mid + sg * d, Y = H * .47 - sg * off(d) / 2; x.fillStyle = '#d9c7a0'; x.fillRect(X - 2, Y - 7, 4, 14); } });
+      // รอยเลื่อน
+      x.fillStyle = 'rgba(40,30,20,.75)'; x.fillRect(mid - 4, 0, 8, H);
+      x.strokeStyle = '#FF6B8A'; x.lineWidth = 2; x.setLineDash([8, 5]); x.beginPath(); x.moveTo(mid, 0); x.lineTo(mid, H); x.stroke(); x.setLineDash([]);
+      arrow(x, mid - W * .3, H * .9, mid - W * .3, H * .74, '#FFD166', 3, 10);
+      arrow(x, mid + W * .3, H * .1, mid + W * .3, H * .26, '#FFD166', 3, 10);
+      var locked = far - step;
+      if (shakeA > 0) glow(x, mid, H * .5, 90, [255, 107, 138], .5 * shakeA);
+      label(x, 'รอยเลื่อนแนวระดับ', mid, 20, '#FF6B8A', 13);
+      label(x, 'มุมมองจากด้านบน', 8, H - 10, '#E8EDFF', 12, 'left');
+      label(x, 'ถนน', mid - W * .38, H * .32 - 14, '#E8EDFF', 12); label(x, 'ลำธาร', mid + W * .38, H * .62 + 22, '#9ED8FF', 12);
+      if (locked > 6 && p < 1) label(x, 'รอยเลื่อนยังติดกัน หินบิดงอสะสมพลังงาน', mid, H * .8, '#FFD166', 12);
+      x.font = '600 12px ' + FONT; x.fillStyle = '#E8EDFF'; x.textAlign = 'right'; x.fillText('แผ่นดินไหวแล้ว ' + tfStep(p) + ' ครั้ง', W - 8, H - 10);
+    }
+  };
+  function subduct(x, W, H, p, t, cont) {
+    var xt = W * (cont ? .4 : .42), dip = .62, R = 120;
+    var sk = x.createLinearGradient(0, 0, 0, SEA); sk.addColorStop(0, '#081233'); sk.addColorStop(1, '#16306a'); x.fillStyle = sk; x.fillRect(0, 0, W, SEA);
+    var s = x.createLinearGradient(0, SEA, 0, 240); s.addColorStop(0, '#1d5fa8'); s.addColorStop(1, '#0d2a5c'); x.fillStyle = s; x.fillRect(0, SEA, W, 160);
+    x.fillStyle = '#E8EDFF'; x.font = '700 12px ' + HFONT; x.textAlign = 'left'; x.fillText('ระดับน้ำทะเล', 8, SEA - 6);
+    asth(x, W, H, 236);
+    convLoops(x, W * .55, 330, W * .16, 30, -1, t);
+    // แนวผิวด้านบนของแผ่นที่มุดลง (โค้งลงทีละน้อย)
+    var Ls = 70 + p * W * .62, top0 = 182, th = 52, pts = [], ang = 0, X = xt, Y = top0;
+    pts.push([0, top0]); pts.push([xt - 60, top0]); X = xt - 60;
+    for (var sL = 0; sL < Ls + 60; sL += 4) { ang = Math.min(dip, sL / R * dip); X += Math.cos(ang) * 4; Y += Math.sin(ang) * 4; pts.push([X, Y]); }
+    var botPts = pts.map(function (q, i) { var j = Math.min(i + 1, pts.length - 1), k = Math.max(i - 1, 0), dx = pts[j][0] - pts[k][0], dy = pts[j][1] - pts[k][1], n = Math.hypot(dx, dy) || 1; return [q[0] - dy / n * th, q[1] + dx / n * th]; });
+    poly(x, pts.concat(botPts.slice().reverse())); x.fillStyle = '#4a4560'; x.fill();
+    line(x, pts); x.strokeStyle = '#2c3550'; x.lineWidth = 9; x.stroke();
+    // ลายเส้นแสดงการเคลื่อนที่ของแผ่นที่มุดลง
+    var mv = (p * 300) % 40;
+    for (var k2 = 0; k2 < 30; k2++) { var xx = k2 * 40 + mv - 40; if (xx > xt - 64) break; x.strokeStyle = 'rgba(255,255,255,.12)'; x.lineWidth = 2; x.beginPath(); x.moveTo(xx, top0 + 4); x.lineTo(xx, top0 + th - 4); x.stroke(); }
+    // ร่องลึก : ผิวแผ่นด้านซ้ายโค้งลงใกล้รอยต่อแล้ว
+    var trench = function (X2) { return top0 + 26 * Math.exp(-Math.pow((X2 - xt) / 34, 2)); };
+    // แผ่นด้านบน (ไม่มุด)
+    var upTop = function (X2) { var d = X2 - xt;
+      if (!cont) return 170 - 2 + (d < 40 ? (40 - d) * .5 : 0);
+      return d < 120 ? 170 - (d / 120) * 76 + Math.max(0, 40 - d) * .55 : 94 - 4 * Math.sin(d * .05); };
+    var upBot = function (X2) { var d = X2 - xt; return Math.max(upTop(X2) + 6, Math.min((cont ? 250 : 222), top0 + d * Math.tan(dip) * .9 - 4)); };
+    var top = [], bot = [];
+    for (var X3 = xt + 2; X3 <= W + 3; X3 += 3) { top.push([X3, upTop(X3)]); bot.push([X3, upBot(X3)]); }
+    poly(x, top.concat(bot.slice().reverse())); x.fillStyle = cont ? '#9a7650' : '#4a4560'; x.fill();
+    if (cont) { var lith = top.map(function (q) { return [q[0], Math.max(q[1] + 70, upBot(q[0]) - 30)]; }); poly(x, lith.concat(bot.slice().reverse())); x.fillStyle = '#5a4a5f'; x.fill();
+      line(x, top.filter(function (q) { return q[1] < SEA; })); x.strokeStyle = '#5d8a5a'; x.lineWidth = 4; x.stroke(); }
+    else { line(x, top); x.strokeStyle = '#2c3550'; x.lineWidth = 9; x.stroke(); }
+    // ปิดร่องลึกด้วยน้ำ
+    x.fillStyle = '#123f80'; x.beginPath(); x.moveTo(xt - 70, top0 - 1); for (var X4 = xt - 70; X4 <= xt + 4; X4 += 3) x.lineTo(X4, trench(X4) - 1); x.lineTo(xt + 4, top0 - 12); x.closePath(); x.fill();
+    // จุดที่แผ่นมุดลงลึกราว 100 กม. -> แมกมา
+    var deepY = 262, mpt = null;
+    for (var i = 0; i < pts.length; i++) if (pts[i][1] >= deepY) { mpt = pts[i]; break; }
+    var vh = 0;
+    if (mpt) {
+      var grow = smooth(0, .25, (pts[pts.length - 1][1] - deepY) / 120);
+      var surfY = upTop(mpt[0]); vh = (cont ? 46 : 92) * grow;
+      glow(x, mpt[0] + 6, deepY - 8, 26, [255, 160, 60], .8 * grow);
+      magmaRise(x, mpt[0] + 4, deepY - 10, surfY - 4, t);
+      volcano(x, mpt[0] + 4, surfY + (cont ? 2 : 0), vh, cont ? 30 : 34, grow > .6, t);
+    }
+    // แผ่นดินไหวตามแผ่นที่มุดลง
+    var qs = [];
+    for (var j2 = 10; j2 < pts.length; j2 += 9) { var q = pts[j2]; if (q[0] < xt - 10) continue; qs.push([q[0] + 4, q[1] + 8, q[1] < 215 ? 0 : (q[1] < 290 ? 1 : 2)]); }
+    quakeDots(x, qs, t);
+    arrow(x, W * .08, top0 - 18, W * .2, top0 - 18, '#FFD166', 3, 10);
+    arrow(x, W * .92, (cont ? 70 : 150), W * .8, (cont ? 70 : 150), '#FFD166', 3, 10);
+    label(x, 'ร่องลึกก้นสมุทร', xt - 10, trench(xt) + 22, '#FFD166', 13);
+    label(x, cont ? 'แผ่นมหาสมุทร (หนาแน่นกว่า)' : 'แผ่นมหาสมุทรเก่า (หนาแน่นกว่า)', W * .2, top0 + 34, '#E8EDFF', 12);
+    label(x, cont ? 'แผ่นทวีป' : 'แผ่นมหาสมุทร', W * .88, cont ? 150 : 200, '#E8EDFF', 12);
+    if (mpt && vh > 20) label(x, cont ? 'เทือกเขาภูเขาไฟ' : 'เกาะภูเขาไฟ', mpt[0] + 4, upTop(mpt[0]) - vh - 16, '#FFB86B', 13);
+    if (mpt && W > 480) label(x, 'ลึกราว 100 กม. หลอมเป็นแมกมา', mpt[0] + 18, deepY + 30, '#ffd7b0', 11, 'left');
+    label(x, 'แผ่นที่มุดลง', pts[Math.min(pts.length - 1, 70)][0] - 30, pts[Math.min(pts.length - 1, 70)][1] + 40, '#E8EDFF', 11);
+  }
+
+  // ================================================================ ภารกิจ B แผนที่รอยต่อ
+  var D2R = Math.PI / 180;
+  function eqe(lon, lat) {
+    var A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    var th = Math.asin(M * Math.sin(lat * D2R)), t2 = th * th, t6 = t2 * t2 * t2;
+    return [lon * D2R * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
+  }
+  // แนวรอยต่อแผ่นธรณีอย่างง่าย [ชนิด, จุด lon/lat, ฝั่งแผ่นด้านบน (เฉพาะ C)]  D แยก · C มุดตัว · K ทวีปชน · T เฉือน
+  var BND = [
+    ['D', [[-1, -54], [-14, -48], [-15, -40], [-13, -30], [-14, -20], [-13, -10], [-15, -2], [-25, 0], [-32, 3], [-38, 8], [-45, 15], [-46, 23], [-42, 30], [-33, 37], [-29, 43], [-28, 50], [-32, 55], [-30, 58], [-24, 62], [-18, 65], [-16, 68], [-5, 71], [5, 74], [10, 79]]],
+    ['D', [[-109, 23], [-106, 16], [-103, 9], [-104, 0], [-110, -10], [-112, -20], [-113, -30], [-112, -36], [-115, -45], [-118, -55], [-135, -58], [-150, -62], [-165, -64], [-180, -63]]],
+    ['D', [[180, -63], [160, -61], [150, -57], [140, -51], [125, -50], [110, -48], [95, -42], [80, -35], [70, -26]]],
+    ['D', [[70, -26], [67, -17], [66, -8], [66, 0], [62, 7], [58, 13], [52, 14], [45, 12], [40, 16], [37, 21], [34, 27]]],
+    ['D', [[70, -26], [57, -33], [45, -40], [32, -45], [18, -50], [5, -53], [-1, -54]]],
+    ['D', [[42, 11.5], [40, 8], [38, 4], [36.5, 0], [35.5, -4], [34, -9], [34.5, -14]]],
+    ['C', [[-150, 57], [-158, 54], [-168, 51.5], [-180, 51]], -1],
+    ['C', [[180, 51], [172, 52], [164, 54]], -1],
+    ['C', [[164, 54], [160, 51], [155, 47], [150, 44], [146, 41], [143.5, 38], [142, 35]], -1],
+    ['C', [[142, 35], [142, 30], [143, 24], [145, 18], [147, 13], [144, 11]], -1],
+    ['C', [[138, 34], [134, 32.5], [131, 30], [128, 27], [124, 24], [122, 22]], -1],
+    ['C', [[127, 14], [127, 8], [126.5, 4]], -1],
+    ['C', [[93, 15], [92.5, 10], [93.5, 6], [95.5, 2], [98, -2], [101, -5.5], [105, -8], [110, -10], [115, -11], [120, -11], [125, -10]], 1],
+    ['C', [[147, -7], [153, -7], [158, -9], [163, -11], [167, -14], [169, -20], [171, -23]], 1],
+    ['C', [[-173, -15], [-174, -21], [-176, -27], [-178, -33], [-180, -37]], -1],
+    ['C', [[180, -37], [178, -40], [176, -42]], -1],
+    ['C', [[-128, 50], [-126, 46], [-125, 41]], 1],
+    ['C', [[-106, 20], [-102, 17], [-97, 15], [-93, 14], [-89, 12.5], [-86, 10.5], [-83, 8]], 1],
+    ['C', [[-79, 4], [-81, -3], [-80, -8], [-77, -13], [-73, -17.5], [-71.5, -23], [-72, -30], [-74, -37], [-75.5, -44], [-76, -48]], 1],
+    ['C', [[-62, 19], [-59.5, 15], [-61, 11]], -1],
+    ['K', [[-9, 36], [2, 36.5], [12, 38], [22, 37], [28, 36], [36, 37], [44, 38], [48, 34], [53, 29], [58, 26], [63, 25.5], [67, 26], [69, 30], [72, 34], [75, 35], [80, 31], [85, 28.5], [90, 27.5], [95, 28], [97, 26]]],
+    ['T', [[-125, 41], [-123, 38.5], [-121, 36], [-118, 34.5], [-116, 33], [-114.5, 31.5], [-109, 23]]],
+    ['T', [[97, 26], [96, 23], [96.2, 19], [95.8, 16], [93, 15]]],
+    ['T', [[166, -47], [168.5, -44.5], [172, -42.5], [176, -42]]],
+    ['T', [[34, 27], [35.5, 33], [36.5, 36]]],
+    ['T', [[-88, 15.5], [-80, 19], [-70, 19.5], [-62, 19]]]
+  ];
+  var VOLC = [[[-77, 1], [-78, -2], [-75, -15], [-69, -18], [-68, -24], [-70, -35], [-72, -41]], [[-122, 49], [-122, 42]], [[-103, 19], [-97, 19], [-90, 14], [-86, 12], [-84, 10]],
+    [[-155, 59], [-165, 55], [-178, 52]], [[160, 56], [155, 50], [148, 45], [141, 42], [139, 36], [138, 35]], [[140, 32], [141, 25], [145, 18], [145, 15]], [[124, 13], [125, 8]],
+    [[96, 4], [100, -1], [105, -6], [110, -7.5], [115, -8.3], [120, -8.5], [125, -8]], [[-175, -19], [-176, -25]], [[175.5, -39]], [[-19, 64.5]], [[36, -3], [37, 0], [39, 8], [41, 12]],
+    [[15, 38], [14, 40.8]], [[-61, 15]], [[168, -16]], [[150, -5]], [[130, 31]]];
+  var SITES = [
+    { n: 'ไอซ์แลนด์', lon: -19, lat: 64.5, a: 0, eq: 'ตื้น', vol: 'มี', land: 'สันเขากลางมหาสมุทรโผล่พ้นน้ำ ภูเขาไฟ รอยแยกบนพื้นดิน',
+      clue: 'เกาะที่ตั้งอยู่บนสันเขากลางมหาสมุทรแอตแลนติกพอดี มีรอยแยกบนพื้นดินกว้างขึ้นราวปีละ 2 ซม. ภูเขาไฟปะทุบ่อย และแผ่นดินไหวตื้น ๆ' },
+    { n: 'หุบเขาทรุดแอฟริกาตะวันออก', lon: 37, lat: 2, a: 0, eq: 'ตื้น', vol: 'มี', land: 'หุบเขาทรุด ทะเลสาบยาว ภูเขาไฟ (คิลิมันจาโร)',
+      clue: 'แผ่นดินแอฟริกากำลังถูกดึงแยกออก พื้นตรงกลางทรุดลงเป็นหุบเขายาวหลายพันกิโลเมตร มีทะเลสาบยาวแคบและภูเขาไฟตามขอบ' },
+    { n: 'เทือกเขาหิมาลัย', lon: 85, lat: 28.5, a: 1, eq: 'ตื้นถึงปานกลาง', vol: 'ไม่มี', land: 'เทือกเขาสูงที่สุดในโลก (ยอดเอเวอเรสต์ 8,849 ม.)',
+      clue: 'แผ่นอินเดียเคลื่อนขึ้นเหนือราวปีละ 4–5 ซม. ดันเข้าหาแผ่นยูเรเชีย (ทวีปทั้งคู่) ไม่มีภูเขาไฟ แต่แผ่นดินไหวบ่อย บนยอดเขาพบซากสัตว์ทะเล' },
+    { n: 'เทือกเขาแอนดีส', lon: -70, lat: -20, a: 1, eq: 'ตื้นถึงลึก', vol: 'มี', land: 'ร่องลึกเปรู-ชิลี + เทือกเขาภูเขาไฟริมทวีป',
+      clue: 'แผ่นนัซกา (มหาสมุทร) เคลื่อนเข้าหาทวีปอเมริกาใต้ มีร่องลึกนอกชายฝั่ง ภูเขาไฟเรียงเป็นแนวบนเทือกเขา แผ่นดินไหวยิ่งเข้าไปในทวีปยิ่งลึก' },
+    { n: 'ร่องลึกมาเรียนา', lon: 145, lat: 15, a: 1, eq: 'ตื้นถึงลึก', vol: 'มี', land: 'ร่องลึกก้นสมุทร (ลึกราว 11 กม. ลึกที่สุดในโลก) + หมู่เกาะภูเขาไฟรูปโค้ง',
+      clue: 'แผ่นแปซิฟิกเคลื่อนเข้าหาแผ่นฟิลิปปิน (มหาสมุทรทั้งคู่) ที่นี่เป็นจุดที่ลึกที่สุดในโลก มีเกาะภูเขาไฟเรียงเป็นแนวโค้ง' },
+    { n: 'รอยเลื่อนซานแอนเดรียส', lon: -120, lat: 36, a: 2, eq: 'ตื้น', vol: 'ไม่มี', land: 'รอยเลื่อนแนวระดับ ลำธารและถนนหักเหแนว',
+      clue: 'แผ่นแปซิฟิกเลื่อนขึ้นไปทางเหนือ แผ่นอเมริกาเหนือเลื่อนลงทางใต้ ผ่านกันด้านข้างราวปีละ 3–5 ซม. ไม่มีภูเขาไฟ แผ่นดินไหวตื้นบ่อย' }
+  ];
+  var BTYPE = ['แยกออกจากกัน', 'เคลื่อนเข้าหากัน', 'เฉือนผ่านกัน'];
+  var BCOL = { D: '#4FD8FF', C: '#FF6B8A', K: '#FF6B8A', T: '#FFD166' };
+  var lay = { b: 1, q: 1, v: 1 }, selB = 0;
+  // จุดแผ่นดินไหวตัวอย่างตามแนวรอยต่อ
+  var EQP = (function () {
+    var r = rnd(31), out = [];
+    BND.forEach(function (b) {
+      var P = b[1];
+      for (var i = 0; i < P.length - 1; i++) {
+        var a = P[i], c = P[i + 1], dl = c[0] - a[0], dt = c[1] - a[1], L = Math.hypot(dl, dt), n = Math.max(1, Math.round(L / (b[0] === 'C' ? 2.2 : 2.6)));
+        var nx = -dt / L, ny = dl / L;
+        for (var k = 0; k < n; k++) {
+          var f = (k + r()) / n, lo = a[0] + dl * f, la = a[1] + dt * f;
+          if (b[0] === 'D' || b[0] === 'T') out.push([lo + (r() - .5) * 1.4, la + (r() - .5) * 1.4, 0]);
+          else if (b[0] === 'K') { out.push([lo + (r() - .5) * 4, la + (r() - .5) * 4, 0]); if (r() < .4) out.push([lo + (r() - .5) * 3, la + (r() - .5) * 3, 1]); }
+          else { var s = b[2]; out.push([lo + (r() - .5) * 1.2, la + (r() - .5) * 1.2, 0]);
+            out.push([lo + nx * s * 2.6 + (r() - .5), la + ny * s * 2.6 + (r() - .5), 1]);
+            if (r() < .55) out.push([lo + nx * s * 5 + (r() - .5), la + ny * s * 5 + (r() - .5), 2]); }
+        }
+      }
+    });
+    return out;
+  })();
+  var VOLP = (function () { var out = []; VOLC.forEach(function (v) { if (v.length === 1) { out.push(v[0]); return; }
+    for (var i = 0; i < v.length - 1; i++) { var a = v[i], c = v[i + 1], n = Math.max(1, Math.round(Math.hypot(c[0] - a[0], c[1] - a[1]) / 3)); for (var k = 0; k < n; k++) out.push([a[0] + (c[0] - a[0]) * k / n, a[1] + (c[1] - a[1]) * k / n]); }
+    out.push(v[v.length - 1]); }); return out; })();
+  var PLN = [['แผ่นแปซิฟิก', -150, -5], ['แผ่นอเมริกาเหนือ', -100, 50], ['แผ่นอเมริกาใต้', -55, -18], ['แผ่นยูเรเชีย', 85, 55], ['แผ่นแอฟริกา', 18, 6], ['แผ่นอินเดีย-ออสเตรเลีย', 100, -32], ['แผ่นแอนตาร์กติก', 40, -72], ['แผ่นนัซกา', -92, -18]];
+  var mapT = null;
+  function drawB() {
+    var cv = $('cvB'), w = cv.clientWidth || 600; cv.dataset.h = Math.round(clamp(w * .52, 200, 440));
+    var c = fit(cv), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var sc = Math.min((W - 10) / 5.45, (H - 10) / 2.66), cx = W / 2, cy = H / 2;
+    var P = function (lon, lat) { var q = eqe(lon, lat); return [cx + q[0] * sc, cy - q[1] * sc]; };
+    mapT = P;
+    // พื้นมหาสมุทร
+    x.beginPath(); for (var la = -90; la <= 90; la += 3) { var q = P(-180, la); if (la === -90) x.moveTo(q[0], q[1]); else x.lineTo(q[0], q[1]); }
+    for (var lb = 90; lb >= -90; lb -= 3) { var q2 = P(180, lb); x.lineTo(q2[0], q2[1]); } x.closePath(); x.fillStyle = '#0c1c4a'; x.fill();
+    x.strokeStyle = 'rgba(120,150,220,.12)'; x.lineWidth = 1;
+    for (var lo = -150; lo <= 150; lo += 30) { x.beginPath(); for (var l2 = -90; l2 <= 90; l2 += 5) { var g = P(lo, l2); if (l2 === -90) x.moveTo(g[0], g[1]); else x.lineTo(g[0], g[1]); } x.stroke(); }
+    for (var lt = -60; lt <= 60; lt += 30) { x.beginPath(); for (var o2 = -180; o2 <= 180; o2 += 5) { var g2 = P(o2, lt); if (o2 === -180) x.moveTo(g2[0], g2[1]); else x.lineTo(g2[0], g2[1]); } x.stroke(); }
+    // ทวีป
+    if (GEO) Object.keys(GEO).forEach(function (k) { GEO[k].forEach(function (ring) {
+      x.beginPath(); ring.forEach(function (p, i) { var q3 = P(p[0], p[1]); if (i) x.lineTo(q3[0], q3[1]); else x.moveTo(q3[0], q3[1]); }); x.closePath();
+      x.fillStyle = '#2f3d68'; x.fill(); x.strokeStyle = '#4c5d96'; x.lineWidth = .8; x.stroke(); }); });
+    var dotR = W < 500 ? 1.6 : 2.2;
+    if (lay.q) EQP.forEach(function (e) { var q4 = P(e[0], e[1]); x.fillStyle = EQC[e[2]]; x.globalAlpha = .85; x.beginPath(); x.arc(q4[0], q4[1], dotR, 0, 6.283); x.fill(); });
+    x.globalAlpha = 1;
+    if (lay.b) BND.forEach(function (b) {
+      x.beginPath(); b[1].forEach(function (p, i) { var q5 = P(p[0], p[1]); if (i) x.lineTo(q5[0], q5[1]); else x.moveTo(q5[0], q5[1]); });
+      x.strokeStyle = BCOL[b[0]]; x.lineWidth = W < 500 ? 1.8 : 2.6; if (b[0] === 'T') x.setLineDash([6, 4]); x.stroke(); x.setLineDash([]);
+    });
+    if (lay.v) VOLP.forEach(function (v) { var q6 = P(v[0], v[1]), r = W < 500 ? 3 : 4.2; x.fillStyle = '#FF4D2E'; x.strokeStyle = '#05081a'; x.lineWidth = .8;
+      x.beginPath(); x.moveTo(q6[0], q6[1] - r); x.lineTo(q6[0] + r * .9, q6[1] + r * .7); x.lineTo(q6[0] - r * .9, q6[1] + r * .7); x.closePath(); x.fill(); x.stroke(); });
+    if (W > 600) PLN.forEach(function (n) { var q7 = P(n[1], n[2]); x.font = '600 11px ' + FONT; x.textAlign = 'center'; x.fillStyle = 'rgba(200,210,240,.55)'; x.fillText(n[0], q7[0], q7[1]); });
+    if ((lay.v || lay.q) && W > 520) { var rf = P(-160, 32); label(x, 'วงแหวนแห่งไฟ', rf[0], rf[1], '#FF8FA6', W < 500 ? 10 : 13); var rf2 = P(160, 30); label(x, 'วงแหวนแห่งไฟ', rf2[0], rf2[1], '#FF8FA6', W < 500 ? 10 : 13); }
+    // กรุงเทพฯ
+    var bk = P(100.5, 13.75); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(bk[0], bk[1], 3.4, 0, 6.283); x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.stroke();
+    label(x, 'ไทย', bk[0] - 4, bk[1] + (W < 500 ? 12 : 15), '#FFD166', W < 500 ? 10 : 12, 'right');
+    // สถานที่สำรวจ
+    SITES.forEach(function (s, i) {
+      var q8 = P(s.lon, s.lat), on = i === selB, done = S.recB[i];
+      if (on) { var pr = 12 + 4 * Math.sin(tA * 4); x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.arc(q8[0], q8[1], pr, 0, 6.283); x.stroke(); }
+      x.fillStyle = done ? '#5EF2A5' : '#E8EDFF'; x.strokeStyle = '#05081a'; x.lineWidth = 2; x.beginPath(); x.arc(q8[0], q8[1], W < 500 ? 7 : 9, 0, 6.283); x.fill(); x.stroke();
+      x.font = '700 ' + (W < 500 ? 9 : 11) + 'px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(String(i + 1), q8[0], q8[1] + (W < 500 ? 3 : 4));
+      if (on && W > 420) label(x, s.n, q8[0], q8[1] - 18, '#FFD166', 12);
+    });
+  }
+  function updB() {
+    var h = '<span class="lbl">ชั้นข้อมูล</span>';
+    [['b', 'รอยต่อแผ่นธรณี'], ['q', 'แผ่นดินไหว'], ['v', 'ภูเขาไฟ']].forEach(function (z) { h += '<button class="chip' + (lay[z[0]] ? ' on' : '') + '" data-l="' + z[0] + '">' + z[1] + '</button>'; });
+    $('layChips').innerHTML = h; bindChips($('layChips'), 'l', function (v) { lay[v] = lay[v] ? 0 : 1; updB(); drawB(); });
+    h = '<span class="lbl">สถานที่</span>';
+    SITES.forEach(function (s, i) { h += '<button class="chip' + (i === selB ? ' on' : '') + (S.recB[i] ? ' done' : '') + '" data-s="' + i + '">' + (i + 1) + ' ' + s.n + '</button>'; });
+    $('siteChips').innerHTML = h; bindChips($('siteChips'), 's', function (v) { selB = +v; updB(); drawB(); });
+    var s = SITES[selB], ok = S.recB[selB];
+    $('bName').textContent = (selB + 1) + ' ' + s.n;
+    $('bClue').textContent = s.clue;
+    $('bData').innerHTML = '<div><div class="k">แผ่นดินไหว</div><span class="lvl ' + (s.eq === 'ตื้น' ? 'm' : 'n') + '">' + s.eq + '</span></div><div><div class="k">ภูเขาไฟ</div><span class="lvl ' + (s.vol === 'มี' ? 'n' : 'y') + '">' + s.vol + '</span></div>';
+    $('bAsk').innerHTML = BTYPE.map(function (b, j) { return '<button data-j="' + j + '" class="' + (ok && j === s.a ? 'ok' : '') + '">' + b + '</button>'; }).join('');
+    Array.prototype.forEach.call($('bAsk').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.recB[selB]) return; var j = +b.getAttribute('data-j');
+        if (j === SITES[selB].a) { S.recB[selB] = 1; save(); updB(); drawB(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('bLand').innerHTML = ok ? 'ถูกต้อง : รอยต่อแบบ<b>' + BTYPE[s.a] + '</b> · ธรณีสัณฐานเด่น : ' + s.land : '';
+    var n = 0, rows = '';
+    SITES.forEach(function (z, i) { var r = S.recB[i]; if (r) n++;
+      rows += '<tr' + (i === selB ? ' class="cur"' : '') + '><td class="n">' + (i + 1) + ' ' + z.n + '</td><td>' + (r ? BTYPE[z.a] : '-') + '</td><td>' + (r ? z.land : '-') + '</td></tr>'; });
+    $('logB').innerHTML = rows;
+    $('progB').innerHTML = 'ตามหาแล้ว <b>' + n + '/6</b>' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ C ได้' : '');
+  }
+  $('cvB').onclick = function (ev) {
+    if (!mapT) return; var r = this.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, best = -1, bd = 22;
+    SITES.forEach(function (s, i) { var q = mapT(s.lon, s.lat), d = Math.hypot(q[0] - mx, q[1] - my); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) { selB = best; updB(); drawB(); }
+  };
+
+  // ================================================================ ภารกิจ C ห้องทดลองรอยเลื่อน
+  var FORCE = ['บีบอัด (ดันเข้าหากัน)', 'ดึง (ดึงออกจากกัน)', 'เฉือน (เลื่อนผ่านกัน)'], ROCK = ['อ่อนตัว (อยู่ลึก ร้อน)', 'เปราะ (ใกล้ผิวโลก เย็น)'];
+  var FS = ['บีบอัด', 'ดึง', 'เฉือน'], RS = ['อ่อนตัว', 'เปราะ'];
+  var RES = {
+    CD: { res: 'ชั้นหินคดโค้ง', eq: 0, why: 'หินที่ลึกและร้อนอ่อนตัว เมื่อถูกบีบจึงค่อย ๆ โค้งงอเป็นลอนโดยไม่แตก ส่วนที่โค้งขึ้นเรียกประทุนคว่ำ ส่วนที่โค้งลงเรียกประทุนหงาย พบมากในเทือกเขาที่เกิดจากการชนกัน' },
+    TD: { res: 'ชั้นหินยืดและบางลง', eq: 0, why: 'หินอ่อนตัวถูกดึงจึงยืดและบางลงคล้ายดึงดินน้ำมัน ผลนี้ไม่ต้องบันทึก ลองเปลี่ยนเป็นหินเปราะดู' },
+    CB: { res: 'รอยเลื่อนย้อน', eq: 1, why: 'หินเปราะถูกบีบ สะสมพลังงานจนแตก หินด้านบนรอยเลื่อน (ด้านซ้าย) <b>เลื่อนขึ้น</b> ทับอีกฝั่ง เปลือกโลกหดสั้นลง พบในบริเวณที่แผ่นธรณีชนกัน' },
+    TB: { res: 'รอยเลื่อนปกติ', eq: 1, why: 'หินเปราะถูกดึง สะสมพลังงานจนแตก หินด้านบนรอยเลื่อน (ด้านขวา) <b>เลื่อนลง</b> เปลือกโลกยืดออก พบในบริเวณที่แผ่นธรณีแยกออก เช่น หุบเขาทรุด' },
+    SB: { res: 'รอยเลื่อนแนวระดับ', eq: 1, why: 'หินสองฝั่งเลื่อนผ่านกันในแนวราบ ช่วงที่ติดกัน หินบิดงอ (แนวต้นไม้โค้ง) เมื่อแตกจะเลื่อนฉับพลัน แนวต้นไม้และถนนขาดเหลื่อมกัน เช่น รอยเลื่อนสะกาย รอยเลื่อนซานแอนเดรียส' }
+  };
+  var fC = 0, rC = 0, fv = 0, ruptN = 0, shakeC = 0, SEIS = [], seisAmp = 0;
+  for (var si = 0; si < 220; si++) SEIS.push(0);
+  function keyC() { return fC === 2 ? 'SB' : (fC === 0 ? 'C' : 'T') + (rC === 0 ? 'D' : 'B'); }
+  function ruptCount(f) { return f >= .9 ? 2 : (f >= .7 ? 1 : 0); }
+  function quakeC() { shakeC = .8; seisAmp = 1; }
+  function energy() { var k = keyC(); if (k[1] === 'D') return .25 * fv; if (fv < .7) return fv / .7; if (fv < .9) return (fv - .7) / .2 * .6; return (fv - .9) / .1 * .35; }
+  function updC() {
+    var k = keyC(), R = RES[k], brittle = k[1] !== 'D';
+    var h = '<span class="lbl">แรงที่กระทำ</span>';
+    FORCE.forEach(function (f, i) { h += '<button class="chip' + (i === fC ? ' on' : '') + '" data-f="' + i + '">' + f + '</button>'; });
+    $('forceChips').innerHTML = h; bindChips($('forceChips'), 'f', function (v) { fC = +v; fv = 0; ruptN = 0; updC(); drawC(); });
+    h = '<span class="lbl">สภาพหิน</span>';
+    ROCK.forEach(function (r, i) { h += '<button class="chip' + (fC !== 2 && i === rC ? ' on' : (fC === 2 && i === 1 ? ' on' : '')) + '" data-r="' + i + '"' + (fC === 2 ? ' disabled' : '') + '>' + r + '</button>'; });
+    $('rockChips').innerHTML = h + (fC === 2 ? '<span class="lbl">แรงเฉือนใกล้ผิวโลก หินเปราะ (มองจากด้านบน)</span>' : ''); bindChips($('rockChips'), 'r', function (v) { if (fC === 2) return; rC = +v; fv = 0; ruptN = 0; updC(); drawC(); });
+    $('cSet').textContent = FS[fC] + ' · ' + (fC === 2 ? 'เปราะ' : RS[rC]);
+    $('cBar').style.width = Math.round(clamp(energy(), 0, 1) * 100) + '%';
+    var done = brittle ? fv >= .7 : fv >= .9;
+    $('cRes').textContent = done ? R.res : (brittle ? (fv > .45 ? 'หินเริ่มบิดงอ ใกล้จะแตก ...' : 'ค่อย ๆ เพิ่มแรง ...') : (fv > .3 ? 'หินกำลังเปลี่ยนรูป ...' : 'ค่อย ๆ เพิ่มแรง ...'));
+    if (done) lvl($('cEq'), R.eq ? 'เกิดแผ่นดินไหว (หินแตกเลื่อนฉับพลัน)' : 'ไม่เกิดทันที (หินค่อย ๆ โค้ง)', R.eq ? 'n' : 'y');
+    else lvl($('cEq'), brittle ? 'กำลังสะสมพลังงาน' : 'ยังไม่เกิด', 'm');
+    $('cWhy').innerHTML = done ? R.why : 'สังเกตลูกศรแรง แถบพลังงานที่สะสม และเครื่องวัดแผ่นดินไหว';
+    $('fR').value = Math.round(fv * 100);
+    var canRec = done && k !== 'TD';
+    $('recC').disabled = !canRec;
+    var n = 0, rows = '';
+    ['CD', 'CB', 'TB', 'SB'].forEach(function (z) { var r = S.recC[z], RR = RES[z]; if (r) n++;
+      rows += '<tr' + (z === k ? ' class="cur"' : '') + '><td>' + FS[z === 'SB' ? 2 : (z[0] === 'C' ? 0 : 1)] + '</td><td>' + (z[1] === 'D' ? 'อ่อนตัว' : 'เปราะ') + '</td><td>' + (r ? RR.res : '-') + '</td><td>' + (r ? (RR.eq ? '<span class="no">เกิด</span>' : '<span class="yes">ไม่เกิดทันที</span>') : '-') + '</td></tr>'; });
+    $('logC').innerHTML = rows;
+    $('recCMsg').textContent = k === 'TD' && done ? 'ผลนี้ไม่ต้องบันทึก ลองแบบอื่น' : (!done ? (brittle ? 'เพิ่มแรงจนหินแตกก่อนจึงบันทึกได้' : 'เพิ่มแรงจนเกือบสุดก่อนจึงบันทึกได้') : 'บันทึกแล้ว ' + n + '/4' + (n === 4 ? ' · ครบแล้ว ไปขั้นที่ 2 ได้' : ''));
+  }
+  $('fR').oninput = function () { fv = +this.value / 100; var n = keyC()[1] === 'D' ? 0 : ruptCount(fv); if (n > ruptN) quakeC(); ruptN = n; updC(); drawC(); };
+  $('resetC').onclick = function () { fv = 0; ruptN = 0; updC(); drawC(); };
+  $('recC').onclick = function () { var k = keyC(); if (k === 'TD') return; S.recC[k] = 1; save(); updC(); };
+  var LAY = ['#d8b36a', '#a8714c', '#cfc6a6', '#8a9670', '#c2875a', '#7f6a8a'];
+  function house(x, hx, hy) { x.fillStyle = '#E8EDFF'; x.fillRect(hx - 9, hy - 14, 18, 14); x.fillStyle = '#FF7A5A'; x.beginPath(); x.moveTo(hx - 12, hy - 14); x.lineTo(hx, hy - 24); x.lineTo(hx + 12, hy - 14); x.closePath(); x.fill(); }
+  function tree(x, tx, ty) { x.fillStyle = '#6b4a2a'; x.fillRect(tx - 1.5, ty - 10, 3, 10); x.fillStyle = '#4caf6a'; x.beginPath(); x.arc(tx, ty - 14, 7, 0, 6.283); x.fill(); }
+  function drawC() {
+    var cv = $('cvC'), c = fit(cv), x = c.x, W = c.W, H = c.H, k = keyC(), f = fv, t = tA;
+    x.save();
+    if (shakeC > 0) x.translate(Math.sin(t * 60) * 5 * shakeC, Math.cos(t * 47) * 3 * shakeC);
+    var sk = x.createLinearGradient(0, 0, 0, 120); sk.addColorStop(0, '#081233'); sk.addColorStop(1, '#1e3d7a'); x.fillStyle = sk; x.fillRect(-10, -10, W + 20, H + 20);
+    var bx0 = W * .1, bx1 = W * .9, top = 120, bot = 300, cx = W / 2, nL = LAY.length, lh = (bot - top) / nL;
+    if (k === 'SB') { drawShear(x, W, H, f, t); x.restore(); drawSeis(); return; }
+    x.fillStyle = '#2a1d14'; x.fillRect(0, bot, W, H - bot);
+    if (k === 'CD' || k === 'TD') {
+      var hw = (bx1 - bx0) / 2 * (k === 'CD' ? 1 - .22 * f : 1 + .14 * f), lam = (bx1 - bx0) * .5, A = 34 * f;
+      var yAt = function (X, y0) { var dx = X - cx;
+        if (k === 'CD') return y0 - A * Math.cos(2 * Math.PI * dx / (lam * (1 - .22 * f)));
+        var mY = (top + bot) / 2, fac = 1 - .5 * f * Math.exp(-Math.pow(dx / 70, 2)); return mY + (y0 - mY) * fac; };
+      for (var L = 0; L < nL; L++) {
+        var ya = top + L * lh, yb = ya + lh, up = [], dn = [];
+        for (var X = cx - hw; X <= cx + hw + .1; X += 3) { up.push([X, yAt(X, ya)]); dn.push([X, yAt(X, yb)]); }
+        poly(x, up.concat(dn.reverse())); x.fillStyle = LAY[L]; x.fill(); x.strokeStyle = 'rgba(40,25,15,.35)'; x.lineWidth = 1; x.stroke();
+      }
+      var surf = function (X) { return yAt(X, top); };
+      x.beginPath(); for (var X2 = cx - hw; X2 <= cx + hw; X2 += 3) { if (X2 === cx - hw) x.moveTo(X2, surf(X2)); else x.lineTo(X2, surf(X2)); } x.strokeStyle = '#5d8a5a'; x.lineWidth = 4; x.stroke();
+      house(x, cx - hw * .5, surf(cx - hw * .5)); tree(x, cx + hw * .45, surf(cx + hw * .45));
+      var al = 20 + 40 * f;
+      if (f > 0) [-1, 1].forEach(function (sg) { var ex = cx + sg * (hw + 8), y = (top + bot) / 2;
+        if (k === 'CD') arrow(x, ex + sg * (al + 10), y, ex + sg * 6, y, '#FF9F6B', 5, 14); else arrow(x, ex - sg * 2, y, ex + sg * (al + 4), y, '#4FD8FF', 5, 14); });
+      if (k === 'CD' && f > .5) { label(x, 'ประทุนคว่ำ', cx, surf(cx) - 26, '#FFD166', 13); label(x, 'ประทุนหงาย', cx - lam * (1 - .22 * f) / 2, surf(cx - lam * (1 - .22 * f) / 2) - 26, '#4FD8FF', 12);
+        if (W > 480) label(x, 'ประทุนหงาย', cx + lam * (1 - .22 * f) / 2, surf(cx + lam * (1 - .22 * f) / 2) - 26, '#4FD8FF', 12); }
+      x.fillStyle = '#2a1d14'; x.fillRect(0, bot, W, H - bot); x.strokeStyle = 'rgba(255,255,255,.15)'; x.beginPath(); x.moveTo(0, bot); x.lineTo(W, bot); x.stroke();
+      if (W > 480) { x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText('ชั้นหินยังต่อเนื่องลงไปด้านล่าง', W - 8, bot + 16); }
+    } else {
+      // หินเปราะ : รอยเลื่อนย้อน (CB) หรือ รอยเลื่อนปกติ (TB)
+      var rev = k === 'CB', n = ruptCount(f), d = 34 * n / 2 + (n ? 6 : 0);
+      var ft = rev ? [cx + 50, top] : [cx - 50, top], fb = rev ? [cx - 90, bot] : [cx + 90, bot];
+      var ux = ft[0] - fb[0], uy = ft[1] - fb[1], ul = Math.hypot(ux, uy); ux /= ul; uy /= ul;   // ทิศขึ้นตามระนาบรอยเลื่อน
+      var mvx = rev ? ux * d : -ux * d, mvy = rev ? uy * d : -uy * d;
+      var bend = n ? 0 : 7 * f / .7;
+      var ext = 400, hang = rev ? [[ft[0], ft[1]], [fb[0], fb[1]], [fb[0] - ux * ext, fb[1] - uy * ext], [bx0 - ext, bot + ext], [bx0 - ext, top]]
+                               : [[ft[0], ft[1]], [fb[0], fb[1]], [fb[0] - ux * ext, fb[1] - uy * ext], [bx1 + ext, bot + ext], [bx1 + ext, top]];
+      var foot = rev ? [[ft[0], ft[1]], [bx1, top], [bx1, bot], [fb[0], fb[1]]] : [[ft[0], ft[1]], [bx0, top], [bx0, bot], [fb[0], fb[1]]];
+      var bands = function () { for (var L2 = 0; L2 < nL; L2++) { x.beginPath(); var ya2 = top + L2 * lh;
+        for (var X3 = bx0 - 60; X3 <= bx1 + 60; X3 += 6) { var by = ya2 - bend * Math.cos((X3 - cx) / (bx1 - bx0) * Math.PI); if (X3 === bx0 - 60) x.moveTo(X3, by); else x.lineTo(X3, by); }
+        for (var X4 = bx1 + 60; X4 >= bx0 - 60; X4 -= 6) x.lineTo(X4, ya2 + lh - bend * Math.cos((X4 - cx) / (bx1 - bx0) * Math.PI));
+        x.closePath(); x.fillStyle = LAY[L2]; x.fill(); x.strokeStyle = 'rgba(40,25,15,.35)'; x.lineWidth = 1; x.stroke(); } };
+      x.save(); x.beginPath(); x.rect(bx0, top - 80, bx1 - bx0, bot - top + 80); x.clip();
+      x.save(); poly(x, foot); x.clip(); bands(); x.restore();
+      x.save(); x.translate(mvx, mvy); poly(x, hang); x.clip(); bands(); x.restore();
+      x.restore();
+      // ผิวดิน + บ้าน
+      var hx = rev ? cx - 50 : cx + 60, hxy = top - bend * Math.cos((hx - cx) / (bx1 - bx0) * Math.PI);
+      house(x, hx + mvx, hxy + mvy + 1); tree(x, rev ? cx + 120 : cx - 120, top - bend * Math.cos(((rev ? 120 : -120)) / (bx1 - bx0) * Math.PI) + 1);
+      if (n) { x.strokeStyle = '#FF6B8A'; x.lineWidth = 2.6; x.beginPath(); x.moveTo(fb[0], fb[1]); x.lineTo(ft[0] + (rev ? mvx : 0), ft[1] + (rev ? mvy : 0)); x.stroke();
+        var hx2 = (ft[0] + fb[0]) / 2, hy2 = (ft[1] + fb[1]) / 2;
+        arrow(x, hx2 - 26 - (rev ? 0 : 0), hy2 + (rev ? 18 : -18), hx2 - 26 + ux * (rev ? 26 : -26), hy2 + (rev ? 18 : -18) + uy * (rev ? 26 : -26), '#FFD166', 2.6, 9);
+        label(x, k === 'CB' ? 'รอยเลื่อนย้อน' : 'รอยเลื่อนปกติ', (rev ? ft[0] + 40 : ft[0] - 40) + mvx, top - 40 + Math.min(0, mvy), '#FF6B8A', 14);
+        label(x, 'หินด้านบนรอยเลื่อน' + (rev ? 'เลื่อนขึ้น' : 'เลื่อนลง'), rev ? bx0 + 60 : bx1 - 60, bot - 14, '#FFD166', 12); }
+      else if (f > .45) { x.setLineDash([4, 5]); x.strokeStyle = 'rgba(255,107,138,' + ((f - .45) * 2.4) + ')'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(fb[0], fb[1]); x.lineTo(ft[0], ft[1]); x.stroke(); x.setLineDash([]);
+        label(x, 'รอยร้าวเริ่มเกิด', ft[0], top - 12, '#FF8FA6', 12); }
+      var al2 = 20 + 40 * f;
+      if (f > 0) [-1, 1].forEach(function (sg) { var ex = sg < 0 ? bx0 - 8 : bx1 + 8, y = (top + bot) / 2;
+        if (rev) arrow(x, ex + sg * (al2 + 10), y, ex + sg * 4, y, '#FF9F6B', 5, 14); else arrow(x, ex - sg * 2, y, ex + sg * (al2 + 4), y, '#4FD8FF', 5, 14); });
+    }
+    x.restore();
+    label(x, 'ภาพตัดขวางชั้นหิน', 8, H - 8, '#E8EDFF', 12, 'left');
+    if (shakeC > 0) label(x, 'แผ่นดินไหว !', W / 2, 34, '#FF6B8A', 22);
+    drawSeis();
+  }
+  function drawShear(x, W, H, f, t) {
+    x.fillStyle = '#3f5a36'; x.fillRect(-10, -10, W + 20, H + 20);
+    var mid = W / 2, dmax = 46, n = ruptCount(f), step = dmax * n / 2, far = dmax * Math.min(1, f / .9);
+    var off = function (d) { return step + (far - step) * (1 - Math.exp(-d / 80)); };
+    for (var r = 0; r < 7; r++) { var y0 = 34 + r * 44;
+      [-1, 1].forEach(function (sg) { for (var d = 16; d <= W / 2 - 8; d += 24) { var X = mid + sg * d, Y = y0 + sg * off(d) / 2; tree(x, X, Y + 8); } }); }
+    [-1, 1].forEach(function (sg) { x.beginPath(); for (var d = 0; d <= W / 2 + 4; d += 4) { var X = mid + sg * d, Y = H * .55 + sg * off(d) / 2; if (d) x.lineTo(X, Y); else x.moveTo(X, Y); } x.strokeStyle = '#5c5c64'; x.lineWidth = 14; x.stroke(); });
+    x.fillStyle = 'rgba(40,30,20,.75)'; x.fillRect(mid - 4, 0, 8, H);
+    if (n) { x.strokeStyle = '#FF6B8A'; x.lineWidth = 2; x.setLineDash([8, 5]); x.beginPath(); x.moveTo(mid, 0); x.lineTo(mid, H); x.stroke(); x.setLineDash([]); }
+    if (f > 0) { arrow(x, mid - W * .3, H * .1, mid - W * .3, H * .1 + 20 + 30 * f, '#FFD166', 4, 12); arrow(x, mid + W * .3, H * .92, mid + W * .3, H * .92 - 20 - 30 * f, '#FFD166', 4, 12); }
+    label(x, n ? 'รอยเลื่อนแนวระดับ' : (f > .45 ? 'รอยเลื่อนยังติดกัน แนวต้นไม้บิดงอ' : 'ภาพมองจากด้านบน'), mid, 20, n ? '#FF6B8A' : '#FFD166', 13);
+    label(x, 'มุมมองจากด้านบน', 8, H - 8, '#E8EDFF', 12, 'left');
+    if (shakeC > 0) label(x, 'แผ่นดินไหว !', W / 2, 50, '#FF6B8A', 22);
+  }
+  function drawSeis() {
+    var c = fit($('cvSeis')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#04071a'; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(120,150,220,.2)'; x.lineWidth = 1; x.beginPath(); x.moveTo(0, H / 2); x.lineTo(W, H / 2); x.stroke();
+    x.beginPath(); SEIS.forEach(function (v, i) { var X = i / (SEIS.length - 1) * W, Y = H / 2 - v * (H / 2 - 4); if (i) x.lineTo(X, Y); else x.moveTo(X, Y); });
+    x.strokeStyle = '#5EF2A5'; x.lineWidth = 1.4; x.stroke();
+  }
+  function seisTick(dt) {
+    var r = Math.random, v = (r() - .5) * .06;
+    if (seisAmp > .01) { v += Math.sin(tA * 55) * seisAmp * (.6 + .4 * r()); seisAmp *= Math.pow(.18, dt); }
+    SEIS.push(v); SEIS.shift();
+  }
+
+  // ไขรหัสรอยต่อ
+  var OPTS = ['การพาความร้อน', 'รอยต่อแบบแยกออก', 'รอยต่อแบบชนกัน', 'รอยต่อแบบเฉือนผ่าน', 'ร่องลึกก้นสมุทร', 'รอยเลื่อน', 'ชั้นหินคดโค้ง', 'วงแหวนแห่งไฟ'];
+  var CL = [
+    { L: 'P', q: 'กระบวนการในชั้นฐานธรณีภาค เนื้อโลกร้อนลอยขึ้น เย็นจมลง หมุนวนเป็นวง เป็นแรงที่ทำให้แผ่นธรณีเคลื่อนที่ (G2)', a: 0,
+      w: 'การพาความร้อน เป็นต้นเหตุให้แผ่นธรณีเคลื่อนที่ และเกิดรอยต่อทั้ง 3 แบบ' },
+    { L: 'L', q: 'แผ่นธรณีเคลื่อนออกจากกัน แมกมาดันขึ้นมาเป็นเปลือกโลกใหม่ เกิดสันเขากลางมหาสมุทร หรือหุบเขาทรุดบนทวีป', a: 1,
+      w: 'รอยต่อแบบแยกออกจากกัน เช่น สันเขากลางมหาสมุทรแอตแลนติก หุบเขาทรุดแอฟริกาตะวันออก' },
+    { L: 'A', q: 'แผ่นธรณีเคลื่อนเข้าหากัน แผ่นที่หนาแน่นกว่ามุดลง หรือทวีปชนทวีปจนเกิดเทือกเขาสูง', a: 2,
+      w: 'รอยต่อแบบเคลื่อนเข้าหากัน เช่น เทือกเขาแอนดีส ญี่ปุ่น เทือกเขาหิมาลัย' },
+    { L: 'T', q: 'แผ่นธรณีเลื่อนผ่านกันในแนวระดับ ไม่เกิดและไม่ทำลายเปลือกโลก ไม่มีภูเขาไฟ', a: 3,
+      w: 'รอยต่อแบบเฉือนผ่านกัน เช่น รอยเลื่อนซานแอนเดรียส รอยเลื่อนสะกายในเมียนมา' },
+    { L: 'E', q: 'แอ่งแคบและลึกที่สุดของพื้นมหาสมุทร เกิดตรงที่แผ่นมหาสมุทรมุดลง จุดที่ลึกที่สุดในโลกลึกราว 11 กม.', a: 4,
+      w: 'ร่องลึกก้นสมุทร เช่น ร่องลึกมาเรียนา ร่องลึกซุนดา (ใกล้ประเทศไทย)' },
+    { L: 'S', q: 'แนวแตกในหินที่หินสองฝั่งเคลื่อนผ่านกัน เมื่อเลื่อนอย่างฉับพลันจะเกิดแผ่นดินไหว', a: 5,
+      w: 'รอยเลื่อน มี 3 แบบ คือ รอยเลื่อนปกติ รอยเลื่อนย้อน รอยเลื่อนแนวระดับ (ขั้นที่ 1)' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '" id="cl' + i + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำใบ้ที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      OPTS.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  var EV = [
+    { y: 'ราว 200–250 ล้านปีก่อน', n: 'แผ่นดินไทยเกิดจากการชนกัน', d: 'แผ่นทวีปย่อยฉาน-ไทยเคลื่อนขึ้นเหนือมาชนกับแผ่นอินโดจีน (G2) แนวรอยต่อเก่าอยู่แถวน่าน-อุตรดิตถ์', i: 'รอยต่อแบบชนกัน (ในอดีต)' },
+    { y: 'ปัจจุบัน', n: 'อินเดียยังดันยูเรเชีย', d: 'แรงจากการชนที่สร้างเทือกเขาหิมาลัยส่งผลถึงภาคเหนือและภาคตะวันตกของไทย กรมทรัพยากรธรณีระบุกลุ่มรอยเลื่อนมีพลังในไทยราว 16 กลุ่ม', i: 'รอยเลื่อนมีพลัง : อาจเกิดแผ่นดินไหวได้อีก' },
+    { y: '26 ธ.ค. 2547', n: 'แผ่นดินไหวสุมาตรา ขนาด 9.1', d: 'แผ่นอินเดีย-ออสเตรเลียมุดลงใต้แผ่นซุนดาที่ร่องลึกซุนดา พื้นทะเลยกตัวฉับพลัน เกิดสึนามิถึงชายฝั่งอันดามันของไทย', i: 'รอยต่อแบบชนกัน · เรียนต่อ G5' },
+    { y: '28 มี.ค. 2568', n: 'แผ่นดินไหวเมียนมา ขนาด 7.7', d: 'รอยเลื่อนสะกายในเมียนมาเลื่อนผ่านกันในแนวระดับ แรงสั่นถึงกรุงเทพฯ ที่ห่างราว 1,000 กม. อาคารสูงหลายแห่งได้รับความเสียหาย', i: 'รอยต่อแบบเฉือนผ่าน (รอยเลื่อนแนวระดับ)' },
+    { y: 'หลายแสนถึงล้านปีก่อน', n: 'ภูเขาไฟที่ดับแล้วในไทย', d: 'เช่น เขาพนมรุ้ง และเขากระโดง จังหวัดบุรีรัมย์ เป็นภูเขาไฟที่ดับแล้ว ปัจจุบันประเทศไทยไม่มีภูเขาไฟที่ยังมีพลัง', i: 'เรียนต่อ G4 ภูเขาไฟ' },
+    { y: 'ทุกวันนี้', n: 'ไทยไม่ได้อยู่บนรอยต่อ', d: 'แต่อยู่ไม่ไกลจากรอยต่อทางทิศตะวันตก จึงรู้สึกแผ่นดินไหวจากเพื่อนบ้านได้ และชายฝั่งอันดามันเสี่ยงสึนามิ', i: 'ต้องรู้จักการเฝ้าระวังและรับมือ (G5)' }
+  ];
+  $('evid').innerHTML = EV.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawA();
+    if (tab === 'B') drawB();
+    if (tab === 'C') drawC();
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (shakeA > 0) shakeA = Math.max(0, shakeA - dt);
+    if (shakeC > 0) shakeC = Math.max(0, shakeC - dt);
+    if (tab === 'A') { stepPlay(dt); drawA(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { seisTick(dt); drawC(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_G3 = { CASES: CASES, SITES: SITES, BTYPE: BTYPE, RES: RES, CL: CL,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; shakeA = 0; shakeC = 0; },
+    setA: function (i, p, t) { playing = 0; cA = i; pA = p; if (t != null) tA = t; tfCount = tfStep(p); updA(); drawA(); },
+    setB: function (i, l) { selB = i; if (l) lay = l; updB(); drawB(); },
+    setC: function (fi, ri, f, quake) { fC = fi; rC = ri; fv = f; ruptN = keyC()[1] === 'D' ? 0 : ruptCount(f);
+      if (quake) { for (var i = 0; i < SEIS.length; i++) { var a = i > 120 ? Math.exp(-(i - 120) / 22) : 0; SEIS[i] = (Math.random() - .5) * .06 + (a ? Math.sin(i * 1.3) * a * .95 : 0); } }
+      else for (var j = 0; j < SEIS.length; j++) SEIS[j] = (Math.random() - .5) * .06;
+      updC(); drawC(); },
+    recAll: function () { CASES.forEach(function (z) { S.recA[z.k] = 1; }); SITES.forEach(function (s, i) { S.recB[i] = 1; }); ['CD', 'CB', 'TB', 'SB'].forEach(function (z) { S.recC[z] = 1; });
+      CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA(); updB(); updC(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
