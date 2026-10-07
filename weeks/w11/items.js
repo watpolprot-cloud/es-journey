@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(11, [
-  // { type: "worksheet", code: "G2", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "G2", title: "สถานการณ์จำลอง ภารกิจย้อนรอยแพนเจีย (ภารกิจ A B C)", file: "g2-sim-pangaea.html", note: "ใช้คู่กับใบงาน G2 · ทวีปเลื่อน พื้นสมุทรแผ่ขยาย การพาความร้อน · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-g2-sim.png" },
+  { type: "worksheet", code: "G2", title: "ใบงาน G2 ภารกิจย้อนรอยแพนเจีย (1 แผ่น 2 หน้า)", file: "g2-worksheet.pdf", note: "3 คะแนน · ส่งครบ = ได้คะแนน · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 11 G2 ทวีปเลื่อนและการแผ่ขยายของพื้นสมุทร", file: "w11-slides-g2-continental-drift.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);

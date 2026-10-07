@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>G2 ภารกิจย้อนรอยแพนเจีย · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง G2 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-G1) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #1c4a5a44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--orange); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); font-weight: 700; letter-spacing: 0; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15.5px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; }
+.leg i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.yes { color: var(--ok); font-weight: 600; } .no { color: var(--err); font-weight: 600; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.note.c { border-left-color: var(--cyan); background: #4fd8ff0d; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.sorts { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.sc { border: 1.5px solid var(--line-hi); border-radius: 12px; padding: 8px 10px; background: #0b123388; font-size: 15px; line-height: 1.45; }
+.sc.ok { border-color: var(--ok); }
+.sc .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 6px; }
+.sc button { font-family: var(--head); font-size: 13.5px; line-height: 1.2; padding: 6px 4px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.sc button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.sc button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.sc .why { font-size: 13.5px; color: var(--ok); margin-top: 5px; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards, .sorts { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 21px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · G2 <span class="unit-tag">หน่วยที่ 2</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจย้อนรอย<b>แพนเจีย</b></h1>
+  <p class="lead">ปี พ.ศ. 2455 อัลเฟรด เวเกเนอร์ ประกาศว่า "ทวีปเคลื่อนที่ได้" และเคยรวมเป็นแผ่นดินผืนเดียว แต่นักวิทยาศาสตร์ส่วนใหญ่ไม่เชื่อ เพราะยังไม่มีหลักฐานพอ ภารกิจของนักบินคือ <b style="color:#FFD166">ย้อนเวลาเก็บหลักฐาน</b> บนทวีป ดำดิ่งสำรวจพื้นมหาสมุทร และหาคำตอบว่าอะไรทำให้แผ่นธรณีเคลื่อนที่ จดผลลงใบงาน G2</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ย้อนเวลาต่อมหาทวีป<small>หลักฐาน 4 ชุดบนทวีป</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>เรือสำรวจพื้นสมุทร<small>สันเขากลางมหาสมุทร</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ห้องพาความร้อน<small>แรงขับ + ไขรหัส + จัดแฟ้ม</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ย้อนเวลาต่อมหาทวีป : หลักฐานของเวเกเนอร์</h2>
+    <p class="how">เลื่อนแถบเวลา (หรือกด "เล่นย้อนเวลา") จากปัจจุบันย้อนไป 250 ล้านปีก่อน ดูทวีปเคลื่อนกลับมารวมกัน เลือกชุดหลักฐานทีละชุด สังเกตว่าพบที่ทวีปใด และเมื่อทวีปรวมกันแล้วเห็นอะไร กด "บันทึกหลักฐาน" ให้ครบ 4 ชุด (ต้องย้อนไปถึง 250 ล้านปีก่อนจึงบันทึกได้) จดลงใบงาน ส่วนที่ 1</p>
+    <div class="twin">
+      <canvas id="cvMap" height="380" aria-label="แผนที่โลกจำลองแสดงทวีปเคลื่อนที่ย้อนเวลากลับไปรวมเป็นแพนเจีย"></canvas>
+      <div class="info">
+        <div class="k">ย้อนเวลาไป</div>
+        <div class="v g" id="aMa">-</div>
+        <div class="k" id="aEra">-</div>
+        <div class="k" style="margin-top:6px">ชุดหลักฐาน</div>
+        <h3 id="aEv">-</h3>
+        <div class="leg" id="aLeg"></div>
+        <div class="d" id="aWhat" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="maR" min="0" max="250" step="1" value="0" aria-label="ย้อนเวลา ล้านปีก่อน">
+    <div class="ctrl"><button class="btn" id="playA">เล่นย้อนเวลา</button><button class="btn" id="nowA">กลับปัจจุบัน</button><span class="lbl">เลื่อนแถบไปทางขวา = ย้อนอดีต</span></div>
+    <div class="chips" id="evChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกหลักฐาน</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ชุดหลักฐาน</th><th>สิ่งที่พบ</th><th>พบที่ทวีป</th><th>เมื่อทวีปรวมเป็นแพนเจีย</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>ทฤษฎีทวีปเลื่อน</b> (เวเกเนอร์ พ.ศ. 2455) : เมื่อราว 250 ล้านปีก่อน ทวีปทั้งหมดรวมเป็นมหาทวีปเดียวชื่อ <b>แพนเจีย</b> (Pangaea แปลว่า "แผ่นดินทั้งหมด") ล้อมรอบด้วยมหาสมุทร <b>พันทาลัสซา</b> ต่อมาแพนเจียแยกออกจากกันเป็นทวีปต่าง ๆ ค่อย ๆ เคลื่อนมาอยู่ตำแหน่งปัจจุบัน · หลักฐาน 4 ชุดของเวเกเนอร์ : รูปร่างขอบทวีป ซากดึกดำบรรพ์ หินและเทือกเขา ภูมิอากาศบรรพกาล</div>
+    <div class="note c"><b>ทำไมตอนนั้นไม่มีใครเชื่อ ?</b> เวเกเนอร์อธิบายไม่ได้ว่า <b>แรงอะไร</b> ทำให้ทวีปขนาดใหญ่เคลื่อนที่ได้ ความคิดนี้จึงถูกปฏิเสธนานกว่า 40 ปี จนกระทั่งมีการสำรวจ <b>พื้นมหาสมุทร</b> (ภารกิจ B) และเข้าใจ <b>การพาความร้อน</b> ใต้แผ่นธรณี (ภารกิจ C)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตารางหลักฐาน 4 ชุด ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> เรือสำรวจพื้นสมุทร : ความลับของสันเขากลางมหาสมุทร</h2>
+    <p class="how">เรือขุดเจาะสำรวจพื้นมหาสมุทรแอตแลนติก ตรงกลางมี <b style="color:#FFD166">สันเขากลางมหาสมุทร</b> เลือกจุดขุดเจาะ 6 จุด ดูอายุของหินบะซอลต์ ความหนาของตะกอนที่ทับถม และทิศของสนามแม่เหล็กที่บันทึกไว้ในหิน กด "บันทึกค่า" ให้ครบ 6 จุด แล้วลองกด "ดูการเกิดพื้นสมุทรใหม่" จดลงใบงาน ส่วนที่ 2</p>
+    <div class="twin">
+      <canvas id="cvSea" height="400" aria-label="ภาพพื้นมหาสมุทรมองจากด้านบนแสดงแถบแม่เหล็ก และภาพตัดขวางสันเขากลางมหาสมุทรพร้อมเรือขุดเจาะ"></canvas>
+      <div class="info">
+        <div class="k">จุดขุดเจาะ (ระยะจากสันเขา)</div>
+        <div class="v g" id="bDist">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">อายุของหิน</div><div class="v c" id="bAge">-</div></div>
+          <div><div class="k">ตะกอนหนา (ราว)</div><div class="v r" id="bSed">-</div></div>
+          <div><div class="k">ขั้วแม่เหล็กในหิน</div><div class="v" id="bPol" style="font-size:20px">-</div></div>
+          <div><div class="k">ทะเลลึก (ราว)</div><div class="v p" id="bDep">-</div></div>
+        </div>
+        <div class="d" id="bWhy" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <input type="range" id="distR" min="-1000" max="1000" step="10" value="0" aria-label="ตำแหน่งเรือขุดเจาะ">
+    <div class="chips" id="distChips"></div>
+    <div class="chips" id="seaMode"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกค่า</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>จุดขุดเจาะ</th><th>อายุของหิน (ล้านปี)</th><th>ตะกอนหนา (ม.)</th><th>ขั้วแม่เหล็กในหิน</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="note"><b>ทฤษฎีการแผ่ขยายของพื้นสมุทร</b> (แฮร์รี เฮสส์ พ.ศ. 2505) : แมกมาจากชั้นฐานธรณีภาคดันตัวขึ้นที่ <b>สันเขากลางมหาสมุทร</b> เย็นตัวเป็นหินบะซอลต์ใหม่ แล้วค่อย ๆ ถูกดันแยกออกไปทั้งสองฝั่ง พื้นมหาสมุทรจึง <b>ขยายกว้างขึ้น</b> และพาทวีปเคลื่อนตามไปด้วย · หลักฐาน : หินอายุน้อยที่สุดอยู่ที่สันเขา ยิ่งห่างยิ่งเก่า · ตะกอนยิ่งห่างยิ่งหนา · แถบแม่เหล็กบรรพกาลเรียงสลับ <b>สมมาตรกันสองฝั่ง</b></div>
+    <div class="note c"><b>ภาวะแม่เหล็กบรรพกาล</b> : สนามแม่เหล็กโลก <b>กลับขั้ว</b> เป็นระยะ (ทุก ๆ หลายแสนถึงหลายล้านปี) เมื่อลาวาเย็นตัว แร่เหล็กในหินบะซอลต์จะเรียงตัวตามสนามแม่เหล็กขณะนั้นแล้วถูกตรึงไว้ หินพื้นสมุทรจึงเป็นเหมือน <b>เทปบันทึก</b> ที่ไหลออกจากสันเขาทั้งสองข้าง · ระยะทาง 1 กม. = 100,000 ซม.</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 จุดขุดเจาะ ตอบข้อ 3–5</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ห้องพาความร้อน : อะไรทำให้แผ่นธรณีเคลื่อนที่</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> ปรับความร้อนจากด้านล่าง ดูการพาความร้อนในชั้นฐานธรณีภาค และการเคลื่อนที่ของแผ่นธรณี · <b style="color:#4FD8FF">ขั้นที่ 2</b> ไขรหัสทวีปเลื่อน 7 ข้อ · <b style="color:#5EF2A5">ขั้นที่ 3</b> จัดแฟ้มหลักฐานเข้าทฤษฎี · <b style="color:#A77BFF">ขั้นที่ 4</b> เส้นทางของความคิด จดลงใบงาน ส่วนที่ 3–4</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ห้องพาความร้อน</h2>
+    <div class="twin">
+      <canvas id="cvConv" height="300" aria-label="ภาพตัดขวางชั้นฐานธรณีภาคแสดงการพาความร้อนและแผ่นธรณีที่เคลื่อนที่อยู่ด้านบน"></canvas>
+      <div class="info">
+        <div class="k">ความร้อนจากด้านล่าง</div>
+        <div class="v r" id="cHeat">-</div>
+        <div class="k" style="margin-top:4px">แผ่นธรณีเคลื่อนที่ (ข้างละ ราว)</div>
+        <div class="v g" id="cSpd">-</div>
+        <div><span class="lvl" id="cState">-</span></div>
+        <div class="d" id="cWhat" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="heatR" min="0" max="100" step="1" value="50" aria-label="ความร้อนจากด้านล่าง">
+    <div class="note"><b>การพาความร้อน (convection)</b> : เนื้อหินในชั้นฐานธรณีภาคร้อนจัดจนอ่อนตัวและไหลได้ช้า ๆ ส่วนที่อยู่ลึกได้รับความร้อนจากแก่นโลกจึงขยายตัว ความหนาแน่นลดลง <b>ลอยขึ้น</b> เมื่อขึ้นมาใกล้ผิวจะไหลแผ่ออกด้านข้าง เย็นตัวลง หนาแน่นขึ้น แล้ว <b>จมลง</b> หมุนวนเป็นวง เหมือนน้ำเดือดในหม้อ · แผ่นธรณีที่อยู่ด้านบนจึงถูกพาให้เคลื่อนที่ : แยกออกจากกันตรงที่เนื้อโลกร้อนลอยขึ้น (สันเขากลางมหาสมุทร) และชนกันหรือมุดลงตรงที่เย็นจมลง (เรียนต่อใน G3)</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ไขรหัสทวีปเลื่อน</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำบอกใบ้ แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">PANGAEA</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · Pangaea มาจากภาษากรีก pan = ทั้งหมด และ gaia = แผ่นดิน</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> จัดแฟ้มหลักฐานเข้าทฤษฎี</h2>
+    <p class="how" style="margin-bottom:4px">หลักฐานแต่ละข้อสนับสนุนทฤษฎีใด แตะ "ทวีปเลื่อน" (หลักฐานบนทวีป สมัยเวเกเนอร์) หรือ "พื้นสมุทรแผ่ขยาย" (หลักฐานจากพื้นมหาสมุทร สมัยเฮสส์)</p>
+    <div class="sorts" id="sorts"></div>
+    <div class="prog" id="sortProg">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 4</em> เส้นทางของความคิด</h2>
+    <p class="how" style="margin-bottom:4px">จากความคิดที่ถูกหัวเราะเยาะ สู่ทฤษฎีที่ใช้อธิบายแผ่นดินไหวและภูเขาไฟในปัจจุบัน ใช้ประกอบใบงาน ส่วนที่ 4</p>
+    <div class="events" id="evid"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : จัดแฟ้มหลักฐาน 6 ข้อ รหัสผ่าน ข้อ 6 · <b>ส่วนที่ 4</b> : จดหมายจากอนาคตถึงเวเกเนอร์</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · แผนที่และการเคลื่อนที่ของทวีปในภารกิจ A เป็นภาพจำลองอย่างง่าย (ตำแหน่งระหว่างทางไม่ใช่ตำแหน่งจริงในอดีต) · แถบแม่เหล็กในภารกิจ B เป็นรูปแบบจำลอง · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+/*GEO-START*/var GEO = {"G":{"NA":{"n":"อเมริกาเหนือ","r":[[[-166,68],[-156,71],[-140,70],[-125,70],[-110,68],[-95,72],[-85,70],[-80,66],[-90,63],[-94,59],[-88,56],[-82,54],[-78,58],[-77,62],[-70,61],[-64,60],[-60,55],[-56,52],[-53,47],[-60,47],[-66,45],[-70,42],[-74,40],[-76,35],[-81,31],[-80,26],[-82,28],[-84,30],[-89,30],[-95,29],[-97,26],[-97,21],[-94,18.3],[-91,18.6],[-90.4,21],[-87,21.5],[-87.5,18.5],[-88.3,17.8],[-92.2,14.6],[-96,16],[-102,18],[-105,21],[-109,25],[-112,29],[-114,31],[-110,23],[-112,25],[-115,28],[-117,32],[-120,34.5],[-123,38],[-124,42],[-124,47],[-127,50],[-131,54],[-135,57],[-140,59.8],[-147,61],[-152,59],[-158,57],[-163,55],[-158,58.5],[-162,60],[-165,62],[-166,65]],[[-73,78],[-60,82],[-30,83.5],[-20,82],[-20,75],[-22,70],[-32,68],[-40,65],[-43,60],[-48,61],[-52,65],[-54,69],[-58,75],[-66,77]]],"R":[[0.388259,-0.90779,0.158657],[0.870272,0.304552,-0.387136],[0.303119,0.288384,0.90827]]},"CA":{"n":"อเมริกากลาง","r":[[[-88.3,17.8],[-88,16],[-84,15],[-83,10],[-79,9],[-77.5,8],[-80,7.5],[-85,10],[-88,13],[-92.2,14.6]]],"R":[[0.388259,-0.90779,0.158657],[0.870272,0.304552,-0.387136],[0.303119,0.288384,0.90827]]},"SA":{"n":"อเมริกาใต้","r":[[[-77,8],[-72,12],[-62,10.7],[-60,8.5],[-57,6.5],[-52,5],[-50,0],[-44,-2.5],[-35,-5.5],[-35,-9],[-39,-14],[-39,-18],[-41,-22],[-48,-26],[-48.6,-28],[-53,-34],[-58,-34.5],[-57,-38],[-62,-39],[-65,-42],[-64,-47],[-68,-50],[-69,-53],[-68,-55],[-72,-54],[-75,-50],[-74,-44],[-73,-38],[-71.5,-30],[-70,-18],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-77,4]]],"R":[[0.680401,-0.727834,-0.085515],[0.60218,0.621773,-0.500777],[0.417653,0.289234,0.861342]]},"EU":{"n":"ยูเรเชีย","r":[[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48.5],[2,51],[5,53],[8.5,54],[8,57],[10.5,57.7],[12,55.5],[14,54],[21,55],[23,59.5],[28,60],[22,60.5],[21.5,65],[24,66],[21,63],[17,61],[19,60],[16,56],[12.5,56.3],[11,59],[5.5,58.5],[5,62],[10,64],[14,67],[19,70],[26,71],[31,70],[41,67],[43,68.5],[53,68],[60,69.5],[70,73],[80,73.5],[88,75.5],[100,78],[113,73.5],[130,72],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[178,62],[165,60],[162,55],[156,51],[155,58],[143,59],[137,54],[141,52],[140,48],[135,43],[130,42.5],[129,35.5],[126,34.5],[126,37.5],[125,39.5],[121,40],[122,37],[119,35],[121,32],[122,29],[119,25],[114,22.3],[109,21.5],[106,20],[108,16],[109,12],[105,8.6],[103,10.5],[100,13.5],[99,10],[102.5,6],[103.5,1.5],[101,2.8],[98,8],[98.5,13],[97.5,16.5],[94.5,16],[94,19],[92,21],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27],[67,24],[62,25],[57,25.7],[56.5,27],[54,26.6],[51.5,24],[51.5,26],[50,30],[48,30],[50,26],[51.5,24],[56,24],[56.4,26.3],[59.8,22.5],[55,17],[52,16],[43.5,12.7],[42.5,15],[39,21.5],[35,28],[34.5,31.5],[35.5,34.5],[36,36.8],[32,36.2],[28,36.6],[26.5,39.5],[29,41],[31,41.2],[35,42],[41,41],[41.5,42.5],[37.5,45],[34,44.5],[33,46],[30,45.5],[28.5,43.5],[28,41.5],[24,40.5],[23,39],[22.5,36.5],[21,38.5],[19.5,41.5],[16,43.5],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40],[16,38],[15.5,40],[12.5,42],[10.5,43.5],[8,44],[5,43.2],[3.2,42],[0,39.5],[-0.5,38],[-2,36.7],[-5.5,36],[-7,37]],[[-5.5,50],[1.5,51],[1.7,52.8],[0,53.5],[-2,55.8],[-1.8,57.6],[-3,58.6],[-5,58.6],[-6.2,56.5],[-5,55],[-3.2,54.5],[-4.5,53.3],[-5,51.7]],[[130,31],[132,33.5],[135,34],[140,35],[141,38],[141.5,41.5],[145,43.5],[142,45.5],[140,42],[139.5,39],[137,37],[133,35.5],[130,33.5]]],"R":[[0.996309,-0.085709,0.004739],[0.085635,0.988606,-0.123791],[0.005925,0.12374,0.992297]]},"AF":{"n":"แอฟริกา","r":[[[-17,21],[-16,15],[-17,14.7],[-15,11],[-13,8],[-8,4.5],[-2,5],[4,6.3],[9,4],[9.5,1],[9,-1],[12,-6],[13.5,-11],[12,-17],[14.5,-23],[15.5,-27],[18,-32],[18.5,-34.5],[20,-35],[25,-34],[28,-33],[32,-28.5],[33,-26],[35.5,-24],[35,-19],[40,-15.5],[40.5,-10],[39,-6],[42,-1],[46,2],[51,11.8],[44,11],[43,13],[39,16],[37,20],[35,24],[33.5,28],[32,31],[29,31],[25,31.8],[20,30.5],[19,32],[15,32.5],[11,33.5],[10,37],[3,36.7],[-2,35.1],[-6,35.8],[-9,32],[-10,29],[-13,27.5]]],"R":[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]]},"MG":{"n":"มาดากัสการ์","r":[[[44,-25],[47,-25],[50,-15],[49.3,-12],[46,-15.5],[44,-16.5],[43.5,-22]]],"R":[[0.989974,0.075906,-0.119117],[-0.099963,0.972321,-0.211185],[0.09979,0.220975,0.970161]]},"IN":{"n":"อินเดีย","r":[[[67,24],[70,21],[72.8,19],[73.5,15.5],[75,12],[76.5,8.5],[77.5,8],[80,10],[80.3,13.5],[82,16.5],[86.5,20],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27]]],"R":[[0.805158,0.569571,-0.165258],[-0.366012,0.696483,0.617209],[0.466644,-0.436464,0.769248]]},"AU":{"n":"ออสเตรเลีย","r":[[[113,-22],[114,-26],[115,-34],[118,-35],[123,-34],[129,-31.5],[132,-32],[135,-34.5],[138,-35.5],[140,-38],[144,-38.5],[147,-38],[150,-37],[153,-31],[153,-25],[149,-21],[146,-19],[145,-15],[143,-11],[141.5,-13],[141,-17],[138,-16.5],[136,-12],[132,-11.5],[130,-13],[127,-14],[125,-15],[122,-18],[117,-20.5]],[[131,-1],[138,-1.5],[141,-2.6],[147,-6],[150,-10.5],[144,-8],[141,-9],[138,-8],[135,-4]],[[144.6,-40.7],[148.3,-40.9],[148,-43.2],[146,-43.6],[145,-42]]],"R":[[0.630941,0.640478,-0.437838],[-0.773372,0.564115,-0.289259],[0.061727,0.521116,0.85125]]},"AN":{"n":"แอนตาร์กติกา","r":[[[-180,-78],[-165,-78.5],[-158,-77.5],[-150,-76.5],[-140,-75.5],[-120,-74],[-100,-74.5],[-90,-73],[-80,-73],[-75,-72],[-70,-69],[-66,-66.5],[-63,-64.5],[-58,-63.3],[-60,-65.5],[-62,-68],[-62,-71],[-60,-74],[-55,-77],[-45,-78],[-35,-77.5],[-28,-75.5],[-20,-73],[-10,-71],[0,-70],[15,-70],[30,-69.5],[40,-69],[45,-67.5],[55,-66.5],[60,-67],[70,-68],[75,-69.5],[80,-68],[90,-66.5],[100,-66],[110,-66],[120,-66.5],[130,-66.2],[140,-66.5],[150,-68.5],[160,-70],[165,-71],[170,-73],[167,-77],[170,-78],[180,-78],[180,-90],[-180,-90]]],"R":[[0.860392,0.210341,-0.464201],[-0.505162,0.472384,-0.722264],[0.06736,0.855926,0.512692]]}},"E":{"fos":[["meso",-50,-26,"SA"],["meso",-54,-31,"SA"],["meso",16,-24,"AF"],["meso",20,-29,"AF"],["cyno",-63,-30,"SA"],["cyno",-66,-36,"SA"],["cyno",22,-14,"AF"],["cyno",26,-9,"AF"],["lyst",26,-30,"AF"],["lyst",80,22,"IN"],["lyst",30,-83,"AN"],["glos",-55,-28,"SA"],["glos",28,-27,"AF"],["glos",78,20,"IN"],["glos",135,-29,"AU"],["glos",145,-32,"AU"],["glos",80,-75,"AN"],["glos",150,-82,"AN"],["glos",45,-20,"MG"]],"rock":[["mt",[[-84,34],[-79,38],[-74,42],[-68,46],[-58,49]],"NA"],["mt",[[-27,70],[-23,76]],"NA"],["mt",[[-5,55],[-4,58],[5,61],[10,64],[15,68]],"EU"],["mt",[[-8,31],[-4,33]],"AF"],["cr",-45,-8,"SA"],["cr",-1,8,"AF"],["cr",-40,-15,"SA"],["cr",11,2,"AF"]],"clim":[["ice",-50,-24,"SA"],["ice",25,-28,"AF"],["ice",79,22,"IN"],["ice",136,-27,"AU"],["ice",60,-72,"AN"],["ice",46,-19,"MG"],["coal",150,-84,"AN"],["coal",-82,38,"NA"],["coal",7,51,"EU"]]},"ICE":[12,-82,"AN"]};/*GEO-END*/
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_g2_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.cl = S.cl || {}; S.so = S.so || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function hex(h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(77), a = []; for (var i = 0; i < 240; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k) { STARF.forEach(function (s) { x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr)); }; }); }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  var FONT = '"Sarabun", sans-serif', HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ย้อนเวลาต่อมหาทวีป
+  var D2R = Math.PI / 180, MAXMA = 250;
+  function xyz(lon, lat) { var a = lon * D2R, b = lat * D2R; return [Math.cos(b) * Math.cos(a), Math.cos(b) * Math.sin(a), Math.sin(b)]; }
+  function mul(R, v) { return [R[0][0] * v[0] + R[0][1] * v[1] + R[0][2] * v[2], R[1][0] * v[0] + R[1][1] * v[1] + R[1][2] * v[2], R[2][0] * v[0] + R[2][1] * v[1] + R[2][2] * v[2]]; }
+  function toLL(v) { var n = Math.hypot(v[0], v[1], v[2]); return [Math.atan2(v[1], v[0]) / D2R, Math.asin(clamp(v[2] / n, -1, 1)) / D2R]; }
+  function eqe(lon, lat) { // Equal Earth (พื้นที่เท่ากัน)
+    var A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    var th = Math.asin(M * Math.sin(lat * D2R)), t2 = th * th, t6 = t2 * t2 * t2;
+    return [lon * D2R * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
+  }
+  var COLS = { NA: '#E8A35C', CA: '#E8A35C', SA: '#5EC98A', EU: '#A98BE0', AF: '#E07A6A', MG: '#5FC9C0', IN: '#5BA7E6', AU: '#E3C04C', AN: '#C9D2E6' };
+  // ศูนย์กลางแพนเจีย (ใช้ฉายแบบ Lambert พื้นที่เท่ากัน)
+  var cen = [0, 0, 0];
+  Object.keys(GEO.G).forEach(function (k) { var g = GEO.G[k]; g.r.forEach(function (ring) { ring.forEach(function (p) { if (Math.abs(p[1]) < 89.9) { var v = mul(g.R, xyz(p[0], p[1])); cen[0] += v[0]; cen[1] += v[1]; cen[2] += v[2]; } }); }); });
+  var C0 = toLL(cen), L0 = C0[0] * D2R, F0 = C0[1] * D2R;
+  function lam(v) {
+    var q = toLL(v), l = q[0] * D2R - L0, f = q[1] * D2R;
+    var k = Math.sqrt(2 / (1 + Math.sin(F0) * Math.sin(f) + Math.cos(F0) * Math.cos(f) * Math.cos(l)));
+    return [k * Math.cos(f) * Math.sin(l), k * (Math.cos(F0) * Math.sin(f) - Math.sin(F0) * Math.cos(f) * Math.cos(l))];
+  }
+  function ptPair(g, lon, lat) { return { p: eqe(lon, lat), q: lam(mul(g.R, xyz(lon, lat))) }; }
+  var GK = Object.keys(GEO.G);
+  GK.forEach(function (k) {
+    var g = GEO.G[k];
+    g.rings = g.r.map(function (ring) { return ring.map(function (p) { return ptPair(g, p[0], p[1]); }); });
+  });
+  // ย้ายแพนเจียให้อยู่กลางกรอบ
+  var bx = [1e9, -1e9, 1e9, -1e9];
+  GK.forEach(function (k) { GEO.G[k].rings.forEach(function (r) { r.forEach(function (a) { bx[0] = Math.min(bx[0], a.q[0]); bx[1] = Math.max(bx[1], a.q[0]); bx[2] = Math.min(bx[2], a.q[1]); bx[3] = Math.max(bx[3], a.q[1]); }); }); });
+  var QX = (bx[0] + bx[1]) / 2, QY = (bx[2] + bx[3]) / 2 - .06;
+  function shiftQ(a) { a.q = [a.q[0] - QX, a.q[1] - QY]; }
+  GK.forEach(function (k) { GEO.G[k].rings.forEach(function (r) { r.forEach(shiftQ); }); });
+  // ท่าทาง 2 มิติของแต่ละทวีป (หมุน + เลื่อน) จากปัจจุบันไปแพนเจีย + ส่วนที่ต่างเล็กน้อยจากการฉายแผนที่
+  GK.forEach(function (k) {
+    var g = GEO.G[k], all = [].concat.apply([], g.rings), n = all.length, cp = [0, 0], cq = [0, 0];
+    all.forEach(function (a) { cp[0] += a.p[0] / n; cp[1] += a.p[1] / n; cq[0] += a.q[0] / n; cq[1] += a.q[1] / n; });
+    var sx = 0, sd = 0;
+    all.forEach(function (a) { var px = a.p[0] - cp[0], py = a.p[1] - cp[1], qx = a.q[0] - cq[0], qy = a.q[1] - cq[1]; sx += px * qy - py * qx; sd += px * qx + py * qy; });
+    g.th = Math.atan2(sx, sd); g.cp = cp; g.cq = cq;
+  });
+  function prep(g, a) { // คำนวณส่วนต่าง (residual) ของจุด
+    var c = Math.cos(g.th), s = Math.sin(g.th), px = a.p[0] - g.cp[0], py = a.p[1] - g.cp[1];
+    a.r = [a.q[0] - (c * px - s * py + g.cq[0]), a.q[1] - (s * px + c * py + g.cq[1])];
+    return a;
+  }
+  GK.forEach(function (k) { var g = GEO.G[k]; g.rings.forEach(function (r) { r.forEach(function (a) { prep(g, a); }); }); });
+  function at(g, a, t) { // ตำแหน่งในหน่วยแผนที่ ณ เวลา t (0 = ปัจจุบัน 1 = แพนเจีย)
+    var th = g.th * t, c = Math.cos(th), s = Math.sin(th), px = a.p[0] - g.cp[0], py = a.p[1] - g.cp[1];
+    return [c * px - s * py + g.cp[0] + t * (g.cq[0] - g.cp[0]) + t * a.r[0], s * px + c * py + g.cp[1] + t * (g.cq[1] - g.cp[1]) + t * a.r[1]];
+  }
+  function mk(gk, lon, lat) { var g = GEO.G[gk], a = ptPair(g, lon, lat); shiftQ(a); prep(g, a); a.g = gk; return a; }
+  // เครื่องหมายหลักฐาน
+  var FOS = { meso: { n: 'มีโซซอรัส', d: 'สัตว์เลื้อยคลานน้ำจืดตัวเล็ก', c: '#FF9F6B' }, cyno: { n: 'ไซโนกนาทัส', d: 'สัตว์เลื้อยคลานบนบก', c: '#FFD166' },
+    lyst: { n: 'ลีสโทรซอรัส', d: 'สัตว์เลื้อยคลานบนบก', c: '#FF6B8A' }, glos: { n: 'กลอสซอพเทอริส', d: 'พืชโบราณ เมล็ดหนัก', c: '#5EF2A5' } };
+  var EVM = { fos: GEO.E.fos.map(function (e) { var a = mk(e[3], e[1], e[2]); a.k = e[0]; return a; }),
+    mt: GEO.E.rock.filter(function (e) { return e[0] === 'mt'; }).map(function (e) { return e[1].map(function (p) { return mk(e[2], p[0], p[1]); }); }),
+    cr: GEO.E.rock.filter(function (e) { return e[0] === 'cr'; }).map(function (e) { return mk(e[3], e[1], e[2]); }),
+    ice: GEO.E.clim.filter(function (e) { return e[0] === 'ice'; }).map(function (e) { return mk(e[3], e[1], e[2]); }),
+    coal: GEO.E.clim.filter(function (e) { return e[0] === 'coal'; }).map(function (e) { return mk(e[3], e[1], e[2]); }) };
+  var ICE = mk(GEO.ICE[2], GEO.ICE[0], GEO.ICE[1]);
+  EVM.ice.forEach(function (a) { var dx = a.q[0] - ICE.q[0], dy = a.q[1] - ICE.q[1], L = Math.hypot(dx, dy) || 1; a.dir = Math.atan2(dy / L, dx / L); });
+  var LBL = { NA: mk('NA', -102, 46), SA: mk('SA', -60, -12), EU: mk('EU', 85, 55), AF: mk('AF', 20, 6), IN: mk('IN', 78, 20), AU: mk('AU', 133, -25), AN: mk('AN', 60, -80) };
+  var TETHYS = [mk('EU', 70, 22), mk('IN', 77, 31)];
+
+  var EVS = [
+    { k: 'edge', n: 'รูปร่างขอบทวีป', what: 'ขอบทวีปฝั่งตะวันออกของอเมริกาใต้ กับขอบฝั่งตะวันตกของแอฟริกา โค้งรับกันพอดี และขอบอเมริกาเหนือรับกับยุโรปและแอฟริกาตะวันตกเฉียงเหนือ',
+      where: 'อเมริกาใต้ กับ แอฟริกา (และอเมริกาเหนือ กับ ยุโรป)', pang: 'ต่อกันได้พอดีเหมือนจิ๊กซอว์', found: 'ขอบทวีปโค้งรับกัน' },
+    { k: 'fos', n: 'ซากดึกดำบรรพ์', what: 'พบซากสิ่งมีชีวิตชนิดเดียวกัน อายุเดียวกัน บนทวีปที่ห่างกันข้ามมหาสมุทร ทั้งที่สัตว์บกและสัตว์น้ำจืดว่ายข้ามมหาสมุทรไม่ได้ และเมล็ดของกลอสซอพเทอริสหนักเกินกว่าจะปลิวข้ามทะเล',
+      where: 'อเมริกาใต้ แอฟริกา อินเดีย ออสเตรเลีย แอนตาร์กติกา', pang: 'บริเวณที่พบเรียงต่อกันเป็นแนวเดียว', found: 'ซากชนิดเดียวกันต่างทวีป' },
+    { k: 'rock', n: 'หินและเทือกเขา', what: 'เทือกเขาเก่าแอปพาเลเชียน (อเมริกาเหนือ) มีหินชนิดและอายุเดียวกับเทือกเขาในกรีนแลนด์ สกอตแลนด์ นอร์เวย์ และโมร็อกโก หินอายุราว 2,000 ล้านปีในบราซิลตรงกับหินในแอฟริกาตะวันตก',
+      where: 'อเมริกาเหนือ กรีนแลนด์ ยุโรป แอฟริกา อเมริกาใต้', pang: 'เทือกเขาและหินต่อกันเป็นแนวเดียว', found: 'หินและเทือกเขาชุดเดียวกัน' },
+    { k: 'clim', n: 'ภูมิอากาศบรรพกาล', what: 'ร่องรอยธารน้ำแข็ง (รอยครูดบนหิน) อายุราว 300 ล้านปี พบในดินแดนที่ปัจจุบันร้อน เช่น อินเดีย แอฟริกา ส่วนถ่านหินซึ่งเกิดจากป่าในเขตร้อนชื้นกลับพบในแอนตาร์กติกา',
+      where: 'อเมริกาใต้ แอฟริกา อินเดีย ออสเตรเลีย แอนตาร์กติกา', pang: 'รอยธารน้ำแข็งชี้ออกจากจุดเดียวกัน (เคยอยู่ใกล้ขั้วโลกใต้)', found: 'รอยธารน้ำแข็งในเขตร้อน + ถ่านหิน' }
+  ];
+  var selE = 0, ma = 0, playing = 0;
+  function eraOf(m) {
+    if (m < 1) return 'ปัจจุบัน · ทวีปอยู่ตำแหน่งที่เราคุ้นเคย';
+    if (m < 66) return 'มหายุคซีโนโซอิก · มหาสมุทรแอตแลนติกยังแคบกว่าปัจจุบัน';
+    if (m < 145) return 'ยุคครีเทเชียส · ไดโนเสาร์ยังครองโลก';
+    if (m < 201) return 'ยุคจูแรสซิก · แพนเจียเริ่มแยกออกจากกัน';
+    if (m < 240) return 'ยุคไทรแอสซิก · ทวีปเกือบรวมเป็นผืนเดียว';
+    return 'ยุคไทรแอสซิกตอนต้น · มหาทวีปแพนเจีย';
+  }
+  function mapView(W, H) { var s = Math.min((W - 16) / 5.42, (H - 46) / 2.66); return { s: s, cx: W / 2, cy: (H - 30) / 2 + 2 }; }
+  function scr(v, m) { return [v.cx + m[0] * v.s, v.cy - m[1] * v.s]; }
+  function tOf(m) { return smooth(0, MAXMA, m); }
+  function drawMap() {
+    var cvm = $('cvMap'), cw0 = cvm.clientWidth || 600; cvm.dataset.h = cw0 < 520 ? Math.round(cw0 * .56 + 44) : 380;
+    var c = fit(cvm), x = c.x, W = c.W, H = c.H, v = mapView(W, H), t = tOf(ma), e = EVS[selE].k;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    starfield(x, W, H, .35);
+    // กรอบโลก Equal Earth (จางลงเมื่อย้อนเวลา)
+    var out = [], i, lat;
+    for (lat = -90; lat <= 90; lat += 5) out.push(eqe(180, lat));
+    for (lat = 90; lat >= -90; lat -= 5) out.push(eqe(-180, lat));
+    x.beginPath(); out.forEach(function (p, j) { var q = scr(v, p); if (j) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); }); x.closePath();
+    var og = x.createLinearGradient(0, v.cy - 1.3 * v.s, 0, v.cy + 1.3 * v.s); og.addColorStop(0, '#0d2a5c'); og.addColorStop(.5, '#0e3570'); og.addColorStop(1, '#0d2a5c');
+    x.fillStyle = og; x.fill();
+    x.save(); x.clip();
+    x.strokeStyle = 'rgba(160,190,255,' + (.16 * (1 - t)) + ')'; x.lineWidth = 1;
+    for (lat = -60; lat <= 60; lat += 30) { x.beginPath(); for (var lo = -180; lo <= 180; lo += 10) { var q = scr(v, eqe(lo, lat)); if (lo > -180) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); } x.stroke(); }
+    for (var lo2 = -150; lo2 <= 150; lo2 += 30) { x.beginPath(); for (lat = -90; lat <= 90; lat += 5) { var q2 = scr(v, eqe(lo2, lat)); if (lat > -90) x.lineTo(q2[0], q2[1]); else x.moveTo(q2[0], q2[1]); } x.stroke(); }
+    x.restore();
+    // ทวีป
+    GK.forEach(function (k) {
+      var g = GEO.G[k], col = hex(COLS[k]), al = k === 'CA' ? 1 - smooth(.12, .45, t) : 1;
+      if (al <= 0.01) return;
+      g.rings.forEach(function (ring) {
+        x.beginPath(); ring.forEach(function (a, j) { var q = scr(v, at(g, a, t)); if (j) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); }); x.closePath();
+        x.fillStyle = rgba(col, .78 * al); x.fill();
+        var hl = e === 'edge' && (k === 'SA' || k === 'AF' || k === 'NA' || k === 'EU');
+        x.strokeStyle = hl ? (k === 'SA' || k === 'AF' ? '#FFD166' : '#4FD8FF') : rgba([20, 24, 50], .7 * al); x.lineWidth = hl ? 2.4 : 1;
+        if (hl) { x.shadowColor = x.strokeStyle; x.shadowBlur = 8; }
+        x.stroke(); x.shadowBlur = 0;
+      });
+    });
+    var P = function (a) { return scr(v, at(GEO.G[a.g], a, t)); };
+    var near = smooth(.82, .98, t);
+    // หลักฐาน
+    if (e === 'fos') {
+      Object.keys(FOS).forEach(function (sp) {
+        var pts = EVM.fos.filter(function (a) { return a.k === sp; }).map(P);
+        if (near > 0 && pts.length > 1) { // แนวต่อเนื่องเมื่อรวมเป็นแพนเจีย
+          var hull = convex(pts); x.beginPath(); hull.forEach(function (q, j) { if (j) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); }); x.closePath();
+          x.lineJoin = 'round'; x.lineWidth = 18; x.strokeStyle = rgba(hex(FOS[sp].c), .5 * near); x.stroke(); x.fillStyle = rgba(hex(FOS[sp].c), .4 * near); x.fill();
+        }
+      });
+      EVM.fos.forEach(function (a) { var q = P(a), cl = FOS[a.k].c; x.fillStyle = cl; x.strokeStyle = '#05081a'; x.lineWidth = 1.5;
+        x.beginPath(); if (a.k === 'glos') { x.moveTo(q[0], q[1] - 6); x.lineTo(q[0] + 5, q[1] + 4); x.lineTo(q[0] - 5, q[1] + 4); x.closePath(); } else x.arc(q[0], q[1], 4.6, 0, 6.283);
+        x.fill(); x.stroke(); });
+    }
+    if (e === 'rock') {
+      EVM.mt.forEach(function (line) {
+        var pts = line.map(P);
+        x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = 'rgba(120,70,30,.9)'; x.lineWidth = 7; x.beginPath();
+        pts.forEach(function (q, j) { if (j) x.lineTo(q[0], q[1]); else x.moveTo(q[0], q[1]); }); x.stroke();
+        x.strokeStyle = '#FFB86B'; x.lineWidth = 2.6; x.stroke();
+        pts.forEach(function (q) { x.fillStyle = '#FFB86B'; x.beginPath(); x.moveTo(q[0], q[1] - 7); x.lineTo(q[0] + 5, q[1] + 2); x.lineTo(q[0] - 5, q[1] + 2); x.closePath(); x.fill(); });
+      });
+      EVM.cr.forEach(function (a) { var q = P(a); x.fillStyle = 'rgba(167,123,255,.35)'; x.strokeStyle = '#C9A9FF'; x.lineWidth = 2; x.beginPath(); x.arc(q[0], q[1], 9, 0, 6.283); x.fill(); x.stroke();
+        x.beginPath(); x.moveTo(q[0] - 6, q[1] + 3); x.lineTo(q[0] + 3, q[1] - 6); x.moveTo(q[0] - 3, q[1] + 6); x.lineTo(q[0] + 6, q[1] - 3); x.stroke(); });
+    }
+    if (e === 'clim') {
+      if (near > 0) { var ic = P(ICE); x.setLineDash([5, 5]); x.strokeStyle = 'rgba(220,245,255,' + .7 * near + ')'; x.lineWidth = 1.6; x.beginPath(); x.arc(ic[0], ic[1], 2.0 * v.s * .26, 0, 6.283); x.stroke(); x.setLineDash([]);
+        glow(x, ic[0], ic[1], .55 * v.s, [220, 245, 255], .22 * near); label(x, 'แผ่นน้ำแข็งยุคนั้น', ic[0], ic[1] + .52 * v.s + 14, 'rgba(220,245,255,' + near + ')', 12); }
+      EVM.ice.forEach(function (a) { var q = P(a), g = GEO.G[a.g], d = a.dir - g.th * (1 - t), L = 13;
+        x.fillStyle = 'rgba(5,8,26,.55)'; x.beginPath(); x.arc(q[0], q[1], 13, 0, 6.283); x.fill();
+        arrow(x, q[0] - Math.cos(d) * L, q[1] + Math.sin(d) * L, q[0] + Math.cos(d) * L, q[1] - Math.sin(d) * L, '#DFF6FF', 2.6, 8); });
+      EVM.coal.forEach(function (a) { var q = P(a); x.fillStyle = '#111'; x.strokeStyle = '#FFD166'; x.lineWidth = 1.6; x.fillRect(q[0] - 5, q[1] - 5, 10, 10); x.strokeRect(q[0] - 5, q[1] - 5, 10, 10); });
+    }
+    // ชื่อทวีป
+    Object.keys(LBL).forEach(function (k) { var q = P(LBL[k]); label(x, GEO.G[k].n, q[0], q[1], '#fff', W < 520 ? 11 : 13); });
+    if (near > 0) {
+      x.globalAlpha = near;
+      label(x, 'แพนเจีย', W < 520 ? W - 40 : v.cx, 22, '#FFD166', 17);
+      label(x, W < 520 ? 'พันทาลัสซา' : 'มหาสมุทรพันทาลัสซา', Math.max(W < 520 ? 40 : 80, v.cx - 1.95 * v.s), v.cy - .95 * v.s, '#9fd8ff', 12);
+      var tq = TETHYS.map(P); label(x, 'ทะเลเททิส', (tq[0][0] + tq[1][0]) / 2 + 26, (tq[0][1] + tq[1][1]) / 2, '#9fd8ff', 12);
+      x.globalAlpha = 1;
+    }
+    // แถบเวลา
+    x.font = '700 15px ' + HFONT; x.textAlign = 'left'; x.fillStyle = '#FFD166';
+    x.fillText(ma < 1 ? 'ปัจจุบัน' : fmt(ma) + ' ล้านปีก่อน', 12, H - 10);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '600 12px ' + FONT; x.fillText('ภาพจำลองอย่างง่าย', W - 10, H - 10);
+  }
+  function convex(p) { // convex hull (monotone chain)
+    var a = p.slice().sort(function (u, w) { return u[0] - w[0] || u[1] - w[1]; }); if (a.length < 3) return a;
+    var cr = function (o, u, w) { return (u[0] - o[0]) * (w[1] - o[1]) - (u[1] - o[1]) * (w[0] - o[0]); }, lo = [], up = [];
+    a.forEach(function (q) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); });
+    a.slice().reverse().forEach(function (q) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); });
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+  function updA() {
+    var ev = EVS[selE];
+    $('aMa').textContent = ma < 1 ? 'ปัจจุบัน' : fmt(ma) + ' ล้านปีก่อน';
+    $('aEra').textContent = eraOf(ma); $('maR').value = ma;
+    $('aEv').textContent = ev.n;
+    var leg = '';
+    if (ev.k === 'edge') leg = '<span><i style="background:#FFD166"></i>อเมริกาใต้ กับ แอฟริกา</span><span><i style="background:#4FD8FF"></i>อเมริกาเหนือ กับ ยุโรป</span>';
+    if (ev.k === 'fos') Object.keys(FOS).forEach(function (s) { leg += '<span><i style="background:' + FOS[s].c + (s === 'glos' ? ';clip-path:polygon(50% 0,100% 100%,0 100%);border-radius:0' : ';border-radius:50%') + '"></i>' + FOS[s].n + ' (' + FOS[s].d + ')</span>'; });
+    if (ev.k === 'rock') leg = '<span><i style="background:#FFB86B"></i>แนวเทือกเขาเก่า</span><span><i style="background:#A77BFF;border-radius:50%"></i>หินอายุราว 2,000 ล้านปีชุดเดียวกัน</span>';
+    if (ev.k === 'clim') leg = '<span><i style="background:#DFF6FF"></i>ทิศรอยครูดของธารน้ำแข็ง</span><span><i style="background:#111;border:1.5px solid #FFD166"></i>ถ่านหิน (เคยเป็นป่าเขตร้อน)</span>';
+    $('aLeg').innerHTML = leg;
+    $('aWhat').innerHTML = ev.what + (ma >= 240 ? '<br><b style="color:#5EF2A5">เมื่อรวมเป็นแพนเจีย : ' + ev.pang + '</b>' : '<br><span style="color:#9AA6CF">ย้อนเวลาไปที่ 250 ล้านปีก่อน แล้วดูว่าหลักฐานเปลี่ยนไปอย่างไร</span>');
+    var h = '<span class="lbl">ชุดหลักฐาน</span>';
+    EVS.forEach(function (z, i) { h += '<button class="chip' + (i === selE ? ' on' : '') + (S.recA[z.k] ? ' done' : '') + '" data-e="' + i + '">' + z.n + '</button>'; });
+    $('evChips').innerHTML = h; bindChips($('evChips'), 'e', function (vv) { selE = +vv; updA(); drawMap(); });
+    var n = 0, rows = '';
+    EVS.forEach(function (z, i) { var r = S.recA[z.k]; if (r) n++;
+      rows += '<tr' + (i === selE ? ' class="cur"' : '') + '><td class="n">' + z.n + '</td><td>' + (r ? z.found : '-') + '</td><td>' + (r ? z.where : '-') + '</td><td>' + (r ? '<span class="yes">' + z.pang + '</span>' : '-') + '</td></tr>'; });
+    $('logA').innerHTML = rows;
+    $('recA').disabled = ma < 240;
+    $('recAMsg').textContent = (ma < 240 ? 'ย้อนเวลาไปให้ถึง 250 ล้านปีก่อนก่อน จึงบันทึกได้ · ' : '') + 'บันทึกแล้ว ' + n + '/4' + (n === 4 ? ' · ครบแล้ว ไปภารกิจ B ได้' : '');
+    $('playA').textContent = playing ? 'หยุด' : (ma >= 249 ? 'เล่นไปข้างหน้า' : 'เล่นย้อนเวลา');
+  }
+  var playDir = 1;
+  $('maR').oninput = function () { playing = 0; ma = +this.value; updA(); drawMap(); };
+  $('playA').onclick = function () { if (playing) { playing = 0; } else { playDir = ma >= 249 ? -1 : 1; playing = 1; } updA(); };
+  $('nowA').onclick = function () { playing = 0; ma = 0; updA(); drawMap(); };
+  $('recA').onclick = function () { if (ma < 240) return; S.recA[EVS[selE].k] = 1; save(); updA(); };
+  function stepPlay(dt) {
+    if (!playing) return;
+    ma = clamp(ma + playDir * dt * 42, 0, MAXMA);
+    if (ma <= 0 || ma >= MAXMA) playing = 0;
+    updA(); drawMap();
+  }
+
+  // ================================================================ ภารกิจ B เรือสำรวจพื้นสมุทร
+  var HALF = 25;   // พื้นสมุทรขยายข้างละ 25 กม. ต่อล้านปี (2.5 ซม./ปี)
+  var SED = 5;     // ตะกอนทับถมราว 5 ม. ต่อล้านปี
+  // ช่วงขั้วแม่เหล็ก (ล้านปีก่อน) [เริ่ม, สิ้นสุด] เริ่มจากปกติ แล้วสลับ กลับขั้ว ปกติ ...
+  var POL = [0.8, 2.6, 3.6, 5.2, 6.8, 9.6, 11.0, 12.6, 14.2, 15.0, 17.4, 19.2, 20.6, 22.4, 25.4, 27.0, 28.4, 30.0, 31.0, 33.6, 35.0, 37.2, 39.0, 41.0, 44.0];
+  function polAt(age) { for (var i = 0; i < POL.length; i++) if (age < POL[i]) return i % 2 === 0; return true; }
+  var STA = [-400, 0, 200, 400, 600, 800];
+  var dist = 0, seaAnim = 0, T = 0;   // T = เวลาในอดีตระหว่างดูการเกิดพื้นสมุทร (ล้านปีก่อน)
+  function ageAt(d) { return Math.abs(d) / HALF; }
+  function depthAt(age) { return 2.5 + 0.35 * Math.sqrt(age); }
+  function sideName(d) { return d === 0 ? 'สันเขา' : (d < 0 ? 'ตะวันตก ' : 'ตะวันออก ') + fmt(Math.abs(d)) + ' กม.'; }
+  function drawSea() {
+    var c = fit($('cvSea')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var L = 14, R = W - 14, X = function (d) { return L + (R - L) * (d + 1000) / 2000; }, mid = X(0);
+    var Tn = seaAnim ? T : 0, made = (44 - Tn) * HALF;  // ระยะที่เกิดแล้ว ณ เวลานั้น
+    // ---- แผนที่พื้นสมุทรมองจากด้านบน
+    var y0 = 30, y1 = 118;
+    x.font = '700 13px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'left'; x.fillText(W > 560 ? 'มองจากด้านบน : แถบแม่เหล็กในหินพื้นมหาสมุทร' : 'มองจากด้านบน : แถบแม่เหล็ก', L, 22);
+    x.fillStyle = '#2a2f45'; x.fillRect(L, y0, R - L, y1 - y0);
+    for (var px = 0; px <= R - L; px += 1) {
+      var d = -1000 + 2000 * px / (R - L), ad = Math.abs(d);
+      if (ad > made) continue;
+      var age = Tn + ad / HALF, nrm = polAt(age);
+      x.fillStyle = nrm ? '#3FA9F5' : '#121a40'; x.fillRect(L + px, y0, 1.2, y1 - y0);
+    }
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 1; x.strokeRect(L, y0, R - L, y1 - y0);
+    x.setLineDash([5, 4]); x.strokeStyle = '#FFD166'; x.lineWidth = 2; x.beginPath(); x.moveTo(mid, y0 - 4); x.lineTo(mid, y1 + 4); x.stroke(); x.setLineDash([]);
+    x.font = '600 11px ' + FONT; x.textAlign = 'center'; x.fillStyle = '#9AA6CF';
+    [-1000, -800, -600, -400, -200, 0, 200, 400, 600, 800, 1000].forEach(function (d) { if (W < 520 && Math.abs(d) % 400 && d) return; x.fillText(fmt(Math.abs(d)), X(d), y1 + 14); });
+    x.textAlign = 'left'; x.fillText('ตะวันตก (กม.)', L, y1 + 27); x.textAlign = 'right'; x.fillText('ตะวันออก (กม.)', R, y1 + 27);
+    x.textAlign = 'center'; x.fillStyle = '#FFD166'; x.fillText('สันเขา', mid, y1 + 27);
+    // ---- ภาพตัดขวาง
+    var sea = 210, base = H - 14, kmY = 22;   // 1 กม. ความลึก = kmY px
+    var gw = x.createLinearGradient(0, sea, 0, base); gw.addColorStop(0, '#0e3570'); gw.addColorStop(1, '#081a3a');
+    x.fillStyle = gw; x.fillRect(L, sea, R - L, base - sea);
+    // ฐานธรณีภาค
+    var ga = x.createLinearGradient(0, base - 60, 0, base); ga.addColorStop(0, 'rgba(236,120,44,.35)'); ga.addColorStop(1, 'rgba(236,120,44,.75)');
+    function floorY(d) { var a = Math.abs(d) / HALF; return sea + (depthAt(Math.min(a, 44)) - 2.0) * kmY; }
+    function sedT(d) { var a = Math.abs(d) / HALF; if (seaAnim && Math.abs(d) > made) return 0; return Math.min(18, (seaAnim ? a : a) * SED / 9); }
+    // เปลือกโลกมหาสมุทร (หินบะซอลต์) และธรณีภาค
+    x.beginPath(); x.moveTo(L, base);
+    for (var p2 = 0; p2 <= R - L; p2 += 4) { var dd = -1000 + 2000 * p2 / (R - L); x.lineTo(L + p2, floorY(dd)); }
+    x.lineTo(R, base); x.closePath(); x.fillStyle = '#3b3550'; x.fill();
+    // แถบแม่เหล็กในเปลือกโลก (ภาพตัด)
+    for (var p3 = 0; p3 <= R - L; p3 += 2) { var d3 = -1000 + 2000 * p3 / (R - L); if (Math.abs(d3) > made) continue; var fy = floorY(d3);
+      x.fillStyle = polAt(Tn + Math.abs(d3) / HALF) ? 'rgba(63,169,245,.55)' : 'rgba(18,26,64,.6)'; x.fillRect(L + p3, fy, 2.2, 16); }
+    // ตะกอน
+    x.beginPath();
+    for (var p4 = 0; p4 <= R - L; p4 += 4) { var d4 = -1000 + 2000 * p4 / (R - L); var fy4 = floorY(d4) - sedT(d4); if (p4) x.lineTo(L + p4, fy4); else x.moveTo(L + p4, fy4); }
+    for (var p5 = R - L; p5 >= 0; p5 -= 4) { var d5 = -1000 + 2000 * p5 / (R - L); x.lineTo(L + p5, floorY(d5)); }
+    x.closePath(); x.fillStyle = '#C9A46A'; x.fill();
+    // ฐานธรณีภาค + แมกมาใต้สันเขา
+    x.fillStyle = ga; x.fillRect(L, base - 60, R - L, 60);
+    var mg = x.createRadialGradient(mid, base - 10, 4, mid, base - 30, 70); mg.addColorStop(0, 'rgba(255,190,90,.95)'); mg.addColorStop(1, 'rgba(255,120,40,0)');
+    x.fillStyle = mg; x.beginPath(); x.ellipse(mid, base - 30, 70, 50, 0, 0, 6.283); x.fill();
+    x.fillStyle = 'rgba(255,170,70,.9)'; x.beginPath(); x.moveTo(mid - 6, base - 40); x.quadraticCurveTo(mid, floorY(0) + 6, mid + 6, base - 40); x.closePath(); x.fill();
+    // ลูกศรแผ่นธรณีแยกออก + การพาความร้อน
+    var off = (tA * 18) % 40;
+    x.strokeStyle = 'rgba(255,209,102,.9)'; x.fillStyle = 'rgba(255,209,102,.9)';
+    [1, -1].forEach(function (sg) {
+      arrow(x, mid + sg * 34, floorY(sg * 300) + 34, mid + sg * 120, floorY(sg * 900) + 34, '#FFD166', 2.4, 9);
+      for (var k = 0; k < 4; k++) { var ax = mid + sg * (60 + k * 40 + off); if (Math.abs(ax - mid) > (R - L) / 2 - 10) continue; x.fillStyle = 'rgba(255,170,70,.55)'; x.beginPath(); x.arc(ax, base - 22 - 10 * Math.sin(k + tA), 2.4, 0, 6.283); x.fill(); }
+    });
+    x.font = '700 12px ' + HFONT; x.textAlign = 'left'; x.fillStyle = '#FFB86B'; x.fillText('ฐานธรณีภาค (แมกมาดันขึ้นที่สันเขา)', L + 6, base - 6);
+    x.fillStyle = '#C9A46A'; x.textAlign = 'right'; x.fillText('ตะกอน', R - 6, floorY(1000) - 22);
+    x.fillStyle = '#b6a9d6'; x.fillText('หินบะซอลต์', R - 6, floorY(1000) + 30);
+    // ระดับน้ำทะเล + เรือ
+    x.strokeStyle = '#4FD8FF'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(L, sea); x.lineTo(R, sea); x.stroke();
+    if (!seaAnim) {
+      var sx = X(dist), fyS = floorY(dist) - sedT(dist);
+      x.strokeStyle = 'rgba(255,209,102,.7)'; x.setLineDash([3, 3]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(sx, y0); x.lineTo(sx, y1); x.stroke(); x.setLineDash([]);
+      x.strokeStyle = '#FFD166'; x.lineWidth = 2; x.beginPath(); x.moveTo(sx, sea); x.lineTo(sx, fyS + 12); x.stroke();
+      x.fillStyle = '#E8EDFF'; x.beginPath(); x.moveTo(sx - 20, sea - 8); x.lineTo(sx + 20, sea - 8); x.lineTo(sx + 14, sea + 1); x.lineTo(sx - 14, sea + 1); x.closePath(); x.fill();
+      x.strokeStyle = '#E8EDFF'; x.lineWidth = 2; x.beginPath(); x.moveTo(sx, sea - 8); x.lineTo(sx, sea - 30); x.moveTo(sx - 7, sea - 8); x.lineTo(sx, sea - 30); x.lineTo(sx + 7, sea - 8); x.stroke();
+      glow(x, sx, fyS + 8, 12, [255, 209, 102], .8);
+      x.font = '700 12px ' + HFONT; x.fillStyle = '#FFD166'; x.textAlign = sx > W - 120 ? 'right' : 'left'; x.fillText('เรือขุดเจาะ', sx + (sx > W - 120 ? -24 : 24), sea - 14);
+    } else {
+      // เข็มทิศสนามแม่เหล็กโลก ณ เวลานั้น
+      var nrmT = polAt(Tn);
+      x.font = '700 15px ' + HFONT; x.textAlign = 'center'; x.fillStyle = '#FFD166';
+      x.fillText(fmt(Tn, 1) + ' ล้านปีก่อน · สนามแม่เหล็กโลก : ' + (nrmT ? 'ปกติ (เหมือนปัจจุบัน)' : 'กลับขั้ว'), W / 2, sea - 30);
+      arrow(x, mid + (nrmT ? -26 : 26), sea - 10, mid + (nrmT ? 26 : -26), sea - 10, nrmT ? '#3FA9F5' : '#FF6B8A', 3, 10);
+    }
+    // คำอธิบายสี
+    if (W > 560) { x.font = '600 11.5px ' + FONT; x.textAlign = 'left'; var lx = R - 140, ly = 22;
+      x.fillStyle = '#3FA9F5'; x.fillRect(lx, ly - 9, 12, 10); x.fillStyle = '#E8EDFF'; x.fillText('ขั้วปกติ', lx + 16, ly);
+      x.fillStyle = '#121a40'; x.fillRect(lx + 72, ly - 9, 12, 10); x.strokeStyle = '#3A4A85'; x.strokeRect(lx + 72, ly - 9, 12, 10); x.fillStyle = '#E8EDFF'; x.fillText('ขั้วกลับ', lx + 88, ly); }
+    else { x.font = '600 11px ' + FONT; x.textAlign = 'left'; x.fillStyle = '#9AA6CF'; x.fillText('ฟ้า = ขั้วปกติ · เข้ม = ขั้วกลับ', L, y1 + 40); }
+  }
+  function updB() {
+    var a = ageAt(dist), nrm = polAt(a), isSta = STA.indexOf(dist) >= 0;
+    $('bDist').textContent = sideName(dist);
+    $('bAge').textContent = a < .05 ? 'ใหม่มาก (~0)' : fmt(a, a % 1 ? 1 : 0) + ' ล้านปี';
+    $('bSed').textContent = fmt(Math.round(a * SED)) + ' ม.';
+    $('bPol').textContent = nrm ? 'ปกติ' : 'กลับขั้ว'; $('bPol').className = 'v ' + (nrm ? 'c' : 'e');
+    $('bDep').textContent = fmt(depthAt(a), 1) + ' กม.';
+    $('bWhy').innerHTML = dist === 0 ? 'ตรงสันเขา แมกมาเพิ่งดันขึ้นมาเย็นตัวเป็นหินบะซอลต์ใหม่ <b>ยังไม่มีตะกอนทับ</b> พื้นทะเลตื้นกว่าบริเวณอื่นเพราะหินยังร้อนและขยายตัว'
+      : 'หินตรงนี้เกิดที่สันเขาเมื่อ ' + fmt(a, a % 1 ? 1 : 0) + ' ล้านปีก่อน แล้วถูกดันออกมาไกล ' + fmt(Math.abs(dist)) + ' กม. ตะกอนจึงมีเวลาทับถมนานกว่า · ตอนหินเย็นตัว สนามแม่เหล็กโลกเป็น <b>' + (nrm ? 'ขั้วปกติ' : 'ขั้วกลับ') + '</b>';
+    $('distR').value = dist;
+    var h = '<span class="lbl">จุดขุดเจาะ</span>';
+    STA.forEach(function (d) { h += '<button class="chip' + (d === dist ? ' on' : '') + (S.recB[d] ? ' done' : '') + '" data-d="' + d + '">' + sideName(d) + '</button>'; });
+    $('distChips').innerHTML = h; bindChips($('distChips'), 'd', function (vv) { seaAnim = 0; dist = +vv; updB(); drawSea(); });
+    h = '<span class="lbl">มุมมอง</span>';
+    [['พื้นสมุทรปัจจุบัน', 0], ['ดูการเกิดพื้นสมุทรใหม่ (ย้อน 44 ล้านปี)', 1]].forEach(function (z) { h += '<button class="chip' + (seaAnim === z[1] ? ' on' : '') + '" data-s="' + z[1] + '">' + z[0] + '</button>'; });
+    $('seaMode').innerHTML = h; bindChips($('seaMode'), 's', function (vv) { seaAnim = +vv; T = 44; updB(); drawSea(); });
+    $('recB').disabled = seaAnim || !isSta;
+    var n = 0, rows = '';
+    STA.forEach(function (d) { var r = S.recB[d], ag = ageAt(d), nr = polAt(ag); if (r) n++;
+      rows += '<tr' + (d === dist ? ' class="cur"' : '') + '><td class="n">' + sideName(d) + '</td><td>' + (r ? fmt(ag) : '-') + '</td><td>' + (r ? fmt(ag * SED) : '-') + '</td><td>' + (r ? (nr ? '<span class="yes">ปกติ</span>' : '<span class="no">กลับขั้ว</span>') : '-') + '</td></tr>'; });
+    $('logB').innerHTML = rows;
+    $('recBMsg').textContent = seaAnim ? 'กลับไปมุมมอง "พื้นสมุทรปัจจุบัน" ก่อนบันทึก' : (!isSta ? 'บันทึกได้เฉพาะ 6 จุดในปุ่ม (แถบเลื่อนใช้สำรวจ)' : 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ C ได้' : ''));
+  }
+  $('distR').oninput = function () { seaAnim = 0; dist = +this.value; STA.forEach(function (d) { if (Math.abs(d - dist) <= 15) dist = d; }); updB(); drawSea(); };
+  $('recB').onclick = function () { if (seaAnim || STA.indexOf(dist) < 0) return; S.recB[dist] = 1; save(); updB(); };
+
+  // ================================================================ ภารกิจ C ห้องพาความร้อน
+  var heat = 50, tC = 0;
+  var PART = (function () { var r = rnd(5), a = []; for (var i = 0; i < 140; i++) a.push([r() * 6.283, .25 + r() * .75, r() < .5 ? -1 : 1]); return a; })();
+  function drawConv() {
+    var c = fit($('cvConv')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var top = 70, bot = H - 22, mid = W / 2, cw = W * .25, ch = (bot - top) / 2 - 6, cy = (top + bot) / 2 + 4;
+    var ga = x.createLinearGradient(0, top, 0, bot); ga.addColorStop(0, '#6b2a16'); ga.addColorStop(1, '#c0501c');
+    x.fillStyle = ga; x.fillRect(0, top, W, bot - top);
+    var gc = x.createLinearGradient(0, bot - 10, 0, H); gc.addColorStop(0, '#ffb347'); gc.addColorStop(1, '#ffd88a');
+    x.fillStyle = gc; x.fillRect(0, bot, W, H - bot);
+    x.font = '700 12px ' + HFONT; x.fillStyle = '#5a2a00'; x.textAlign = 'center'; x.fillText('ความร้อนจากด้านล่าง (แก่นโลก)', W / 2, H - 6);
+    // อนุภาคพาความร้อน 2 วง
+    var sp = heat / 50;
+    PART.forEach(function (p) {
+      var cxp = mid + p[2] * cw, ang = p[0] + p[2] * tC * .6 * sp, rr = p[1];
+      var px = cxp + Math.cos(ang) * cw * .92 * rr, py = cy + Math.sin(ang) * ch * rr;
+      var hot = clamp(.55 * (1 + Math.sin(ang)) / 2 + .45 * (1 - p[2] * Math.cos(ang)) / 2, 0, 1);   // ด้านล่างและฝั่งที่ลอยขึ้น = ร้อน
+      x.fillStyle = 'rgba(' + Math.round(255) + ',' + Math.round(120 + 110 * hot) + ',' + Math.round(40 + 60 * hot) + ',' + (.35 + .5 * hot) + ')';
+      x.beginPath(); x.arc(px, py, 2.4 + hot * 1.6, 0, 6.283); x.fill();
+    });
+    // ลูกศรวงการพาความร้อน
+    if (heat > 0) [-1, 1].forEach(function (sg) {
+      var cxp = mid + sg * cw;
+      x.strokeStyle = 'rgba(255,230,180,.75)'; x.lineWidth = 2.4;
+      x.beginPath(); x.ellipse(cxp, cy, cw * .62, ch * .62, 0, 0, 6.283); x.stroke();
+      [0, Math.PI].forEach(function (a0) { var a = a0 + sg * (tC * .6 * sp % 6.283), ax = cxp + Math.cos(a) * cw * .62, ay = cy + Math.sin(a) * ch * .62, dx = -Math.sin(a) * sg, dy = Math.cos(a) * sg;
+        arrow(x, ax - dx * 10, ay - dy * 10, ax + dx * 6, ay + dy * 6, 'rgba(255,230,180,.95)', 2.4, 9); });
+    });
+    // แผ่นธรณี
+    var plateY = top - 26, pth = 26, gap = 4 + 0, move = (tC * 10 * sp) % 30;
+    [-1, 1].forEach(function (sg) {
+      var x0 = mid + sg * gap, x1 = mid + sg * (W * .44);
+      x.fillStyle = sg < 0 ? '#4a6fa8' : '#5d8a5a';
+      x.beginPath(); x.moveTo(x0, plateY); x.lineTo(x1, plateY); x.quadraticCurveTo(x1 + sg * 30, plateY + 10, x1 + sg * 26, plateY + pth + 34); x.lineTo(x1 + sg * 2, plateY + pth + 30); x.quadraticCurveTo(x1 - sg * 2, plateY + pth, x1 - sg * 10, plateY + pth); x.lineTo(x0, plateY + pth); x.closePath(); x.fill();
+      x.save(); x.beginPath(); x.rect(Math.min(x0, x1), plateY, Math.abs(x1 - x0), pth); x.clip();
+      x.strokeStyle = 'rgba(255,255,255,.18)'; x.lineWidth = 2;
+      for (var k = -1; k < 30; k++) { var lx = mid + sg * (k * 30 + move); x.beginPath(); x.moveTo(lx, plateY); x.lineTo(lx, plateY + pth); x.stroke(); }
+      x.restore();
+      if (heat > 0) arrow(x, mid + sg * 40, plateY - 12, mid + sg * (40 + 20 + 30 * sp), plateY - 12, '#FFD166', 2.6, 9);
+    });
+    // แมกมาที่สันเขา
+    var mgl = x.createRadialGradient(mid, top, 2, mid, top, 34); mgl.addColorStop(0, 'rgba(255,220,120,' + (.3 + .6 * sp / 2) + ')'); mgl.addColorStop(1, 'rgba(255,120,40,0)');
+    x.fillStyle = mgl; x.beginPath(); x.arc(mid, top, 34, 0, 6.283); x.fill();
+    x.font = '700 12px ' + HFONT; x.fillStyle = '#FFD166'; x.textAlign = 'center';
+    x.fillText('สันเขากลางมหาสมุทร', mid, plateY - 26);
+    x.fillStyle = '#E8EDFF'; x.textAlign = 'left'; x.fillText('ธรณีภาค (แผ่นธรณี)', 8, plateY - 6);
+    x.fillStyle = '#ffd7b0'; x.fillText('ฐานธรณีภาค', 8, top + 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.fillText('มุดลง (G3)', W - 8, plateY - 6);
+    x.textAlign = 'center'; x.fillStyle = '#fff3d6'; x.font = '600 11.5px ' + FONT;
+    if (W > 520) { x.fillText('ร้อน ลอยขึ้น', mid, cy + 4); x.fillText('เย็น จมลง', mid - cw * 1.62, cy + 4); x.fillText('เย็น จมลง', mid + cw * 1.62, cy + 4); }
+  }
+  function updC() {
+    var spd = heat / 20;
+    $('cHeat').textContent = heat === 0 ? 'ไม่มี' : (heat < 34 ? 'น้อย' : heat < 67 ? 'ปานกลาง' : 'มาก') + ' (' + heat + '%)';
+    $('cSpd').textContent = heat === 0 ? 'หยุดนิ่ง' : fmt(spd, 1) + ' ซม./ปี';
+    $('cState').textContent = heat === 0 ? 'ไม่มีการพาความร้อน' : 'เกิดการพาความร้อน'; $('cState').className = 'lvl ' + (heat === 0 ? 'n' : 'y');
+    $('cWhat').innerHTML = heat === 0 ? 'ถ้าไม่มีความร้อน เนื้อโลกไม่หมุนวน <b>แผ่นธรณีก็ไม่เคลื่อนที่</b> นี่คือคำตอบที่เวเกเนอร์ยังไม่มีในสมัยนั้น'
+      : 'เนื้อโลกร้อนตรงกลาง <b>ลอยขึ้น</b> แล้วไหลแผ่ออกสองข้างใต้แผ่นธรณี เย็นตัวลงแล้ว <b>จมลง</b> แผ่นธรณีด้านบนจึงถูกพาให้แยกออกจากกันที่สันเขา ' +
+        (heat >= 40 && heat <= 60 ? '· ราว 2.5 ซม./ปี ใกล้เคียงกับที่วัดได้จริงในมหาสมุทรแอตแลนติก (พอ ๆ กับเล็บงอก)' : '· ความร้อนมากขึ้น การพาความร้อนเร็วขึ้น');
+    $('heatR').value = heat;
+  }
+  $('heatR').oninput = function () { heat = +this.value; updC(); drawConv(); };
+
+  // ไขรหัสทวีปเลื่อน
+  var OPTS = ['แพนเจีย', 'อัลเฟรด เวเกเนอร์', 'มีโซซอรัส', 'กลอสซอพเทอริส', 'สันเขากลางมหาสมุทร', 'แถบแม่เหล็กบรรพกาล', 'การพาความร้อน', 'แฮร์รี เฮสส์'];
+  var CL = [
+    { L: 'P', q: 'มหาทวีปที่รวมทุกทวีปไว้เป็นผืนเดียวเมื่อราว 250 ล้านปีก่อน ชื่อมาจากภาษากรีกแปลว่า "แผ่นดินทั้งหมด"', a: 0,
+      w: 'แพนเจีย (Pangaea) ล้อมรอบด้วยมหาสมุทรพันทาลัสซา ต่อมาแยกเป็นลอเรเชียทางเหนือ และกอนด์วานาทางใต้' },
+    { L: 'A', q: 'นักวิทยาศาสตร์ชาวเยอรมัน เสนอทฤษฎีทวีปเลื่อนเมื่อ พ.ศ. 2455 พร้อมหลักฐาน 4 ชุด แต่อธิบายไม่ได้ว่าแรงอะไรทำให้ทวีปเคลื่อน', a: 1,
+      w: 'อัลเฟรด เวเกเนอร์ (Alfred Wegener) นักอุตุนิยมวิทยา เสียชีวิตระหว่างสำรวจกรีนแลนด์ พ.ศ. 2473 ก่อนที่ทฤษฎีของเขาจะได้รับการยอมรับ' },
+    { L: 'N', q: 'สัตว์เลื้อยคลานน้ำจืดตัวเล็ก ว่ายข้ามมหาสมุทรไม่ได้ แต่พบซากทั้งในอเมริกาใต้และแอฟริกาตอนใต้', a: 2,
+      w: 'มีโซซอรัส (Mesosaurus) เป็นหลักฐานว่าอเมริกาใต้และแอฟริกาเคยเชื่อมต่อกัน' },
+    { L: 'G', q: 'พืชโบราณที่เมล็ดหนักเกินกว่าลมจะพัดข้ามทะเล แต่พบซากในทวีปซีกใต้ทั้ง 5 รวมทั้งแอนตาร์กติกา', a: 3,
+      w: 'กลอสซอพเทอริส (Glossopteris) พบในอเมริกาใต้ แอฟริกา อินเดีย ออสเตรเลีย แอนตาร์กติกา (มหาทวีปกอนด์วานา)' },
+    { L: 'A', q: 'แนวเทือกเขาใต้ทะเลยาวต่อเนื่องรอบโลก มีแมกมาดันขึ้นมา หินตรงนี้อายุน้อยที่สุด และยังไม่มีตะกอนทับ', a: 4,
+      w: 'สันเขากลางมหาสมุทร เป็นบริเวณที่เกิดพื้นมหาสมุทรใหม่ (ภารกิจ B)' },
+    { L: 'E', q: 'ลายแถบในหินพื้นมหาสมุทรที่บันทึกการกลับขั้วของสนามแม่เหล็กโลก เรียงสลับกันสมมาตรทั้งสองฝั่งของสันเขา', a: 5,
+      w: 'แถบแม่เหล็กบรรพกาล (ภาวะแม่เหล็กบรรพกาล) เป็นหลักฐานสำคัญของการแผ่ขยายของพื้นสมุทร' },
+    { L: 'A', q: 'กระบวนการในชั้นฐานธรณีภาค เนื้อโลกร้อนลอยขึ้น เย็นจมลง หมุนวนเป็นวง เป็นแรงที่ทำให้แผ่นธรณีเคลื่อนที่', a: 6,
+      w: 'การพาความร้อน คือคำตอบของคำถามที่เวเกเนอร์ตอบไม่ได้ (ขั้นที่ 1)' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '" id="cl' + i + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำใบ้ที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      OPTS.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // จัดแฟ้มหลักฐาน (0 = ทวีปเลื่อน, 1 = พื้นสมุทรแผ่ขยาย)
+  var SO = [
+    { t: 'ขอบทวีปอเมริกาใต้กับแอฟริกาต่อกันได้พอดี', a: 0, w: 'หลักฐานบนทวีป ที่เวเกเนอร์สังเกตจากแผนที่' },
+    { t: 'หินพื้นมหาสมุทรยิ่งห่างจากสันเขา ยิ่งมีอายุมาก', a: 1, w: 'ได้จากการขุดเจาะพื้นมหาสมุทร (ภารกิจ B)' },
+    { t: 'พบซากมีโซซอรัสทั้งในอเมริกาใต้และแอฟริกา', a: 0, w: 'ซากดึกดำบรรพ์ชนิดเดียวกันบนทวีปที่ห่างกัน' },
+    { t: 'แถบแม่เหล็กในหินเรียงสลับสมมาตรสองฝั่งสันเขา', a: 1, w: 'ภาวะแม่เหล็กบรรพกาล บันทึกการเกิดหินใหม่ที่สันเขา' },
+    { t: 'พบร่องรอยธารน้ำแข็งในอินเดียและแอฟริกาซึ่งปัจจุบันร้อน', a: 0, w: 'ภูมิอากาศบรรพกาล แสดงว่าทวีปเคยอยู่ใกล้ขั้วโลก' },
+    { t: 'ตะกอนบนพื้นมหาสมุทรยิ่งห่างจากสันเขา ยิ่งหนา', a: 1, w: 'หินที่เก่ากว่ามีเวลาให้ตะกอนทับถมนานกว่า' },
+    { t: 'เทือกเขาแอปพาเลเชียนมีหินชุดเดียวกับเทือกเขาในสกอตแลนด์และนอร์เวย์', a: 0, w: 'หินและเทือกเขาต่อเนื่องกันข้ามมหาสมุทร' },
+    { t: 'กลางมหาสมุทรมีแนวเทือกเขาใต้ทะเลที่มีแมกมาดันขึ้นมา', a: 1, w: 'สันเขากลางมหาสมุทร พบจากการทำแผนที่พื้นมหาสมุทร' }
+  ];
+  function sortUI() {
+    var h = '', n = 0;
+    SO.forEach(function (s, i) { var ok = S.so[i] === s.a; if (ok) n++;
+      h += '<div class="sc' + (ok ? ' ok' : '') + '">' + s.t + '<div class="opts">' + ['ทวีปเลื่อน', 'พื้นสมุทรแผ่ขยาย'].map(function (o, j) { return '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === s.a ? 'ok' : '') + '">' + o + '</button>'; }).join('') +
+        '</div>' + (ok ? '<div class="why">' + s.w + '</div>' : '') + '</div>'; });
+    $('sorts').innerHTML = h;
+    Array.prototype.forEach.call($('sorts').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.so[i] === SO[i].a) return;
+        if (j === SO[i].a) { S.so[i] = j; save(); sortUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('sortProg').innerHTML = 'จัดแฟ้มถูกแล้ว <b>' + n + '/8</b>' + (n === 8 ? ' · หลักฐานบนทวีป + หลักฐานจากพื้นมหาสมุทร รวมกันเป็น <b>ทฤษฎีธรณีแปรสัณฐาน</b> (เรียนต่อ G3)' : '');
+  }
+  var EV = [
+    { y: 'พ.ศ. 2455', n: 'เวเกเนอร์เสนอทวีปเลื่อน', d: 'ใช้หลักฐานบนทวีป 4 ชุด แต่อธิบายไม่ได้ว่าแรงอะไรทำให้ทวีปเคลื่อน นักวิทยาศาสตร์ส่วนใหญ่จึงไม่ยอมรับ', i: 'หลักฐาน : ขอบทวีป ซากดึกดำบรรพ์ หิน ภูมิอากาศ' },
+    { y: 'พ.ศ. 2473', n: 'เวเกเนอร์เสียชีวิตที่กรีนแลนด์', d: 'ระหว่างออกสำรวจลมฟ้าอากาศบนแผ่นน้ำแข็ง ขณะที่ความคิดของเขายังถูกปฏิเสธ', i: 'อีกราว 30 ปีจึงมีหลักฐานใหม่' },
+    { y: 'พ.ศ. 2493–2503', n: 'แผนที่พื้นมหาสมุทร', d: 'เรือสำรวจใช้คลื่นเสียงวัดความลึก แมรี ธาร์ป วาดแผนที่จนพบสันเขากลางมหาสมุทรที่มีหุบเขาทรุดอยู่ตรงกลาง', i: 'พบสันเขายาวต่อเนื่องรอบโลก' },
+    { y: 'พ.ศ. 2505', n: 'เฮสส์เสนอการแผ่ขยายของพื้นสมุทร', d: 'พื้นมหาสมุทรใหม่เกิดที่สันเขาแล้วแยกออกสองข้าง โดยมีการพาความร้อนในเนื้อโลกเป็นแรงขับ', i: 'ตอบคำถามเรื่องแรงที่เวเกเนอร์ตอบไม่ได้' },
+    { y: 'พ.ศ. 2506', n: 'แถบแม่เหล็กสมมาตร', d: 'ไวน์และแมทธิวส์อธิบายว่าแถบแม่เหล็กที่สลับกันสองฝั่งสันเขา คือบันทึกการกลับขั้วของสนามแม่เหล็กโลก', i: 'หลักฐานภาวะแม่เหล็กบรรพกาล' },
+    { y: 'พ.ศ. 2511', n: 'เรือขุดเจาะยืนยัน', d: 'เรือโกลมาร์ ชาเลนเจอร์ ขุดเจาะพื้นมหาสมุทรแอตแลนติก พบว่าหินยิ่งห่างสันเขายิ่งเก่า ตะกอนยิ่งหนา', i: 'นำไปสู่ทฤษฎีธรณีแปรสัณฐาน (G3)' }
+  ];
+  $('evid').innerHTML = EV.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawMap();
+    if (tab === 'B') drawSea();
+    if (tab === 'C') drawConv();
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt; tC += dt;
+    if (tab === 'A') stepPlay(dt);
+    if (tab === 'B') { if (seaAnim) { T -= dt * 3.2; if (T < 0) T = 44; } drawSea(); }
+    if (tab === 'C') drawConv();
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC(); cluesUI(); sortUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_G2 = { EVS: EVS, STA: STA, CL: CL, SO: SO, polAt: polAt, ageAt: ageAt, HALF: HALF, SED: SED,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    setA: function (e, m) { playing = 0; selE = e; ma = m; updA(); drawMap(); },
+    setB: function (d, an, t) { dist = d; seaAnim = an ? 1 : 0; if (t != null) T = t; updB(); drawSea(); },
+    setC: function (h, t) { heat = h; if (t != null) tC = t; updC(); drawConv(); },
+    recAll: function () { EVS.forEach(function (z) { S.recA[z.k] = 1; }); STA.forEach(function (d) { S.recB[d] = 1; }); CL.forEach(function (a, i) { S.cl[i] = a.a; });
+      SO.forEach(function (s, i) { S.so[i] = s.a; }); updA(); updB(); cluesUI(); sortUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
