@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>G1 ภารกิจสแกนใจกลางโลก · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง G1 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-E7) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b1f5e55, transparent), radial-gradient(900px 500px at 0% 110%, #5a2a1c44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--orange); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 0 0 12px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.brand .unit-tag { color: var(--ink); font-weight: 700; letter-spacing: 0; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 24px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 21px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15.5px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.yes { color: var(--ok); font-weight: 600; } .no { color: var(--err); font-weight: 600; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.note.c { border-left-color: var(--cyan); background: #4fd8ff0d; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 21px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · G1 <span class="unit-tag">หน่วยที่ 2</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจสแกน<b>ใจกลางโลก</b></h1>
+  <p class="lead">นักบินกลับถึงดาวเคราะห์บ้านเกิดแล้ว ภารกิจใหม่คือสำรวจ "ข้างใน" ของโลก ซึ่งลึกถึง 6,371 กิโลเมตร แต่มนุษย์เจาะลงไปได้ลึกที่สุดเพียงราว 12 กิโลเมตร เครื่องมือของเราจึงเป็น <b style="color:#FFD166">คลื่นไหวสะเทือน</b> จากแผ่นดินไหว ทดลองว่าคลื่นผ่านอะไรได้บ้าง ตั้งสถานีตรวจวัดรอบโลก แล้วสแกนหาชั้นต่าง ๆ จดผลลงใบงาน G1</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองคลื่น<small>คลื่น P และ S ผ่านอะไรได้บ้าง</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>สถานีตรวจวัดรอบโลก<small>ตามหาเขตอับคลื่น</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>เจาะสแกนชั้นโลก<small>แบ่งชั้น + ไขรหัส</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองคลื่น : คลื่น P และ S ผ่านอะไรได้บ้าง</h2>
+    <p class="how"><b style="color:#FFD166">การทดลอง</b> ตัวแปรต้น = ชนิดคลื่น (P, S) และสถานะของตัวกลาง (ของแข็ง ของเหลว แก๊ส) · ตัวแปรตาม = คลื่นผ่านได้หรือไม่ และความเร็ว · เลือกคลื่นและตัวกลาง ดูการสั่นของอนุภาค (จุดสีทอง) แล้วกด "บันทึกค่า" ให้ครบ 6 แบบ จดลงใบงาน ส่วนที่ 1</p>
+    <div class="twin">
+      <canvas id="cvWave" height="320" aria-label="ภาพจำลองคลื่นไหวสะเทือนเคลื่อนที่ผ่านตัวกลาง"></canvas>
+      <div class="info">
+        <div class="k">ตัวกลาง</div>
+        <h3 id="wMed">-</h3>
+        <div class="k" id="wState">-</div>
+        <div class="k" style="margin-top:6px">คลื่นที่ส่ง</div>
+        <div class="v c" id="wWave" style="font-size:20px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ผ่านได้ไหม</div><div class="v" id="wPass">-</div></div>
+          <div><div class="k">ความเร็ว</div><div class="v g" id="wSpd">-</div></div>
+        </div>
+        <div class="d" id="wHow" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <div class="chips" id="waveChips"></div>
+    <div class="chips" id="medChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกค่า</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ตัวกลาง</th><th>สถานะ</th><th>คลื่น P</th><th>คลื่น S</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note"><b>สังเกต</b> คลื่น P (คลื่นปฐมภูมิ) ทำให้อนุภาค <b>สั่นไปมาในแนวเดียวกับทิศที่คลื่นเคลื่อนที่</b> เกิดเป็นช่วงอัดสลับช่วงขยาย จึงผ่านได้ทั้งของแข็ง ของเหลว และแก๊ส · คลื่น S (คลื่นทุติยภูมิ) ทำให้อนุภาค <b>สั่นตั้งฉากกับทิศที่คลื่นเคลื่อนที่</b> ต้องอาศัยเนื้อที่ยึดกันแน่น จึง <b>ผ่านได้เฉพาะของแข็ง</b> · ในตัวกลางเดียวกัน คลื่น P เร็วกว่าคลื่น S เสมอ</div>
+    <div class="note c"><b>นี่คือกุญแจของภารกิจ</b> ถ้าส่งคลื่น S ลงไปใต้โลกแล้ว "หายไป" ที่ความลึกใด แปลว่าชั้นนั้นเป็น <b>ของเหลว</b> และถ้าความเร็วของคลื่นเปลี่ยนทันที แปลว่าเข้าสู่ <b>ชั้นใหม่</b> ที่มีสมบัติต่างไป</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 3 ตัวกลาง ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> สถานีตรวจวัดรอบโลก : ตามหาเขตอับคลื่น</h2>
+    <p class="how">เกิดแผ่นดินไหวที่จุดบนสุดของโลก (ดาวสีแดง) เลือกตำแหน่งสถานีตรวจวัดคลื่นไหวสะเทือน 6 ตำแหน่ง ตามระยะเชิงมุมจากจุดเกิดแผ่นดินไหว ดูว่าสถานีตรวจพบ <b style="color:#4FD8FF">คลื่น P</b> และ <b style="color:#FF9F6B">คลื่น S</b> หรือไม่ กด "บันทึกค่า" ให้ครบ 6 สถานี แล้วลองสลับเป็น "ถ้าโลกแข็งทั้งลูก" เพื่อเปรียบเทียบ จดลงใบงาน ส่วนที่ 2</p>
+    <div class="twin">
+      <canvas id="cvGlobe" height="390" aria-label="ภาพตัดโลกแสดงเส้นทางคลื่นไหวสะเทือนจากจุดเกิดแผ่นดินไหวไปยังสถานีตรวจวัด"></canvas>
+      <div class="info">
+        <div class="k">ระยะเชิงมุมของสถานีจากจุดเกิดแผ่นดินไหว</div>
+        <div class="v g" id="bDeg">-</div>
+        <div class="k" id="bMode" style="color:#4FD8FF;font-size:15px">-</div>
+        <div class="g2" style="margin-top:6px">
+          <div><div class="k">คลื่น P</div><div class="v" id="bP">-</div><div class="k" id="bPt">-</div></div>
+          <div><div class="k">คลื่น S</div><div class="v" id="bS">-</div><div class="k" id="bSt">-</div></div>
+        </div>
+        <div class="d" id="bWhy" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <input type="range" id="degR" min="5" max="180" step="1" aria-label="ระยะเชิงมุมของสถานีตรวจวัด">
+    <div class="chips" id="degChips"></div>
+    <div class="chips" id="modeChips"></div>
+    <div class="ctrl"><button class="btn gold solid" id="recB">บันทึกค่า</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ระยะเชิงมุม</th><th>ตรวจพบคลื่น P</th><th>ตรวจพบคลื่น S</th><th>คลื่น P ถึงหลังเกิด</th><th>คลื่น S ถึงหลังเกิด</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="note"><b>เขตอับคลื่น</b> คือบริเวณบนผิวโลกที่ระยะเชิงมุมราว <b>103°–142°</b> จากจุดเกิดแผ่นดินไหว ซึ่งสถานีตรวจวัด <b>ไม่พบทั้งคลื่น P และคลื่น S โดยตรง</b> และเลย 103° ออกไปจะ <b>ไม่พบคลื่น S เลย</b> · นักวิทยาศาสตร์อธิบายว่าใต้เนื้อโลกลงไปมี <b>แก่นโลกชั้นนอกที่เป็นของเหลว</b> คลื่น S จึงผ่านไม่ได้ ส่วนคลื่น P ผ่านได้แต่ช้าลงทันทีจึงหักเห ไปโผล่ไกลกว่า 142°</div>
+    <div class="note c"><b>ระยะเชิงมุม</b> คือมุมที่จุดศูนย์กลางโลก ระหว่างจุดเกิดแผ่นดินไหวกับสถานี (0° = ที่เดียวกัน 180° = อีกฟากหนึ่งของโลก) · เวลาที่คลื่นถึงเป็นค่าโดยประมาณ คลื่น P ถึงก่อนคลื่น S เสมอ ความต่างของเวลา 2 คลื่นนี้ใช้หาระยะทางถึงจุดเกิดแผ่นดินไหว (จะใช้อีกใน G5)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 สถานี ตอบข้อ 3–4</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> เจาะสแกนชั้นโลก : แบ่งชั้นโครงสร้างโลก</h2>
+    <p class="how"><b style="color:#FFD166">ขั้นที่ 1</b> ส่งหัวสแกนลงไปที่ความลึก 5 ค่า (หรือเลื่อนแถบสำรวจเอง) ดูว่าอยู่ชั้นใดเมื่อแบ่ง <b>ตามส่วนประกอบทางเคมี</b> และ <b>ตามสมบัติเชิงกล</b> สถานะ อุณหภูมิ และความเร็วคลื่น กด "บันทึกค่า" ให้ครบ 5 ค่า · <b style="color:#4FD8FF">ขั้นที่ 2</b> ไขรหัสชั้นโลก 6 ข้อ · <b style="color:#5EF2A5">ขั้นที่ 3</b> หลักฐานอื่นที่ช่วยยืนยัน จดลงใบงาน ส่วนที่ 3–4</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> สแกนตามความลึก</h2>
+    <div class="twin">
+      <canvas id="cvDeep" height="380" aria-label="แผนภาพชั้นโครงสร้างโลกแบ่งตามส่วนประกอบและตามสมบัติเชิงกล พร้อมตำแหน่งหัวสแกน"></canvas>
+      <div class="info">
+        <div class="k">ความลึกจากผิวโลก</div>
+        <div class="v g" id="cDep">-</div>
+        <div class="g2" style="margin-top:2px">
+          <div><div class="k">ชั้นตามส่วนประกอบ</div><div class="v c" id="cComp" style="font-size:19px">-</div></div>
+          <div><div class="k">ชั้นตามสมบัติเชิงกล</div><div class="v o" id="cMech" style="font-size:19px">-</div></div>
+        </div>
+        <div><span class="lvl" id="cState">-</span></div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">อุณหภูมิ (ราว)</div><div class="v r" id="cTemp" style="font-size:19px">-</div></div>
+          <div><div class="k">ความหนาแน่น (ราว)</div><div class="v p" id="cRho" style="font-size:19px">-</div></div>
+          <div><div class="k">ความเร็วคลื่น P</div><div class="v c" id="cP" style="font-size:19px">-</div></div>
+          <div><div class="k">ความเร็วคลื่น S</div><div class="v r" id="cS" style="font-size:19px">-</div></div>
+        </div>
+        <div class="d" id="cWhat" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="depR" min="0" max="1000" step="1" aria-label="ความลึกของหัวสแกน">
+    <div class="chips" id="depChips"></div>
+    <canvas id="cvGraph" height="230" style="margin-top:8px" aria-label="กราฟความเร็วคลื่น P และ S กับความลึก"></canvas>
+    <div class="ctrl"><button class="btn gold solid" id="recC">บันทึกค่า</button><span class="lbl" id="recCMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ความลึก (กม.)</th><th>ชั้นตามส่วนประกอบ</th><th>ชั้นตามสมบัติเชิงกล</th><th>สถานะ</th><th>คลื่น P / S (กม./วินาที)</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+    <div class="note"><b>แนวแบ่งชั้นที่ความเร็วคลื่นเปลี่ยนทันที</b> · ลึกราว 35 กม. (ใต้ทวีป) <b>แนวแบ่งโมโฮโรวิซิก (โมโฮ)</b> คลื่นเร็วขึ้นทันที = เปลือกโลกกับเนื้อโลก · ลึก 2,900 กม. <b>แนวแบ่งกูเทนเบิร์ก</b> คลื่น S หายไป คลื่น P ช้าลงทันที = เนื้อโลกกับแก่นโลกที่เป็นของเหลว · ลึก 5,150 กม. <b>แนวแบ่งเลห์มันน์</b> คลื่น P เร็วขึ้น = แก่นโลกชั้นในที่เป็นของแข็ง · ช่วงลึกราว 100–250 กม. คลื่นช้าลงเล็กน้อย = ฐานธรณีภาคที่หินหลอมเหลวบางส่วน</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ไขรหัสชั้นโลก</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำบอกใบ้ แล้วแตะชื่อชั้นที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">SEISMO</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · seismo- มาจากภาษากรีก แปลว่า "สั่นสะเทือน" วิชาที่ศึกษาคลื่นไหวสะเทือนเรียกว่า วิทยาคลื่นไหวสะเทือน (seismology)</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> หลักฐานอื่นที่ช่วยยืนยัน</h2>
+    <p class="how" style="margin-bottom:4px">คลื่นไหวสะเทือนเป็นข้อมูลหลัก แต่นักวิทยาศาสตร์ยังมีหลักฐานอื่นที่สอดคล้องกัน เลือกใช้ในใบงาน ส่วนที่ 4</p>
+    <div class="events" id="evid"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 5 ความลึก รหัสผ่าน ข้อ 5 · <b>ส่วนที่ 4</b> : โปสการ์ดจากใต้พิภพ</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ แต่ละตำราต่างกันเล็กน้อย · เส้นทางคลื่นในภารกิจ B เป็นภาพจำลองอย่างง่าย · หน้านี้ไม่บันทึกข้อมูลนักเรียน · ES Journey ครูนพพล ภาณุสุวัฒน์ โรงเรียนพรตพิทยพยัต</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_g1_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.recC = S.recC || {}; S.cl = S.cl || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function rnd(seed) { var s = seed; return function () { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var STARF = (function () { var r = rnd(77), a = []; for (var i = 0; i < 240; i++) a.push([r(), r(), r() > .93 ? 1.6 : 1, .25 + r() * .6]); return a; })();
+  function starfield(x, W, H, k) { STARF.forEach(function (s) { x.globalAlpha = s[3] * (k || 1); x.fillStyle = '#fff'; x.fillRect(s[0] * W, s[1] * H, s[2], s[2]); }); x.globalAlpha = 1; }
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr)); }; }); }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  function lerpT(tab, v) { // ตารางค่า [[x, y], ...] เรียงตาม x
+    if (v <= tab[0][0]) return tab[0][1];
+    for (var i = 1; i < tab.length; i++) if (v <= tab[i][0]) { var a = tab[i - 1], b = tab[i]; return b[0] === a[0] ? b[1] : a[1] + (b[1] - a[1]) * (v - a[0]) / (b[0] - a[0]); }
+    return tab[tab.length - 1][1];
+  }
+  var FONT = '"Sarabun", sans-serif', HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ห้องทดลองคลื่น
+  var WAVES = [{ k: 'P', n: 'คลื่น P (ปฐมภูมิ)', col: '#4FD8FF' }, { k: 'S', n: 'คลื่น S (ทุติยภูมิ)', col: '#FF9F6B' }];
+  // ความเร็วจริงโดยประมาณ (กม./วินาที) : หินแกรนิต P 6.0 S 3.5 · น้ำ P 1.5 · อากาศ P 0.34 (เท่ากับเสียง)
+  var MEDS = [
+    { k: 'sol', n: 'หินแกรนิต', st: 'ของแข็ง', P: 6.0, S: 3.5, col: [170, 160, 150], d: 'อนุภาคยึดกันแน่นเป็นโครงสร้าง' },
+    { k: 'liq', n: 'น้ำ', st: 'ของเหลว', P: 1.5, S: 0, col: [80, 160, 255], d: 'อนุภาคอยู่ชิดกันแต่เลื่อนไถลผ่านกันได้' },
+    { k: 'gas', n: 'อากาศ', st: 'แก๊ส', P: 0.34, S: 0, col: [200, 210, 255], d: 'อนุภาคอยู่ห่างกันมาก เคลื่อนที่อิสระ' }
+  ];
+  var selW = 0, selM = 0;
+  var GASP = (function () { var r = rnd(11), a = []; for (var i = 0; i < 90; i++) a.push([r(), r(), r() * 6.283]); return a; })();
+  function drawWave() {
+    var c = fit($('cvWave')), x = c.x, W = c.W, H = c.H, w = WAVES[selW], m = MEDS[selM];
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var x0 = 46, x1 = W - 18, y0 = 64, y1 = H - 64, tw = x1 - x0, th = y1 - y0;
+    // ตัวกลาง
+    x.fillStyle = rgba(m.col, .08); x.strokeStyle = rgba(m.col, .5); x.lineWidth = 1.5;
+    x.beginPath(); x.rect(x0, y0, tw, th); x.fill(); x.stroke();
+    var spd = w.k === 'P' ? m.P : m.S, pass = spd > 0;
+    var vis = 40 + (pass ? spd : 3.5) * 32;             // ความเร็วบนจอ (สัดส่วนกับความเร็วจริงอย่างหยาบ)
+    var span = tw + 160, xc = x0 + ((tA * vis) % span) - 30;
+    var amp = 1;
+    if (!pass) amp = Math.exp(-Math.max(0, xc - x0) / 22);
+    var wid = 22, A = w.k === 'P' ? 9 : 13;
+    function disp(px) { var u = (px - xc) / wid; return amp * (-u * Math.exp(-u * u) * 2.33); }
+    var dx = 16, rows = 9, cols = Math.floor(tw / dx), ry = th / (rows + 1);
+    var pts = [], i, j;
+    if (m.k === 'gas') {
+      GASP.forEach(function (g) { var bx = x0 + 8 + g[0] * (tw - 16), by = y0 + 8 + g[1] * (th - 16); bx += Math.sin(tA * 1.3 + g[2]) * 3; by += Math.cos(tA * 1.1 + g[2]) * 3;
+        var d = disp(bx) * A; pts.push([bx + (w.k === 'P' ? d : 0), by + (w.k === 'S' ? d : 0), bx]); });
+    } else {
+      for (j = 0; j < rows; j++) for (i = 0; i <= cols; i++) {
+        var bx = x0 + 8 + i * (tw - 16) / cols, by = y0 + (j + 1) * ry;
+        if (m.k === 'liq') { bx += Math.sin(tA * 2 + i * 1.7 + j) * 1.6; by += Math.cos(tA * 1.7 + i + j * 2.1) * 1.6; }
+        var d2 = disp(bx) * A; pts.push([bx + (w.k === 'P' ? d2 : 0), by + (w.k === 'S' ? d2 : 0), bx, i, j]);
+      }
+      if (m.k === 'sol') { // พันธะระหว่างอนุภาค
+        x.strokeStyle = 'rgba(200,190,180,.18)'; x.lineWidth = 1;
+        for (j = 0; j < rows; j++) for (i = 0; i <= cols; i++) { var p = pts[j * (cols + 1) + i];
+          if (i < cols) { var q = pts[j * (cols + 1) + i + 1]; x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(q[0], q[1]); x.stroke(); }
+          if (j < rows - 1) { var r2 = pts[(j + 1) * (cols + 1) + i]; x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(r2[0], r2[1]); x.stroke(); } }
+      }
+    }
+    var trk = null, mid = x0 + tw * .5;
+    pts.forEach(function (p) { x.fillStyle = rgba(m.col, .85); x.beginPath(); x.arc(p[0], p[1], m.k === 'gas' ? 2.6 : 3, 0, 6.283); x.fill(); });
+    // อนุภาคติดตาม (สีทอง) แถวกลาง
+    if (m.k === 'gas') { var gx = mid, gy = y0 + th / 2, dg = disp(gx) * A; trk = [gx + (w.k === 'P' ? dg : 0), gy + (w.k === 'S' ? dg : 0), gx, gy]; }
+    else { var jm = Math.floor(rows / 2), im = Math.round(cols / 2), pm = pts[jm * (cols + 1) + im]; trk = [pm[0], pm[1], pm[2], y0 + (jm + 1) * ry]; }
+    x.strokeStyle = 'rgba(255,209,102,.45)'; x.setLineDash([3, 3]); x.lineWidth = 1;
+    if (w.k === 'P') { x.beginPath(); x.moveTo(trk[2] - A - 2, trk[3] + 9); x.lineTo(trk[2] + A + 2, trk[3] + 9); x.stroke(); }
+    else { x.beginPath(); x.moveTo(trk[2] + 9, trk[3] - A - 2); x.lineTo(trk[2] + 9, trk[3] + A + 2); x.stroke(); }
+    x.setLineDash([]);
+    glow(x, trk[0], trk[1], 12, [255, 209, 102], .55); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(trk[0], trk[1], 4.6, 0, 6.283); x.fill();
+    // แหล่งกำเนิด
+    var ph = Math.sin(tA * 9) * (xc < x0 + 30 ? 1 : .2);
+    x.fillStyle = '#FF6B8A'; x.beginPath();
+    if (w.k === 'P') x.rect(x0 - 34 + ph * 4, y0 + th / 2 - 22, 16, 44); else x.rect(x0 - 34, y0 + th / 2 - 22 + ph * 6, 16, 44);
+    x.fill();
+    x.font = '600 12px ' + FONT; x.fillStyle = '#FF6B8A'; x.textAlign = 'left'; x.fillText('ต้นกำเนิด', 4, y0 + th / 2 - 30);
+    // ลูกศรทิศคลื่น + ทิศการสั่น
+    x.textAlign = 'left'; x.font = '600 13px ' + FONT;
+    arrow(x, x0, 26, x0 + 120, 26, '#9AA6CF', 2, 9); x.fillStyle = '#9AA6CF'; x.fillText('ทิศที่คลื่นเคลื่อนที่', x0 + 128, 31);
+    var ax = Math.min(W - 150, x0 + 300);
+    if (W > 520) {
+      x.fillStyle = '#FFD166'; x.fillText('ทิศการสั่นของอนุภาค', ax + 40, 31);
+      if (w.k === 'P') { arrow(x, ax + 16, 26, ax + 34, 26, '#FFD166', 2, 7); arrow(x, ax + 16, 26, ax - 2, 26, '#FFD166', 2, 7); }
+      else { arrow(x, ax + 16, 26, ax + 16, 12, '#FFD166', 2, 7); arrow(x, ax + 16, 26, ax + 16, 40, '#FFD166', 2, 7); }
+    }
+    // ป้ายผล
+    x.font = '700 15px ' + HFONT; x.textAlign = 'center';
+    x.fillStyle = w.col; x.fillText(w.n + ' ใน' + m.n + ' (' + m.st + ')', W / 2, H - 34);
+    x.font = '700 16px ' + HFONT;
+    if (pass) { x.fillStyle = '#5EF2A5'; x.fillText('ผ่านได้ · ' + fmt(spd, spd < 1 ? 2 : 1) + ' กม./วินาที', W / 2, H - 12); }
+    else {
+      x.fillStyle = '#FF6B8A'; x.fillText('ผ่านไม่ได้ · คลื่นหายไป', W / 2, H - 12);
+      var cx = x0 + 70, cy = y0 + th / 2; x.strokeStyle = '#FF6B8A'; x.lineWidth = 4;
+      x.beginPath(); x.moveTo(cx - 14, cy - 14); x.lineTo(cx + 14, cy + 14); x.moveTo(cx + 14, cy - 14); x.lineTo(cx - 14, cy + 14); x.stroke();
+    }
+  }
+  function updA() {
+    var w = WAVES[selW], m = MEDS[selM], spd = w.k === 'P' ? m.P : m.S, pass = spd > 0;
+    $('wMed').textContent = m.n; $('wState').textContent = 'สถานะ : ' + m.st + ' · ' + m.d;
+    $('wWave').textContent = w.n; $('wWave').style.color = w.col;
+    $('wPass').textContent = pass ? 'ผ่านได้' : 'ผ่านไม่ได้'; $('wPass').className = 'v ' + (pass ? 'o' : 'e');
+    $('wSpd').textContent = pass ? fmt(spd, spd < 1 ? 2 : 1) + ' กม./วินาที' : '0';
+    $('wHow').innerHTML = (w.k === 'P' ? 'คลื่น P ดันอนุภาคให้ <b>สั่นไปมาในแนวเดียวกับทิศที่คลื่นเคลื่อนที่</b> (อัด ขยาย สลับกัน) ตัวกลางทุกสถานะถูกอัดได้ คลื่น P จึงผ่านได้หมด'
+      : (pass ? 'คลื่น S เขย่าอนุภาคให้ <b>สั่นขึ้นลงตั้งฉากกับทิศที่คลื่นเคลื่อนที่</b> ของแข็งยึดกันแน่น อนุภาคหนึ่งจึงดึงอนุภาคข้าง ๆ ให้สั่นตามต่อไปได้'
+        : 'คลื่น S ต้องให้อนุภาคดึงกันให้สั่นตามด้านข้าง แต่ใน' + m.st + 'อนุภาคเลื่อนไถลผ่านกันได้ ไม่ดึงกันไว้ <b>คลื่น S จึงหายไปทันที</b>'));
+    var h = '<span class="lbl">ชนิดคลื่น</span>';
+    WAVES.forEach(function (z, i) { h += '<button class="chip' + (i === selW ? ' on' : '') + '" data-w="' + i + '">' + z.n + '</button>'; });
+    $('waveChips').innerHTML = h; bindChips($('waveChips'), 'w', function (v) { selW = +v; updA(); drawWave(); });
+    h = '<span class="lbl">ตัวกลาง</span>';
+    MEDS.forEach(function (z, i) { var done = S.recA[z.k + 'P'] && S.recA[z.k + 'S']; h += '<button class="chip' + (i === selM ? ' on' : '') + (done ? ' done' : '') + '" data-m="' + i + '">' + z.n + ' (' + z.st + ')</button>'; });
+    $('medChips').innerHTML = h; bindChips($('medChips'), 'm', function (v) { selM = +v; updA(); drawWave(); });
+    var n = 0, rows = '';
+    MEDS.forEach(function (z, i) {
+      var cell = function (k) { if (!S.recA[z.k + k]) return '-'; n++; var v = z[k]; return v > 0 ? '<span class="yes">ผ่าน</span> · ' + fmt(v, v < 1 ? 2 : 1) + ' กม./วินาที' : '<span class="no">ไม่ผ่าน</span>'; };
+      rows += '<tr' + (i === selM ? ' class="cur"' : '') + '><td class="n">' + z.n + '</td><td>' + z.st + '</td><td>' + cell('P') + '</td><td>' + cell('S') + '</td></tr>';
+    });
+    $('logA').innerHTML = rows;
+    $('recAMsg').textContent = 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ B ได้' : '');
+  }
+  $('recA').onclick = function () { S.recA[MEDS[selM].k + WAVES[selW].k] = 1; save(); updA(); };
+
+  // ================================================================ ภารกิจ B สถานีตรวจวัดรอบโลก
+  var RC = 3480 / 6371, RI = 1221 / 6371;   // รัศมีแก่นโลก แก่นโลกชั้นใน (สัดส่วนรัศมีโลก)
+  var SH1 = 103, SH2 = 142;                 // เขตอับคลื่น
+  var DEGS = [30, 60, 90, 120, 150, 180];
+  // เวลาเดินทางโดยประมาณ (นาที) แผ่นดินไหวตื้น
+  var TP = [[0, 0], [10, 2.4], [20, 4.6], [30, 6.2], [40, 7.6], [50, 8.9], [60, 10.1], [70, 11.2], [80, 12.2], [90, 13.0], [100, 13.8], [103, 14.0]];
+  var TPK = [[142, 19.2], [150, 19.6], [160, 19.9], [170, 20.1], [180, 20.2]];
+  var TS = [[0, 0], [10, 4.3], [20, 8.3], [30, 11.1], [40, 13.7], [50, 16.1], [60, 18.3], [70, 20.2], [80, 22.0], [90, 23.6], [100, 25.0], [103, 25.3]];
+  var deg = 30, solid = false;
+  function obs(dg, sol) { // ผลที่สถานีตรวจพบ
+    if (sol) return { P: true, S: true, z: 'solid' };
+    if (dg <= SH1) return { P: true, S: true, z: 'near' };
+    if (dg < SH2) return { P: false, S: false, z: 'shadow' };
+    return { P: true, S: false, z: 'far' };
+  }
+  function pol(cx, cy, R, r, a) { var t = a * Math.PI / 180; return [cx + R * r * Math.sin(t), cy - R * r * Math.cos(t)]; }
+  function mantlePath(dg) { // เส้นทางโค้งผ่านเนื้อโลก (หน่วยรัศมีโลก) ค่า r ต่ำสุดใกล้แก่นโลกที่ 103°
+    var c = Math.cos(dg * Math.PI / 360), rt = c * (1 - .112 * Math.min(1, Math.pow(dg / 103, 2))), rc = 2 * rt - c, pts = [];
+    var P0 = [0, 1], P2 = [Math.sin(dg * Math.PI / 180), Math.cos(dg * Math.PI / 180)], C = [rc * Math.sin(dg * Math.PI / 360), rc * Math.cos(dg * Math.PI / 360)];
+    for (var i = 0; i <= 40; i++) { var t = i / 40, u = 1 - t; pts.push([u * u * P0[0] + 2 * u * t * C[0] + t * t * P2[0], u * u * P0[1] + 2 * u * t * C[1] + t * t * P2[1]]); }
+    return pts;
+  }
+  function seg(a, b, n) { var p = []; for (var i = 0; i <= n; i++) p.push([a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n]); return p; }
+  function onR(r, a) { return [r * Math.sin(a * Math.PI / 180), r * Math.cos(a * Math.PI / 180)]; }
+  function corePath(dg) { // คลื่น P ผ่านแก่นโลก ไปโผล่ที่ dg (142°–180°)
+    var k = (180 - dg) / (180 - SH2), th1 = 24 * k, th2 = dg - th1, A = [0, 1], B = onR(RC, th1), Cc = onR(RC, th2), D = onR(1, dg);
+    var mid = onR(Math.max(.02, RC * Math.cos((th2 - th1) * Math.PI / 360) * .86), (th1 + th2) / 2), core = [];
+    for (var i = 0; i <= 24; i++) { var t = i / 24, u = 1 - t; core.push([u * u * B[0] + 2 * u * t * (2 * mid[0] - (B[0] + Cc[0]) / 2) + t * t * Cc[0], u * u * B[1] + 2 * u * t * (2 * mid[1] - (B[1] + Cc[1]) / 2) + t * t * Cc[1]]); }
+    return { all: seg(A, B, 14).concat(core.slice(1), seg(Cc, D, 14).slice(1)), toCore: seg(A, B, 14), hit: B };
+  }
+  function pathLen(p) { var L = 0; for (var i = 1; i < p.length; i++) L += Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); return L; }
+  function along(p, f) { var L = pathLen(p) * f, s = 0; for (var i = 1; i < p.length; i++) { var d = Math.hypot(p[i][0] - p[i - 1][0], p[i][1] - p[i - 1][1]); if (s + d >= L) { var t = (L - s) / d; return [p[i - 1][0] + (p[i][0] - p[i - 1][0]) * t, p[i - 1][1] + (p[i][1] - p[i - 1][1]) * t]; } s += d; } return p[p.length - 1]; }
+  function routes(dg, sol) { // คืน {P: path|null, S: path|null, Pstop, Sstop}
+    if (sol || dg <= SH1) { var mp = mantlePath(dg); return { P: mp, S: mp, Sx: null, Px: null }; }
+    if (dg < SH2) { var land = SH2 + (dg - SH1) / (SH2 - SH1) * (180 - SH2) * .9, cp = corePath(land), gp = corePath(SH2 + (dg - SH1) / (SH2 - SH1) * 30);
+      return { P: null, Pbent: cp.all, S: gp.toCore, Sx: gp.hit, land: land }; }
+    var c2 = corePath(dg); return { P: c2.all, S: c2.toCore, Sx: c2.hit };
+  }
+  function drawGlobe() {
+    var c = fit($('cvGlobe')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H); starfield(x, W, H, .6);
+    var R = Math.min(W * (W < 420 ? .34 : .40), H * .42), cx = W / 2, cy = H / 2 + 6;
+    var M = function (p) { return [cx + R * p[0], cy - R * p[1]]; };
+    // ชั้นของโลก
+    var g = x.createRadialGradient(cx, cy, R * RC, cx, cy, R);
+    g.addColorStop(0, '#8a3b1e'); g.addColorStop(1, '#5a2a18');
+    x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.fill();
+    if (!solid) {
+      var g2 = x.createRadialGradient(cx, cy, R * RI, cx, cy, R * RC); g2.addColorStop(0, '#ffb547'); g2.addColorStop(1, '#e0702a');
+      x.fillStyle = g2; x.beginPath(); x.arc(cx, cy, R * RC, 0, 6.283); x.fill();
+      glow(x, cx, cy, R * RI * 1.6, [255, 240, 180], .5);
+      x.fillStyle = '#fff1b8'; x.beginPath(); x.arc(cx, cy, R * RI, 0, 6.283); x.fill();
+    } else {
+      x.fillStyle = '#6b3320'; x.beginPath(); x.arc(cx, cy, R * RC, 0, 6.283); x.fill();
+      x.strokeStyle = 'rgba(255,255,255,.18)'; x.setLineDash([4, 4]); x.beginPath(); x.arc(cx, cy, R * RC, 0, 6.283); x.stroke(); x.setLineDash([]);
+    }
+    x.strokeStyle = '#c9a27a'; x.lineWidth = 2.5; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.stroke();
+    // ป้ายชั้น
+    x.font = '600 12px ' + FONT; x.textAlign = 'center';
+    x.fillStyle = 'rgba(255,230,210,.75)'; x.fillText('เนื้อโลก (ของแข็ง)', cx - R * .02, cy - R * .76);
+    if (!solid) { x.fillStyle = '#3a1608'; x.fillText('แก่นโลกชั้นนอก', cx, cy - R * .36); x.fillText('(ของเหลว)', cx, cy - R * .36 + 14); x.fillText('ชั้นใน', cx, cy + 4); }
+    else { x.fillStyle = 'rgba(255,230,210,.8)'; x.fillText('สมมติ : แข็งทั้งลูก', cx, cy + 4); }
+    // เขตอับคลื่น
+    var shadowShown = !solid && (S.recB[120] || (deg > SH1 && deg < SH2));
+    if (shadowShown) {
+      x.lineWidth = 9; x.strokeStyle = 'rgba(255,107,138,.55)';
+      [[SH1, SH2], [-SH2, -SH1]].forEach(function (z) { x.beginPath(); x.arc(cx, cy, R + 7, (z[0] - 90) * Math.PI / 180, (z[1] - 90) * Math.PI / 180); x.stroke(); });
+      x.font = '700 12px ' + HFONT; x.fillStyle = '#FF6B8A';
+      var lp = pol(cx, cy, R, .84, -122); x.fillText('เขตอับคลื่น', lp[0], lp[1]); x.fillText('103°–142°', lp[0], lp[1] + 14);
+    }
+    // ขีดองศา
+    x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF';
+    [30, 60, 90, 120, 150, 180].forEach(function (a) { var p = pol(cx, cy, R, 1.0, a), q = pol(cx, cy, R, 1.05, a); x.strokeStyle = '#9AA6CF'; x.lineWidth = 1; x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(q[0], q[1]); x.stroke();
+      var t = pol(cx, cy, R, 1.12, a); x.fillText(a + '°', t[0], t[1] + 4); });
+    // เส้นทางของสถานีที่บันทึกแล้ว (จาง)
+    DEGS.forEach(function (d) { if (!S.recB[d] || d === deg || solid) return; var rr = routes(d, false); drawPath(x, M, rr.P, 'rgba(79,216,255,.22)', 1.5); drawPath(x, M, rr.S && obs(d).S ? rr.S : null, 'rgba(255,159,107,.22)', 1.5); });
+    var r = routes(deg, solid), o = obs(deg, solid);
+    if (r.Pbent) { drawPath(x, M, r.Pbent, 'rgba(79,216,255,.55)', 2, true); var lp2 = M(onR(1, r.land)); x.fillStyle = '#4FD8FF'; x.beginPath(); x.arc(lp2[0], lp2[1], 4, 0, 6.283); x.fill(); }
+    drawPath(x, M, r.S, '#FF9F6B', 6);
+    drawPath(x, M, r.P, '#4FD8FF', 2.4);
+    if (r.Sx) { var hx = M(r.Sx); x.strokeStyle = '#FF6B8A'; x.lineWidth = 3; x.beginPath(); x.moveTo(hx[0] - 7, hx[1] - 7); x.lineTo(hx[0] + 7, hx[1] + 7); x.moveTo(hx[0] + 7, hx[1] - 7); x.lineTo(hx[0] - 7, hx[1] + 7); x.stroke(); }
+    // จุดคลื่นวิ่ง (P เร็วกว่า S)
+    var cyc = 4.2, f = (tA % cyc) / cyc;
+    if (r.P) { var pp = M(along(r.P, Math.min(1, f * 1.55))); glow(x, pp[0], pp[1], 9, [79, 216, 255], .9); }
+    if (r.Pbent) { var pb = M(along(r.Pbent, Math.min(1, f * 1.55))); glow(x, pb[0], pb[1], 8, [79, 216, 255], .8); }
+    if (r.S) { var sp = M(along(r.S, Math.min(1, f * .9))); glow(x, sp[0], sp[1], 9, [255, 159, 107], .9); }
+    // จุดเกิดแผ่นดินไหว
+    var e0 = M([0, 1]); glow(x, e0[0], e0[1], 16, [255, 80, 100], .8);
+    x.fillStyle = '#FF6B8A'; x.beginPath(); for (var k = 0; k < 10; k++) { var rr2 = k % 2 ? 4 : 9, a2 = k * Math.PI / 5 - Math.PI / 2; x.lineTo(e0[0] + rr2 * Math.cos(a2), e0[1] + rr2 * Math.sin(a2)); } x.closePath(); x.fill();
+    x.font = '700 12px ' + HFONT; x.fillStyle = '#FF6B8A'; x.textAlign = 'center'; x.fillText('จุดเกิดแผ่นดินไหว', e0[0], e0[1] - 14);
+    // สถานี
+    var st = pol(cx, cy, R, 1.0, deg), sx = st[0], sy = st[1];
+    x.save(); x.translate(sx, sy); x.rotate(deg * Math.PI / 180);
+    x.fillStyle = '#FFD166'; x.beginPath(); x.moveTo(0, -16); x.lineTo(-8, 0); x.lineTo(8, 0); x.closePath(); x.fill(); x.restore();
+    var lt = pol(cx, cy, R, 1.24, deg); lt[0] = clamp(lt[0], 42, W - 42); x.font = '700 13px ' + HFONT; x.fillStyle = '#FFD166'; x.fillText('สถานี ' + deg + '°', lt[0], lt[1] + 4);
+    // คำอธิบายสี
+    x.textAlign = 'left'; x.font = '600 12px ' + FONT;
+    x.fillStyle = '#4FD8FF'; x.fillRect(10, H - 34, 16, 3); x.fillText('คลื่น P', 30, H - 29);
+    x.fillStyle = '#FF9F6B'; x.fillRect(10, H - 16, 16, 3); x.fillText('คลื่น S', 30, H - 11);
+    x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText('ภาพจำลองอย่างง่าย', W - 10, H - 11);
+  }
+  function drawPath(x, M, p, col, w, dash) {
+    if (!p) return; x.strokeStyle = col; x.lineWidth = w; if (dash) x.setLineDash([5, 4]);
+    x.beginPath(); p.forEach(function (q, i) { var m = M(q); if (i) x.lineTo(m[0], m[1]); else x.moveTo(m[0], m[1]); }); x.stroke(); x.setLineDash([]);
+  }
+  function tP(d) { return d <= SH1 ? lerpT(TP, d) : (d >= SH2 ? lerpT(TPK, d) : null); }
+  function tS(d) { return d <= SH1 ? lerpT(TS, d) : null; }
+  function tTxt(v) { return v == null ? '-' : 'ราว ' + fmt(v, 1) + ' นาที'; }
+  function updB() {
+    var o = obs(deg, solid);
+    $('bDeg').textContent = deg + '°'; $('degR').value = deg;
+    $('bMode').textContent = solid ? 'โหมดสมมติ : ถ้าโลกแข็งทั้งลูก (ไม่มีชั้นของเหลว)' : 'โลกจริง (ข้อมูลจากสถานีทั่วโลก)';
+    $('bP').textContent = o.P ? 'พบ' : 'ไม่พบ'; $('bP').className = 'v ' + (o.P ? 'o' : 'e');
+    $('bS').textContent = o.S ? 'พบ' : 'ไม่พบ'; $('bS').className = 'v ' + (o.S ? 'o' : 'e');
+    $('bPt').textContent = solid ? 'สมมติ' : (o.P ? 'ถึงหลังเกิด ' + tTxt(tP(deg)) : 'ไม่มีคลื่นมาถึงโดยตรง');
+    $('bSt').textContent = solid ? 'สมมติ' : (o.S ? 'ถึงหลังเกิด ' + tTxt(tS(deg)) : 'ไม่มีคลื่นมาถึง');
+    $('bWhy').innerHTML = {
+      solid: 'ถ้าโลกแข็งทั้งลูก คลื่น P และ S จะเดินทางผ่านไปถึง <b>ทุกสถานี</b> ไม่มีเขตอับคลื่น แต่ข้อมูลจริงจากสถานีทั่วโลก <b>มีเขตอับคลื่น</b> และไม่พบคลื่น S เลยเกิน 103° แปลว่าโลกจริง <b>ไม่ได้แข็งทั้งลูก</b>',
+      near: 'คลื่น P และ S เดินทางผ่าน <b>เนื้อโลกซึ่งเป็นของแข็ง</b> มาถึงสถานีได้ทั้งคู่ คลื่น P ถึงก่อนเพราะเร็วกว่า · เส้นทางโค้งเพราะยิ่งลึกคลื่นยิ่งเร็วขึ้น',
+      shadow: '<b style="color:#FF6B8A">เขตอับคลื่น</b> ไม่พบทั้ง P และ S โดยตรง · คลื่น S <b>หยุดที่ผิวแก่นโลกชั้นนอก</b> เพราะเป็นของเหลว · คลื่น P เข้าไปในแก่นโลกแล้ว <b>ช้าลงทันทีจึงหักเห</b> ไปโผล่ไกลกว่า 142° (เส้นประ)',
+      far: 'พบเฉพาะ <b>คลื่น P ที่ทะลุผ่านแก่นโลก</b> · ไม่พบคลื่น S เพราะคลื่น S ผ่าน <b>แก่นโลกชั้นนอกที่เป็นของเหลว</b> ไม่ได้'
+    }[o.z];
+    var h = '<span class="lbl">ตำแหน่งสถานี</span>';
+    DEGS.forEach(function (d) { h += '<button class="chip' + (d === deg ? ' on' : '') + (S.recB[d] ? ' done' : '') + '" data-d="' + d + '">' + d + '°</button>'; });
+    $('degChips').innerHTML = h; bindChips($('degChips'), 'd', function (v) { deg = +v; updB(); drawGlobe(); });
+    h = '<span class="lbl">แบบจำลองโลก</span>';
+    [[0, 'โลกจริง'], [1, 'ถ้าโลกแข็งทั้งลูก']].forEach(function (z) { h += '<button class="chip' + ((z[0] === 1) === solid ? ' on' : '') + '" data-s="' + z[0] + '">' + z[1] + '</button>'; });
+    $('modeChips').innerHTML = h; bindChips($('modeChips'), 's', function (v) { solid = v === '1'; updB(); drawGlobe(); });
+    var rec = DEGS.indexOf(deg) >= 0 && !solid;
+    $('recB').disabled = !rec;
+    var n = 0, rows = '';
+    DEGS.forEach(function (d) {
+      var r2 = S.recB[d], ob = obs(d, false); if (r2) n++;
+      var yn = function (v) { return v ? '<span class="yes">พบ</span>' : '<span class="no">ไม่พบ</span>'; };
+      rows += '<tr' + (d === deg ? ' class="cur"' : '') + '><td>' + d + '°</td><td>' + (r2 ? yn(ob.P) : '-') + '</td><td>' + (r2 ? yn(ob.S) : '-') + '</td><td>' + (r2 ? tTxt(ob.P ? tP(d) : null) : '-') + '</td><td>' + (r2 ? tTxt(ob.S ? tS(d) : null) : '-') + '</td></tr>';
+    });
+    $('logB').innerHTML = rows;
+    $('recBMsg').textContent = solid ? 'โหมดสมมติใช้เปรียบเทียบ บันทึกค่าจากโลกจริงเท่านั้น' : (DEGS.indexOf(deg) < 0 ? 'บันทึกได้เฉพาะ 6 ตำแหน่งในปุ่ม' : 'บันทึกแล้ว ' + n + '/6' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ C ได้' : ''));
+  }
+  $('degR').oninput = function () { deg = +this.value; DEGS.forEach(function (d) { if (Math.abs(d - deg) <= 1) deg = d; }); updB(); drawGlobe(); };
+  $('recB').onclick = function () { if (solid || DEGS.indexOf(deg) < 0) return; S.recB[deg] = 1; save(); updB(); drawGlobe(); };
+
+  // ================================================================ ภารกิจ C เจาะสแกนชั้นโลก
+  var RE = 6371;
+  var COMP = [{ n: 'เปลือกโลก', a: 0, b: 35, col: '#8f7a64', w: 'หินแกรนิต (ทวีป) หินบะซอลต์ (มหาสมุทร) ธาตุหลัก ซิลิคอน ออกซิเจน อะลูมิเนียม' },
+    { n: 'เนื้อโลก', a: 35, b: 2900, col: '#a24b25', w: 'หินเพริโดไทต์ ธาตุหลัก ซิลิคอน ออกซิเจน แมกนีเซียม เหล็ก' },
+    { n: 'แก่นโลก', a: 2900, b: RE, col: '#f0a43c', w: 'โลหะเหล็กและนิกเกิล' }];
+  var MECH = [{ n: 'ธรณีภาค', a: 0, b: 100, st: 'ของแข็ง (แข็งและเปราะ)', lc: 'y', col: '#7e6a58', w: 'เปลือกโลก + เนื้อโลกส่วนบนสุด แตกเป็นแผ่นธรณีหลายแผ่น' },
+    { n: 'ฐานธรณีภาค', a: 100, b: 700, st: 'ของแข็งเนื้ออ่อน หลอมเหลวบางส่วน', lc: 'm', col: '#c4572a', w: 'หินร้อนจัดหลอมเหลวบางส่วน ไหลได้ช้ามาก แผ่นธรณีเคลื่อนที่อยู่บนชั้นนี้' },
+    { n: 'มัชฌิมภาค', a: 700, b: 2900, st: 'ของแข็ง', lc: 'y', col: '#8d3a1e', w: 'เนื้อโลกส่วนล่าง ความดันสูงมาก หินจึงเป็นของแข็ง (มีโซสเฟียร์)' },
+    { n: 'แก่นโลกชั้นนอก', a: 2900, b: 5150, st: 'ของเหลว', lc: 'n', col: '#ec8a2c', w: 'เหล็กและนิกเกิลหลอมเหลว การไหลวนของชั้นนี้ทำให้เกิดสนามแม่เหล็กโลก' },
+    { n: 'แก่นโลกชั้นใน', a: 5150, b: RE, st: 'ของแข็ง', lc: 'y', col: '#ffd774', w: 'เหล็กและนิกเกิล ร้อนที่สุดแต่เป็นของแข็งเพราะความดันสูงมหาศาล' }];
+  var VP = [[0, 6.0], [35, 6.7], [35.001, 8.0], [100, 8.1], [220, 7.8], [400, 8.9], [700, 10.6], [1500, 11.6], [2900, 13.7], [2900.001, 8.0], [5150, 10.3], [5150.001, 11.0], [RE, 11.3]];
+  var VS = [[0, 3.5], [35, 3.9], [35.001, 4.5], [100, 4.5], [220, 4.3], [400, 4.8], [700, 5.9], [1500, 6.4], [2900, 7.3]];
+  var TT = [[0, 15], [35, 600], [100, 1300], [700, 1900], [2900, 3000], [2900.001, 4000], [5150, 5000], [RE, 5400]];
+  var RHO = [[0, 2.7], [35, 2.9], [35.001, 3.3], [700, 4.4], [2900, 5.6], [2900.001, 9.9], [5150, 12.2], [5150.001, 12.8], [RE, 13.1]];
+  var DEPS = [20, 200, 1500, 4000, 6000];
+  var dep = 20;
+  function layerAt(L, d) { for (var i = 0; i < L.length; i++) if (d < L[i].b || i === L.length - 1) return L[i]; }
+  function vs(d) { return d >= 2900 ? 0 : lerpT(VS, d); }
+  function sY(d, y0, h) { return y0 + Math.sqrt(d / RE) * h; }   // มาตราส่วนรากที่สอง ขยายชั้นบน
+  function drawDeep() {
+    var c = fit($('cvDeep')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var y0 = 34, h = H - 58, narrow = W < 520;
+    // ภาพโลกตามมาตราส่วนจริง (มุมซ้าย)
+    var er = Math.min(W * .2, h * .34), ex = er + 14, ey = y0 + er + 22;
+    if (!narrow) {
+      [[RE, '#a24b25'], [RE - 2900, '#ec8a2c'], [RE - 5150, '#ffd774']].forEach(function (z) { x.fillStyle = z[1]; x.beginPath(); x.arc(ex, ey, er * z[0] / RE, 0, 6.283); x.fill(); });
+      x.strokeStyle = '#c9a27a'; x.lineWidth = 2; x.beginPath(); x.arc(ex, ey, er, 0, 6.283); x.stroke();
+      var pr = er * (RE - dep) / RE; x.strokeStyle = '#FFD166'; x.lineWidth = 1.5; x.setLineDash([3, 3]); x.beginPath(); x.arc(ex, ey, pr, 0, 6.283); x.stroke(); x.setLineDash([]);
+      x.beginPath(); x.moveTo(ex, ey - er - 4); x.lineTo(ex, ey - pr); x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.stroke();
+      glow(x, ex, ey - pr, 8, [255, 209, 102], .9);
+      x.font = '600 12px ' + FONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'center'; x.fillText('ตามมาตราส่วนจริง', ex, y0 + 10);
+      x.fillText('เปลือกโลกบางมาก', ex, ey + er + 18); x.fillText('เหมือนเปลือกแอปเปิล', ex, ey + er + 33);
+    }
+    // แผนภาพ 2 คอลัมน์ (มาตราส่วนรากที่สอง)
+    var cx0 = narrow ? 44 : ex + er + 26, cw = (W - cx0 - 12) / 2, col1 = cx0, col2 = cx0 + cw;
+    x.font = '700 13px ' + HFONT; x.textAlign = 'center'; x.fillStyle = '#4FD8FF'; x.fillText(narrow ? 'ส่วนประกอบ' : 'ตามส่วนประกอบ', col1 + cw / 2, y0 - 12);
+    x.fillStyle = '#5EF2A5'; x.fillText(narrow ? 'สมบัติเชิงกล' : 'ตามสมบัติเชิงกล', col2 + cw / 2, y0 - 12);
+    function band(L, X) { L.forEach(function (z) { var a = sY(z.a, y0, h), b = sY(z.b, y0, h); x.fillStyle = z.col; x.fillRect(X + 2, a, cw - 4, b - a);
+      x.strokeStyle = 'rgba(5,8,26,.9)'; x.lineWidth = 1.5; x.strokeRect(X + 2, a, cw - 4, b - a);
+      var cyl = (a + b) / 2, big = b - a > 16; if (!big) return;
+      x.fillStyle = z.n.indexOf('แก่น') === 0 ? '#3a1608' : '#fff'; x.font = '700 ' + (narrow ? 12 : 14) + 'px ' + FONT; x.fillText(z.n, X + cw / 2, cyl + 5); }); }
+    band(COMP, col1); band(MECH, col2);
+    // เปลือกโลกบาง : ป้ายนำ
+    // เลขความลึก
+    x.textAlign = 'right'; x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF';
+    [0, 100, 700, 2900, 5150, RE].forEach(function (d) { var y = sY(d, y0, h); x.fillText(fmt(d), cx0 - 4, y + 4); });
+    // หัวสแกน
+    var py = sY(dep, y0, h);
+    x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.moveTo(cx0, py); x.lineTo(W - 10, py); x.stroke();
+    glow(x, W - 12, py, 9, [255, 209, 102], .9);
+    x.fillStyle = '#FFD166'; x.font = '700 13px ' + HFONT; x.textAlign = 'right'; x.fillText(fmt(dep) + ' กม.', W - 14, py - 6 < y0 ? py + 16 : py - 6);
+    x.textAlign = 'left'; x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF'; x.fillText('มาตราส่วนขยายชั้นบน', cx0, H - 8);
+  }
+  function drawGraph() {
+    var c = fit($('cvGraph')), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var L = 44, R = W - 12, T = 22, B = H - 34, gx = function (d) { return L + (R - L) * d / RE; }, gy = function (v) { return B - (B - T) * v / 14; };
+    x.strokeStyle = '#2C3A73'; x.lineWidth = 1; x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right';
+    [0, 2, 4, 6, 8, 10, 12, 14].forEach(function (v) { x.beginPath(); x.moveTo(L, gy(v)); x.lineTo(R, gy(v)); x.stroke(); x.fillText(v, L - 6, gy(v) + 4); });
+    x.textAlign = 'center';
+    [0, 1000, 2000, 3000, 4000, 5000, 6000].forEach(function (d) { x.fillText(fmt(d), gx(d), B + 14); });
+    x.fillText('ความลึก (กม.)', (L + R) / 2, B + 28);
+    x.save(); x.translate(12, (T + B) / 2); x.rotate(-Math.PI / 2); x.fillText('ความเร็ว (กม./วินาที)', 0, 0); x.restore();
+    // แนวแบ่ง
+    [[35, 'โมโฮ'], [2900, 'กูเทนเบิร์ก'], [5150, 'เลห์มันน์']].forEach(function (z) { x.strokeStyle = 'rgba(255,209,102,.45)'; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(gx(z[0]), T); x.lineTo(gx(z[0]), B); x.stroke(); x.setLineDash([]);
+      x.fillStyle = '#FFD166'; x.textAlign = z[0] < 100 ? 'left' : 'center'; x.fillText(z[1], gx(z[0]) + (z[0] < 100 ? 3 : 0), T - 6); });
+    x.fillStyle = 'rgba(236,138,44,.10)'; x.fillRect(gx(2900), T, gx(5150) - gx(2900), B - T);
+    function line(tabl, col, upto) { x.strokeStyle = col; x.lineWidth = 2.6; x.beginPath(); for (var i = 0; i < tabl.length && tabl[i][0] <= upto; i++) { var X = gx(tabl[i][0]), Y = gy(tabl[i][1]); if (i) x.lineTo(X, Y); else x.moveTo(X, Y); } x.stroke(); }
+    line(VP, '#4FD8FF', RE); line(VS, '#FF9F6B', 2900);
+    x.strokeStyle = '#FF9F6B'; x.lineWidth = 2.6; x.beginPath(); x.moveTo(gx(2900), gy(0)); x.lineTo(gx(5150), gy(0)); x.stroke();
+    x.textAlign = 'left'; x.font = '700 12px ' + HFONT;
+    x.fillStyle = '#4FD8FF'; x.fillText('คลื่น P', gx(1700), gy(12.7));
+    x.fillStyle = '#FF9F6B'; x.fillText('คลื่น S', gx(1700), gy(5.4));
+    x.fillStyle = '#FF6B8A'; x.textAlign = 'center'; x.fillText('S = 0 ผ่านไม่ได้', gx(4025), gy(0) - 6);
+    // หัวสแกน
+    x.strokeStyle = '#FFD166'; x.lineWidth = 2; x.beginPath(); x.moveTo(gx(dep), T); x.lineTo(gx(dep), B); x.stroke();
+    var vp = lerpT(VP, dep), v2 = vs(dep);
+    glow(x, gx(dep), gy(vp), 7, [79, 216, 255], 1); if (dep < 2900) glow(x, gx(dep), gy(v2), 7, [255, 159, 107], 1);
+  }
+  function depFromSlider(s) { return Math.round(RE * Math.pow(s / 1000, 2)); }
+  function sliderFromDep(d) { return Math.round(1000 * Math.sqrt(d / RE)); }
+  function updC() {
+    var cp = layerAt(COMP, dep), me = layerAt(MECH, dep), vp = lerpT(VP, dep), v2 = vs(dep);
+    $('cDep').textContent = fmt(dep) + ' กม.'; $('depR').value = sliderFromDep(dep);
+    $('cComp').textContent = cp.n; $('cMech').textContent = me.n;
+    $('cState').textContent = me.st; $('cState').className = 'lvl ' + me.lc;
+    $('cTemp').textContent = fmt(Math.round(lerpT(TT, dep) / 100) * 100 || 15) + ' °C';
+    $('cRho').textContent = fmt(lerpT(RHO, dep), 1) + ' g/cm³';
+    $('cP').textContent = fmt(vp, 1) + ' กม./วิ';
+    $('cS').textContent = dep >= 5150 ? 'วัดโดยตรงยาก' : (v2 > 0 ? fmt(v2, 1) + ' กม./วิ' : 'ผ่านไม่ได้');
+    $('cS').style.fontSize = dep >= 5150 ? '16px' : '';
+    $('cWhat').innerHTML = '<b>' + me.n + '</b> : ' + me.w + '<br><span style="color:#9AA6CF">ส่วนประกอบ : ' + cp.w + '</span>';
+    var h = '<span class="lbl">ความลึก (กม.)</span>';
+    DEPS.forEach(function (d) { h += '<button class="chip' + (d === dep ? ' on' : '') + (S.recC[d] ? ' done' : '') + '" data-p="' + d + '">' + fmt(d) + '</button>'; });
+    $('depChips').innerHTML = h; bindChips($('depChips'), 'p', function (v) { dep = +v; updC(); drawDeep(); drawGraph(); });
+    $('recC').disabled = DEPS.indexOf(dep) < 0;
+    var n = 0, rows = '';
+    DEPS.forEach(function (d) {
+      var r = S.recC[d], a = layerAt(COMP, d), b = layerAt(MECH, d), s2 = vs(d); if (r) n++;
+      rows += '<tr' + (d === dep ? ' class="cur"' : '') + '><td>' + fmt(d) + '</td><td>' + (r ? a.n : '-') + '</td><td>' + (r ? b.n : '-') + '</td><td>' + (r ? b.st : '-') + '</td><td>' +
+        (r ? fmt(lerpT(VP, d), 1) + ' / ' + (d >= 5150 ? '-' : (s2 > 0 ? fmt(s2, 1) : '<span class="no">ผ่านไม่ได้</span>')) : '-') + '</td></tr>';
+    });
+    $('logC').innerHTML = rows;
+    $('recCMsg').textContent = DEPS.indexOf(dep) < 0 ? 'บันทึกได้เฉพาะ 5 ความลึกในปุ่ม' : 'บันทึกแล้ว ' + n + '/5';
+  }
+  $('depR').oninput = function () { dep = depFromSlider(+this.value); DEPS.forEach(function (d) { if (Math.abs(d - dep) <= Math.max(3, d * .015)) dep = d; }); updC(); drawDeep(); drawGraph(); };
+  $('recC').onclick = function () { if (DEPS.indexOf(dep) < 0) return; S.recC[dep] = 1; save(); updC(); };
+
+  // ไขรหัสชั้นโลก
+  var OPTS = ['เปลือกโลก', 'ธรณีภาค', 'ฐานธรณีภาค', 'มัชฌิมภาค', 'แก่นโลกชั้นนอก', 'แก่นโลกชั้นใน'];
+  var CL = [
+    { L: 'S', q: 'คลื่น S เดินทางผ่านชั้นนี้ไม่ได้ เพราะเป็นเหล็กและนิกเกิลหลอมเหลว การไหลวนของชั้นนี้ทำให้โลกมีสนามแม่เหล็ก', a: 4,
+      w: 'แก่นโลกชั้นนอก ลึก 2,900–5,150 กม. เป็นของเหลว เป็นเหตุผลที่สถานีเลย 103° ไม่พบคลื่น S' },
+    { L: 'E', q: 'เราอาศัยอยู่บนชั้นนี้ เป็นชั้นที่บางที่สุด ใต้ทวีปหนาเฉลี่ยราว 35 กม. ใต้มหาสมุทรหนาเพียงราว 5–10 กม.', a: 0,
+      w: 'เปลือกโลก (แบ่งตามส่วนประกอบ) เปลือกโลกทวีปเป็นหินแกรนิต เปลือกโลกมหาสมุทรเป็นหินบะซอลต์ ซึ่งหนาแน่นกว่า' },
+    { L: 'I', q: 'ร้อนที่สุดราว 5,000 °C ขึ้นไป แต่เป็นของแข็ง เพราะความดันสูงมหาศาล คลื่น P เร็วขึ้นทันทีเมื่อเข้าสู่ชั้นนี้', a: 5,
+      w: 'แก่นโลกชั้นใน ลึก 5,150–6,371 กม. ความดันสูงมากจนเหล็กหลอมเหลวไม่ได้' },
+    { L: 'S', q: 'หินแข็งและเปราะ ประกอบด้วยเปลือกโลกกับเนื้อโลกส่วนบนสุด หนาราว 100 กม. แตกออกเป็นแผ่น ๆ', a: 1,
+      w: 'ธรณีภาค (แบ่งตามสมบัติเชิงกล) แต่ละแผ่นเรียกว่า แผ่นธรณี ซึ่งจะเรียนต่อใน G2–G3' },
+    { L: 'M', q: 'หินร้อนจัดหลอมเหลวบางส่วน ไหลได้ช้า ๆ คลื่นไหวสะเทือนช้าลงเล็กน้อย แผ่นธรณีเคลื่อนที่อยู่บนชั้นนี้', a: 2,
+      w: 'ฐานธรณีภาค ลึกราว 100–700 กม. เป็นต้นกำเนิดของแมกมาและเกี่ยวข้องกับการเคลื่อนที่ของแผ่นธรณี' },
+    { L: 'O', q: 'ส่วนที่หนาที่สุดของเนื้อโลก ลึกราว 700–2,900 กม. เป็นของแข็ง คลื่น P เร็วขึ้นเรื่อย ๆ ตามความลึก', a: 3,
+      w: 'มัชฌิมภาค (มีโซสเฟียร์) ความดันสูงทำให้หินเป็นของแข็ง แม้อุณหภูมิสูงกว่าฐานธรณีภาค' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '" id="cl' + i + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำใบ้ที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      OPTS.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  var EV = [
+    { y: 'ความหนาแน่น', n: 'โลกหนักเกินกว่าหินที่ผิว', d: 'ความหนาแน่นเฉลี่ยของโลกทั้งลูกราว 5.5 g/cm³ แต่หินเปลือกโลกมีเพียงราว 2.7–3.0 g/cm³ ข้างในโลกจึงต้องมีวัสดุที่หนาแน่นกว่ามาก', i: 'สอดคล้องกับแก่นโลกที่เป็นเหล็กและนิกเกิล' },
+    { y: 'อุกกาบาต', n: 'อุกกาบาตเหล็ก', d: 'อุกกาบาตบางก้อนเป็นเหล็กปนนิกเกิลเกือบทั้งก้อน เชื่อว่าเป็นชิ้นส่วนแก่นของวัตถุที่เกิดพร้อมโลกในระบบสุริยะ (เชื่อมกับ E6)', i: 'บอกส่วนประกอบของแก่นโลก' },
+    { y: 'หินจากใต้ดิน', n: 'หินเพริโดไทต์', d: 'ภูเขาไฟบางแห่งพาก้อนหินสีเขียวจากเนื้อโลกส่วนบนขึ้นมาด้วย และบางที่แผ่นธรณีดันเนื้อโลกขึ้นมาให้เห็นบนผิวโลก', i: 'บอกส่วนประกอบของเนื้อโลก' },
+    { y: 'สนามแม่เหล็ก', n: 'เข็มทิศชี้เหนือได้', d: 'โลกมีสนามแม่เหล็กที่ช่วยกันลมสุริยะ (E6) เกิดจากการไหลวนของเหล็กหลอมเหลวในแก่นโลกชั้นนอก', i: 'สอดคล้องกับแก่นโลกชั้นนอกที่เป็นของเหลว' },
+    { y: 'การเจาะสำรวจ', n: 'หลุมเจาะโคลา (รัสเซีย)', d: 'หลุมเจาะที่ลึกที่สุดในโลกลึกราว 12 กม. ยังไม่ถึงครึ่งของเปลือกโลกทวีป และเป็นเพียงราว 0.2% ของรัศมีโลก', i: 'จึงต้องใช้ข้อมูลทางอ้อม เช่น คลื่นไหวสะเทือน' },
+    { y: 'คลื่นไหวสะเทือน', n: 'สถานีทั่วโลกนับพันแห่ง', d: 'ทุกครั้งที่เกิดแผ่นดินไหว สถานีทั่วโลกบันทึกเวลาที่คลื่น P และ S มาถึง นำมาคำนวณย้อนหาความเร็วคลื่นในแต่ละความลึก', i: 'ข้อมูลหลักที่ใช้แบ่งชั้นโครงสร้างโลก' }
+  ];
+  $('evid').innerHTML = EV.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawWave();
+    if (tab === 'B') drawGlobe();
+    if (tab === 'C') { drawDeep(); drawGraph(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') drawWave();
+    if (tab === 'B') drawGlobe();
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_G1 = { MEDS: MEDS, DEGS: DEGS, DEPS: DEPS, COMP: COMP, MECH: MECH, CL: CL, obs: obs, layerAt: layerAt, VP: VP, vs: vs, lerpT: lerpT,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    setT: function (t) { tA = t; drawAll(); },
+    setA: function (w, m, t) { selW = w; selM = m; if (t != null) tA = t; updA(); drawWave(); },
+    setB: function (d, sol, t) { deg = d; solid = !!sol; if (t != null) tA = t; updB(); drawGlobe(); },
+    setC: function (d) { dep = d; updC(); drawDeep(); drawGraph(); },
+    recAll: function () { MEDS.forEach(function (m) { S.recA[m.k + 'P'] = 1; S.recA[m.k + 'S'] = 1; }); DEGS.forEach(function (d) { S.recB[d] = 1; });
+      DEPS.forEach(function (d) { S.recC[d] = 1; }); CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA(); updB(); updC(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>

@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(10, [
-  // { type: "worksheet", code: "G1", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "G1", title: "สถานการณ์จำลอง ภารกิจสแกนใจกลางโลก (ภารกิจ A B C)", file: "g1-sim-earth-scan.html", note: "ใช้คู่กับใบงาน G1 · คลื่นไหวสะเทือน เขตอับคลื่น การแบ่งชั้นโลก · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-g1-sim.png" },
+  { type: "worksheet", code: "G1", title: "ใบงาน G1 ภารกิจสแกนใจกลางโลก (1 แผ่น 2 หน้า)", file: "g1-worksheet.pdf", note: "3 คะแนน · ส่งครบ = ได้คะแนน · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 10 G1 โครงสร้างโลก", file: "w10-slides-g1-earth-structure.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);
