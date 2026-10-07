@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(16, [
-  // { type: "worksheet", code: "A2", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "A2", title: "สถานการณ์จำลอง ภารกิจหอบังคับการสายลมโลก (ภารกิจ A B C)", file: "a2-sim-global-winds.html", note: "ใช้คู่กับใบงาน A2 · ห้องทดลองคอริออลิส ห้องทดลองพายุหมุน แผนที่สายลมรอบโลกและมรสุม · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-a2-sim.png" },
+  { type: "worksheet", code: "A2", title: "ใบงาน A2 ภารกิจหอบังคับการสายลมโลก (1 แผ่น 2 หน้า)", file: "a2-worksheet.pdf", note: "3 คะแนน · ส่งครบ = ได้คะแนน · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 16 A2 การหมุนเวียนของอากาศ", file: "w16-slides-a2-air-circulation.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);

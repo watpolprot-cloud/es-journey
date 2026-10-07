@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A2 ภารกิจหอบังคับการสายลมโลก · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #5a4a1c44, transparent), radial-gradient(900px 500px at 0% 110%, #1b4a6e44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--cyan); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip:disabled { opacity: .35; cursor: default; }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 8px; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 4px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FFD166, #FF6B8A); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.budget { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; align-items: center; margin-top: 6px; }
+.budget svg { width: 100%; height: auto; display: block; background: #050a1f; border: 1px solid var(--line-hi); border-radius: 12px; }
+.budget .rows { display: flex; flex-direction: column; gap: 6px; }
+.budget .rows div { border-radius: 10px; padding: 6px 10px; background: #0b1233aa; border: 1.5px solid var(--line); font-size: 15px; line-height: 1.35; }
+.budget .rows b { font-family: var(--head); font-size: 20px; margin-right: 6px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards, .budget { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .al .opts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · A2 <span class="unit-tag">หน่วยที่ 3</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจหอบังคับการ<b>สายลมโลก</b></h1>
+  <p class="lead">ทดลองว่าการหมุนรอบตัวเองของโลกทำให้ลมเลี้ยวได้อย่างไร ดูพายุหมุนจากดาวเทียม แล้วไขความลับของสายลมรอบโลกตามเขตละติจูดและลมมรสุมที่พัดผ่านประเทศไทย</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองคอริออลิส<small>ม้าหมุน × ลูกโลกหมุน</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ห้องทดลองพายุหมุน<small>ความกดอากาศต่ำ สูง × ซีกโลก</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>แผนที่สายลมรอบโลก<small>เซลล์ 3 วง ลมประจำ มรสุม</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองคอริออลิส : โลกหมุน ลมจึงเลี้ยว</h2>
+    <p class="how">โลกหมุนรอบตัวเองจากทิศตะวันตกไปทิศตะวันออก วันละ 1 รอบ สิ่งที่เคลื่อนที่ไปไกล ๆ บนโลก เช่น ลม จึงดูเหมือนเลี้ยวออกจากทางเดิม นักบินจะทดลอง 2 ขั้น</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ม้าหมุนทดลอง : ขว้างลูกบอลไปที่เป้า</h2>
+    <div class="chips" id="diskChips"></div>
+    <div class="twin">
+      <canvas id="cvA1" height="330" aria-label="ม้าหมุน 2 ภาพ ภาพซ้ายมองจากภายนอก ลูกบอลวิ่งเป็นเส้นตรงขณะที่เป้าหมุนไป ภาพขวามองจากบนม้าหมุน ลูกบอลดูเหมือนเลี้ยวออกจากเป้า"></canvas>
+      <div class="info">
+        <div class="k">ม้าหมุน</div>
+        <div class="v c" id="a1Case">-</div>
+        <div class="k" id="a1Sub">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ม้าหมุนหมุนไป<br>ระหว่างลูกบอลกลิ้ง</div><div class="v g" id="a1Rot">-</div></div>
+          <div><div class="k">ลูกบอลตก<br>ห่างจากเป้า</div><div class="v r" id="a1Off">-</div></div>
+        </div>
+        <h3 id="a1Res" style="margin-top:4px">-</h3>
+        <div class="d" id="a1Why">-</div>
+      </div>
+    </div>
+    <input type="range" id="tA1" min="0" max="100" step="1" value="0" aria-label="ลูกบอลกลิ้งจากกลางม้าหมุนถึงขอบ">
+    <div class="ctrl"><button class="btn" id="playA1">ขว้างลูกบอล</button><button class="btn" id="resetA1">เริ่มใหม่</button><span class="lbl" id="recA1Msg">ลูกบอลถึงขอบม้าหมุนแล้วจะบันทึกให้อัตโนมัติ</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ม้าหมุน</th><th>มองจากภายนอก</th><th>มองจากบนม้าหมุน (ผู้ขว้าง)</th><th>ตกห่างเป้า</th></tr></thead>
+      <tbody id="logA1"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ลูกโลกหมุน : ปล่อยอากาศที่ละติจูดต่าง ๆ</h2>
+    <p class="how" style="margin-bottom:4px">เลือกละติจูดและทิศที่อากาศเคลื่อนที่ แล้วกด "ปล่อยอากาศ" ภาพขวาเป็นแผนที่มองจากด้านบน ณ ตำแหน่งนั้น เส้นประคือทางที่อากาศตั้งใจไป เส้นสีทองคือทางที่ไปจริง ปล่อยครบแล้วบันทึกให้อัตโนมัติ</p>
+    <div class="chips" id="latChips"></div>
+    <div class="chips" id="dirChips"></div>
+    <div class="twin">
+      <canvas id="cvA2" height="340" aria-label="ลูกโลกมองจากด้านข้างแสดงละติจูดที่เลือก และแผนที่มองจากด้านบนแสดงทางที่อากาศเคลื่อนที่จริงเทียบกับทางที่ตั้งใจไป"></canvas>
+      <div class="info">
+        <div class="k">ตำแหน่งที่ปล่อยอากาศ</div>
+        <div class="v c" id="a2Case" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">แรงคอริออลิส<br>(เทียบขั้วโลก = 100%)</div><div class="v g" id="a2F">-</div></div>
+          <div><div class="k">อากาศเบี่ยง<br>ไปทาง</div><div class="v r" id="a2Dev">-</div></div>
+        </div>
+        <div class="bar" style="margin-top:4px"><i id="a2Bar"></i></div>
+        <div class="k" id="a2Spin" style="margin-top:4px">-</div>
+        <div class="d" id="a2Why" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tA2" min="0" max="100" step="1" value="0" aria-label="อากาศเคลื่อนที่">
+    <div class="ctrl"><button class="btn" id="playA2">ปล่อยอากาศ</button><button class="btn" id="resetA2">เริ่มใหม่</button><span class="lbl" id="recA2Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ละติจูด</th><th>แรงคอริออลิส (เทียบขั้วโลก)</th><th>อากาศเบี่ยงไปทาง</th></tr></thead>
+      <tbody id="logA2"></tbody>
+    </table></div>
+    <div class="note">ลมและกระแสน้ำที่เคลื่อนที่บนโลกที่กำลังหมุน จะ <b>เบี่ยงไปทางขวาในซีกโลกเหนือ</b> และ <b>เบี่ยงไปทางซ้ายในซีกโลกใต้</b> ไม่ว่าจะเคลื่อนไปทิศใด เรียกว่าผลของ <b>แรงคอริออลิส</b> (Coriolis) แรงนี้มากที่สุดที่ขั้วโลก ลดลงเมื่อใกล้เส้นศูนย์สูตร และเป็นศูนย์ที่เส้นศูนย์สูตร · ผลนี้เห็นชัดกับสิ่งที่เคลื่อนที่ไกลหลายร้อยกิโลเมตร เช่น ลมและพายุ แต่เล็กเกินกว่าจะกำหนดทิศน้ำวนในอ่างล้างหน้า</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ผลม้าหมุน 3 กรณี + ตาราง 5 ละติจูด (0° 30° เหนือ 60° เหนือ 90° เหนือ 30° ใต้) ตอบข้อ 1</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ห้องทดลองพายุหมุน : ความกดอากาศต่ำ ความกดอากาศสูง</h2>
+    <p class="how">ลมพัดจากความกดอากาศสูงไปต่ำ (จากภารกิจ A1) แต่ระหว่างทางลมเบี่ยงเพราะโลกหมุน เลือกซีกโลกและศูนย์กลางความกดอากาศ กด "สังเกต 1 วัน" ดูภาพจากดาวเทียมและภาพตัดขวาง แล้วตอบว่าลมหมุนทิศใด ตอบถูกจึงบันทึกผล</p>
+    <div class="chips" id="hemiChips"></div>
+    <div class="chips" id="ctrChips"></div>
+    <div class="twin">
+      <canvas id="cvB" height="450" aria-label="ภาพมองจากดาวเทียมแสดงเส้นความกดอากาศเท่ากันและลมที่หมุนวนเข้าหรือออกจากศูนย์กลาง และภาพตัดขวางแสดงอากาศลอยตัวขึ้นหรือจมตัวลง"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="bCase" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความกดอากาศ<br>ที่ศูนย์กลาง (hPa)</div><div class="v g" id="bP">-</div></div>
+          <div><div class="k">ลมที่ผิวพื้น</div><div class="v r" id="bFlow" style="font-size:17px">-</div></div>
+          <div><div class="k">อากาศตรงกลาง</div><div class="v p" id="bAir" style="font-size:17px">-</div></div>
+          <div><div class="k">ลมฟ้าอากาศ</div><div class="v c" id="bWx" style="font-size:16px">-</div></div>
+        </div>
+        <div class="k" id="bTime" style="margin-top:4px">-</div>
+        <div class="bar"><i id="bBar"></i></div>
+        <div class="k" style="margin-top:6px">ลมหมุนรอบศูนย์กลางทิศใด ?</div>
+        <div class="pick" id="bAsk"></div>
+        <div class="d" id="bWhy" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <input type="range" id="tB" min="0" max="100" step="1" value="0" aria-label="เวลาที่สังเกต">
+    <div class="ctrl"><button class="btn" id="playB">สังเกต 1 วัน</button><button class="btn" id="resetB">เริ่มใหม่</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="leg"><span><i style="background:#9fe8ff"></i>ลมที่ผิวพื้น (ทางเดินของอากาศ)</span><span><i style="background:#9AA6CF"></i>เส้นความกดอากาศเท่ากัน (hPa)</span><span><i style="background:#E8EDFF"></i>แขนเมฆของพายุ</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>กรณี</th><th>ลมที่ผิวพื้น</th><th>หมุนวน</th><th>อากาศตรงกลาง</th><th>ลมฟ้าอากาศ</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>แฟ้มพายุจริง</em> พายุหมุนเขตร้อน 6 ลูก</h2>
+    <p class="how" style="margin-bottom:4px">พายุหมุนเขตร้อนคือศูนย์กลางความกดอากาศต่ำที่รุนแรงมาก เรียกชื่อต่างกันตามแหล่งที่เกิด : ไต้ฝุ่น (แปซิฟิกตะวันตก ทะเลจีนใต้) ไซโคลน (มหาสมุทรอินเดีย ออสเตรเลีย) เฮอร์ริเคน (แอตแลนติก แปซิฟิกตะวันออก)</p>
+    <div class="events" id="libB"></div>
+    <div class="note">ซีกโลกเหนือ : ความกดอากาศต่ำ ลมพัดเข้าหาศูนย์กลาง <b>หมุนทวนเข็มนาฬิกา</b> อากาศลอยตัวขึ้น เกิดเมฆฝน · ความกดอากาศสูง ลมพัดออก <b>หมุนตามเข็มนาฬิกา</b> อากาศจมตัวลง ท้องฟ้าแจ่มใส · ซีกโลกใต้ทิศการหมุนกลับกัน แต่การลอยขึ้น-จมลงเหมือนเดิม</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 4 กรณี (ซีกโลกเหนือ L H ซีกโลกใต้ L H) ตอบข้อ 2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> แผนที่สายลมรอบโลก : เซลล์ 3 วง ลมประจำ และมรสุม</h2>
+    <p class="how">เส้นศูนย์สูตรร้อนกว่าขั้วโลก (จากภารกิจ A1) อากาศจึงหมุนเวียนเป็นวงใหญ่ระดับโลก นักบินจะสำรวจ 3 ขั้น แล้วไขรหัสหอบังคับการ</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ลูกโลกสายลม : เซลล์การหมุนเวียน แถบความกดอากาศ และลมประจำ</h2>
+    <p class="how" style="margin-bottom:4px">ลองเลือก "โลกไม่หมุน" เทียบกับ "โลกหมุน" ก่อน จากนั้นใช้แบบโลกหมุน เลือกแถบละติจูดแล้วกด "ปล่อยบอลลูน" ดูว่าอากาศลอยขึ้นหรือจมลง และแตะชื่อลมประจำทั้ง 3 ชนิด (บันทึกให้อัตโนมัติ)</p>
+    <div class="chips" id="modeChips"></div>
+    <div class="chips" id="beltChips"></div>
+    <div class="chips" id="windChips"></div>
+    <div class="twin">
+      <canvas id="cvC1" height="420" aria-label="ลูกโลกแสดงเซลล์การหมุนเวียนของอากาศที่ขอบด้านขวา แถบความกดอากาศสูงและต่ำ และลูกศรลมประจำบนผิวโลก"></canvas>
+      <div class="info">
+        <div class="k">แบบจำลอง</div>
+        <div class="v c" id="c1Mode" style="font-size:18px">-</div>
+        <h3 id="c1Name" style="margin-top:4px">-</h3>
+        <div class="g2">
+          <div><div class="k">ความกดอากาศ</div><div class="v g" id="c1P" style="font-size:18px">-</div></div>
+          <div><div class="k">อากาศ</div><div class="v p" id="c1Air" style="font-size:18px">-</div></div>
+        </div>
+        <div class="k">ลมฟ้าอากาศ</div><div class="d" id="c1Wx">-</div>
+        <div class="k">ตัวอย่างพื้นที่</div><div class="d" id="c1Ex" style="color:#4FD8FF">-</div>
+        <h3 id="c1WName" style="margin-top:6px">-</h3>
+        <div class="d" id="c1WTxt">-</div>
+      </div>
+    </div>
+    <div class="ctrl"><button class="btn" id="playC1">ปล่อยบอลลูน</button><span class="lbl" id="recC1Msg"></span></div>
+    <div class="leg"><span><i style="background:#FFD166"></i>เซลล์แฮดลีย์ (0–30°)</span><span><i style="background:#4FD8FF"></i>เซลล์เฟอร์เรล (30–60°)</span><span><i style="background:#A77BFF"></i>เซลล์ขั้วโลก (60–90°)</span><span><i style="background:#E8EDFF"></i>ลมที่ผิวพื้น</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>แถบละติจูด</th><th>ความกดอากาศ</th><th>อากาศ</th><th>ลมฟ้าอากาศ</th></tr></thead>
+      <tbody id="logC1"></tbody>
+    </table></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ลมประจำ</th><th>ช่วงละติจูด</th><th>ซีกโลกเหนือ พัดมาจากทิศ</th><th>ซีกโลกใต้ พัดมาจากทิศ</th></tr></thead>
+      <tbody id="logCW"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> สายลมมรสุมผ่านประเทศไทย</h2>
+    <p class="how" style="margin-bottom:4px">แผนที่แสดงลมที่ผิวพื้นแถบเอเชียและมหาสมุทรอินเดีย เลือกเดือน สังเกตเส้นทางลม (สังเกตตอนลมข้ามเส้นศูนย์สูตร) แล้วตอบว่าลมที่พัดผ่านประเทศไทยมาจากทิศใด ตอบถูกจึงบันทึก</p>
+    <div class="chips" id="monChips"></div>
+    <div class="twin">
+      <canvas id="cvC2" height="400" aria-label="แผนที่เอเชียตะวันออกเฉียงใต้ อินเดีย และมหาสมุทรอินเดีย แสดงทางลมที่ผิวพื้น แถบความกดอากาศต่ำเขตร้อน และศูนย์กลางความกดอากาศสูงต่ำตามฤดู"></canvas>
+      <div class="info">
+        <div class="k">เดือน</div>
+        <div class="v c" id="c2Mon">-</div>
+        <div class="k" style="margin-top:4px">ลมที่พัดผ่านประเทศไทยมาจากทิศใด ?</div>
+        <div class="pick" id="c2Ask"></div>
+        <h3 id="c2Name" style="margin-top:4px">-</h3>
+        <div class="k" id="c2Per">-</div>
+        <div class="d" id="c2Wx">-</div>
+        <div class="d" id="c2Why" style="color:#5EF2A5;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="leg"><span><i style="background:#E8EDFF"></i>ทางลมที่ผิวพื้น</span><span><i style="background:#FF6B8A"></i>แถบความกดอากาศต่ำเขตร้อน (ร่องฝน)</span><span><i style="background:#9AA6CF"></i>เส้นศูนย์สูตร</span><span><i class="dot" style="background:#FFD166"></i>ประเทศไทย</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>เดือน</th><th>ลมที่พัดผ่านประเทศไทย</th><th>ช่วงเวลา</th><th>ลักษณะอากาศ</th></tr></thead>
+      <tbody id="logC2"></tbody>
+    </table></div>
+    <div class="prog" id="progC">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ไขรหัสหอบังคับการ</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">HADLEY</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · จอร์จ แฮดลีย์ (George Hadley) นักวิทยาศาสตร์ชาวอังกฤษ อธิบายที่มาของลมค้าไว้เมื่อ ค.ศ. 1735 เซลล์แฮดลีย์จึงตั้งตามชื่อของเขา</div>
+    </div>
+
+    <h2 class="sub-h"><em>คลังภูมิอากาศ</em> สายลมกำหนดภูมิอากาศ (สำหรับส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">ใช้ประกอบการวาดแผนที่สายลมโลกและตอบคำถามในส่วนที่ 4</p>
+    <div class="events" id="libC"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 แถบละติจูด + ตาราง 3 ลมประจำ + รหัสผ่าน ข้อ 3 (มรสุม) · <b>ส่วนที่ 4</b> : วาดแผนที่สายลมโลกฉบับนักบิน</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ภาพย่อส่วนและขยายเกินจริงเพื่อให้เห็นชัด · แรงคอริออลิสเทียบขั้วโลกคิดตาม sin ของละติจูด · เซลล์การหมุนเวียนและแถบความกดอากาศเป็นแบบจำลองอย่างง่าย ของจริงเลื่อนขึ้นลงตามฤดูกาล · ทางลมมรสุมเป็นภาพรวมโดยประมาณ · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_a2_sim_v1';
+  var S = load() || {};
+  ['a1', 'a2', 'b', 'c1', 'cw', 'c2', 'cl'].forEach(function (k) { S[k] = S[k] || {}; });
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function fit(cv, ratio, mn, mx) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h;
+    if (ratio) h = Math.round(clamp(w * ratio, mn, mx)); else h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var RAD = Math.PI / 180;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function chips(id, lbl, arr, cur, attr, done, fn) {
+    var h = '<span class="lbl">' + lbl + '</span>';
+    arr.forEach(function (t, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (done && done(i) ? ' done' : '') + '" data-' + attr + '="' + i + '">' + t + '</button>'; });
+    $(id).innerHTML = h; bindChips($(id), attr, function (v) { fn(+v); });
+  }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  // ลูกศรโค้งรอบจุด (cx, cy) รัศมี r จากมุม a1 ไป a2 (องศาแบบคณิตศาสตร์ ทวนเข็มนาฬิกาเป็นบวก) หัวลูกศรอยู่ที่ a2
+  function arcArrow(x, cx, cy, r, a1, a2, col, w, head) {
+    var n = 24, i, a; x.strokeStyle = col; x.lineWidth = w || 2; x.beginPath();
+    for (i = 0; i <= n; i++) { a = (a1 + (a2 - a1) * i / n) * RAD; if (i) x.lineTo(cx + r * Math.cos(a), cy - r * Math.sin(a)); else x.moveTo(cx + r * Math.cos(a), cy - r * Math.sin(a)); }
+    x.stroke();
+    var b = (a2 - (a2 - a1) * .12) * RAD, e = a2 * RAD;
+    arrow(x, cx + r * Math.cos(b), cy - r * Math.sin(b), cx + r * Math.cos(e), cy - r * Math.sin(e), col, w || 2, head || 9);
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function stars(x, W, H, n) { x.fillStyle = 'rgba(232,237,255,.55)'; for (var i = 0; i < n; i++) { x.fillRect(hash(i, 21) * W, hash(i, 22) * H, 1.3, 1.3); } }
+  function bg(x, W, H, n) { x.fillStyle = '#050a1f'; x.fillRect(0, 0, W, H); stars(x, W, H, n || 50); }
+  function askUI(id, opts, ans, okNow, onOk, onNo) {
+    $(id).innerHTML = opts.map(function (o, j) { return '<button data-j="' + j + '" class="' + (okNow && j === ans ? 'ok' : '') + '">' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($(id).querySelectorAll('button'), function (b) {
+      b.onclick = function () { var j = +b.getAttribute('data-j'); if (j === ans) { if (onOk()) return; } else { onNo && onNo(); }
+        b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); };
+    });
+  }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ขั้นที่ 1 ม้าหมุน
+  var DISK = [{ n: 'ไม่หมุน', w: 0 }, { n: 'หมุนทวนเข็มนาฬิกา', w: 1 }, { n: 'หมุนตามเข็มนาฬิกา', w: -1 }];
+  var DISKX = ['ม้าหมุนอยู่นิ่ง เหมือนโลกที่ไม่หมุน', 'เหมือนมองโลกลงมาจากเหนือขั้วโลกเหนือ (ซีกโลกเหนือ)', 'เหมือนมองโลกขึ้นไปจากใต้ขั้วโลกใต้ (ซีกโลกใต้)'];
+  var DISKW = ['ม้าหมุนไม่หมุน เป้าอยู่ที่เดิม ลูกบอลกลิ้งตรงไปถึงเป้าพอดี ทั้งคนข้างนอกและผู้ขว้างเห็นเหมือนกัน',
+    'ลูกบอลกลิ้งเป็นเส้นตรงจริง ๆ แต่ระหว่างนั้นม้าหมุนพาเป้าหมุนไปทางซ้าย ผู้ขว้างที่หมุนไปด้วยจึงเห็นลูกบอลเลี้ยวไปทางขวาของเป้า เหมือนลมในซีกโลกเหนือ',
+    'ม้าหมุนหมุนพาเป้าไปทางขวา ผู้ขว้างจึงเห็นลูกบอลเลี้ยวไปทางซ้ายของเป้า เหมือนลมในซีกโลกใต้'];
+  var SPIN = 50;   // องศาที่ม้าหมุนหมุนไประหว่างลูกบอลกลิ้งจากกลางถึงขอบ
+  function diskDev(k) { var w = DISK[k].w; return w === 0 ? 'ไม่เบน (ตรงเป้า)' : w > 0 ? 'เบนไปทางขวา' : 'เบนไปทางซ้าย'; }
+  function diskOff(k) { return Math.abs(DISK[k].w) * SPIN; }
+  var dk = 1, pA1 = 0, playA1 = 0;
+  function updA1() {
+    if (pA1 >= 1 && !S.a1[dk]) { S.a1[dk] = 1; save(); }
+    chips('diskChips', 'ม้าหมุน', DISK.map(function (d) { return d.n; }), dk, 'd', function (i) { return S.a1[i]; }, function (v) { dk = v; pA1 = 0; playA1 = 0; updA1(); drawA1(); });
+    var done = pA1 >= 1;
+    $('a1Case').textContent = DISK[dk].n; $('a1Sub').textContent = DISKX[dk];
+    $('a1Rot').textContent = fmt(diskOff(dk) * pA1) + '°';
+    $('a1Off').textContent = done ? diskOff(dk) + '°' : '-';
+    $('a1Res').textContent = done ? 'ผู้ขว้างเห็นลูกบอล' + diskDev(dk) : (pA1 > 0 ? 'ลูกบอลกำลังกลิ้ง...' : 'กด "ขว้างลูกบอล"');
+    $('a1Why').textContent = done ? DISKW[dk] : 'ผู้ขว้างยืนตรงกลาง เล็งไปที่เป้าสีทองที่ขอบม้าหมุน แล้วขว้างลูกบอลให้กลิ้งตรงไปข้างหน้า';
+    $('tA1').value = Math.round(pA1 * 100); $('playA1').textContent = playA1 ? 'หยุด' : 'ขว้างลูกบอล';
+    $('logA1').innerHTML = DISK.map(function (d, i) { var r = S.a1[i];
+      return '<tr' + (i === dk ? ' class="cur"' : '') + '><td class="n">' + d.n + '</td><td>' + (r ? 'เส้นตรง' : '-') + '</td><td>' + (r ? diskDev(i) : '-') + '</td><td>' + (r ? diskOff(i) + '°' : '-') + '</td></tr>'; }).join('');
+    var n = DISK.filter(function (d, i) { return S.a1[i]; }).length;
+    $('recA1Msg').textContent = n === 3 ? 'บันทึกครบ 3 กรณีแล้ว ไปขั้นที่ 2 ต่อ' : 'บันทึกแล้ว ' + n + ' / 3 กรณี (ลูกบอลถึงขอบแล้วบันทึกอัตโนมัติ)';
+  }
+  $('tA1').oninput = function () { pA1 = +this.value / 100; playA1 = 0; updA1(); drawA1(); };
+  $('playA1').onclick = function () { if (pA1 >= 1) pA1 = 0; playA1 = playA1 ? 0 : 1; updA1(); };
+  $('resetA1').onclick = function () { pA1 = 0; playA1 = 0; updA1(); drawA1(); };
+  function diskImg(x, cx, cy, R, rot, w) {
+    for (var i = 0; i < 8; i++) {
+      var a0 = (i * 45 + rot) * RAD; x.fillStyle = i % 2 ? '#22336f' : '#18244f';
+      x.beginPath(); x.moveTo(cx, cy); x.arc(cx, cy, R, -a0, -(a0 + 45 * RAD), true); x.closePath(); x.fill();
+    }
+    x.strokeStyle = '#3A4A85'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.stroke();
+    if (w) arcArrow(x, cx, cy, R + 10, w > 0 ? 205 : 245, w > 0 ? 245 : 205, '#A77BFF', 2.5, 9);
+    var ta = (90 + rot) * RAD, tx = cx + R * .93 * Math.cos(ta), ty = cy - R * .93 * Math.sin(ta);
+    glow(x, tx, ty, 18, [255, 209, 102], .45);
+    x.fillStyle = '#FFD166'; x.beginPath(); x.arc(tx, ty, 8, 0, 6.283); x.fill();
+    x.strokeStyle = '#06102A'; x.lineWidth = 2; x.beginPath(); x.arc(tx, ty, 4, 0, 6.283); x.stroke();
+    x.fillStyle = '#4FD8FF'; x.beginPath(); x.arc(cx, cy, 7, 0, 6.283); x.fill();
+    return [tx, ty];
+  }
+  function drawA1() {
+    var f = fit($('cvA1'), .58, 230, 330), x = f.x, W = f.W, H = f.H; bg(x, W, H, 40);
+    var R = Math.max(40, Math.min(W / 4 - 18, (H - 84) / 2)), cy = 34 + R + 12, C = [W / 4, 3 * W / 4];
+    var w = DISK[dk].w, rot = w * SPIN * pA1, sm = W < 520 ? 11 : 13, done = pA1 >= 1;
+    label(x, 'มองจากภายนอก (ยืนบนพื้น)', C[0], 18, '#9AA6CF', sm);
+    label(x, 'มองจากบนม้าหมุน (ผู้ขว้าง)', C[1], 18, '#4FD8FF', sm);
+    // ภาพที่ 1 : มองจากภายนอก ม้าหมุนหมุนไป ลูกบอลวิ่งตรง
+    diskImg(x, C[0], cy, R, rot, w);
+    x.setLineDash([5, 5]); x.strokeStyle = 'rgba(232,237,255,.45)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(C[0], cy); x.lineTo(C[0], cy - R); x.stroke(); x.setLineDash([]);
+    x.strokeStyle = '#FF9F6B'; x.lineWidth = 3; x.beginPath(); x.moveTo(C[0], cy); x.lineTo(C[0], cy - pA1 * R); x.stroke();
+    if (pA1 > 0) { x.fillStyle = '#fff'; x.beginPath(); x.arc(C[0], cy - pA1 * R, 6, 0, 6.283); x.fill(); }
+    // ภาพที่ 2 : มองจากบนม้าหมุน สิ่งรอบตัวหมุนสวนทาง
+    for (var k = 0; k < 10; k++) { var a = (k * 36 + 18 - rot) * RAD; x.fillStyle = '#5EF2A5'; x.globalAlpha = .55;
+      x.beginPath(); x.arc(C[1] + (R + 13) * Math.cos(a), cy - (R + 13) * Math.sin(a), 3, 0, 6.283); x.fill(); x.globalAlpha = 1; }
+    diskImg(x, C[1], cy, R, 0, w);
+    x.setLineDash([5, 5]); x.strokeStyle = 'rgba(232,237,255,.45)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(C[1], cy); x.lineTo(C[1], cy - R); x.stroke(); x.setLineDash([]);
+    x.strokeStyle = '#FF9F6B'; x.lineWidth = 3; x.beginPath();
+    var px = C[1], py = cy;
+    for (var i = 0; i <= 40; i++) { var s = pA1 * i / 40, th = (90 - w * SPIN * s) * RAD; px = C[1] + s * R * Math.cos(th); py = cy - s * R * Math.sin(th); if (i) x.lineTo(px, py); else x.moveTo(px, py); }
+    x.stroke();
+    if (pA1 > 0) { x.fillStyle = '#fff'; x.beginPath(); x.arc(px, py, 6, 0, 6.283); x.fill(); }
+    var by = Math.min(H - 10, cy + R + 26);
+    label(x, done ? (w ? 'ลูกบอลวิ่งตรง แต่เป้าหมุนหนีไป' : 'ลูกบอลวิ่งตรงถึงเป้า') : 'ลูกบอลวิ่งเป็นเส้นตรง', C[0], by, '#E8EDFF', sm);
+    label(x, done ? 'ลูกบอล' + diskDev(dk) : 'ผู้ขว้างหมุนไปพร้อมม้าหมุน', C[1], by, done && w ? '#FFD166' : '#E8EDFF', sm);
+  }
+
+  // ================================================================ ภารกิจ A ขั้นที่ 2 ลูกโลกหมุน
+  var LATS = [{ l: 90, n: '90° เหนือ (ขั้วโลกเหนือ)' }, { l: 60, n: '60° เหนือ' }, { l: 30, n: '30° เหนือ' }, { l: 0, n: '0° (เส้นศูนย์สูตร)' },
+    { l: -30, n: '30° ใต้' }, { l: -60, n: '60° ใต้' }, { l: -90, n: '90° ใต้ (ขั้วโลกใต้)' }];
+  var DIRS = [{ n: 'ไปทางทิศเหนือ', h: 90 }, { n: 'ไปทางทิศตะวันออก', h: 0 }, { n: 'ไปทางทิศใต้', h: 270 }, { n: 'ไปทางทิศตะวันตก', h: 180 }];
+  var KDEF = 70;   // มุมเลี้ยวรวม (องศา) ที่ขั้วโลก
+  function corF(i) { return Math.round(100 * Math.abs(Math.sin(LATS[i].l * RAD))); }
+  function devA(i) { var l = LATS[i].l; return l === 0 ? 'ไม่เบี่ยง' : l > 0 ? 'ขวา' : 'ซ้าย'; }
+  var WSA2 = [3, 2, 1, 0, 4];   // แถวในใบงาน 0° 30°N 60°N 90°N 30°S
+  var la = 2, dr = 0, pA2 = 0, playA2 = 0;
+  function spinTxt(l) { return l === 0 ? 'พื้นโลกตรงเส้นศูนย์สูตรไม่หมุนรอบแนวดิ่ง (มองจากด้านบน) จึงไม่มีการเบี่ยง' :
+    'พื้นโลกตรงนี้หมุน' + (l > 0 ? 'ทวนเข็มนาฬิกา' : 'ตามเข็มนาฬิกา') + 'เมื่อมองจากด้านบน (เหมือนม้าหมุน' + (l > 0 ? 'ทวนเข็ม' : 'ตามเข็ม') + ') ยิ่งใกล้ขั้วโลกยิ่งหมุนเร็ว'; }
+  function updA2() {
+    if (pA2 >= 1 && !S.a2[la]) { S.a2[la] = 1; save(); }
+    chips('latChips', 'ละติจูด', LATS.map(function (z) { return z.n.replace(/ \(.*\)/, ''); }), la, 'l', function (i) { return S.a2[i]; }, function (v) { la = v; pA2 = 0; playA2 = 0; updA2(); drawA2(); });
+    chips('dirChips', 'ทิศที่อากาศเคลื่อน', DIRS.map(function (z) { return z.n.replace('ไปทาง', ''); }), dr, 'r', null, function (v) { dr = v; pA2 = 0; playA2 = 0; updA2(); drawA2(); });
+    var done = pA2 >= 1, l = LATS[la].l;
+    $('a2Case').textContent = LATS[la].n + ' · อากาศเคลื่อน' + DIRS[dr].n;
+    $('a2F').textContent = corF(la) + '%'; $('a2Bar').style.width = corF(la) + '%';
+    $('a2Dev').textContent = done ? (l === 0 ? 'ไม่เบี่ยง' : devA(la)) : '-';
+    $('a2Spin').textContent = spinTxt(l);
+    $('a2Why').textContent = done ? (l === 0 ? 'ที่เส้นศูนย์สูตรอากาศเคลื่อนตรงไปตามทางเดิม แรงคอริออลิสเป็นศูนย์' :
+      'อากาศเบี่ยงไปทาง' + devA(la) + 'ของทิศที่เคลื่อนที่ ลองเปลี่ยนทิศดู ในซีกโลก' + (l > 0 ? 'เหนือ' : 'ใต้') + 'ไม่ว่าไปทิศใดก็เบี่ยงไปทาง' + devA(la) + 'เสมอ') : 'กด "ปล่อยอากาศ" แล้วดูว่าเส้นสีทองออกนอกเส้นประหรือไม่';
+    $('tA2').value = Math.round(pA2 * 100); $('playA2').textContent = playA2 ? 'หยุด' : 'ปล่อยอากาศ';
+    $('logA2').innerHTML = LATS.map(function (z, i) { var r = S.a2[i];
+      return '<tr' + (i === la ? ' class="cur"' : '') + '><td class="n">' + z.n + '</td><td>' + (r ? corF(i) + '%' : '-') + '</td><td>' + (r ? devA(i) : '-') + '</td></tr>'; }).join('');
+    var n = WSA2.filter(function (i) { return S.a2[i]; }).length;
+    $('recA2Msg').textContent = 'ละติจูดในใบงานบันทึกแล้ว ' + n + ' / 5 (0° 30°เหนือ 60°เหนือ 90°เหนือ 30°ใต้)';
+  }
+  $('tA2').oninput = function () { pA2 = +this.value / 100; playA2 = 0; updA2(); drawA2(); };
+  $('playA2').onclick = function () { if (pA2 >= 1) pA2 = 0; playA2 = playA2 ? 0 : 1; updA2(); };
+  $('resetA2').onclick = function () { pA2 = 0; playA2 = 0; updA2(); drawA2(); };
+  function drawA2() {
+    var f = fit($('cvA2'), .62, 240, 340), x = f.x, W = f.W, H = f.H; bg(x, W, H, 40);
+    var l = LATS[la].l, sm = W < 520 ? 11 : 13;
+    var R = Math.max(40, Math.min(W * .2, H / 2 - 46)), gx = W * .24, gy = H / 2 + 4;
+    // ลูกโลก (แกนตั้ง มองจากด้านข้างที่ระนาบศูนย์สูตร)
+    glow(x, gx, gy, R * 1.35, [79, 216, 255], .18);
+    var g = x.createRadialGradient(gx - R * .35, gy - R * .35, R * .1, gx, gy, R);
+    g.addColorStop(0, '#3f8fd6'); g.addColorStop(1, '#0f3166'); x.fillStyle = g; x.beginPath(); x.arc(gx, gy, R, 0, 6.283); x.fill();
+    [-60, -30, 0, 30, 60].forEach(function (b) {
+      var y = gy - R * Math.sin(b * RAD), hw = R * Math.cos(b * RAD);
+      x.strokeStyle = b === 0 ? 'rgba(232,237,255,.8)' : 'rgba(154,166,207,.45)'; x.lineWidth = b === 0 ? 1.6 : 1;
+      x.beginPath(); x.moveTo(gx - hw, y); x.lineTo(gx + hw, y); x.stroke();
+    });
+    x.setLineDash([4, 4]); x.strokeStyle = 'rgba(232,237,255,.5)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(gx, gy - R - 16); x.lineTo(gx, gy + R + 16); x.stroke(); x.setLineDash([]);
+    label(x, 'N', gx, gy - R - 20, '#E8EDFF', 12); label(x, 'S', gx, gy + R + 30, '#E8EDFF', 12);
+    arrow(x, gx - R * .55, gy + R * .12, gx + R * .55, gy + R * .12, 'rgba(255,209,102,.9)', 2.5, 9);
+    label(x, 'หมุน ตะวันตก → ตะวันออก', gx, Math.min(H - 6, gy + R + 30), '#FFD166', sm, 'center');
+    var my = gy - R * Math.sin(l * RAD), mx = gx + R * .12 * Math.cos(l * RAD);
+    if (l !== 0) { var rr = 6 + 10 * Math.abs(Math.sin(l * RAD)); arcArrow(x, mx, my, rr, l > 0 ? 40 : 320, l > 0 ? 320 : 40, '#A77BFF', 2, 7); }
+    glow(x, mx, my, 16, [255, 107, 138], .6); x.fillStyle = '#FF6B8A'; x.beginPath(); x.arc(mx, my, 5, 0, 6.283); x.fill();
+    // แผนที่มองจากด้านบน
+    var s = Math.max(120, Math.min(W * .44, H - 60)), px = W * .52, py = (H - s) / 2 + 12;
+    x.setLineDash([3, 4]); x.strokeStyle = 'rgba(255,107,138,.6)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(mx + 8, my); x.lineTo(px, py + s / 2); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#0b1840'; x.fillRect(px, py, s, s); x.strokeStyle = '#3A4A85'; x.lineWidth = 1.5; x.strokeRect(px, py, s, s);
+    x.strokeStyle = 'rgba(58,74,133,.55)'; x.lineWidth = 1;
+    for (var k = 1; k < 6; k++) { x.beginPath(); x.moveTo(px + s * k / 6, py); x.lineTo(px + s * k / 6, py + s); x.stroke(); x.beginPath(); x.moveTo(px, py + s * k / 6); x.lineTo(px + s, py + s * k / 6); x.stroke(); }
+    label(x, 'มองจากด้านบน ณ ' + LATS[la].n.replace(/ \(.*\)/, ''), px + s / 2, py - 8, '#4FD8FF', sm);
+    arrow(x, px + 16, py + 34, px + 16, py + 12, '#E8EDFF', 2, 7); label(x, 'เหนือ', px + 16, py + 48, '#E8EDFF', 10);
+    var h0 = DIRS[dr].h, D = -KDEF * Math.sin(l * RAD), L = s * .62;
+    var sx = px + s / 2 - L / 2 * Math.cos(h0 * RAD), sy = py + s / 2 + L / 2 * Math.sin(h0 * RAD);
+    x.setLineDash([6, 5]); x.strokeStyle = 'rgba(232,237,255,.55)'; x.lineWidth = 2; x.beginPath(); x.moveTo(sx, sy);
+    x.lineTo(sx + L * Math.cos(h0 * RAD), sy - L * Math.sin(h0 * RAD)); x.stroke(); x.setLineDash([]);
+    var cx = sx, cy = sy, N = 60; x.strokeStyle = '#FFD166'; x.lineWidth = 3.5; x.beginPath(); x.moveTo(cx, cy);
+    for (var i = 1; i <= N; i++) { var u = pA2 * i / N, h = (h0 + D * u) * RAD; cx += L * pA2 / N * Math.cos(h); cy -= L * pA2 / N * Math.sin(h); x.lineTo(cx, cy); }
+    x.stroke();
+    glow(x, cx, cy, 16, [79, 216, 255], .7); x.fillStyle = '#4FD8FF'; x.beginPath(); x.arc(cx, cy, 6, 0, 6.283); x.fill();
+    if (pA2 >= 1) label(x, l === 0 ? 'ไม่เบี่ยง' : 'เบี่ยงไปทาง' + devA(la), px + s / 2, py + s - 10, l === 0 ? '#E8EDFF' : '#FFD166', sm + 1);
+  }
+
+  // ================================================================ ภารกิจ B ห้องทดลองพายุหมุน
+  var HEMI = ['ซีกโลกเหนือ', 'ซีกโลกใต้'], CTR = ['ความกดอากาศต่ำ (L)', 'ความกดอากาศสูง (H)'];
+  function sgnB(h, c) { return (h === 0 ? 1 : -1) * (c === 0 ? 1 : -1); }   // +1 = ทวนเข็มนาฬิกา
+  function spinB(h, c) { return sgnB(h, c) > 0 ? 'ทวนเข็มนาฬิกา' : 'ตามเข็มนาฬิกา'; }
+  function flowB(c) { return c === 0 ? 'พัดเข้าหาศูนย์กลาง' : 'พัดออกจากศูนย์กลาง'; }
+  function airB(c) { return c === 0 ? 'ลอยตัวขึ้น' : 'จมตัวลง'; }
+  function wxB(c) { return c === 0 ? 'เมฆมาก ฝนตก ลมแรง' : 'ท้องฟ้าแจ่มใส อากาศแห้ง'; }
+  var PB = [996, 1024];
+  var WSB = ['0-0', '0-1', '1-0', '1-1'];
+  var bh = 0, bc = 0, pB = 0, playB = 0;
+  function keyB() { return bh + '-' + bc; }
+  function updB() {
+    chips('hemiChips', 'ซีกโลก', HEMI, bh, 'h', null, function (v) { bh = v; pB = 0; playB = 0; updB(); drawB(); });
+    chips('ctrChips', 'ศูนย์กลาง', CTR, bc, 'c', function (i) { return S.b[bh + '-' + i]; }, function (v) { bc = v; pB = 0; playB = 0; updB(); drawB(); });
+    var done = pB >= 1, k = keyB(), rec = !!S.b[k], ans = sgnB(bh, bc) > 0 ? 0 : 1;
+    $('bCase').textContent = HEMI[bh] + ' · ' + CTR[bc];
+    $('bP').textContent = PB[bc] + (bc === 0 ? ' (ต่ำ)' : ' (สูง)');
+    $('bFlow').textContent = done ? flowB(bc) : '-'; $('bAir').textContent = done ? airB(bc) : '-'; $('bWx').textContent = done ? wxB(bc) : '-';
+    $('bTime').textContent = done ? 'สังเกตครบ 1 วันแล้ว ตอบคำถามด้านล่าง' : 'สังเกตแล้ว ' + Math.round(pB * 24) + ' ชั่วโมง จาก 24 ชั่วโมง';
+    $('bBar').style.width = Math.round(pB * 100) + '%';
+    askUI('bAsk', ['ทวนเข็มนาฬิกา', 'ตามเข็มนาฬิกา'], ans, rec, function () {
+      if (pB < 1) { $('bWhy').style.color = '#FF9F6B'; $('bWhy').textContent = 'สังเกตให้ครบ 1 วันก่อน (กด "สังเกต 1 วัน") จึงบันทึกได้'; return false; }
+      S.b[k] = 1; save(); updB(); return true; });
+    $('bWhy').style.color = '#5EF2A5';
+    $('bWhy').textContent = rec ? 'ถูกต้อง ลม' + flowB(bc) + ' แล้วเบี่ยงไปทาง' + (bh === 0 ? 'ขวา' : 'ซ้าย') + ' จึงหมุนวน' + spinB(bh, bc) + ' · อากาศ' + airB(bc) + (bc === 0 ? ' เย็นลงจนเกิดเมฆและฝน' : ' อุ่นขึ้นและแห้ง เมฆจึงไม่เกิด') : '';
+    $('tB').value = Math.round(pB * 100); $('playB').textContent = playB ? 'หยุด' : 'สังเกต 1 วัน';
+    $('logB').innerHTML = WSB.map(function (z) { var r = S.b[z], q = z.split('-'), h = +q[0], c = +q[1];
+      return '<tr' + (z === k ? ' class="cur"' : '') + '><td class="n">' + HEMI[h] + ' · ' + (c === 0 ? 'L' : 'H') + '</td><td>' + (r ? flowB(c) : '-') + '</td><td>' + (r ? spinB(h, c) : '-') + '</td><td>' + (r ? airB(c) : '-') + '</td><td>' + (r ? wxB(c) : '-') + '</td></tr>'; }).join('');
+    var n = WSB.filter(function (z) { return S.b[z]; }).length;
+    $('recBMsg').textContent = n === 4 ? 'บันทึกครบ 4 กรณีแล้ว ไปภารกิจ C ต่อ' : 'บันทึกแล้ว ' + n + ' / 4 กรณี';
+  }
+  $('tB').oninput = function () { pB = +this.value / 100; playB = 0; updB(); drawB(); };
+  $('playB').onclick = function () { if (pB >= 1) pB = 0; playB = playB ? 0 : 1; updB(); };
+  $('resetB').onclick = function () { pB = 0; playB = 0; updB(); drawB(); };
+  function stormPt(i, s, sg, low, R, rotT) {
+    var th0 = i / 40 * 6.283 + hash(i, 5) * .5 + rotT, r, th;
+    if (low) { r = R * (.98 - .84 * s); th = th0 + sg * (1.1 * s + 2.3 * s * s); } else { r = R * (.12 + .86 * s); th = th0 + sg * (2.4 * s - .9 * s * s); }
+    return [r, th];
+  }
+  function drawB() {
+    var f = fit($('cvB')), x = f.x, W = f.W, H = f.H; bg(x, W, H, 40);
+    var sm = W < 520 ? 11 : 13, sg = sgnB(bh, bc), low = bc === 0, done = pB >= 1;
+    var R = Math.max(60, Math.min(W / 2 - 34, H * .3)), cx = W / 2, cy = 30 + R;
+    label(x, HEMI[bh] + ' · มองจากดาวเทียม', cx, 16, '#4FD8FF', sm);
+    var g = x.createRadialGradient(cx, cy, 0, cx, cy, R * 1.05); g.addColorStop(0, '#123a6b'); g.addColorStop(1, '#0a1c3d');
+    x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R * 1.05, 0, 6.283); x.fill();
+    [.28, .52, .76, 1].forEach(function (q, j) {
+      x.strokeStyle = 'rgba(154,166,207,.5)'; x.lineWidth = 1.2; x.beginPath(); x.arc(cx, cy, R * q, 0, 6.283); x.stroke();
+      x.font = '600 10px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'left'; x.fillText(String(low ? 1000 + 4 * j : 1020 - 4 * j), cx + R * q * .71 + 3, cy - R * q * .71 - 2);
+    });
+    var tt = tA * .16;
+    if (low && pB > 0) {   // แขนเมฆของพายุ
+      x.lineCap = 'round';
+      for (var a = 0; a < 3; a++) { x.strokeStyle = 'rgba(232,237,255,' + (.28 * smooth(0, .6, pB)) + ')'; x.lineWidth = R * .13; x.beginPath();
+        for (var u = 0; u <= 30; u++) { var p = stormPt(0, u / 30 * .92, sg, true, R, a * 2.094 + sg * tA * .25), X = cx + p[0] * Math.cos(p[1]), Y = cy - p[0] * Math.sin(p[1]); if (u) x.lineTo(X, Y); else x.moveTo(X, Y); }
+        x.stroke(); }
+      x.lineCap = 'butt';
+      x.fillStyle = '#050a1f'; x.beginPath(); x.arc(cx, cy, R * .06, 0, 6.283); x.fill();
+    }
+    for (var i = 0; i < 40; i++) {
+      var s = (tt + hash(i, 3)) % 1;
+      for (var k = 0; k < 7; k++) {
+        var s2 = s - k * .014; if (s2 < 0) continue;
+        var p2 = stormPt(i, s2, sg, low, R, 0); x.fillStyle = 'rgba(159,232,255,' + (.85 - k * .11) + ')';
+        x.beginPath(); x.arc(cx + p2[0] * Math.cos(p2[1]), cy - p2[0] * Math.sin(p2[1]), k ? 1.6 : 2.6, 0, 6.283); x.fill();
+      }
+    }
+    x.font = '700 ' + Math.round(R * .3) + 'px ' + HFONT; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.lineWidth = 4; x.strokeStyle = 'rgba(5,8,26,.9)'; x.strokeText(low ? 'L' : 'H', cx, cy); x.fillStyle = low ? '#FF6B8A' : '#4FD8FF'; x.fillText(low ? 'L' : 'H', cx, cy); x.textBaseline = 'alphabetic';
+    if (done) { arcArrow(x, cx, cy, R * 1.12, sg > 0 ? 200 : 270, sg > 0 ? 270 : 200, '#FFD166', 3, 11); label(x, 'หมุน' + spinB(bh, bc), cx, cy + R * 1.05 + 16, '#FFD166', sm + 2); }
+    // ภาพตัดขวาง
+    var top = cy + R + 34, bot = H - 10, gy = bot - 14, mid = W / 2, hw = Math.min(W / 2 - 16, R * 1.6);
+    label(x, 'ภาพตัดขวาง', mid - hw + 34, top + 4, '#9AA6CF', sm - 1);
+    x.fillStyle = '#2b4a26'; x.fillRect(mid - hw, gy, hw * 2, bot - gy); x.strokeStyle = '#5EF2A5'; x.lineWidth = 1; x.beginPath(); x.moveTo(mid - hw, gy); x.lineTo(mid + hw, gy); x.stroke();
+    var hh = gy - top - 8, ph = (tA * .6) % 1;
+    if (low) {
+      arrow(x, mid - hw + 10, gy - 8, mid - 22, gy - 8, '#9fe8ff', 2.5, 8); arrow(x, mid + hw - 10, gy - 8, mid + 22, gy - 8, '#9fe8ff', 2.5, 8);
+      arrow(x, mid, gy - 6 - hh * .2 * ph, mid, gy - hh * (.55 + .2 * ph), '#FF9F6B', 3, 10);
+      var cl = smooth(.1, .8, pB);
+      if (cl > 0) { x.fillStyle = 'rgba(232,237,255,' + (.85 * cl) + ')'; [[0, 0, 22], [-22, 6, 15], [22, 6, 15], [0, -12, 16]].forEach(function (c) { x.beginPath(); x.arc(mid + c[0] * (.6 + .4 * cl), top + 22 + c[1], c[2] * (.5 + .5 * cl), 0, 6.283); x.fill(); }); }
+      if (pB > .6) { x.strokeStyle = 'rgba(79,216,255,.8)'; x.lineWidth = 1.5; for (var r = 0; r < 7; r++) { var rx = mid - 24 + r * 8, ry = top + 42 + ((tA * 60 + r * 13) % Math.max(8, gy - top - 50)); x.beginPath(); x.moveTo(rx, ry); x.lineTo(rx - 2, ry + 6); x.stroke(); } }
+      label(x, 'อากาศลอยตัวขึ้น เย็นลง เกิดเมฆ', mid + 30, gy - hh * .62, '#FF9F6B', sm - 1, 'left');
+    } else {
+      arrow(x, mid - 22, gy - 8, mid - hw + 10, gy - 8, '#9fe8ff', 2.5, 8); arrow(x, mid + 22, gy - 8, mid + hw - 10, gy - 8, '#9fe8ff', 2.5, 8);
+      arrow(x, mid, top + 10 + hh * .2 * ph, mid, top + hh * (.55 + .2 * ph), '#4FD8FF', 3, 10);
+      glow(x, mid - hw + 40, top + 22, 26, [255, 209, 102], .55); x.fillStyle = '#FFE08A'; x.beginPath(); x.arc(mid - hw + 40, top + 22, 9, 0, 6.283); x.fill();
+      label(x, 'อากาศจมตัวลง อุ่นและแห้ง', mid + 30, top + hh * .45, '#4FD8FF', sm - 1, 'left');
+    }
+    label(x, low ? 'ลมพัดเข้า' : 'ลมพัดออก', mid - hw * .55, gy - 14, '#9fe8ff', sm - 1);
+  }
+  var LIBB = [
+    { y: 'ซีกโลกเหนือ · หมุนทวนเข็มนาฬิกา', n: 'ไต้ฝุ่นไห่เยี่ยน (ฟิลิปปินส์ พ.ย. 2556)', d: 'หนึ่งในพายุที่แรงที่สุดที่เคยขึ้นฝั่ง ความเร็วลมราว 300 กม./ชม. คลื่นพายุซัดฝั่งสูงหลายเมตร มีผู้เสียชีวิตกว่า 6,000 คน', i: 'ไต้ฝุ่น : เกิดในมหาสมุทรแปซิฟิกตะวันตก' },
+    { y: 'ซีกโลกเหนือ · หมุนทวนเข็มนาฬิกา', n: 'ไต้ฝุ่นยางิ (ก.ย. 2567)', d: 'ขึ้นฝั่งเวียดนามแล้วอ่อนกำลังลงเป็นหย่อมความกดอากาศต่ำ แต่ยังนำฝนตกหนักจนเกิดน้ำท่วมใหญ่ที่ อ.แม่สาย จ.เชียงราย', i: 'พายุอ่อนกำลังแล้วยังนำฝนมาได้มาก' },
+    { y: 'ซีกโลกเหนือ · หมุนทวนเข็มนาฬิกา', n: 'พายุโซนร้อนปาบึก (ม.ค. 2562)', d: 'ก่อตัวในทะเลจีนใต้ ขึ้นฝั่งที่ อ.ปากพนัง จ.นครศรีธรรมราช ลมแรง คลื่นสูง ฝนตกหนักทั่วภาคใต้', i: 'พายุหมุนเกิดได้แม้ในฤดูหนาวของไทย' },
+    { y: 'ซีกโลกเหนือ · หมุนทวนเข็มนาฬิกา', n: 'ไซโคลนนาร์กีส (เมียนมา พ.ค. 2551)', d: 'เคลื่อนจากอ่าวเบงกอลขึ้นฝั่งบริเวณปากแม่น้ำอิรวดี คลื่นพายุซัดฝั่งท่วมที่ราบต่ำ มีผู้เสียชีวิตและสูญหายกว่า 130,000 คน', i: 'ไซโคลน : เกิดในมหาสมุทรอินเดีย' },
+    { y: 'ซีกโลกเหนือ · หมุนทวนเข็มนาฬิกา', n: 'เฮอร์ริเคนแคทรีนา (สหรัฐอเมริกา ส.ค. 2548)', d: 'ถล่มเมืองนิวออร์ลีนส์ คันกั้นน้ำพัง น้ำท่วมราวร้อยละ 80 ของเมือง มีผู้เสียชีวิตราว 1,800 คน', i: 'เฮอร์ริเคน : เกิดในมหาสมุทรแอตแลนติก' },
+    { y: 'ซีกโลกใต้ · หมุนตามเข็มนาฬิกา', n: 'ไซโคลนยาซี (ออสเตรเลีย ก.พ. 2554)', d: 'พายุระดับรุนแรงที่สุด ขึ้นฝั่งรัฐควีนส์แลนด์ ภาพถ่ายดาวเทียมเห็นแขนเมฆหมุนตามเข็มนาฬิกาชัดเจน ตรงข้ามกับพายุในซีกโลกเหนือ', i: 'ซีกโลกใต้ หมุนกลับทิศ' }
+  ];
+  $('libB').innerHTML = LIBB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 ลูกโลกสายลม
+  var MODES = ['โลกไม่หมุน (สมมติ)', 'โลกหมุน (ของจริง)'];
+  var BELTS = [
+    { l: 0, n: '0° เส้นศูนย์สูตร', P: 'ต่ำ', air: 'ลอยตัวขึ้น', wx: 'เมฆมาก ฝนตกชุก', ex: 'ป่าดิบชื้นแอมะซอน ลุ่มน้ำคองโก อินโดนีเซีย', up: 1 },
+    { l: 30, n: '30° เหนือ', P: 'สูง', air: 'จมตัวลง', wx: 'ท้องฟ้าแจ่มใส แห้งแล้ง', ex: 'ทะเลทรายซาฮารา คาบสมุทรอาหรับ (ซีกโลกใต้ : ทะเลทรายออสเตรเลีย)', up: 0 },
+    { l: 60, n: '60° เหนือ', P: 'ต่ำ', air: 'ลอยตัวขึ้น', wx: 'เมฆและฝนบ่อย มีพายุ', ex: 'สหราชอาณาจักร นอร์เวย์ อะแลสกาตอนใต้', up: 1 },
+    { l: 90, n: '90° ขั้วโลกเหนือ', P: 'สูง', air: 'จมตัวลง', wx: 'หนาวจัด แห้ง', ex: 'อาร์กติก กรีนแลนด์ (ขั้วโลกใต้ : แอนตาร์กติกา)', up: 0 }];
+  var WINDS = [
+    { n: 'ลมค้า', a: 0, b: 30, fN: 'ตะวันออกเฉียงเหนือ', fS: 'ตะวันออกเฉียงใต้', c: 'เซลล์แฮดลีย์', t: 'อากาศที่ผิวพื้นไหลจากความกดอากาศสูงที่ 30° กลับมาเส้นศูนย์สูตร แล้วเบี่ยงไปทางตะวันตก ลมสม่ำเสมอ เรือใบสินค้าในอดีตใช้ข้ามมหาสมุทร' },
+    { n: 'ลมตะวันตก', a: 30, b: 60, fN: 'ตะวันตกเฉียงใต้', fS: 'ตะวันตกเฉียงเหนือ', c: 'เซลล์เฟอร์เรล', t: 'อากาศที่ผิวพื้นไหลจาก 30° ไปทางขั้วโลก แล้วเบี่ยงไปทางตะวันออก พาความชื้นและพายุเข้าสู่ยุโรปและอเมริกาเหนือ' },
+    { n: 'ลมตะวันออกขั้วโลก', a: 60, b: 90, fN: 'ตะวันออกเฉียงเหนือ', fS: 'ตะวันออกเฉียงใต้', c: 'เซลล์ขั้วโลก', t: 'อากาศเย็นจัดที่จมตัวลงที่ขั้วโลกไหลออกมาทาง 60° แล้วเบี่ยงไปทางตะวันตก ลมหนาวและแห้ง' }];
+  var cm = 0, cb = 0, cw = -1, pC1 = 1, playC1 = 0;
+  function updC1() {
+    if (cm === 1 && pC1 >= 1 && cb >= 0 && !S.c1[cb]) { S.c1[cb] = 1; save(); }
+    if (cm === 1 && cw >= 0 && !S.cw[cw]) { S.cw[cw] = 1; save(); }
+    chips('modeChips', 'แบบจำลอง', MODES, cm, 'm', null, function (v) { cm = v; pC1 = 1; playC1 = 0; updC1(); drawC1(); });
+    chips('beltChips', 'แถบละติจูด', BELTS.map(function (b) { return b.n; }), cb, 'b', function (i) { return S.c1[i]; }, function (v) { cb = v; pC1 = 0; playC1 = 1; updC1(); drawC1(); });
+    chips('windChips', 'ลมประจำ', WINDS.map(function (w) { return w.n; }), cw, 'w', function (i) { return S.cw[i]; }, function (v) { cw = v; updC1(); drawC1(); });
+    $('c1Mode').textContent = MODES[cm];
+    var B = BELTS[cb], done = pC1 >= 1;
+    if (cm === 0) {
+      $('c1Name').textContent = 'ถ้าโลกไม่หมุนรอบตัวเอง';
+      $('c1P').textContent = 'ศูนย์สูตร ต่ำ'; $('c1Air').textContent = 'ขั้วโลก จมลง';
+      $('c1Wx').textContent = 'อากาศร้อนลอยขึ้นที่เส้นศูนย์สูตร ไหลไปจมตัวที่ขั้วโลกเป็นวงใหญ่วงเดียว ลมที่ผิวพื้นพัดจากขั้วโลกตรงมาเส้นศูนย์สูตร (ซีกโลกเหนือพัดมาจากทิศเหนือ)';
+      $('c1Ex').textContent = 'กดเลือก "โลกหมุน (ของจริง)" เพื่อดูว่าแรงคอริออลิสแบ่งวงใหญ่เป็น 3 วง';
+    } else if (!B) {
+      $('c1Name').textContent = 'เลือกแถบละติจูด'; $('c1P').textContent = '?'; $('c1Air').textContent = '?';
+      $('c1Wx').textContent = 'แตะแถบละติจูด แล้วกด "ปล่อยบอลลูน"'; $('c1Ex').textContent = '-';
+    } else {
+      $('c1Name').textContent = 'แถบ ' + B.n;
+      $('c1P').textContent = done ? B.P : '?'; $('c1Air').textContent = done ? B.air : '?';
+      $('c1Wx').textContent = done ? B.wx : 'กด "ปล่อยบอลลูน" แล้วดูว่าบอลลูนลอยขึ้นหรือจมลง';
+      $('c1Ex').textContent = done ? B.ex : '-';
+    }
+    var Wd = WINDS[cw];
+    $('c1WName').textContent = cw < 0 ? 'แตะชื่อลมประจำเพื่อดูรายละเอียด' : Wd.n + ' (' + Wd.a + '–' + Wd.b + '°)';
+    $('c1WTxt').textContent = cw < 0 ? '' : (cm === 0 ? 'ในแบบโลกไม่หมุนยังไม่มีลมนี้ เปลี่ยนเป็น "โลกหมุน" ก่อน' :
+      'ซีกโลกเหนือพัดมาจากทิศ' + Wd.fN + ' · ซีกโลกใต้พัดมาจากทิศ' + Wd.fS + ' · ' + Wd.c + ' · ' + Wd.t);
+    $('playC1').textContent = playC1 ? 'บอลลูนกำลังเคลื่อน' : 'ปล่อยบอลลูน';
+    $('logC1').innerHTML = BELTS.map(function (b, i) { var r = S.c1[i];
+      return '<tr' + (i === cb ? ' class="cur"' : '') + '><td class="n">' + b.n + '</td><td>' + (r ? b.P : '-') + '</td><td>' + (r ? b.air : '-') + '</td><td>' + (r ? b.wx : '-') + '</td></tr>'; }).join('');
+    $('logCW').innerHTML = WINDS.map(function (w, i) { var r = S.cw[i];
+      return '<tr' + (i === cw ? ' class="cur"' : '') + '><td class="n">' + w.n + '</td><td>' + (r ? w.a + '–' + w.b + '°' : '-') + '</td><td>' + (r ? w.fN : '-') + '</td><td>' + (r ? w.fS : '-') + '</td></tr>'; }).join('');
+    $('recC1Msg').textContent = cm === 0 ? 'แบบโลกไม่หมุนไม่บันทึกผล เปลี่ยนเป็น "โลกหมุน" เพื่อบันทึก' : 'บันทึกแล้ว แถบละติจูด ' + BELTS.filter(function (b, i) { return S.c1[i]; }).length + ' / 4 · ลมประจำ ' + WINDS.filter(function (w, i) { return S.cw[i]; }).length + ' / 3';
+    updProg();
+  }
+  $('playC1').onclick = function () { pC1 = 0; playC1 = 1; updC1(); };
+  var CELLS = [
+    [{ n: 'เซลล์เดียว (โลกไม่หมุน)', col: [255, 209, 102], pts: [[3, 0], [3, 1], [87, 1], [87, 0]] }],
+    [{ n: 'เซลล์แฮดลีย์', col: [255, 209, 102], pts: [[3, 0], [3, 1], [27, 1], [27, 0]] },
+      { n: 'เซลล์เฟอร์เรล', col: [79, 216, 255], pts: [[33, 0], [57, 0], [57, 1], [33, 1]] },
+      { n: 'เซลล์ขั้วโลก', col: [167, 123, 255], pts: [[87, 1], [87, 0], [63, 0], [63, 1]] }]];
+  function cellPath(c, sgn, map) {
+    var P = [], n = c.pts.length;
+    for (var i = 0; i < n; i++) { var a = c.pts[i], b = c.pts[(i + 1) % n];
+      for (var k = 0; k < 14; k++) { var u = k / 14; P.push(map(sgn * (a[0] + (b[0] - a[0]) * u), a[1] + (b[1] - a[1]) * u)); } }
+    return P;
+  }
+  function windVec(lat, mode) {   // ทิศที่ลมผิวพื้นเคลื่อนไปบนภาพ (dx ขวา, dy ลง)
+    var a = Math.abs(lat), n = lat > 0;
+    if (mode === 0) return [0, n ? 1 : -1];
+    if (a < 30 || a >= 60) return [-1, n ? .6 : -.6];
+    return [1, n ? -.6 : .6];
+  }
+  function drawC1() {
+    var f = fit($('cvC1'), .78, 300, 470), x = f.x, W = f.W, H = f.H; bg(x, W, H, 50);
+    var sm = W < 520 ? 10 : 12, wide = W >= 500;
+    var R = Math.max(60, Math.min((H / 2 - 20) / 1.38, W * (wide ? .27 : .29))), D = R * .38, cx = wide ? W * .36 : W * .4, cy = H / 2;
+    function map(lat, lev) { var r = R + 5 + lev * (D - 10); return [cx + r * Math.cos(lat * RAD), cy - r * Math.sin(lat * RAD)]; }
+    glow(x, cx, cy, R * 1.3, [79, 216, 255], .15);
+    var g = x.createRadialGradient(cx - R * .3, cy - R * .3, R * .1, cx, cy, R); g.addColorStop(0, '#3f8fd6'); g.addColorStop(1, '#0f3166');
+    x.fillStyle = g; x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.fill();
+    x.save(); x.beginPath(); x.arc(cx, cy, R, 0, 6.283); x.clip();
+    if (cm === 1 && cw >= 0) { var Wd = WINDS[cw]; x.fillStyle = 'rgba(255,209,102,.18)';
+      [1, -1].forEach(function (sg) { var y1 = cy - R * Math.sin(sg * Wd.a * RAD), y2 = cy - R * Math.sin(sg * Wd.b * RAD); x.fillRect(cx - R, Math.min(y1, y2), 2 * R, Math.abs(y2 - y1)); }); }
+    x.restore();
+    [-60, -30, 0, 30, 60].forEach(function (b) { var y = cy - R * Math.sin(b * RAD), hw = R * Math.cos(b * RAD);
+      x.strokeStyle = b === 0 ? 'rgba(232,237,255,.75)' : 'rgba(154,166,207,.45)'; x.lineWidth = b === 0 ? 1.5 : 1; x.beginPath(); x.moveTo(cx - hw, y); x.lineTo(cx + hw, y); x.stroke();
+      x.font = '600 ' + sm + 'px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText(Math.abs(b) + '°' + (b > 0 ? ' เหนือ' : b < 0 ? ' ใต้' : ''), cx - hw - 6, y + 4); });
+    if (cm === 1 && cb >= 0) { var bl = BELTS[cb].l, yb = cy - R * Math.sin(bl * RAD), hb = R * Math.cos(bl * RAD);
+      x.strokeStyle = '#FFD166'; x.lineWidth = 3; x.beginPath(); x.moveTo(cx - hb - 2, yb); x.lineTo(cx + hb + 2, yb); x.stroke(); if (bl === 90) glow(x, cx, yb, 14, [255, 209, 102], .8); }
+    // ลูกศรลมที่ผิวพื้น
+    var zones = cm === 0 ? [[45, 3], [-45, 3], [12, 3], [-12, 3], [75, 1], [-75, 1]] : [[15, 3], [45, 3], [75, 1], [-15, 3], [-45, 3], [-75, 1]];
+    var al = R * .17;
+    zones.forEach(function (z, zi) { var lat = z[0], y = cy - R * Math.sin(lat * RAD), hw = R * Math.cos(lat * RAD), v = windVec(lat, cm), m = Math.hypot(v[0], v[1]);
+      for (var k = 0; k < z[1]; k++) {
+        var xx = z[1] === 1 ? cx : cx + hw * (-.55 + .55 * k), ph = ((tA * .5 + k * .37 + zi * .21) % 1);
+        var ox = v[0] / m * al * (ph - .5) * .6, oy = v[1] / m * al * (ph - .5) * .6, x1 = xx - v[0] / m * al / 2 + ox, y1 = y - v[1] / m * al / 2 + oy;
+        x.globalAlpha = .45 + .55 * Math.sin(ph * Math.PI);
+        arrow(x, x1, y1, x1 + v[0] / m * al, y1 + v[1] / m * al, '#E8EDFF', 2.2, 7); x.globalAlpha = 1; } });
+    // เซลล์การหมุนเวียนที่ขอบขวา
+    x.fillStyle = 'rgba(79,216,255,.06)'; x.beginPath(); x.arc(cx, cy, R + D, -Math.PI / 2, Math.PI / 2); x.arc(cx, cy, R + 2, Math.PI / 2, -Math.PI / 2, true); x.closePath(); x.fill();
+    CELLS[cm].forEach(function (c) { [1, -1].forEach(function (sgn) {
+      var P = cellPath(c, sgn, map), hi = cm === 1 && cw >= 0 && WINDS[cw].c === c.n;
+      x.strokeStyle = rgba(c.col, hi ? .95 : .6); x.lineWidth = hi ? 3 : 2; x.beginPath(); P.forEach(function (p, i) { if (i) x.lineTo(p[0], p[1]); else x.moveTo(p[0], p[1]); }); x.closePath(); x.stroke();
+      for (var e = 0; e < 4; e++) { var i0 = e * 14 + 6; arrow(x, P[i0][0], P[i0][1], P[i0 + 2][0], P[i0 + 2][1], rgba(c.col, .95), 2, 7); }
+      for (var d = 0; d < 3; d++) { var u = (tA * .09 + d / 3) % 1, q = P[Math.floor(u * P.length)]; x.fillStyle = rgba(c.col, 1); x.beginPath(); x.arc(q[0], q[1], 3, 0, 6.283); x.fill(); }
+    }); });
+    if (wide) CELLS[cm].forEach(function (c) { var m = (c.pts[0][0] + c.pts[2][0]) / 2, p = map(m, 1.15); label(x, c.n, p[0] + 6, p[1] + 4, rgba(c.col, 1), sm, 'left'); });
+    var PL = cm === 0 ? [[0, 'L'], [90, 'H'], [-90, 'H']] : [[0, 'L'], [30, 'H'], [60, 'L'], [90, 'H'], [-30, 'H'], [-60, 'L'], [-90, 'H']];
+    PL.forEach(function (z) { var p = map(z[0], 1), r = R + D + 13, X = cx + r * Math.cos(z[0] * RAD), Y = cy - r * Math.sin(z[0] * RAD) + 5;
+      if (Math.abs(z[0]) === 90) { X = cx - 14; Y = cy - Math.sign(z[0]) * (R + D - 8) + 5; }
+      label(x, z[1], X, Y, z[1] === 'L' ? '#FF6B8A' : '#4FD8FF', 15); });
+    // บอลลูน
+    if (cm === 1 && cb >= 0 && pC1 < 1.001) { var B = BELTS[cb], lev = B.up ? .05 + .9 * pC1 : .95 - .9 * pC1, bp = map(B.l === 90 ? 88 : B.l === 0 ? 1.5 : B.l, lev);
+      x.strokeStyle = '#E8EDFF'; x.lineWidth = 1; x.beginPath(); x.moveTo(bp[0], bp[1] + 6); x.lineTo(bp[0], bp[1] + 13); x.stroke();
+      glow(x, bp[0], bp[1], 14, [255, 107, 138], .5); x.fillStyle = '#FF6B8A'; x.beginPath(); x.arc(bp[0], bp[1], 6, 0, 6.283); x.fill(); }
+    label(x, cm === 0 ? 'แบบจำลอง : โลกไม่หมุน' : 'แบบจำลอง : โลกหมุน 3 เซลล์', 8, 16, cm === 0 ? '#FF9F6B' : '#5EF2A5', sm + 1, 'left');
+  }
+
+  // ================================================================ ภารกิจ C ขั้นที่ 2 ลมมรสุม
+  var LAND = [
+    [[60, 25.3], [67, 24.6], [69, 22.5], [72.6, 21.3], [73, 19], [74, 16], [75.5, 12.5], [76.5, 9.5], [77.5, 8.1], [78.3, 8.9], [79.3, 10.3], [80.3, 13.3], [80.2, 15.5], [82.3, 16.6], [84.5, 18.8], [86.8, 20.5], [87.5, 21.8], [89, 21.7], [90.5, 22.3], [91.8, 22.3], [92.3, 20.7], [93.7, 19], [94.4, 16.2], [95.4, 15.8], [97.6, 16.5], [98.2, 13.5], [98.6, 10.5], [98.3, 8], [99.2, 7.5], [100.3, 6.4], [100.4, 4.8], [101.3, 2.8], [103.4, 1.4], [104.2, 1.5], [103.4, 3.8], [103.1, 5.5], [102.1, 6.2], [100.5, 7.4], [100, 9.2], [99.2, 10.6], [99.6, 12.2], [100.1, 13.5], [100.9, 12.7], [102.4, 12.1], [103.5, 10.6], [104.8, 8.6], [106.6, 9.6], [109, 11.6], [109.3, 13.5], [108.6, 15.4], [106.6, 17.5], [105.8, 19.2], [106.6, 20.4], [108, 21.5], [110, 21.2], [111.3, 21.5], [113.5, 22.3], [116.5, 22.9], [118.8, 24.6], [120.2, 26.9], [121.7, 29.5], [121.9, 31], [120.9, 32.6], [119.4, 34.4], [120.3, 36.2], [122.4, 37.2], [121.3, 37.7], [118.9, 37.5], [119.2, 39.4], [121.4, 40], [60, 40]],
+    [[79.8, 9.8], [81.3, 8.5], [81.8, 7.4], [81.2, 6.1], [80.1, 6], [79.8, 8]],
+    [[95.3, 5.6], [97.5, 5.2], [100.3, 2.2], [102.3, .4], [104, -1], [106, -3], [105.8, -5.8], [104.5, -5.9], [102.3, -4], [100.4, -1], [98.7, 1.7]],
+    [[109, 1.5], [111.5, 2.5], [113, 3.2], [115.4, 5.3], [117, 7], [119, 5.3], [118, 4.3], [117.8, 1], [116.5, -1.5], [116, -3.8], [114.5, -3.5], [111, -3], [110, -1.2]],
+    [[105.2, -6.8], [106.5, -6], [108.5, -6.7], [110.5, -6.9], [112.5, -6.9], [114.5, -7.8], [112, -8.3], [108.5, -7.8], [106, -7.4]],
+    [[119.5, -5.5], [120.5, -1.5], [119.6, .5], [120.5, 1.2], [124.8, 1.5], [121.5, .3], [123.3, -.9], [121.8, -1.8], [122.8, -4.6], [121.3, -4.8], [120.5, -3.2]],
+    [[120, 18.5], [122.2, 18.4], [122, 16], [121.5, 14.2], [124, 13.5], [123.5, 12.7], [120.6, 14.2], [120, 16]],
+    [[122, 8], [124, 8.5], [126.5, 9.3], [126, 6.5], [125.3, 5.8], [124, 6.5], [122, 7]],
+    [[108.7, 19.2], [110.5, 20.1], [111, 19.6], [110, 18.3], [109, 18.4]],
+    [[120.1, 22.6], [121, 25.1], [121.9, 24.9], [121.4, 23], [120.8, 21.9]],
+    [[131, -1.2], [134, -.8], [138, -1.6], [141, -2.6], [145, -4.2], [147.5, -6.3], [147, -8], [143.5, -9], [141, -9.1], [138, -8.3], [137.8, -5.2], [133, -4], [132, -2.7]],
+    [[114, -22], [114, -21.8], [116.7, -20.6], [119.5, -20], [121.3, -19.5], [122.7, -17.3], [125.3, -14.8], [127, -13.8], [129.6, -14.9], [130.3, -12.4], [132.6, -11.5], [135, -12.2], [136.7, -12.2], [135.7, -14.6], [136.8, -15.9], [139.4, -17.4], [140.8, -17.4], [141.6, -14], [142.5, -10.7], [143.5, -14], [145.4, -14.9], [146.3, -18.9], [147.6, -19.9], [148.8, -20.6], [149.5, -22], [114, -22]]];
+  var LON0 = 62, LON1 = 150, LAT0 = -22, LAT1 = 40;
+  var MONS = [
+    { n: 'มกราคม', itcz: -9, ans: 0, name: 'ลมมรสุมตะวันออกเฉียงเหนือ', per: 'ช่วงกลางเดือนตุลาคม ถึง กุมภาพันธ์ (ฤดูหนาวของไทย)', wx: 'อากาศเย็นและแห้ง ท้องฟ้าโปร่ง (ภาคใต้ฝั่งอ่าวไทยมีฝนตก เพราะลมพัดผ่านทะเลมา)',
+      why: 'ช่วงนี้ซีกโลกเหนือเป็นฤดูหนาว แผ่นดินจีนและไซบีเรียเย็นจัด เกิดความกดอากาศสูง อากาศไหลลงมาทางใต้และเบี่ยงไปทางขวา (ตะวันตก) จึงพัดมาจากทิศตะวันออกเฉียงเหนือ · สัปดาห์นี้ (ก.พ.) ประเทศไทยยังอยู่ในช่วงนี้',
+      H: [[106, 34, 'H', 'ความกดอากาศสูง (จีน ไซบีเรีย)'], [128, -16, 'L', 'ความกดอากาศต่ำ (ออสเตรเลียตอนเหนือ)']] },
+    { n: 'กรกฎาคม', itcz: 21, ans: 1, name: 'ลมมรสุมตะวันตกเฉียงใต้', per: 'ช่วงกลางเดือนพฤษภาคม ถึง กลางเดือนตุลาคม (ฤดูฝนของไทย)', wx: 'นำความชื้นจากมหาสมุทรอินเดีย ฝนตกชุกทั่วประเทศ (ฝั่งอันดามันฝนชุกมาก)',
+      why: 'ช่วงนี้แผ่นดินเอเชียร้อนจัด เกิดความกดอากาศต่ำ ลมค้าตะวันออกเฉียงใต้จากซีกโลกใต้พัดข้ามเส้นศูนย์สูตร แล้วเบี่ยงไปทางขวาในซีกโลกเหนือ กลายเป็นลมตะวันตกเฉียงใต้',
+      H: [[71, 30, 'L', 'ความกดอากาศต่ำ (อินเดีย ปากีสถาน)'], [84, -17, 'H', 'ความกดอากาศสูง (มหาสมุทรอินเดียใต้)']] }];
+  var DIR8 = ['ตะวันออกเฉียงเหนือ', 'ตะวันตกเฉียงใต้', 'ตะวันออกเฉียงใต้', 'ตะวันตกเฉียงเหนือ'];
+  var cmon = 0;
+  function monVel(lon, lat, m) {   // ทิศที่ลมเคลื่อนไป (องศาแบบคณิตศาสตร์ ตะวันออก = 0) และความแรง
+    var M = MONS[m], it = M.itcz, a, s = 1;
+    if (m === 0) {
+      if (lat > 3) a = 222; else if (lat > -3) a = 222 + (3 - lat) / 6 * 88; else a = 310;
+      if (lat < it - 1.5) { a = 140; s = .8; }
+    } else {
+      if (lat < -3) a = 128; else if (lat < 5) a = 128 - (lat + 3) / 8 * 98; else a = 30;
+      if (lat > it + 1.5) { a = 100; s = .35; }
+    }
+    s *= .25 + .75 * smooth(0, 6, Math.abs(lat - it));
+    return [Math.cos(a * RAD) * s, Math.sin(a * RAD) * s];
+  }
+  var PART = []; for (var pi = 0; pi < 240; pi++) PART.push([LON0 + hash(pi, 7) * (LON1 - LON0), LAT0 + hash(pi, 8) * (LAT1 - LAT0), hash(pi, 9)]);
+  function stepC2(dt) {
+    PART.forEach(function (p, i) { var v = monVel(p[0], p[1], cmon); p[0] += v[0] * dt * 6; p[1] += v[1] * dt * 6; p[2] += dt * .25;
+      if (p[2] > 1 || p[0] < LON0 || p[0] > LON1 || p[1] < LAT0 || p[1] > LAT1) { p[0] = LON0 + Math.random() * (LON1 - LON0); p[1] = LAT0 + Math.random() * (LAT1 - LAT0); p[2] = 0; } });
+  }
+  function updC2() {
+    chips('monChips', 'เดือน', MONS.map(function (m) { return m.n; }), cmon, 'n', function (i) { return S.c2[i]; }, function (v) { cmon = v; updC2(); drawC2(); });
+    var M = MONS[cmon], rec = !!S.c2[cmon];
+    $('c2Mon').textContent = M.n;
+    askUI('c2Ask', DIR8, M.ans, rec, function () { S.c2[cmon] = 1; save(); updC2(); return true; });
+    $('c2Name').textContent = rec ? M.name : 'ดูลูกศรสีทองที่ประเทศไทย';
+    $('c2Per').textContent = rec ? M.per : '';
+    $('c2Wx').textContent = rec ? M.wx : 'ลมพัด "มาจาก" ทิศใด ให้ดูว่าลูกศรพุ่งออกมาจากด้านไหน';
+    $('c2Why').textContent = rec ? M.why : '';
+    $('logC2').innerHTML = MONS.map(function (m, i) { var r = S.c2[i];
+      return '<tr' + (i === cmon ? ' class="cur"' : '') + '><td class="n">' + m.n + '</td><td>' + (r ? m.name : '-') + '</td><td>' + (r ? m.per.replace(/ \(.*\)/, '') : '-') + '</td><td>' + (r ? m.wx.replace(/ \(.*\)/, '') : '-') + '</td></tr>'; }).join('');
+    updProg();
+  }
+  function drawC2() {
+    var f = fit($('cvC2'), .74, 250, 520), x = f.x, W = f.W, H = f.H;
+    x.fillStyle = '#0a1a3d'; x.fillRect(0, 0, W, H);
+    var X = function (lon) { return (lon - LON0) / (LON1 - LON0) * W; }, Y = function (lat) { return (LAT1 - lat) / (LAT1 - LAT0) * H; };
+    var sm = W < 520 ? 10 : 12, M = MONS[cmon];
+    x.fillStyle = '#2d4a2a'; x.strokeStyle = '#5c7f4f'; x.lineWidth = 1;
+    LAND.forEach(function (poly) { x.beginPath(); poly.forEach(function (p, i) { if (i) x.lineTo(X(p[0]), Y(p[1])); else x.moveTo(X(p[0]), Y(p[1])); }); x.closePath(); x.fill(); x.stroke(); });
+    [-20, -10, 10, 20, 30].forEach(function (l) { x.strokeStyle = 'rgba(154,166,207,.18)'; x.beginPath(); x.moveTo(0, Y(l)); x.lineTo(W, Y(l)); x.stroke(); });
+    x.setLineDash([6, 5]); x.strokeStyle = 'rgba(232,237,255,.7)'; x.lineWidth = 1.4; x.beginPath(); x.moveTo(0, Y(0)); x.lineTo(W, Y(0)); x.stroke(); x.setLineDash([]);
+    label(x, 'เส้นศูนย์สูตร', W - 6, Y(0) - 5, '#E8EDFF', sm, 'right');
+    var gI = x.createLinearGradient(0, Y(M.itcz + 3), 0, Y(M.itcz - 3)); gI.addColorStop(0, 'rgba(255,107,138,0)'); gI.addColorStop(.5, 'rgba(255,107,138,.35)'); gI.addColorStop(1, 'rgba(255,107,138,0)');
+    x.fillStyle = gI; x.fillRect(0, Y(M.itcz + 3), W, Y(M.itcz - 3) - Y(M.itcz + 3));
+    label(x, 'แถบความกดอากาศต่ำเขตร้อน (ร่องฝน)', 8, Y(M.itcz) + 4, '#FF6B8A', sm, 'left');
+    x.lineCap = 'round';
+    PART.forEach(function (p) { var v = monVel(p[0], p[1], cmon), a = Math.sin(Math.PI * clamp(p[2], 0, 1));
+      x.strokeStyle = 'rgba(232,237,255,' + (.85 * a) + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(p[0]), Y(p[1])); x.lineTo(X(p[0] - v[0] * 2.2), Y(p[1] - v[1] * 2.2)); x.stroke();
+      x.fillStyle = 'rgba(255,255,255,' + (.95 * a) + ')'; x.beginPath(); x.arc(X(p[0]), Y(p[1]), 2.2, 0, 6.283); x.fill(); });
+    x.lineCap = 'butt';
+    M.H.forEach(function (h) { label(x, h[2], X(h[0]), Y(h[1]) + 6, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', 22); label(x, h[3], X(h[0]), Y(h[1]) + 22, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', sm); });
+    label(x, 'มหาสมุทรอินเดีย', X(80), Y(-6), 'rgba(154,166,207,.9)', sm); label(x, 'อ่าวเบงกอล', X(89), Y(15), 'rgba(154,166,207,.9)', sm); label(x, 'ทะเลจีนใต้', X(113), Y(13), 'rgba(154,166,207,.9)', sm);
+    var tx = X(100.5), ty = Y(14.5), v = monVel(100.5, 14.5, cmon), m = Math.hypot(v[0], v[1]), L = Math.max(46, W * .09);
+    glow(x, tx, ty, 22, [255, 209, 102], .55); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(tx, ty, 5, 0, 6.283); x.fill();
+    arrow(x, tx - v[0] / m * L, ty + v[1] / m * L, tx - v[0] / m * 8, ty + v[1] / m * 8, '#FFD166', 4, 12);
+    label(x, 'ประเทศไทย', tx + 10, ty - 10, '#FFD166', sm + 1, 'left');
+    label(x, 'เดือน' + M.n, 8, 16, '#4FD8FF', sm + 2, 'left');
+  }
+
+  // ---------------------------------------------------------------- ความก้าวหน้าภารกิจ C
+  function updProg() {
+    var a = BELTS.filter(function (b, i) { return S.c1[i]; }).length, b = WINDS.filter(function (w, i) { return S.cw[i]; }).length, c = MONS.filter(function (m, i) { return S.c2[i]; }).length;
+    $('progC').innerHTML = 'ภารกิจ C บันทึกแล้ว : แถบละติจูด <b>' + a + '/4</b> · ลมประจำ <b>' + b + '/3</b> · มรสุม <b>' + c + '/2</b>';
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส
+  var CL = [
+    { L: 'H', q: 'อากาศที่เคลื่อนที่ในซีกโลกเหนือเบี่ยงไปทางใด', o: ['ไม่เบี่ยงเลย', 'เบี่ยงไปทางซ้ายของทิศที่เคลื่อนที่', 'เบี่ยงไปทางขวาของทิศที่เคลื่อนที่', 'เบี่ยงขึ้นสู่อวกาศ'], a: 2,
+      w: 'โลกหมุนจากตะวันตกไปตะวันออก อากาศที่เคลื่อนที่ในซีกโลกเหนือจึงเบี่ยงไปทางขวา ซีกโลกใต้เบี่ยงไปทางซ้าย เรียกว่าผลของแรงคอริออลิส' },
+    { L: 'A', q: 'บริเวณเส้นศูนย์สูตร อากาศเป็นอย่างไร', o: ['ร้อน ลอยตัวขึ้น ความกดอากาศต่ำ ฝนตกชุก', 'เย็น จมตัวลง ความกดอากาศสูง', 'แห้งแล้งที่สุดในโลก', 'มีลมตะวันตกพัดแรงตลอดเวลา'], a: 0,
+      w: 'เส้นศูนย์สูตรได้รับแสงอาทิตย์เกือบตั้งฉากทั้งปี อากาศร้อนชื้นลอยตัวขึ้น เย็นลงจนเกิดเมฆและฝน จึงมีป่าดิบชื้น' },
+    { L: 'D', q: 'ทะเลทรายซาฮาราและคาบสมุทรอาหรับอยู่ใกล้ละติจูด 30° เหนือ เพราะอะไร', o: ['อยู่ใกล้ดวงอาทิตย์มากที่สุด', 'อากาศจมตัวลง ความกดอากาศสูง จึงไม่ค่อยเกิดเมฆและฝน', 'มีพายุพัดผ่านตลอดปี', 'อากาศลอยตัวขึ้น เกิดฝนตลอดปี'], a: 1,
+      w: 'อากาศที่ลอยขึ้นจากเส้นศูนย์สูตรไหลมาจมตัวลงแถบละติจูด 30° อากาศที่จมลงจะอุ่นและแห้ง ทะเลทรายใหญ่ของโลกจึงอยู่ในแถบนี้ทั้งซีกโลกเหนือและใต้' },
+    { L: 'L', q: 'ลมค้าในซีกโลกเหนือพัดมาจากทิศตะวันออกเฉียงเหนือ เพราะอะไร', o: ['อากาศจากละติจูด 30° พัดกลับมาเส้นศูนย์สูตร แล้วเบี่ยงไปทางขวา', 'ภูเขาบังลมจากทิศอื่นไว้', 'ดวงอาทิตย์ขึ้นทางทิศตะวันออก', 'เป็นลมทะเลที่พัดเข้าฝั่ง'], a: 0,
+      w: 'อากาศที่ผิวพื้นไหลจากความกดอากาศสูงที่ 30° ไปความกดอากาศต่ำที่เส้นศูนย์สูตร (ไปทางใต้) แล้วเบี่ยงไปทางขวา (ตะวันตก) จึงพัดมาจากทิศตะวันออกเฉียงเหนือ' },
+    { L: 'E', q: 'พายุไต้ฝุ่นในทะเลจีนใต้และมหาสมุทรแปซิฟิกตะวันตก ลมหมุนอย่างไร', o: ['ตามเข็มนาฬิกา พัดออกจากศูนย์กลาง', 'ไม่หมุน พัดตรงเข้าศูนย์กลาง', 'ตามเข็มนาฬิกา พัดเข้าหาศูนย์กลาง', 'ทวนเข็มนาฬิกา พัดเข้าหาศูนย์กลาง'], a: 3,
+      w: 'ไต้ฝุ่นเป็นศูนย์กลางความกดอากาศต่ำในซีกโลกเหนือ ลมพัดเข้าหาศูนย์กลางแล้วเบี่ยงไปทางขวา จึงหมุนวนทวนเข็มนาฬิกา (ซีกโลกใต้หมุนตามเข็มนาฬิกา)' },
+    { L: 'Y', q: 'ฤดูฝนของประเทศไทย (กลางเดือนพฤษภาคม – กลางเดือนตุลาคม) เกิดจากลมใดเป็นหลัก', o: ['ลมมรสุมตะวันออกเฉียงเหนือจากประเทศจีน', 'ลมตะวันออกขั้วโลก', 'ลมมรสุมตะวันตกเฉียงใต้จากมหาสมุทรอินเดีย', 'ลมบกที่พัดออกสู่ทะเล'], a: 2,
+      w: 'ฤดูร้อนของซีกโลกเหนือ แผ่นดินเอเชียร้อนกว่ามหาสมุทร ลมจากมหาสมุทรอินเดียพัดข้ามเส้นศูนย์สูตรแล้วเบี่ยงขวา กลายเป็นลมมรสุมตะวันตกเฉียงใต้ นำความชื้นมาตกเป็นฝน' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- คลังภูมิอากาศ
+  var LIBC = [
+    { y: '0° · ความกดอากาศต่ำ', n: 'ป่าดิบชื้นแอมะซอน อินโดนีเซีย', d: 'อากาศร้อนชื้นลอยตัวขึ้นทุกวัน ฝนตกชุกเกือบทั้งปี ลมที่ผิวพื้นอ่อนมาก นักเดินเรือเรียกเขตนี้ว่า doldrums (เขตลมสงบ)', i: 'เซลล์แฮดลีย์ ขาขึ้น' },
+    { y: '30° · ความกดอากาศสูง', n: 'ทะเลทรายซาฮารา อาหรับ ออสเตรเลีย', d: 'อากาศจมตัวลง อุ่นและแห้ง ไม่ค่อยเกิดเมฆ ทะเลทรายใหญ่ของโลกจึงเรียงตัวใกล้ละติจูด 20–30° ทั้งซีกโลกเหนือและใต้', i: 'เซลล์แฮดลีย์ ขาลง' },
+    { y: '0–30° · ลมค้า', n: 'เส้นทางเรือใบข้ามมหาสมุทร', d: 'เรือใบจากยุโรปล่องลงใต้ไปใช้ลมค้าพัดข้ามมหาสมุทรแอตแลนติกไปทวีปอเมริกา แล้วขึ้นเหนือไปใช้ลมตะวันตกพัดกลับยุโรป', i: 'ขาไป : ลมค้า · ขากลับ : ลมตะวันตก' },
+    { y: '30–60° · ลมตะวันตก', n: 'ยุโรปตะวันตก สหราชอาณาจักร', d: 'ลมตะวันตกพัดความชื้นจากมหาสมุทรแอตแลนติกเข้าฝั่ง ฝนตกกระจายเกือบตลอดปี เที่ยวบินจากอเมริกาไปยุโรปจึงใช้เวลาน้อยกว่าขากลับ', i: 'เซลล์เฟอร์เรล' },
+    { y: '60–90° · ลมตะวันออกขั้วโลก', n: 'อาร์กติก แอนตาร์กติกา', d: 'อากาศเย็นจัดจมตัวลงที่ขั้วโลก ความกดอากาศสูง หนาวและแห้งมาก แอนตาร์กติกาจึงเป็นทะเลทรายเย็นที่ใหญ่ที่สุดในโลก', i: 'เซลล์ขั้วโลก' },
+    { y: '14° เหนือ · มรสุม', n: 'ประเทศไทย', d: 'อยู่ในเขตลมค้า แต่แผ่นดินเอเชียกับมหาสมุทรร้อนไม่เท่ากันตามฤดู ลมจึงเปลี่ยนทิศเป็นลมมรสุมตะวันออกเฉียงเหนือ (เย็น แห้ง) และลมมรสุมตะวันตกเฉียงใต้ (ฝนชุก)', i: 'ฤดูหนาว และฤดูฝนของไทย' }
+  ];
+  $('libC').innerHTML = LIBC.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawA1(); drawA2(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') {
+      if (playA1) { pA1 = Math.min(1, pA1 + dt / 3); if (pA1 >= 1) playA1 = 0; updA1(); }
+      if (playA2) { pA2 = Math.min(1, pA2 + dt / 3); if (pA2 >= 1) playA2 = 0; updA2(); }
+      drawA1(); drawA2();
+    }
+    if (tab === 'B') { if (playB) { pB = Math.min(1, pB + dt / 8); if (pB >= 1) playB = 0; updB(); } drawB(); }
+    if (tab === 'C') { if (playC1) { pC1 = Math.min(1, pC1 + dt / 2.5); if (pC1 >= 1) playC1 = 0; updC1(); } stepC2(dt); drawC1(); drawC2(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA1(); updA2(); updB(); updC1(); updC2(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_A2 = { DISK: DISK, SPIN: SPIN, diskDev: diskDev, LATS: LATS, corF: corF, devA: devA, HEMI: HEMI, spinB: spinB, flowB: flowB, airB: airB, wxB: wxB,
+    BELTS: BELTS, WINDS: WINDS, MONS: MONS, CL: CL,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    tick: function (t) { tA = t; for (var i = 0; i < 60; i++) stepC2(.05); },
+    setA1: function (k, p) { playA1 = 0; dk = k; pA1 = p; updA1(); drawA1(); },
+    setA2: function (i, d, p) { playA2 = 0; la = i; dr = d; pA2 = p; updA2(); drawA2(); },
+    setB: function (h, c, p, t) { playB = 0; bh = h; bc = c; pB = p; if (t != null) tA = t; updB(); drawB(); },
+    setC1: function (m, b, w, p) { playC1 = 0; cm = m; cb = b; cw = w; pC1 = p; updC1(); drawC1(); },
+    setC2: function (m) { cmon = m; updC2(); drawC2(); },
+    recAll: function () { DISK.forEach(function (d, i) { S.a1[i] = 1; }); LATS.forEach(function (z, i) { S.a2[i] = 1; }); WSB.forEach(function (z) { S.b[z] = 1; });
+      BELTS.forEach(function (b, i) { S.c1[i] = 1; }); WINDS.forEach(function (w, i) { S.cw[i] = 1; }); MONS.forEach(function (m, i) { S.c2[i] = 1; });
+      CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA1(); updA2(); updB(); updC1(); updC2(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
