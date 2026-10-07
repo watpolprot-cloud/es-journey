@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>G5 ภารกิจศูนย์รับมือแผ่นดินไหวและสึนามิ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง G5 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-G4) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b3a5e44, transparent), radial-gradient(900px 500px at 0% 110%, #5a3a1c44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--orange); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+.star-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--gold); border-radius: 999px; padding: 0 10px; margin-left: 4px; letter-spacing: 0; vertical-align: 1px; }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip:disabled { opacity: .35; cursor: default; }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 8px; }
+.lvl { font-family: var(--head); font-weight: 700; font-size: 15px; border-radius: 999px; padding: 0 10px; display: inline-block; }
+.lvl.y { background: #5ef2a522; color: var(--ok); border: 1px solid var(--ok); }
+.lvl.m { background: #ffd1661c; color: var(--gold); border: 1px solid var(--gold); }
+.lvl.n { background: #ff6b8a1a; color: var(--err); border: 1px solid var(--err); }
+.mmi { font-family: var(--head); font-weight: 700; font-size: 30px; line-height: 1; border-radius: 10px; padding: 4px 12px; display: inline-block; color: var(--ink); min-width: 70px; text-align: center; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+.leg i.box { width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 4px; }
+.pick.two { grid-template-columns: 1fr 1fr; }
+.pick.one { grid-template-columns: 1fr; }
+.pick.one button { text-align: left; padding: 7px 10px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FFD166, #FF6B8A); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.ev.good .n { color: var(--ok); }
+.guide { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+.guide div { border-radius: 10px; padding: 6px 9px; font-size: 14px; line-height: 1.35; background: #0b1233aa; border: 1.5px solid var(--line); }
+.guide b { font-family: var(--head); display: block; font-size: 15px; }
+.guide .k1 { border-color: #FFD166; } .guide .k1 b { color: #FFD166; }
+.guide .k2 { border-color: #FF9F6B; } .guide .k2 b { color: #FF9F6B; }
+.guide .k3 { border-color: #4FD8FF; } .guide .k3 b { color: #4FD8FF; }
+.guide .k4 { border-color: #3fbf7f; } .guide .k4 b { color: #5EF2A5; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .guide { grid-template-columns: 1fr 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .pick { grid-template-columns: 1fr; }
+  .pick.two { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · G5 <span class="unit-tag">หน่วยที่ 2</span><span class="star-tag">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจศูนย์รับมือ<b>แผ่นดินไหวและสึนามิ</b></h1>
+  <p class="lead">ทดลองว่าแผ่นดินไหวเกิดอย่างไร ขนาดกับความรุนแรงต่างกันอย่างไร ตามหาพื้นที่เสี่ยงทั่วโลก แล้วประจำการศูนย์เตือนภัยสึนามิ ตัดสินใจให้ทุกคนปลอดภัย</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองแผ่นดินไหว<small>ขนาด × ระยะทาง × พื้นดิน</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>แผนที่แผ่นดินไหวโลก<small>ตามหา 6 เหตุการณ์ + สึนามิ</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์เตือนภัยสึนามิ<small>ทดลองคลื่น เตือนภัย ไขรหัส</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองแผ่นดินไหว : ขนาดกับความรุนแรง</h2>
+    <p class="how">เลือกขนาดแผ่นดินไหว ชนิดพื้นดิน และเมืองที่ต้องการดู แล้วกด "เดินเวลา" ดูหินสะสมแรงจนแตกเลื่อน คลื่นไหวสะเทือนเดินทางไปถึง 3 เมือง จนสุดแถบเวลาจึงบันทึกผลได้</p>
+    <div class="chips" id="magChips"></div>
+    <div class="chips" id="soilChips"></div>
+    <div class="chips" id="townChips"></div>
+    <div class="twin">
+      <canvas id="cvA" height="400" aria-label="ภาพตัดขวางรอยเลื่อน หินสะสมแรงจนแตกเลื่อน จุดศูนย์เกิดแผ่นดินไหว คลื่นไหวสะเทือน และอาคารใน 3 เมืองที่ระยะต่างกัน"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="aCase">-</div>
+        <div class="k" id="aProp">-</div>
+        <div class="k" style="margin-top:4px">แรงที่สะสมในหิน</div>
+        <div class="bar"><i id="aBar"></i></div>
+        <div class="k" id="aTime" style="margin-top:2px">-</div>
+        <div class="g2" style="margin-top:4px;align-items:center">
+          <div><div class="k">ความรุนแรงที่เมืองนี้<br>(มาตราเมอร์คัลลี)</div></div>
+          <div><span class="mmi" id="aMMI">-</span></div>
+        </div>
+        <h3 id="aEff" style="margin-top:4px">-</h3>
+        <div class="k" style="margin-top:4px">ตัวอย่างจริงขนาดใกล้เคียง</div>
+        <div class="d" id="aEx" style="color:#4FD8FF">-</div>
+        <div class="d" id="aWhy" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tR" min="0" max="100" step="1" value="0" aria-label="เดินเวลา">
+    <div class="ctrl"><button class="btn" id="playA">เดินเวลา</button><button class="btn" id="resetA">เริ่มใหม่</button><span class="lbl">เลื่อนแถบไปทางขวา = เวลาผ่านไป</span></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกผล</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ขนาด · เมือง (ระยะ)</th><th>ความรุนแรง</th><th>ผลที่เกิดขึ้น</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <div class="note">ขนาด (แมกนิจูด) = พลังงานที่แผ่นดินไหวปล่อยออกมา 1 ครั้งมีค่าเดียว · ขนาดเพิ่ม 1 พลังงานเพิ่มราว 32 เท่า · ความรุนแรง (มาตราเมอร์คัลลี I–XII) = ผลที่คนรู้สึกและความเสียหาย ณ แต่ละที่ ยิ่งไกลยิ่งลดลง ดินอ่อนทำให้สั่นแรงขึ้น</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 4 กรณี (พื้นหินแข็ง) ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> แผนที่แผ่นดินไหวโลก : ตามหา 6 เหตุการณ์และสึนามิ</h2>
+    <p class="how">เปิด-ปิดชั้นข้อมูล เลือกเหตุการณ์ อ่านคำใบ้ แล้วตอบว่าเกิดที่รอยต่อแบบใด จากนั้นตอบว่าเกิดสึนามิหรือไม่ ตอบถูกครบจะเปิดแฟ้มเหตุการณ์</p>
+    <div class="chips" id="layChips"></div>
+    <canvas id="cvB" height="420" aria-label="แผนที่โลกแสดงรอยต่อแผ่นธรณี จุดเกิดแผ่นดินไหวขนาดใหญ่ และเหตุการณ์ที่ต้องตามหา 6 เหตุการณ์"></canvas>
+    <div class="leg"><span><i style="background:#4FD8FF"></i>แยกออกจากกัน</span><span><i style="background:#FF6B8A"></i>เคลื่อนเข้าหากัน</span><span><i style="background:#FFD166"></i>เฉือนผ่านกัน</span>
+      <span><i class="dot" style="background:#FF9F6B"></i>แผ่นดินไหวใหญ่ในอดีต</span><span><i class="dot" style="background:transparent;border:2px solid #4FD8FF"></i>สึนามิ</span><span><i class="dot" style="background:#FFD166"></i>ประเทศไทย</span></div>
+    <div class="chips" id="siteChips"></div>
+    <div class="info" style="margin-top:6px">
+      <div class="k">เหตุการณ์ที่ตามหา</div>
+      <div class="v g" id="bName">-</div>
+      <div class="d" id="bClue">-</div>
+      <div class="g3" style="margin-top:2px" id="bData"></div>
+      <div><div class="k" style="margin-top:6px">1) แผ่นดินไหวนี้เกิดที่รอยต่อแบบใด ?</div><div class="pick" id="bAsk"></div></div>
+      <div id="bTsW" class="hide"><div class="k" style="margin-top:6px">2) แผ่นดินไหวนี้ทำให้เกิดสึนามิหรือไม่ ?</div><div class="pick two" id="bTs"></div></div>
+      <div class="d" id="bStory" style="color:#5EF2A5"></div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>เหตุการณ์</th><th>เกิดที่รอยต่อแบบ</th><th>สึนามิ</th><th>ผลกระทบเด่น</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="prog" id="progB">-</div>
+    <h2 class="sub-h"><em>คลังข้อมูล</em> ภัยจากแผ่นดินไหวและสึนามิ</h2>
+    <div class="events" id="haz"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 เหตุการณ์ ตอบข้อ 3</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์เตือนภัยสึนามิ "หาดดาวทะเล"</h2>
+    <p class="how">หาดดาวทะเลเป็นเมืองชายฝั่งทะเลอันดามันสมมติ นักบินประจำการศูนย์เตือนภัย ทดลองดูว่าสึนามิเกิดและเดินทางอย่างไร แล้วตัดสินใจเตือนภัยให้ทันเวลา</p>
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ห้องทดลองสึนามิ : คลื่นเดินทางจากทะเลลึกเข้าหาฝั่ง</h2>
+    <div class="chips" id="causeChips"></div>
+    <div class="twin">
+      <canvas id="cvC1" height="340" aria-label="ภาพตัดขวางมหาสมุทรตั้งแต่ทะเลลึกถึงชายฝั่ง แสดงคลื่นสึนามิเดินทางผ่านทุ่นตรวจวัด 4 จุด ความเร็วลดลงและคลื่นสูงขึ้นเมื่อเข้าใกล้ฝั่ง"></canvas>
+      <div class="info">
+        <div class="k">สาเหตุที่ทดลอง</div>
+        <div class="v c" id="cCause" style="font-size:19px">-</div>
+        <div class="k" id="cClock">-</div>
+        <div class="g3" style="margin-top:4px">
+          <div><div class="k">ความลึกใต้<br>ยอดคลื่น (ม.)</div><div class="v g" id="cDep">-</div></div>
+          <div><div class="k">ความเร็ว<br>(กม./ชม.)</div><div class="v c" id="cSpd">-</div></div>
+          <div><div class="k">ความสูง<br>คลื่น (ม.)</div><div class="v r" id="cHt">-</div></div>
+        </div>
+        <div class="d" id="cMsg" style="margin-top:6px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tC" min="0" max="100" step="1" value="0" aria-label="เวลาหลังแผ่นดินไหว">
+    <div class="ctrl"><button class="btn" id="playC">เดินเวลา</button><button class="btn" id="resetC">เริ่มใหม่</button><button class="btn gold solid" id="recC">บันทึกผล</button><span class="lbl" id="recCMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ทุ่นที่ความลึก (ม.)</th><th>ความเร็วคลื่น (กม./ชม.)</th><th>ความสูงคลื่น (ม.)</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สาเหตุ</th><th>ผลที่เกิด</th></tr></thead>
+      <tbody id="logCz"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ศูนย์เตือนภัย : ตัดสินใจ 4 ช่วงเวลา</h2>
+    <p class="how" style="margin-bottom:4px">เลือกช่วงเวลา อ่านรายงาน แล้วเลือกสิ่งที่ศูนย์เตือนภัยหรือประชาชนควรทำ ตอบถูกจึงไปช่วงต่อไปได้</p>
+    <div class="chips" id="stgChips"></div>
+    <div class="twin">
+      <canvas id="cvC2" height="340" aria-label="แผนที่เมืองชายฝั่งหาดดาวทะเล แสดงชายหาด โรงแรม โรงเรียน หอเตือนภัย อาคารหลบภัย เนินเขาจุดรวมพล เส้นทางอพยพ และพื้นที่น้ำท่วมจากสึนามิ"></canvas>
+      <div class="info">
+        <div class="k" id="sTime">-</div>
+        <div class="d" id="sEv" style="font-weight:600">-</div>
+        <div class="k" style="margin-top:4px">ควรทำอย่างไร ?</div>
+        <div class="pick one" id="sAsk"></div>
+        <div class="d" id="sWhy" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <div class="leg"><span><i class="box" style="background:#4FD8FF55;border:1.5px solid #4FD8FF"></i>พื้นที่เสี่ยงน้ำท่วมจากสึนามิ</span><span><i style="background:#5EF2A5"></i>เส้นทางอพยพ</span>
+      <span><i class="dot" style="background:#FFD166"></i>หอเตือนภัย</span><span><i class="box" style="background:#5EF2A5"></i>จุดปลอดภัย</span></div>
+    <div class="guide">
+      <div class="k1"><b>แผ่นดินไหว · ระหว่าง</b>หมอบ ป้อง เกาะ ใต้โต๊ะที่แข็งแรง ห่างหน้าต่างและของที่อาจตกใส่ อยู่นอกอาคารให้ไปที่โล่ง</div>
+      <div class="k2"><b>แผ่นดินไหว · หลัง</b>ออกจากอาคารทางบันได ห้ามใช้ลิฟต์ ระวังอาฟเตอร์ช็อก ตรวจแก๊สรั่วและสายไฟ</div>
+      <div class="k3"><b>สึนามิ · เมื่อมีสัญญาณ</b>แผ่นดินไหวแรงที่ชายฝั่ง น้ำทะเลลดลงผิดปกติ หรือได้ยินเตือนภัย ขึ้นที่สูงหรือไกลฝั่งทันที</div>
+      <div class="k4"><b>สึนามิ · หลัง</b>คลื่นมาหลายลูก ลูกหลังอาจใหญ่กว่า อยู่ที่สูงจนทางการประกาศยกเลิก</div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ช่วงเวลา</th><th>สิ่งที่เกิดขึ้น</th><th>สิ่งที่ควรทำ</th></tr></thead>
+      <tbody id="logS"></tbody>
+    </table></div>
+    <div class="prog" id="progS">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ไขรหัสศูนย์เตือนภัย</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">HARBOR</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · สึนามิ (tsunami) ภาษาญี่ปุ่นแปลว่า "คลื่นที่ท่าเรือ" (harbor wave)</div>
+    </div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 4</em> คลังพื้นที่เสี่ยงภัยสำหรับภารกิจปลายทาง (ส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">เลือก 1 พื้นที่ (จากคลังนี้ จากภารกิจ B บ้านหรือโรงเรียนของเรา หรือหาเอง) แล้วสืบค้นต่อจากเว็บไซต์ ข่าว หรือ AI เพื่อออกแบบแผนรับมือแผ่นดินไหวหรือสึนามิ</p>
+    <div class="events" id="lib"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 ทุ่น รหัสผ่าน ข้อ 4 · <b>ส่วนที่ 4</b> : ภารกิจปลายทาง แผนรับมือแผ่นดินไหวและสึนามิ (สืบค้น ออกแบบ นำเสนอ)</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · ความรุนแรงในภารกิจ A คำนวณจากสูตรอย่างง่าย (ศูนย์เกิดลึก 10 กม.) · ภาพตัดขวางขยายความสูงเกินจริงเพื่อให้เห็นชัด · แผนที่ภารกิจ B เป็นภาพอย่างง่าย · หาดดาวทะเลและข้อมูลในภารกิจ C เป็นสถานการณ์สมมติ · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+/*GEO-START*/var GEO = {"NA":[[[-166,68],[-156,71],[-140,70],[-125,70],[-110,68],[-95,72],[-85,70],[-80,66],[-90,63],[-94,59],[-88,56],[-82,54],[-78,58],[-77,62],[-70,61],[-64,60],[-60,55],[-56,52],[-53,47],[-60,47],[-66,45],[-70,42],[-74,40],[-76,35],[-81,31],[-80,26],[-82,28],[-84,30],[-89,30],[-95,29],[-97,26],[-97,21],[-94,18.3],[-91,18.6],[-90.4,21],[-87,21.5],[-87.5,18.5],[-88.3,17.8],[-92.2,14.6],[-96,16],[-102,18],[-105,21],[-109,25],[-112,29],[-114,31],[-110,23],[-112,25],[-115,28],[-117,32],[-120,34.5],[-123,38],[-124,42],[-124,47],[-127,50],[-131,54],[-135,57],[-140,59.8],[-147,61],[-152,59],[-158,57],[-163,55],[-158,58.5],[-162,60],[-165,62],[-166,65]],[[-73,78],[-60,82],[-30,83.5],[-20,82],[-20,75],[-22,70],[-32,68],[-40,65],[-43,60],[-48,61],[-52,65],[-54,69],[-58,75],[-66,77]]],"CA":[[[-88.3,17.8],[-88,16],[-84,15],[-83,10],[-79,9],[-77.5,8],[-80,7.5],[-85,10],[-88,13],[-92.2,14.6]]],"SA":[[[-77,8],[-72,12],[-62,10.7],[-60,8.5],[-57,6.5],[-52,5],[-50,0],[-44,-2.5],[-35,-5.5],[-35,-9],[-39,-14],[-39,-18],[-41,-22],[-48,-26],[-48.6,-28],[-53,-34],[-58,-34.5],[-57,-38],[-62,-39],[-65,-42],[-64,-47],[-68,-50],[-69,-53],[-68,-55],[-72,-54],[-75,-50],[-74,-44],[-73,-38],[-71.5,-30],[-70,-18],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-77,4]]],"EU":[[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48.5],[2,51],[5,53],[8.5,54],[8,57],[10.5,57.7],[12,55.5],[14,54],[21,55],[23,59.5],[28,60],[22,60.5],[21.5,65],[24,66],[21,63],[17,61],[19,60],[16,56],[12.5,56.3],[11,59],[5.5,58.5],[5,62],[10,64],[14,67],[19,70],[26,71],[31,70],[41,67],[43,68.5],[53,68],[60,69.5],[70,73],[80,73.5],[88,75.5],[100,78],[113,73.5],[130,72],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[178,62],[165,60],[162,55],[156,51],[155,58],[143,59],[137,54],[141,52],[140,48],[135,43],[130,42.5],[129,35.5],[126,34.5],[126,37.5],[125,39.5],[121,40],[122,37],[119,35],[121,32],[122,29],[119,25],[114,22.3],[109,21.5],[106,20],[108,16],[109,12],[105,8.6],[103,10.5],[100,13.5],[99,10],[102.5,6],[103.5,1.5],[101,2.8],[98,8],[98.5,13],[97.5,16.5],[94.5,16],[94,19],[92,21],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27],[67,24],[62,25],[57,25.7],[56.5,27],[54,26.6],[51.5,24],[51.5,26],[50,30],[48,30],[50,26],[51.5,24],[56,24],[56.4,26.3],[59.8,22.5],[55,17],[52,16],[43.5,12.7],[42.5,15],[39,21.5],[35,28],[34.5,31.5],[35.5,34.5],[36,36.8],[32,36.2],[28,36.6],[26.5,39.5],[29,41],[31,41.2],[35,42],[41,41],[41.5,42.5],[37.5,45],[34,44.5],[33,46],[30,45.5],[28.5,43.5],[28,41.5],[24,40.5],[23,39],[22.5,36.5],[21,38.5],[19.5,41.5],[16,43.5],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40],[16,38],[15.5,40],[12.5,42],[10.5,43.5],[8,44],[5,43.2],[3.2,42],[0,39.5],[-0.5,38],[-2,36.7],[-5.5,36],[-7,37]],[[-5.5,50],[1.5,51],[1.7,52.8],[0,53.5],[-2,55.8],[-1.8,57.6],[-3,58.6],[-5,58.6],[-6.2,56.5],[-5,55],[-3.2,54.5],[-4.5,53.3],[-5,51.7]],[[130,31],[132,33.5],[135,34],[140,35],[141,38],[141.5,41.5],[145,43.5],[142,45.5],[140,42],[139.5,39],[137,37],[133,35.5],[130,33.5]]],"AF":[[[-17,21],[-16,15],[-17,14.7],[-15,11],[-13,8],[-8,4.5],[-2,5],[4,6.3],[9,4],[9.5,1],[9,-1],[12,-6],[13.5,-11],[12,-17],[14.5,-23],[15.5,-27],[18,-32],[18.5,-34.5],[20,-35],[25,-34],[28,-33],[32,-28.5],[33,-26],[35.5,-24],[35,-19],[40,-15.5],[40.5,-10],[39,-6],[42,-1],[46,2],[51,11.8],[44,11],[43,13],[39,16],[37,20],[35,24],[33.5,28],[32,31],[29,31],[25,31.8],[20,30.5],[19,32],[15,32.5],[11,33.5],[10,37],[3,36.7],[-2,35.1],[-6,35.8],[-9,32],[-10,29],[-13,27.5]]],"MG":[[[44,-25],[47,-25],[50,-15],[49.3,-12],[46,-15.5],[44,-16.5],[43.5,-22]]],"IN":[[[67,24],[70,21],[72.8,19],[73.5,15.5],[75,12],[76.5,8.5],[77.5,8],[80,10],[80.3,13.5],[82,16.5],[86.5,20],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27]]],"AU":[[[113,-22],[114,-26],[115,-34],[118,-35],[123,-34],[129,-31.5],[132,-32],[135,-34.5],[138,-35.5],[140,-38],[144,-38.5],[147,-38],[150,-37],[153,-31],[153,-25],[149,-21],[146,-19],[145,-15],[143,-11],[141.5,-13],[141,-17],[138,-16.5],[136,-12],[132,-11.5],[130,-13],[127,-14],[125,-15],[122,-18],[117,-20.5]],[[131,-1],[138,-1.5],[141,-2.6],[147,-6],[150,-10.5],[144,-8],[141,-9],[138,-8],[135,-4]],[[144.6,-40.7],[148.3,-40.9],[148,-43.2],[146,-43.6],[145,-42]]],"AN":[[[-180,-78],[-165,-78.5],[-158,-77.5],[-150,-76.5],[-140,-75.5],[-120,-74],[-100,-74.5],[-90,-73],[-80,-73],[-75,-72],[-70,-69],[-66,-66.5],[-63,-64.5],[-58,-63.3],[-60,-65.5],[-62,-68],[-62,-71],[-60,-74],[-55,-77],[-45,-78],[-35,-77.5],[-28,-75.5],[-20,-73],[-10,-71],[0,-70],[15,-70],[30,-69.5],[40,-69],[45,-67.5],[55,-66.5],[60,-67],[70,-68],[75,-69.5],[80,-68],[90,-66.5],[100,-66],[110,-66],[120,-66.5],[130,-66.2],[140,-66.5],[150,-68.5],[160,-70],[165,-71],[170,-73],[167,-77],[170,-78],[180,-78],[180,-90],[-180,-90]]]};/*GEO-END*/
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_g5_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.recC = S.recC || {}; S.cz = S.cz || {}; S.st = S.st || {}; S.cl = S.cl || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n) { return (+n).toLocaleString('en-US', { maximumFractionDigits: 1 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function star(x, cx, cy, r, col) {
+    x.beginPath(); for (var i = 0; i < 10; i++) { var a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; x.lineTo(cx + Math.cos(a) * rr, cy + Math.sin(a) * rr); }
+    x.closePath(); x.fillStyle = col; x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1.2; x.stroke();
+  }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ห้องทดลองแผ่นดินไหว
+  var MAGS = [5, 6, 7, 8];
+  var ENERGY = ['1 เท่า (ใช้เป็นตัวเทียบ)', 'ราว 32 เท่า', 'ราว 1,000 เท่า', 'ราว 32,000 เท่า'];
+  var MEX = ['แผ่นดินไหวขนาด 5 เกิดในภาคเหนือและภาคตะวันตกของไทยได้เป็นครั้งคราว',
+    'แม่ลาว เชียงราย 5 พ.ค. 2557 ขนาด 6.3 (ใหญ่ที่สุดเท่าที่ตรวจวัดได้ในประเทศไทย)',
+    'เนปาล 2558 (7.8) · ตุรกี 2566 (7.8) · เมียนมา 28 มี.ค. 2568 (7.7) กรุงเทพฯ รู้สึกได้',
+    'ชิลี 2553 (8.8) · แผ่นดินไหวสุมาตรา 2547 (9.1) และญี่ปุ่น 2554 (9.0) ใหญ่กว่านี้อีก'];
+  var TOWNS = [{ k: 'ก', d: 10, p: .2 }, { k: 'ข', d: 100, p: .52 }, { k: 'ค', d: 1000, p: .85 }];
+  var SOIL = ['พื้นหินแข็ง', 'ดินเหนียวอ่อน (แบบกรุงเทพฯ)'];
+  var ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+  var MMI = ['', 'ไม่รู้สึก เครื่องมือวัดได้เท่านั้น', 'รู้สึกได้บางคนที่อยู่นิ่ง ๆ บนอาคารสูง', 'รู้สึกเบา ๆ ในอาคาร ของแขวนแกว่ง',
+    'คนในอาคารส่วนใหญ่รู้สึก ประตูหน้าต่างสั่น', 'เกือบทุกคนรู้สึก ของเล็กตกหล่น คนตื่นจากหลับ', 'ทุกคนรู้สึก ตกใจ ของตกจากชั้น ผนังร้าว',
+    'ยืนลำบาก อาคารที่สร้างไม่ดีเสียหาย', 'อาคารทั่วไปเสียหายมาก บางส่วนพัง', 'อาคารเสียหายหนัก บางหลังถล่ม พื้นดินแตก',
+    'อาคารส่วนใหญ่ถล่ม ถนนและรางรถไฟบิดงอ', 'แทบทุกอย่างพัง สะพานขาด', 'เสียหายทั้งหมด เห็นพื้นดินเป็นคลื่น'];
+  function mmiCol(I) { return I <= 3 ? '#5EF2A5' : I <= 5 ? '#FFD166' : I <= 7 ? '#FF9F6B' : '#FF4D5E'; }
+  // สูตรอย่างง่าย : I = 1.5M - 3 log10(R) + 1.5  (R = ระยะจากจุดศูนย์เกิด ลึก 10 กม.) · ดินอ่อน +1
+  function inten(M, d, soil) { var R = Math.sqrt(d * d + 100); return clamp(Math.round(1.5 * M - 3 * Math.log10(R) + 1.5) + (soil ? 1 : 0), 1, 12); }
+  var WSK = ['0-0', '2-0', '2-1', '2-2'];   // กรณีที่จดลงใบงาน (ขนาด-เมือง) พื้นหินแข็ง
+  var mA = 2, sA = 0, tw = 0, pA = 0, playing = 0, shakeA = 0, ruptured = 0;
+  var RUP = .4;
+  function keyA() { return mA + '-' + tw; }
+  function caseLabel(k) { var z = k.split('-'); return 'ขนาด ' + MAGS[+z[0]] + ' · เมือง ' + TOWNS[+z[1]].k + ' (' + fmt(TOWNS[+z[1]].d) + ' กม.)'; }
+  function front() { return pA <= RUP ? -1 : (pA - RUP) / (1 - RUP) * 1.0; }
+  function updA() {
+    var h = '<span class="lbl">ขนาด (แมกนิจูด)</span>';
+    MAGS.forEach(function (m, i) { h += '<button class="chip' + (i === mA ? ' on' : '') + '" data-m="' + i + '">ขนาด ' + m + '</button>'; });
+    $('magChips').innerHTML = h; bindChips($('magChips'), 'm', function (v) { mA = +v; pA = 0; playing = 0; ruptured = 0; updA(); drawA(); });
+    h = '<span class="lbl">พื้นดินใต้เมือง</span>';
+    SOIL.forEach(function (g, i) { h += '<button class="chip' + (i === sA ? ' on' : '') + '" data-g="' + i + '">' + g + '</button>'; });
+    $('soilChips').innerHTML = h; bindChips($('soilChips'), 'g', function (v) { sA = +v; updA(); drawA(); });
+    h = '<span class="lbl">เมืองที่ดู</span>';
+    TOWNS.forEach(function (t, i) { h += '<button class="chip' + (i === tw ? ' on' : '') + '" data-w="' + i + '">เมือง ' + t.k + ' · ' + fmt(t.d) + ' กม.</button>'; });
+    $('townChips').innerHTML = h; bindChips($('townChips'), 'w', function (v) { tw = +v; updA(); drawA(); });
+    var M = MAGS[mA], T = TOWNS[tw], I = inten(M, T.d, sA), got = front() >= T.p || pA >= 1;
+    $('aCase').textContent = 'ขนาด ' + M + ' · เมือง ' + T.k + ' ห่าง ' + fmt(T.d) + ' กม.';
+    $('aProp').textContent = SOIL[sA] + ' · พลังงานเทียบกับขนาด 5 : ' + ENERGY[mA];
+    $('aBar').style.width = (pA <= RUP ? pA / RUP * 100 : 100 - smooth(RUP, RUP + .08, pA) * 100) + '%';
+    $('aTime').textContent = pA < RUP ? 'หินถูกแรงกระทำ ค่อย ๆ โค้งงอ สะสมพลังงาน' : (got ? 'คลื่นไหวสะเทือนมาถึงเมือง ' + T.k + ' แล้ว' : 'หินแตกและเลื่อนตามรอยเลื่อน คลื่นกำลังเดินทาง');
+    var m = $('aMMI'); m.textContent = got ? ROMAN[I] : '?'; m.style.background = got ? mmiCol(I) : '#2C3A73'; m.style.color = got ? '#06102A' : '#9AA6CF';
+    $('aEff').textContent = got ? MMI[I] : 'รอคลื่นมาถึง';
+    $('aEx').textContent = MEX[mA];
+    $('aWhy').textContent = got ? (tw === 0 ? 'เมือง ก อยู่ใกล้จุดเหนือศูนย์เกิดมาก คลื่นยังมีพลังงานสูง จึงสั่นแรงที่สุด' :
+      tw === 1 ? 'คลื่นเดินทางไกลขึ้น พลังงานกระจายและลดลง เมือง ข จึงสั่นน้อยกว่าเมือง ก แม้เป็นแผ่นดินไหวครั้งเดียวกัน' :
+      'เมือง ค ไกลมาก การสั่นเบาลงมาก แต่ถ้าอยู่บนดินอ่อนหรือในอาคารสูง ยังรู้สึกได้ (เหมือนกรุงเทพฯ เมื่อเกิดแผ่นดินไหวในเมียนมา 2568)') +
+      (sA ? ' · ดินเหนียวอ่อนขยายการสั่นให้แรงขึ้นและนานขึ้น' : '') : '';
+    var k = keyA(), ok = WSK.indexOf(k) >= 0 && !sA;
+    $('recA').disabled = !(ok && pA >= 1);
+    $('recAMsg').textContent = pA < 1 ? 'เดินเวลาให้สุดแถบก่อน' : (sA ? 'กรณีดินอ่อนเป็นการทดลองเพิ่ม ใช้ตอบข้อ 2 (บันทึกเฉพาะพื้นหินแข็ง)' : (WSK.indexOf(k) < 0 ? 'กรณีนี้ทดลองเพิ่มได้ ไม่ต้องจดลงใบงาน' : (S.recA[k] ? 'บันทึกแล้ว' : 'กดบันทึกได้')));
+    var n = 0, rows = '';
+    WSK.forEach(function (z) { var r = S.recA[z], q = z.split('-'), Iz = inten(MAGS[+q[0]], TOWNS[+q[1]].d, 0); if (r) n++;
+      rows += '<tr' + (z === k && !sA ? ' class="cur"' : '') + '><td class="n">' + caseLabel(z) + '</td><td>' + (r ? ROMAN[Iz] : '-') + '</td><td>' + (r ? MMI[Iz] : '-') + '</td></tr>'; });
+    $('logA').innerHTML = rows + '<tr><td colspan="3" class="lbl">บันทึกแล้ว ' + n + '/4 กรณี</td></tr>';
+    $('tR').value = Math.round(pA * 100);
+    $('playA').textContent = playing ? 'หยุด' : 'เดินเวลา';
+  }
+  $('tR').oninput = function () { var o = pA; pA = +this.value / 100; playing = 0; if (o < RUP && pA >= RUP) shakeA = .6; updA(); drawA(); };
+  $('playA').onclick = function () { if (pA >= 1) pA = 0; playing = playing ? 0 : 1; updA(); };
+  $('resetA').onclick = function () { pA = 0; playing = 0; updA(); drawA(); };
+  $('recA').onclick = function () { var k = keyA(); if (WSK.indexOf(k) < 0 || sA || pA < 1) return; S.recA[k] = 1; save(); updA(); };
+  function stepPlay(dt) {
+    if (!playing) return; var o = pA; pA = Math.min(1, pA + dt / 9);
+    if (o < RUP && pA >= RUP) shakeA = .6;
+    if (pA >= 1) playing = 0;
+    updA();
+  }
+  function drawA() {
+    var c = fit($('cvA')), x = c.x, W = c.W, H = c.H, M = MAGS[mA];
+    var sx = shakeA > 0 ? Math.sin(tA * 90) * shakeA * 6 : 0;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    x.save(); x.translate(sx, 0);
+    var H1 = Math.round(H * .56), ySurf = Math.round(H1 * .2), yBot = H1 - 4;
+    // ฟ้า
+    var g = x.createLinearGradient(0, 0, 0, ySurf); g.addColorStop(0, '#0a1440'); g.addColorStop(1, '#1d3570'); x.fillStyle = g; x.fillRect(-10, 0, W + 20, ySurf + 30);
+    var xf0 = W * .46, slope = .42;
+    function xf(y) { return xf0 + (y - ySurf) * slope; }
+    var D = 6 + (M - 5) * 4, u = pA < RUP ? D * pA / RUP : D, slip = pA >= RUP, L = W * .16;
+    function dyR(px, y) { if (slip) return -D; return -u * (1 - Math.exp(-Math.max(0, px - xf(y)) / L)); }
+    var NB = 5, cols = ['#7a5a3a', '#8e6b45', '#6d4f33', '#82603f', '#5f442c'];
+    function bands(side) {
+      x.save(); x.beginPath();
+      var yt = ySurf - 40;
+      if (side) { x.moveTo(xf(yt), yt); x.lineTo(W + 20, yt); x.lineTo(W + 20, yBot); x.lineTo(xf(yBot), yBot); }
+      else { x.moveTo(-20, yt); x.lineTo(xf(yt), yt); x.lineTo(xf(yBot), yBot); x.lineTo(-20, yBot); }
+      x.closePath(); x.clip();
+      for (var i = 0; i < NB; i++) {
+        var y0 = ySurf + (yBot - ySurf) * i / NB, y1 = ySurf + (yBot - ySurf) * (i + 1) / NB;
+        x.beginPath();
+        for (var px = -20; px <= W + 20; px += 6) { var yy = y0 + (side ? dyR(px, y0) : 0); if (px === -20) x.moveTo(px, yy); else x.lineTo(px, yy); }
+        for (var px2 = W + 20; px2 >= -20; px2 -= 6) x.lineTo(px2, i === NB - 1 ? yBot + 20 : y1 + (side ? dyR(px2, y1) : 0));
+        x.closePath(); x.fillStyle = cols[i]; x.fill();
+      }
+      // ถนนบนผิวดิน
+      x.strokeStyle = '#d9d9d9'; x.lineWidth = 2; x.setLineDash([8, 6]); x.beginPath();
+      for (var p3 = -20; p3 <= W + 20; p3 += 6) { var y3 = ySurf - 1 + (side ? dyR(p3, ySurf) : 0); if (p3 === -20) x.moveTo(p3, y3); else x.lineTo(p3, y3); }
+      x.stroke(); x.setLineDash([]);
+      x.restore();
+    }
+    bands(0); bands(1);
+    // รอยเลื่อน
+    x.strokeStyle = slip ? '#FF4D5E' : '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.moveTo(xf(ySurf - (slip ? D + 2 : 2)), ySurf - (slip ? D + 2 : 2)); x.lineTo(xf(yBot), yBot); x.stroke();
+    label(x, 'รอยเลื่อน', xf(yBot) + 8, yBot - 8, slip ? '#FF6B8A' : '#FFD166', 12, 'left');
+    // แรงกระทำ
+    if (!slip) { var al = .4 + .6 * pA / RUP, ym = (ySurf + yBot) / 2;
+      x.globalAlpha = al; arrow(x, 18, ym, 18 + 26 + pA / RUP * 14, ym, '#FF9F6B', 4, 12); arrow(x, W - 18, ym + 10, W - 44 - pA / RUP * 14, ym + 10, '#FF9F6B', 4, 12); x.globalAlpha = 1;
+      label(x, 'แรงที่กระทำต่อหิน', 18, ym - 14, '#FF9F6B', 12, 'left'); }
+    // จุดศูนย์เกิด
+    var hy = ySurf + (yBot - ySurf) * .68, hx = xf(hy);
+    if (slip) {
+      var fr = (pA - RUP) / (1 - RUP);
+      x.save(); x.beginPath(); x.rect(-20, ySurf - D - 6, W + 40, yBot - ySurf + D + 6); x.clip();
+      for (var r = 0; r < 4; r++) { var rr = (fr * 2.2 - r * .18) * W * .5; if (rr <= 0) continue;
+        x.strokeStyle = 'rgba(79,216,255,' + clamp(.75 - rr / W, 0, .75) + ')'; x.lineWidth = 2.2; x.beginPath(); x.arc(hx, hy, rr, 0, 6.283); x.stroke(); }
+      x.restore();
+      glow(x, hx, hy, 26, [255, 77, 94], .55);
+    }
+    star(x, hx, hy, 10, slip ? '#FF4D5E' : '#9AA6CF');
+    label(x, 'จุดศูนย์เกิดแผ่นดินไหว (ลึก ~10 กม.)', hx + 16, hy + 4, slip ? '#FF8FA6' : '#9AA6CF', 12, 'left');
+    var ex = hx, ey = ySurf + (slip ? (ex > xf(ySurf) ? -D : 0) : 0);
+    x.strokeStyle = 'rgba(255,255,255,.4)'; x.setLineDash([3, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(hx, hy - 10); x.lineTo(ex, ey); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#FFD166'; x.beginPath(); x.moveTo(ex, ey - 2); x.lineTo(ex - 7, ey - 14); x.lineTo(ex + 7, ey - 14); x.closePath(); x.fill();
+    label(x, 'จุดเหนือศูนย์เกิด', ex, ey - 18, '#FFD166', 12);
+    if (!slip && pA > .05) label(x, 'หินโค้งงอ สะสมพลังงาน', W * .78, ySurf - 12, '#FFD166', 13);
+    if (slip && pA < RUP + .2) label(x, 'หินแตก เลื่อนตัว ปล่อยพลังงาน', W * .78, ySurf - D - 12, '#FF6B8A', 13);
+    x.restore();
+    // ---------------- แถบเมือง
+    var y2 = H1 + 4, gy = H - 34;
+    x.fillStyle = '#081233'; x.fillRect(0, y2, W, H - y2);
+    x.strokeStyle = '#2C3A73'; x.beginPath(); x.moveTo(0, y2); x.lineTo(W, y2); x.stroke();
+    label(x, 'ระยะห่างจากจุดเหนือศูนย์เกิด (ระยะไม่ตามมาตราส่วน)', 8, y2 + 16, '#9AA6CF', 11.5, 'left');
+    var X0 = 26, X1 = W - 16;
+    x.fillStyle = sA ? '#5a4632' : '#4a4f5c'; x.fillRect(0, gy, W, H - gy);
+    x.strokeStyle = sA ? '#8a6d4c' : '#7d8496'; x.lineWidth = 2; x.beginPath(); x.moveTo(0, gy); x.lineTo(W, gy); x.stroke();
+    x.fillStyle = '#FFD166'; x.beginPath(); x.moveTo(X0, gy - 2); x.lineTo(X0 - 7, gy - 14); x.lineTo(X0 + 7, gy - 14); x.closePath(); x.fill();
+    var fr2 = front();
+    if (fr2 >= 0 && pA < 1) { var fx = X0 + fr2 * (X1 - X0); var gg = x.createLinearGradient(fx - 40, 0, fx, 0); gg.addColorStop(0, 'rgba(79,216,255,0)'); gg.addColorStop(1, 'rgba(79,216,255,.45)');
+      x.fillStyle = gg; x.fillRect(fx - 40, y2 + 22, 40, gy - y2 - 22); x.strokeStyle = '#4FD8FF'; x.lineWidth = 2; x.beginPath(); x.moveTo(fx, y2 + 22); x.lineTo(fx, gy); x.stroke(); }
+    TOWNS.forEach(function (T, i) {
+      var cx = X0 + T.p * (X1 - X0), I = inten(M, T.d, sA), arrived = fr2 >= T.p || pA >= 1, since = arrived ? Math.max(0, fr2 - T.p) : 0;
+      var amp = arrived && pA < 1 ? Math.min(9, (I - 1) * .9) * Math.exp(-since * 2.2) : 0;
+      var bw = W < 500 ? 9 : 13, hs = [16, 30, 48], collapsed = pA >= 1 && I >= 9, cracked = pA >= 1 && I >= 6;
+      if (i === tw) { x.strokeStyle = '#FFD166'; x.lineWidth = 2; x.strokeRect(cx - bw * 2.6, gy - hs[2] - 30, bw * 5.2, hs[2] + 44); }
+      hs.forEach(function (hh, j) {
+        var bx = cx + (j - 1) * bw * 1.6, sw = Math.sin(tA * 26 + j * 1.7 + i) * amp * hh / 48;
+        if (collapsed && j === 2) { x.fillStyle = '#7d8496'; x.beginPath(); x.moveTo(bx - bw * .9, gy); x.lineTo(bx - bw * .2, gy - 12); x.lineTo(bx + bw * .5, gy - 8); x.lineTo(bx + bw * 1.1, gy); x.closePath(); x.fill(); return; }
+        var tilt = collapsed && j === 1 ? 6 : 0;
+        x.fillStyle = j === 0 ? '#c9a27a' : '#9fb3d9'; x.beginPath(); x.moveTo(bx - bw / 2, gy); x.lineTo(bx - bw / 2 + sw + tilt, gy - hh); x.lineTo(bx + bw / 2 + sw + tilt, gy - hh); x.lineTo(bx + bw / 2, gy); x.closePath(); x.fill();
+        x.fillStyle = '#0a1440'; for (var w2 = 1; w2 < hh / 9; w2++) { var wy = gy - w2 * 9; var o = sw * w2 * 9 / hh; x.fillRect(bx - bw / 2 + 3 + o + tilt * w2 * 9 / hh, wy - 4, bw - 6, 3); }
+        if (cracked && j > 0) { x.strokeStyle = '#05081a'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(bx - 2, gy - hh * .3); x.lineTo(bx + 1, gy - hh * .5); x.lineTo(bx - 1, gy - hh * .7); x.stroke(); }
+      });
+      label(x, 'เมือง ' + T.k + ' · ' + fmt(T.d) + ' กม.', cx, H - 12, i === tw ? '#FFD166' : '#E8EDFF', W < 500 ? 10 : 12);
+      if (arrived) { var by = gy - hs[2] - 22; x.fillStyle = mmiCol(I); x.beginPath(); x.roundRect ? x.roundRect(cx - 20, by - 14, 40, 22, 6) : x.rect(cx - 20, by - 14, 40, 22); x.fill();
+        x.font = '700 15px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(ROMAN[I], cx, by + 3); }
+    });
+  }
+
+  // ================================================================ ภารกิจ B แผนที่แผ่นดินไหวโลก
+  var D2R = Math.PI / 180;
+  function eqe(lon, lat) {
+    var A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    var th = Math.asin(M * Math.sin(lat * D2R)), t2 = th * th, t6 = t2 * t2 * t2;
+    return [lon * D2R * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
+  }
+  // แนวรอยต่อแผ่นธรณีอย่างง่าย (ชุดเดียวกับสถานการณ์จำลอง G3 G4)  D แยก · C มุดตัว · K ทวีปชน · T เฉือน
+  var BND = [
+    ['D', [[-1, -54], [-14, -48], [-15, -40], [-13, -30], [-14, -20], [-13, -10], [-15, -2], [-25, 0], [-32, 3], [-38, 8], [-45, 15], [-46, 23], [-42, 30], [-33, 37], [-29, 43], [-28, 50], [-32, 55], [-30, 58], [-24, 62], [-18, 65], [-16, 68], [-5, 71], [5, 74], [10, 79]]],
+    ['D', [[-109, 23], [-106, 16], [-103, 9], [-104, 0], [-110, -10], [-112, -20], [-113, -30], [-112, -36], [-115, -45], [-118, -55], [-135, -58], [-150, -62], [-165, -64], [-180, -63]]],
+    ['D', [[180, -63], [160, -61], [150, -57], [140, -51], [125, -50], [110, -48], [95, -42], [80, -35], [70, -26]]],
+    ['D', [[70, -26], [67, -17], [66, -8], [66, 0], [62, 7], [58, 13], [52, 14], [45, 12], [40, 16], [37, 21], [34, 27]]],
+    ['D', [[70, -26], [57, -33], [45, -40], [32, -45], [18, -50], [5, -53], [-1, -54]]],
+    ['D', [[42, 11.5], [40, 8], [38, 4], [36.5, 0], [35.5, -4], [34, -9], [34.5, -14]]],
+    ['C', [[-150, 57], [-158, 54], [-168, 51.5], [-180, 51]]],
+    ['C', [[180, 51], [172, 52], [164, 54]]],
+    ['C', [[164, 54], [160, 51], [155, 47], [150, 44], [146, 41], [143.5, 38], [142, 35]]],
+    ['C', [[142, 35], [142, 30], [143, 24], [145, 18], [147, 13], [144, 11]]],
+    ['C', [[138, 34], [134, 32.5], [131, 30], [128, 27], [124, 24], [122, 22]]],
+    ['C', [[122, 22], [119.5, 18], [119.5, 14], [120.5, 12]]],
+    ['C', [[127, 14], [127, 8], [126.5, 4]]],
+    ['C', [[93, 15], [92.5, 10], [93.5, 6], [95.5, 2], [98, -2], [101, -5.5], [105, -8], [110, -10], [115, -11], [120, -11], [125, -10]]],
+    ['C', [[147, -7], [153, -7], [158, -9], [163, -11], [167, -14], [169, -20], [171, -23]]],
+    ['C', [[-173, -15], [-174, -21], [-176, -27], [-178, -33], [-180, -37]]],
+    ['C', [[180, -37], [178, -40], [176, -42]]],
+    ['C', [[-128, 50], [-126, 46], [-125, 41]]],
+    ['C', [[-106, 20], [-102, 17], [-97, 15], [-93, 14], [-89, 12.5], [-86, 10.5], [-83, 8]]],
+    ['C', [[-79, 4], [-81, -3], [-80, -8], [-77, -13], [-73, -17.5], [-71.5, -23], [-72, -30], [-74, -37], [-75.5, -44], [-76, -48]]],
+    ['C', [[-62, 19], [-59.5, 15], [-61, 11]]],
+    ['C', [[12, 38.5], [16, 40], [18, 38.5], [16, 37]]],
+    ['K', [[-9, 36], [2, 36.5], [12, 38], [22, 37], [28, 36], [36, 37], [44, 38], [48, 34], [53, 29], [58, 26], [63, 25.5], [67, 26], [69, 30], [72, 34], [75, 35], [80, 31], [85, 28.5], [90, 27.5], [95, 28], [97, 26]]],
+    ['T', [[-125, 41], [-123, 38.5], [-121, 36], [-118, 34.5], [-116, 33], [-114.5, 31.5], [-109, 23]]],
+    ['T', [[97, 26], [96, 23], [96.2, 19], [95.8, 16], [93, 15]]],
+    ['T', [[166, -47], [168.5, -44.5], [172, -42.5], [176, -42]]],
+    ['T', [[34, 27], [35.5, 33], [36.5, 36]]],
+    ['T', [[-88, 15.5], [-80, 19], [-70, 19.5], [-62, 19]]]
+  ];
+  // จุดแผ่นดินไหวใหญ่ (สุ่มตามแนวรอยต่อ แบบคงที่) แสดงแนวแผ่นดินไหว
+  var QP = (function () { var out = [], n = 0; BND.forEach(function (b) { var step = b[0] === 'D' ? 9 : 2.6, jit = b[0] === 'D' ? .8 : 2.2;
+    for (var i = 0; i < b[1].length - 1; i++) { var a = b[1][i], c = b[1][i + 1], len = Math.hypot(c[0] - a[0], c[1] - a[1]), k = Math.max(1, Math.round(len / step));
+      for (var j = 0; j < k; j++) { n++; var f = j / k, lo = a[0] + (c[0] - a[0]) * f + (hash(n, 1) - .5) * jit, la = a[1] + (c[1] - a[1]) * f + (hash(n, 2) - .5) * jit;
+        out.push([clamp(lo, -179.5, 179.5), la, hash(n, 3)]); } } }); return out; })();
+  var BTYPE = ['รอยต่อแบบมุดตัว (แผ่นมหาสมุทรมุดลง)', 'แผ่นทวีปชนกัน', 'รอยต่อหรือรอยเลื่อนแบบเฉือนผ่านกัน'];
+  var BSHORT = ['มุดตัว', 'ทวีปชนกัน', 'เฉือนผ่านกัน'];
+  var SITES = [
+    { n: 'สุมาตรา–อันดามัน', c: 'อินโดนีเซีย', y: '26 ธ.ค. 2547', m: '9.1', w: 'ใต้ทะเล', lon: 95.9, lat: 3.3, a: 0, ts: 1, haz: 'สึนามิถล่มชายฝั่งมหาสมุทรอินเดีย รวมทั้งไทย',
+      clue: 'ศูนย์เกิดอยู่ใต้ทะเลนอกชายฝั่งเกาะสุมาตรา แผ่นอินเดีย-ออสเตรเลียมุดลงใต้แผ่นซุนดาที่ร่องลึกซุนดา พื้นทะเลยาวกว่า 1,000 กม. ยกตัวขึ้นทันที',
+      story: 'สึนามิถล่ม 14 ประเทศ ผู้เสียชีวิตราว 230,000 คน ประเทศไทย 6 จังหวัดอันดามันเสียหาย เสียชีวิตราว 5,400 คน คลื่นถึงภูเก็ตราว 2 ชั่วโมงหลังแผ่นดินไหว หลังเหตุการณ์ไทยตั้งศูนย์เตือนภัยพิบัติแห่งชาติและหอเตือนภัยตามชายฝั่ง' },
+    { n: 'โทโฮกุ', c: 'ญี่ปุ่น', y: '11 มี.ค. 2554', m: '9.0', w: 'ใต้ทะเล', lon: 142.4, lat: 38.3, a: 0, ts: 1, haz: 'สึนามิสูงกว่า 10 ม. โรงไฟฟ้านิวเคลียร์เสียหาย',
+      clue: 'ศูนย์เกิดอยู่ใต้ทะเลทางตะวันออกของญี่ปุ่น แผ่นแปซิฟิกมุดลงใต้ญี่ปุ่นที่ร่องลึกญี่ปุ่น',
+      story: 'คลื่นสูงกว่า 10 ม. บางแห่งซัดขึ้นสูงเกือบ 40 ม. ถึงฝั่งภายในราว 30–60 นาที ผู้เสียชีวิตและสูญหายราว 18,000 คน โรงไฟฟ้านิวเคลียร์ฟุกุชิมะเสียหาย · ญี่ปุ่นมีระบบเตือนภัยแผ่นดินไหวล่วงหน้าไม่กี่วินาที รถไฟหัวกระสุนหยุดทัน' },
+    { n: 'มัณฑะเลย์–สะกาย', c: 'เมียนมา', y: '28 มี.ค. 2568', m: '7.7', w: 'บนบก', lon: 95.9, lat: 22.0, a: 2, ts: 0, haz: 'อาคารพังในเมียนมา กรุงเทพฯ อาคารสูงโยก',
+      clue: 'ศูนย์เกิดอยู่บนบกตอนกลางของเมียนมา ตามรอยเลื่อนสะกายซึ่งยาวเกือบ 1,500 กม. แผ่นอินเดียเลื่อนขึ้นเหนือผ่านแผ่นซุนดาไปด้านข้าง',
+      story: 'เมียนมามีผู้เสียชีวิตหลายพันคน กรุงเทพฯ ห่างราว 1,000 กม. ยังรู้สึกได้ อาคารสูงโยก น้ำในสระบนดาดฟ้ากระฉอก อาคารสูงที่กำลังก่อสร้างในเขตจตุจักรถล่ม · ดินเหนียวอ่อนของกรุงเทพฯ ทำให้การสั่นแรงขึ้นและนานขึ้น' },
+    { n: 'กาฐมาณฑุ', c: 'เนปาล', y: '25 เม.ย. 2558', m: '7.8', w: 'บนบก', lon: 84.7, lat: 28.2, a: 1, ts: 0, haz: 'อาคารเก่าพัง ดินถล่ม หิมะถล่ม',
+      clue: 'ศูนย์เกิดอยู่บนบกใต้เทือกเขาหิมาลัย แผ่นทวีปอินเดียดันเข้าหาแผ่นทวีปยูเรเชีย ทำให้เทือกเขาสูงขึ้นเรื่อย ๆ',
+      story: 'ผู้เสียชีวิตราว 9,000 คน วัดและอาคารเก่าในกาฐมาณฑุพัง ดินถล่มปิดหมู่บ้านบนภูเขา หิมะถล่มบนยอดเอเวอเรสต์ ไม่มีทะเลจึงไม่เกิดสึนามิ' },
+    { n: 'วัลดิเวีย', c: 'ชิลี', y: '22 พ.ค. 2503', m: '9.5', w: 'ใต้ทะเล', lon: -73.0, lat: -38.2, a: 0, ts: 1, haz: 'สึนามิข้ามมหาสมุทรถึงฮาวายและญี่ปุ่น',
+      clue: 'ศูนย์เกิดอยู่ใต้ทะเลนอกชายฝั่งอเมริกาใต้ แผ่นนัซกาซึ่งเป็นแผ่นมหาสมุทรมุดลงใต้แผ่นอเมริกาใต้',
+      story: 'แผ่นดินไหวใหญ่ที่สุดเท่าที่เคยตรวจวัดได้ สึนามิข้ามมหาสมุทรแปซิฟิก ถึงฮาวายราว 15 ชั่วโมง และถึงญี่ปุ่นราว 22 ชั่วโมง ทำให้คนที่อยู่ห่างออกไปกว่า 17,000 กม. เสียชีวิต จึงเกิดระบบเตือนภัยสึนามิแปซิฟิก' },
+    { n: 'คาห์รามันมาราช', c: 'ตุรกี–ซีเรีย', y: '6 ก.พ. 2566', m: '7.8', w: 'บนบก', lon: 37.0, lat: 37.2, a: 2, ts: 0, haz: 'อาคารพังจำนวนมากตอนกลางคืน',
+      clue: 'ศูนย์เกิดอยู่บนบกทางใต้ของตุรกี ตามรอยเลื่อนอะนาโตเลียตะวันออก แผ่นอาหรับเลื่อนผ่านแผ่นอะนาโตเลียไปด้านข้าง',
+      story: 'เกิดตอนตี 4 คนส่วนใหญ่หลับอยู่ในอาคาร อาคารจำนวนมากที่สร้างไม่ได้มาตรฐานพังลง ผู้เสียชีวิตกว่า 50,000 คน บทเรียน : อาคารต้องออกแบบต้านแผ่นดินไหว' }
+  ];
+  var HAZ = [
+    { n: 'อาคารพังถล่ม', y: 'ภัยร้ายแรงที่สุด', d: 'คนส่วนใหญ่เสียชีวิตจากอาคารและสิ่งของพังทับ ไม่ใช่จากการสั่นโดยตรง อาคารที่ออกแบบต้านแผ่นดินไหวช่วยชีวิตคนได้มาก' },
+    { n: 'สึนามิ', y: 'ภัย', d: 'คลื่นจากพื้นทะเลที่ยกหรือยุบทันที เดินทางเร็วเท่าเครื่องบิน เข้าฝั่งเป็นกำแพงน้ำ ท่วมไกลหลายร้อยเมตรถึงหลายกิโลเมตร มาหลายลูก' },
+    { n: 'ดินถล่ม หินร่วง', y: 'ภัย', d: 'บนภูเขาและที่ลาดชัน การสั่นทำให้ดินและหินไหลลงมาปิดถนนและหมู่บ้าน เช่น เนปาล 2558' },
+    { n: 'ดินเหลว (ทรายเหลว)', y: 'ภัย', d: 'ดินทรายที่ชุ่มน้ำเมื่อถูกเขย่าจะเสียความแข็งแรง กลายเป็นโคลน อาคารทรุดและเอียง ท่อใต้ดินลอยขึ้น' },
+    { n: 'ไฟไหม้ แก๊สรั่ว', y: 'ภัย', d: 'ท่อแก๊สแตก สายไฟขาด ทำให้เกิดไฟไหม้ตามมา หลังแผ่นดินไหวจึงต้องตรวจแก๊สรั่วและปิดไฟฟ้าก่อน' },
+    { n: 'อาฟเตอร์ช็อก', y: 'ภัย', d: 'แผ่นดินไหวขนาดเล็กกว่าตามมาหลายวันถึงหลายเดือน อาคารที่ร้าวแล้วอาจพังลง ห้ามกลับเข้าอาคารที่เสียหาย' },
+    { n: 'ดินอ่อนขยายการสั่น', y: 'ใกล้ตัว', d: 'กรุงเทพฯ ตั้งอยู่บนดินเหนียวอ่อน การสั่นจากแผ่นดินไหวไกลถูกขยายให้แรงและนานขึ้น อาคารสูงโยกมาก กฎหมายจึงกำหนดให้อาคารสูงออกแบบต้านแผ่นดินไหว', good: 1 },
+    { n: 'ประเทศไทยกับแผ่นดินไหว', y: 'ใกล้ตัว', d: 'กรมทรัพยากรธรณีพบกลุ่มรอยเลื่อนมีพลัง 16 กลุ่ม ส่วนใหญ่อยู่ภาคเหนือ ภาคตะวันตก และภาคใต้ เช่น แม่ลาว เชียงราย 2557 ขนาด 6.3', good: 1 },
+    { n: 'ประเทศไทยกับสึนามิ', y: 'ใกล้ตัว', d: 'ชายฝั่งทะเลอันดามัน 6 จังหวัด (ระนอง พังงา ภูเก็ต กระบี่ ตรัง สตูล) เสี่ยงสึนามิจากแนวมุดตัวสุมาตรา–อันดามัน ฝั่งอ่าวไทยมีโอกาสต่ำกว่ามาก', good: 1 }
+  ];
+  $('haz').innerHTML = HAZ.map(function (e) { return '<div class="ev' + (e.good ? ' good' : '') + '"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '</div>'; }).join('');
+  var BCOL = { D: '#4FD8FF', C: '#FF6B8A', K: '#FF6B8A', T: '#FFD166' };
+  var lay = { b: 1, q: 1 }, selB = 0, mapT = null;
+  function drawB() {
+    var cv = $('cvB'), w = cv.clientWidth || 600; cv.dataset.h = Math.round(clamp(w * .52, 200, 440));
+    var c = fit(cv), x = c.x, W = c.W, H = c.H;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var sc = Math.min((W - 10) / 5.45, (H - 10) / 2.66), cx = W / 2, cy = H / 2;
+    var P = function (lon, lat) { var q = eqe(lon, lat); return [cx + q[0] * sc, cy - q[1] * sc]; };
+    mapT = P;
+    x.beginPath(); for (var la = -90; la <= 90; la += 3) { var q = P(-180, la); if (la === -90) x.moveTo(q[0], q[1]); else x.lineTo(q[0], q[1]); }
+    for (var lb = 90; lb >= -90; lb -= 3) { var q2 = P(180, lb); x.lineTo(q2[0], q2[1]); } x.closePath(); x.fillStyle = '#0c1c4a'; x.fill();
+    x.strokeStyle = 'rgba(120,150,220,.12)'; x.lineWidth = 1;
+    for (var lo = -150; lo <= 150; lo += 30) { x.beginPath(); for (var l2 = -90; l2 <= 90; l2 += 5) { var g = P(lo, l2); if (l2 === -90) x.moveTo(g[0], g[1]); else x.lineTo(g[0], g[1]); } x.stroke(); }
+    for (var lt = -60; lt <= 60; lt += 30) { x.beginPath(); for (var o2 = -180; o2 <= 180; o2 += 5) { var g2 = P(o2, lt); if (o2 === -180) x.moveTo(g2[0], g2[1]); else x.lineTo(g2[0], g2[1]); } x.stroke(); }
+    if (GEO) Object.keys(GEO).forEach(function (k) { GEO[k].forEach(function (ring) {
+      x.beginPath(); ring.forEach(function (p, i) { var q3 = P(p[0], p[1]); if (i) x.lineTo(q3[0], q3[1]); else x.moveTo(q3[0], q3[1]); }); x.closePath();
+      x.fillStyle = '#2f3d68'; x.fill(); x.strokeStyle = '#4c5d96'; x.lineWidth = .8; x.stroke(); }); });
+    if (lay.b) BND.forEach(function (b) {
+      x.beginPath(); b[1].forEach(function (p, i) { var q5 = P(p[0], p[1]); if (i) x.lineTo(q5[0], q5[1]); else x.moveTo(q5[0], q5[1]); });
+      x.strokeStyle = BCOL[b[0]]; x.lineWidth = W < 500 ? 1.6 : 2.4; if (b[0] === 'T') x.setLineDash([6, 4]); x.stroke(); x.setLineDash([]);
+    });
+    if (lay.q) QP.forEach(function (p) { var q6 = P(p[0], p[1]), r = (W < 500 ? 1.6 : 2.2) + p[2] * (W < 500 ? 1.4 : 2.2); x.fillStyle = 'rgba(255,159,107,.8)'; x.beginPath(); x.arc(q6[0], q6[1], r, 0, 6.283); x.fill(); });
+    if (lay.q && W > 520) { var rf = P(-160, 32); label(x, 'วงแหวนแห่งไฟ', rf[0], rf[1], '#FF8FA6', 13); var rf2 = P(160, 30); label(x, 'วงแหวนแห่งไฟ', rf2[0], rf2[1], '#FF8FA6', 13);
+      var rf3 = P(60, 42); label(x, 'แนวแอลป์–หิมาลัย', rf3[0], rf3[1], '#FF8FA6', 12); }
+    var bk = P(100.5, 13.75); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(bk[0], bk[1], 3.4, 0, 6.283); x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.stroke();
+    label(x, 'ไทย', bk[0] + 6, bk[1] + (W < 500 ? 12 : 15), '#FFD166', W < 500 ? 10 : 12, 'left');
+    SITES.forEach(function (s, i) {
+      var q8 = P(s.lon, s.lat), on = i === selB, done = S.recB[i] === 2;
+      if (done && s.ts) for (var k = 0; k < 3; k++) { var rr = ((tA * .5 + k / 3) % 1) * (W < 500 ? 26 : 40) + 6; x.strokeStyle = 'rgba(79,216,255,' + (1 - (rr - 6) / (W < 500 ? 26 : 40)) * .8 + ')'; x.lineWidth = 1.8; x.beginPath(); x.arc(q8[0], q8[1], rr, 0, 6.283); x.stroke(); }
+      if (on) { var pr = 12 + 4 * Math.sin(tA * 4); x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.arc(q8[0], q8[1], pr, 0, 6.283); x.stroke(); }
+      x.fillStyle = done ? '#5EF2A5' : '#E8EDFF'; x.strokeStyle = '#05081a'; x.lineWidth = 2; x.beginPath(); x.arc(q8[0], q8[1], W < 500 ? 7 : 9, 0, 6.283); x.fill(); x.stroke();
+      x.font = '700 ' + (W < 500 ? 9 : 11) + 'px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(String(i + 1), q8[0], q8[1] + (W < 500 ? 3 : 4));
+      if (on && W > 420) label(x, s.n, q8[0], q8[1] - 18, '#FFD166', 12);
+    });
+  }
+  function updB() {
+    var h = '<span class="lbl">ชั้นข้อมูล</span>';
+    [['b', 'รอยต่อแผ่นธรณี'], ['q', 'แผ่นดินไหวใหญ่ในอดีต']].forEach(function (z) { h += '<button class="chip' + (lay[z[0]] ? ' on' : '') + '" data-l="' + z[0] + '">' + z[1] + '</button>'; });
+    $('layChips').innerHTML = h; bindChips($('layChips'), 'l', function (v) { lay[v] = lay[v] ? 0 : 1; updB(); drawB(); });
+    h = '<span class="lbl">เหตุการณ์</span>';
+    SITES.forEach(function (s, i) { h += '<button class="chip' + (i === selB ? ' on' : '') + (S.recB[i] === 2 ? ' done' : '') + '" data-s="' + i + '">' + (i + 1) + ' ' + s.n + '</button>'; });
+    $('siteChips').innerHTML = h; bindChips($('siteChips'), 's', function (v) { selB = +v; updB(); drawB(); });
+    var s = SITES[selB], st = S.recB[selB] || 0;
+    $('bName').textContent = (selB + 1) + ' ' + s.n + ' (' + s.c + ')';
+    $('bClue').textContent = s.clue;
+    $('bData').innerHTML = '<div><div class="k">วันที่</div><div class="d">' + s.y + '</div></div><div><div class="k">ขนาด</div><div class="d">' + s.m + '</div></div><div><div class="k">ศูนย์เกิด</div><div class="d">' + s.w + '</div></div>';
+    $('bAsk').innerHTML = BTYPE.map(function (b, j) { return '<button data-j="' + j + '" class="' + (st >= 1 && j === s.a ? 'ok' : '') + '">' + b + '</button>'; }).join('');
+    Array.prototype.forEach.call($('bAsk').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.recB[selB]) return; var j = +b.getAttribute('data-j');
+        if (j === SITES[selB].a) { S.recB[selB] = 1; save(); updB(); drawB(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('bTsW').classList.toggle('hide', st < 1);
+    $('bTs').innerHTML = ['เกิดสึนามิ', 'ไม่เกิดสึนามิ'].map(function (b, j) { return '<button data-j="' + j + '" class="' + (st === 2 && j === 1 - s.ts ? 'ok' : '') + '">' + b + '</button>'; }).join('');
+    Array.prototype.forEach.call($('bTs').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.recB[selB] !== 1) return; var j = +b.getAttribute('data-j');
+        if (j === 1 - SITES[selB].ts) { S.recB[selB] = 2; save(); updB(); drawB(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('bStory').innerHTML = st === 2 ? 'ถูกต้อง : เกิดที่<b>' + BTYPE[s.a] + '</b> · <b>' + (s.ts ? 'เกิดสึนามิ เพราะพื้นทะเลถูกยกหรือยุบทันที' : 'ไม่เกิดสึนามิ เพราะศูนย์เกิดอยู่บนบก พื้นทะเลไม่ถูกยก') + '</b><br>' + s.story :
+      (st === 1 ? 'ถูกต้อง : เกิดที่<b>' + BTYPE[s.a] + '</b> · ต่อไปตอบข้อ 2 (ดูว่าศูนย์เกิดอยู่ใต้ทะเลหรือบนบก)' : '');
+    var n = 0, rows = '';
+    SITES.forEach(function (z, i) { var r = S.recB[i] === 2; if (r) n++;
+      rows += '<tr' + (i === selB ? ' class="cur"' : '') + '><td class="n">' + (i + 1) + ' ' + z.n + ' ' + z.y.slice(-4) + '</td><td>' + (r ? BSHORT[z.a] : '-') + '</td><td>' + (r ? (z.ts ? 'เกิด' : 'ไม่เกิด') : '-') + '</td><td>' + (r ? z.haz : '-') + '</td></tr>'; });
+    $('logB').innerHTML = rows;
+    $('progB').innerHTML = 'ตามหาแล้ว <b>' + n + '/6</b>' + (n === 6 ? ' · ครบแล้ว ไปภารกิจ C ได้' : '');
+  }
+  $('cvB').onclick = function (ev) {
+    if (!mapT) return; var r = this.getBoundingClientRect(), mx = ev.clientX - r.left, my = ev.clientY - r.top, best = -1, bd = 22;
+    SITES.forEach(function (s, i) { var q = mapT(s.lon, s.lat), d = Math.hypot(q[0] - mx, q[1] - my); if (d < bd) { bd = d; best = i; } });
+    if (best >= 0) { selB = best; updB(); drawB(); }
+  };
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 ห้องทดลองสึนามิ
+  // ภาพตัดขวาง : ตำแหน่ง xn 0–1 · ระยะจริง 0.1 → ฝั่ง (0.9) = 600 กม. · ความเร็วคลื่นน้ำตื้น v = √(g·d)
+  // ภาพย่อส่วนไม่เท่ากัน : ทะเลลึกย่อมาก ไหล่ทวีปขยาย · SEG = [ถึง xn, กม.ต่อ 1 หน่วย xn]  รวม 0.1→0.9 = 600 กม.
+  var XS = .1, XSH = .9, SEG = [[.45, 400 / .35], [.58, 90 / .13], [.72, 70 / .14], [.86, 36 / .14], [.9, 4 / .04]];
+  function kmd(xn) { for (var i = 0; i < SEG.length; i++) if (xn < SEG[i][0]) return SEG[i][1]; return SEG[SEG.length - 1][1]; }
+  function kmTo(xn) { var s = 0, N = 200; for (var i = 0; i < N; i++) { var a = xn + (XSH - xn) * (i + .5) / N; s += kmd(a) * (XSH - xn) / N; } return s; }
+  function depth(xn) {
+    if (xn < .45) return 4000; if (xn < .58) return 4000 - (xn - .45) / .13 * 3000; if (xn < .72) return 1000 - (xn - .58) / .14 * 900;
+    if (xn < .86) return 100 - (xn - .72) / .14 * 90; if (xn < XSH) return 10 - (xn - .86) / .04 * 10; return 0;
+  }
+  function vkmh(d) { return Math.sqrt(9.8 * d) * 3.6; }
+  function htm(d, A0) { return A0 * Math.pow(4000 / Math.max(d, 5), .25); }
+  var PROBES = [{ d: 4000, x: .3 }, { d: 1000, x: .58 }, { d: 100, x: .72 }, { d: 10, x: .86 }];
+  var CAUSE = [
+    { n: 'แผ่นดินไหวใต้ทะเล ขนาด 9 รอยต่อมุดตัว (พื้นทะเลยกตัว)', s: 'ใต้ทะเล ขนาด 9 มุดตัว', A0: .5, src: XS, res: 'เกิดสึนามิขนาดใหญ่ เดินทางข้ามทะเลมาถึงฝั่ง' },
+    { n: 'แผ่นดินไหวใต้ทะเล ขนาด 7', s: 'ใต้ทะเล ขนาด 7', A0: .05, src: XS, res: 'สึนามิเล็กมาก (ไม่กี่เซนติเมตรถึงสิบเซนติเมตร) เพราะพื้นทะเลยกตัวน้อย' },
+    { n: 'แผ่นดินไหวบนบก ขนาด 7.7 รอยเลื่อนเฉือน', s: 'บนบก ขนาด 7.7 เฉือน', A0: 0, src: -1, res: 'ไม่เกิดสึนามิ เพราะพื้นทะเลไม่ถูกยก (แต่บนบกสั่นแรง)' },
+    { n: 'ภูเขาไฟระเบิดหรือแผ่นดินถล่มลงทะเล ใกล้ฝั่ง', s: 'ภูเขาไฟ/แผ่นดินถล่ม', A0: .9, src: .78, res: 'เกิดสึนามิเฉพาะที่ ใกล้ฝั่งมาก เตือนภัยได้น้อย (เช่น อะนักกรากะตัว 2561)' }
+  ];
+  var TT = (function () { var N = 900, a = [], t = 0; for (var i = 0; i <= N; i++) { var xn = i / N; a.push(t); t += (1 / N) * kmd(xn + .5 / N) / vkmh(Math.max(depth(xn + .5 / N), 3)); } return a; })();
+  function ttAt(xn) { var N = TT.length - 1, f = clamp(xn, 0, 1) * N, i = Math.floor(f); return i >= N ? TT[N] : TT[i] + (TT[i + 1] - TT[i]) * (f - i); }
+  function xAtT(src, h) { var t0 = ttAt(src) + h; var lo = src, hi = XSH; for (var k = 0; k < 40; k++) { var mid = (lo + hi) / 2; if (ttAt(mid) < t0) lo = mid; else hi = mid; } return (lo + hi) / 2; }
+  var cC = 0, pC = 0, playC = 0;
+  function totalH(ci) { var C = CAUSE[ci]; return C.src < 0 ? 1 : ttAt(XSH) - ttAt(C.src); }
+  function crestX() { var C = CAUSE[cC]; if (C.src < 0) return -1; return xAtT(C.src, pC * totalH(cC)); }
+  function updC1() {
+    var h = '<span class="lbl">สาเหตุ</span>';
+    CAUSE.forEach(function (z, i) { h += '<button class="chip' + (i === cC ? ' on' : '') + (S.cz[i] ? ' done' : '') + '" data-c="' + i + '">' + z.s + '</button>'; });
+    $('causeChips').innerHTML = h; bindChips($('causeChips'), 'c', function (v) { cC = +v; pC = 0; playC = 0; updC1(); drawC1(); });
+    var C = CAUSE[cC], xc = crestX(), d = xc < 0 ? 0 : depth(xc), hrs = pC * totalH(cC);
+    $('cCause').textContent = C.n;
+    if (C.src < 0) { $('cClock').textContent = 'ศูนย์เกิดอยู่บนบก'; $('cDep').textContent = '-'; $('cSpd').textContent = '-'; $('cHt').textContent = '0'; }
+    else { var mins = Math.round(hrs * 60); $('cClock').textContent = 'เวลาหลังแผ่นดินไหว ' + (mins >= 60 ? Math.floor(mins / 60) + ' ชม. ' + (mins % 60) + ' นาที' : mins + ' นาที') + ' · ห่างฝั่ง ' + Math.round(kmTo(xc)) + ' กม.';
+      var atS = pC >= 1 || d < 1; $('cDep').textContent = atS ? 'ถึงฝั่ง' : fmt(Math.round(d)); $('cSpd').textContent = atS ? '-' : fmt(Math.round(vkmh(d))); $('cHt').textContent = !C.A0 ? '0' : (atS ? (C.A0 >= .3 ? 'หลายเมตร' : '< 0.5') : fmt(Math.round(htm(d, C.A0) * 10) / 10)); }
+    var near = C.src >= 0 && C.A0 > 0 && pC > .82 && pC < 1;
+    $('cMsg').innerHTML = pC >= 1 ? '<b style="color:#FFD166">' + C.res + '</b>' + (cC === 0 ? ' · คลื่นซัดขึ้นฝั่งสูงได้หลายเมตร' : '') :
+      near && C.A0 >= .3 ? '<b style="color:#FF6B8A">น้ำทะเลที่ชายหาดลดลงผิดปกติ ! สัญญาณเตือนว่าคลื่นกำลังมา หนีขึ้นที่สูงทันที</b>' :
+      (cC === 2 ? 'แผ่นดินไหวบนบกทำให้พื้นดินสั่น แต่ไม่ได้ยกน้ำทะเลทั้งมวลขึ้น ลองเดินเวลาดู' : 'ในทะเลลึกคลื่นเดินทางเร็วมากแต่ต่ำ เรือกลางทะเลแทบไม่รู้สึก สังเกตความเร็วและความสูงเมื่อผ่านทุ่นแต่ละจุด');
+    if (pC >= 1 && !S.cz[cC]) { S.cz[cC] = 1; save(); }
+    $('recC').disabled = !(cC === 0 && pC >= 1);
+    $('recCMsg').textContent = cC !== 0 ? 'ตารางทุ่นบันทึกจากกรณีขนาด 9 · กรณีนี้ดูผลแล้วบันทึกอัตโนมัติด้านล่าง' : (pC < 1 ? 'เดินเวลาจนคลื่นถึงฝั่งก่อน' : (S.recC.dep ? 'บันทึกแล้ว' : 'กดบันทึกได้'));
+    $('logC').innerHTML = PROBES.map(function (p) { var r = S.recC.dep; return '<tr><td>' + fmt(p.d) + '</td><td>' + (r ? fmt(Math.round(vkmh(p.d))) : '-') + '</td><td>' + (r ? fmt(Math.round(htm(p.d, .5) * 10) / 10) : '-') + '</td></tr>'; }).join('');
+    var nz = 0; $('logCz').innerHTML = CAUSE.map(function (z, i) { if (S.cz[i]) nz++; return '<tr' + (i === cC ? ' class="cur"' : '') + '><td class="n">' + z.s + '</td><td>' + (S.cz[i] ? z.res : '-') + '</td></tr>'; }).join('');
+    $('tC').value = Math.round(pC * 100); $('playC').textContent = playC ? 'หยุด' : 'เดินเวลา';
+  }
+  $('tC').oninput = function () { pC = +this.value / 100; playC = 0; updC1(); drawC1(); };
+  $('playC').onclick = function () { if (pC >= 1) pC = 0; playC = playC ? 0 : 1; updC1(); };
+  $('resetC').onclick = function () { pC = 0; playC = 0; updC1(); drawC1(); };
+  $('recC').onclick = function () { if (cC !== 0 || pC < 1) return; S.recC.dep = 1; save(); updC1(); };
+  function drawC1() {
+    var c = fit($('cvC1')), x = c.x, W = c.W, H = c.H, C = CAUSE[cC];
+    var seaY = Math.round(H * .3), botY = H - 16;
+    var X = function (xn) { return xn * W; }, Yd = function (d) { return seaY + Math.sqrt(d / 4000) * (botY - seaY - 8); };
+    var g = x.createLinearGradient(0, 0, 0, seaY); g.addColorStop(0, '#0a1440'); g.addColorStop(1, '#1d3570'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var xc = crestX(), pxm = W < 500 ? 8 : 12;
+    // ระดับน้ำ (η) : ยอดคลื่นที่ xc นำหน้าด้วยท้องคลื่น (น้ำลด) ทางฝั่ง
+    function eta(xn) {
+      if (xc < 0 || !C.A0) return 0; var d = depth(xc), wv = clamp(.035 * Math.sqrt(Math.max(d, 10) / 4000) + .012, .014, .05), A = htm(d || 5, C.A0);
+      if (pC >= 1) wv = .03;
+      var u = (xn - xc) / wv; return A * (Math.exp(-u * u) - .75 * Math.exp(-Math.pow(u - 1.4, 2)));
+    }
+    var shoreShift = 0;
+    if (C.A0 && xc > 0) { var e0 = eta(XSH); shoreShift = clamp(e0 * .02, -.05, .06); }
+    // น้ำ
+    x.beginPath(); x.moveTo(0, seaY);
+    for (var px = 0; px <= W; px += 3) { var xn = px / W; if (xn > XSH + shoreShift + .002) break; x.lineTo(px, seaY - eta(xn) * pxm); }
+    x.lineTo(X(XSH + shoreShift), botY); x.lineTo(0, botY); x.closePath();
+    var gw = x.createLinearGradient(0, seaY, 0, botY); gw.addColorStop(0, '#1f6fb0'); gw.addColorStop(1, '#0b2a5e'); x.fillStyle = gw; x.fill();
+    // น้ำท่วมบนฝั่ง
+    if (pC >= 1 && C.A0 >= .3) { var ru = C.A0 >= .5 ? .07 : .045; x.fillStyle = 'rgba(79,216,255,.55)'; x.beginPath(); x.moveTo(X(XSH), seaY); x.lineTo(X(XSH + ru), seaY - 6); x.lineTo(X(XSH + ru), seaY + 2); x.lineTo(X(XSH), seaY + 8); x.closePath(); x.fill();
+      label(x, 'น้ำท่วมชายฝั่ง', X(XSH + ru / 2), seaY + 44, '#4FD8FF', 12); }
+    // พื้นทะเลและแผ่นดิน
+    x.beginPath(); x.moveTo(0, H);
+    for (var p2 = 0; p2 <= W; p2 += 3) { var xn2 = p2 / W, yy = xn2 <= XSH ? Yd(depth(xn2)) : seaY - (xn2 - XSH) / (1 - XSH) * (seaY * .55); x.lineTo(p2, yy); }
+    x.lineTo(W, H); x.closePath(); x.fillStyle = '#5a4632'; x.fill();
+    // ร่องลึก
+    x.fillStyle = '#3d2f22'; x.beginPath(); x.moveTo(X(.06), botY - 8); x.lineTo(X(.1), H); x.lineTo(X(.14), botY - 8); x.closePath(); x.fill();
+    // เมือง เนินเขา
+    var hx = X(.97), hy = seaY - seaY * .5; x.fillStyle = '#3f7a4a'; x.beginPath(); x.moveTo(X(.93), seaY - seaY * .35); x.lineTo(hx, hy - 6); x.lineTo(W, hy - 4); x.lineTo(W, seaY); x.closePath(); x.fill();
+    x.fillStyle = '#c9d6ff'; [.915, .93].forEach(function (b, i) { x.fillRect(X(b), seaY - seaY * (.12 + (b - XSH) * 2.2) - 10 - i * 4, 6, 10 + i * 4); });
+    label(x, 'เนินเขา ปลอดภัย', W - 4, hy - 14, '#5EF2A5', 11.5, 'right');
+    label(x, 'ฝั่ง', X(XSH) + 4, seaY + 26, '#E8EDFF', 12);
+    // แหล่งกำเนิด
+    if (C.src >= 0) { var sx = X(C.src), sy = C.src < .2 ? botY - 6 : Yd(depth(C.src));
+      if (C.src < .2) { var up = pC < .03 ? pC / .03 : 1; x.fillStyle = '#FF9F6B'; x.fillRect(sx - 18, sy - 6 * up, 36, 6 * up + 2); star(x, sx, sy - 10, 8, '#FF4D5E');
+        label(x, 'พื้นทะเลยกตัว', sx + 6, sy - 22, '#FF9F6B', 11.5, 'left'); }
+      else { x.fillStyle = '#8b6f55'; x.beginPath(); x.moveTo(sx - 16, seaY + 20); x.lineTo(sx - 4, seaY - 24); x.lineTo(sx + 6, seaY - 22); x.lineTo(sx + 16, seaY + 20); x.closePath(); x.fill();
+        if (pC < .4) glow(x, sx, seaY - 26, 18, [255, 120, 60], .6); label(x, 'ภูเขาไฟ/ดินถล่ม', sx, seaY - 34, '#FF9F6B', 11.5); } }
+    else { var lx = X(.965); star(x, lx, seaY - seaY * .45, 9, '#FF4D5E'); label(x, 'แผ่นดินไหวบนบก', lx, seaY - seaY * .45 - 16, '#FF6B8A', 11.5, 'right');
+      if (pC > 0) label(x, 'ทะเลสงบ ไม่เกิดคลื่น', X(.45), seaY - 14, '#9AA6CF', 13); }
+    // ทุ่น
+    PROBES.forEach(function (p, i) { var bx = X(p.x), by = seaY - eta(p.x) * pxm, passed = xc >= p.x && C.A0 > 0 && C.src >= 0 && C.src < p.x;
+      x.strokeStyle = 'rgba(255,255,255,.35)'; x.setLineDash([3, 4]); x.beginPath(); x.moveTo(bx, by); x.lineTo(bx, Yd(p.d)); x.stroke(); x.setLineDash([]);
+      x.fillStyle = passed ? '#FFD166' : '#E8EDFF'; x.beginPath(); x.arc(bx, by - 3, 5, 0, 6.283); x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.stroke();
+      label(x, fmt(p.d) + ' ม.', bx, Math.min(Yd(p.d) + 14, H - 4), '#9AA6CF', 11);
+      if (passed && cC === 0) label(x, fmt(Math.round(vkmh(p.d))) + ' กม./ชม.', bx, by - 14 - (i % 2) * 14, '#4FD8FF', W < 500 ? 10 : 11.5); });
+    if (xc > 0 && C.A0) { var cy = seaY - eta(xc) * pxm; arrow(x, X(xc) + 6, cy - 20, X(xc) + 26, cy - 20, '#FFD166', 2, 7); }
+    label(x, 'ทะเลลึก', X(.25), seaY + 30, '#9AA6CF', 12);
+    label(x, 'ความลึกและความสูงคลื่นไม่ตามมาตราส่วน', 6, 16, '#9AA6CF', 11, 'left');
+  }
+
+  // ================================================================ ภารกิจ C ขั้นที่ 2 ศูนย์เตือนภัย
+  var STG = [
+    { t: '08:00 · 0 นาที', ev: 'แผ่นดินไหวขนาด 8.8 ใต้ทะเลอันดามัน ห่างฝั่ง 600 กม. ศูนย์เกิดตื้น ที่รอยต่อแบบมุดตัว ชายฝั่งรู้สึกสั่นเพียงเล็กน้อย',
+      o: ['ไม่ต้องทำอะไร เพราะชายฝั่งสั่นนิดเดียว', 'ประกาศเฝ้าระวังสึนามิ ให้ประชาชนชายฝั่งเตรียมพร้อมอพยพ', 'สั่งให้ทุกคนลงไปรวมกันที่ชายหาด'], a: 1, k: 'ประกาศเฝ้าระวัง เตรียมพร้อมอพยพ',
+      why: 'แผ่นดินไหวใหญ่ใต้ทะเลที่รอยต่อแบบมุดตัวอาจทำให้เกิดสึนามิ ชายฝั่งสั่นน้อยเพราะอยู่ไกล แต่คลื่นยังมาได้ ต้องเฝ้าระวังทันที', wave: 600 },
+    { t: '08:25 · 25 นาที', ev: 'ทุ่นตรวจวัดสึนามิกลางทะเลลึกพบระดับน้ำเปลี่ยนผิดปกติ 0.6 ม. คลื่นกำลังเคลื่อนเข้าหาชายฝั่ง',
+      o: ['ประกาศเตือนภัยสึนามิ เปิดเสียงหอเตือนภัย ส่งข้อความเตือนทางมือถือ ให้อพยพทันที', 'รอให้เห็นคลื่นที่ชายหาดก่อนจึงประกาศ', 'ประกาศว่าคลื่นสูงแค่ 0.6 ม. ไม่อันตราย'], a: 0, k: 'เตือนภัย เปิดหอเตือนภัย อพยพทันที',
+      why: 'คลื่นที่ต่ำกว่า 1 ม. ในทะเลลึกจะสูงขึ้นมากเมื่อเข้าใกล้ฝั่ง และมาเร็วมาก ต้องอพยพก่อนคลื่นถึงฝั่ง ยิ่งเตือนเร็วยิ่งมีเวลาหนี', wave: 420 },
+    { t: '09:40 · 100 นาที', ev: 'น้ำทะเลที่ชายหาดลดลงอย่างรวดเร็วผิดปกติ เห็นปะการังและปลาดิ้นบนหาด นักท่องเที่ยวบางคนเดินลงไปดู',
+      o: ['เดินลงไปเก็บปลาและถ่ายรูป', 'วิ่งขึ้นที่สูงหรืออาคารหลบภัยทันที ไม่ย้อนกลับไปเก็บของ', 'รอดูคลื่นอยู่ที่ชายหาด'], a: 1, k: 'น้ำลดผิดปกติ ขึ้นที่สูงทันที',
+      why: 'น้ำทะเลลดลงผิดปกติเป็นสัญญาณเตือนตามธรรมชาติว่าคลื่นกำลังมาในไม่กี่นาที เหตุการณ์ปี 2547 หลายคนเดินลงไปดูจึงหนีไม่ทัน', wave: 25 },
+    { t: '10:00 · 2 ชั่วโมง', ev: 'คลื่นลูกแรกซัดเข้าฝั่งแล้วไหลกลับลงทะเล ผู้อพยพบางคนอยากกลับลงไปดูบ้านและร้านค้า',
+      o: ['กลับไปดูบ้านได้ทันที เพราะคลื่นผ่านไปแล้ว', 'อยู่ในที่สูงต่อ คลื่นลูกถัดไปอาจใหญ่กว่า รอทางการประกาศยกเลิก', 'ลงไปช่วยเก็บของที่ชายหาด'], a: 1, k: 'อยู่ที่สูงต่อ รอประกาศยกเลิก',
+      why: 'สึนามิมาเป็นชุดหลายลูก ห่างกันหลายนาทีถึงชั่วโมง ลูกหลังอาจใหญ่กว่าลูกแรก ต้องรอทางการประกาศยกเลิกก่อนกลับ', wave: 0 }
+  ];
+  var selS = 0;
+  function updC2() {
+    var h = '<span class="lbl">ช่วงเวลา</span>';
+    STG.forEach(function (z, i) { var lock = i > 0 && S.st[i - 1] !== STG[i - 1].a; h += '<button class="chip' + (i === selS ? ' on' : '') + (S.st[i] === z.a ? ' done' : '') + '" data-s="' + i + '"' + (lock ? ' disabled' : '') + '>' + z.t + '</button>'; });
+    $('stgChips').innerHTML = h; bindChips($('stgChips'), 's', function (v) { selS = +v; updC2(); drawC2(); });
+    var Z = STG[selS], ok = S.st[selS] === Z.a;
+    $('sTime').textContent = 'ช่วงเวลา ' + (selS + 1) + ' / 4 · ' + Z.t;
+    $('sEv').textContent = Z.ev;
+    $('sAsk').innerHTML = Z.o.map(function (o, j) { return '<button data-j="' + j + '" class="' + (ok && j === Z.a ? 'ok' : '') + '">' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($('sAsk').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.st[selS] === STG[selS].a) return; var j = +b.getAttribute('data-j');
+        if (j === STG[selS].a) { S.st[selS] = j; save(); updC2(); drawC2(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('sWhy').textContent = ok ? 'ถูกต้อง : ' + Z.why : '';
+    var n = 0; $('logS').innerHTML = STG.map(function (z, i) { var r = S.st[i] === z.a; if (r) n++; return '<tr' + (i === selS ? ' class="cur"' : '') + '><td>' + z.t + '</td><td class="n">' + z.ev.split(' ').slice(0, 4).join(' ') + ' ...</td><td>' + (r ? z.k : '-') + '</td></tr>'; }).join('');
+    $('progS').innerHTML = 'ตัดสินใจถูกแล้ว <b>' + n + '/4</b>' + (n === 4 ? ' · ทุกคนในหาดดาวทะเลอพยพทัน' : '');
+  }
+  function drawC2() {
+    var c = fit($('cvC2')), x = c.x, W = c.W, H = c.H, Z = STG[selS], ok = S.st[selS] === Z.a;
+    var sea = selS === 2 ? .2 : .3, beach = .4;
+    x.fillStyle = '#2b4a2f'; x.fillRect(0, 0, W, H);
+    // เนินเขา
+    var hl = x.createRadialGradient(W * .9, H * .42, 10, W * .9, H * .42, W * .22); hl.addColorStop(0, '#6f9a52'); hl.addColorStop(1, 'rgba(60,110,60,0)'); x.fillStyle = hl; x.fillRect(W * .62, 0, W * .38, H);
+    x.strokeStyle = 'rgba(200,230,160,.35)'; x.lineWidth = 1; [.06, .11, .16].forEach(function (r) { x.beginPath(); x.ellipse(W * .9, H * .42, W * r, H * r * 2.2, 0, 0, 6.283); x.stroke(); });
+    // ทะเลและหาด
+    x.fillStyle = '#e8d6a6'; x.fillRect(0, 0, W * beach, H);
+    if (selS === 2) { x.fillStyle = '#b9a77e'; x.fillRect(W * .2, 0, W * .1, H); for (var i = 0; i < 14; i++) { x.fillStyle = '#FF9F6B'; x.beginPath(); x.ellipse(W * (.21 + hash(i, 4) * .08), H * hash(i, 5), 4, 2, 0, 0, 6.283); x.fill(); } }
+    var gs = x.createLinearGradient(0, 0, W * sea, 0); gs.addColorStop(0, '#0b2a5e'); gs.addColorStop(1, '#1f6fb0'); x.fillStyle = gs; x.fillRect(0, 0, W * sea, H);
+    // พื้นที่เสี่ยงน้ำท่วม
+    x.fillStyle = selS === 3 ? 'rgba(79,216,255,.5)' : 'rgba(79,216,255,.16)'; x.fillRect(W * sea, 0, W * (.66 - sea), H);
+    x.strokeStyle = '#4FD8FF'; x.setLineDash([6, 5]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(W * .66, 0); x.lineTo(W * .66, H); x.stroke(); x.setLineDash([]);
+    label(x, 'แนวน้ำท่วมสึนามิ', W * .66 - 4, 16, '#4FD8FF', 11.5, 'right');
+    if (selS === 3) { for (var k = 0; k < 3; k++) { x.strokeStyle = 'rgba(255,255,255,.6)'; x.lineWidth = 2; x.beginPath(); for (var yy = 0; yy <= H; yy += 6) { var wx = W * (.5 + k * .05) + Math.sin(yy * .05 + tA * 3 + k) * 5; if (yy === 0) x.moveTo(wx, yy); else x.lineTo(wx, yy); } x.stroke(); } }
+    // ถนนและเส้นทางอพยพ
+    x.strokeStyle = '#8a8f9e'; x.lineWidth = 6; x.beginPath(); x.moveTo(W * .42, H * .5); x.lineTo(W * .84, H * .5); x.stroke();
+    x.beginPath(); x.moveTo(W * .55, H * .1); x.lineTo(W * .55, H * .9); x.stroke();
+    var go = selS >= 1 && (S.st[1] === STG[1].a || selS > 1);
+    x.globalAlpha = go ? 1 : .45; [[.42, .5, .82, .5], [.55, .82, .55, .55], [.48, .22, .6, .3]].forEach(function (r) { x.setLineDash([8, 6]); arrow(x, W * r[0], H * r[1], W * r[2], H * r[3], '#5EF2A5', 3, 10); x.setLineDash([]); }); x.globalAlpha = 1;
+    // สถานที่
+    function place(px, py, w, h, col, t, ty) { x.fillStyle = col; x.fillRect(W * px - w / 2, H * py - h / 2, w, h); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.strokeRect(W * px - w / 2, H * py - h / 2, w, h); label(x, t, W * px, H * py + (ty || h / 2 + 13), '#E8EDFF', W < 500 ? 10 : 11.5); }
+    place(.47, .22, 26, 18, '#c9d6ff', 'โรงแรมริมหาด');
+    place(.6, .3, 24, 26, '#5EF2A5', 'อาคารหลบภัย');
+    place(.5, .78, 30, 18, '#FFD166', 'โรงเรียน');
+    x.fillStyle = '#5EF2A5'; x.beginPath(); x.arc(W * .88, H * .5, 10, 0, 6.283); x.fill(); label(x, 'จุดรวมพลบนเนินเขา', W * .88, H * .5 + 24, '#5EF2A5', W < 500 ? 10 : 11.5);
+    x.fillStyle = '#FFD166'; x.fillRect(W * .43 - 3, H * .62 - 14, 6, 14); x.beginPath(); x.arc(W * .43, H * .62 - 16, 6, 0, 6.283); x.fill();
+    if (selS === 1 && ok) for (var s2 = 0; s2 < 3; s2++) { var rr = ((tA * .8 + s2 / 3) % 1) * 46 + 8; x.strokeStyle = 'rgba(255,209,102,' + (1 - (rr - 8) / 46) + ')'; x.lineWidth = 2; x.beginPath(); x.arc(W * .43, H * .62 - 16, rr, 0, 6.283); x.stroke(); }
+    label(x, 'หอเตือนภัย', W * .43, H * .62 + 12, '#FFD166', W < 500 ? 10 : 11.5);
+    label(x, 'ชายหาด', W * (sea + .05), H * .9, '#06102A', 12);
+    label(x, 'ทะเลอันดามัน', W * sea / 2, H * .9, '#E8EDFF', 12);
+    if (Z.wave > 0) { label(x, 'คลื่นอยู่ห่างฝั่งราว ' + Z.wave + ' กม.', 8, 18, '#FF9F6B', 12.5, 'left'); arrow(x, 6, 34, 40, 34, '#FF9F6B', 3, 9); }
+    if (selS === 2) label(x, 'น้ำทะเลลดลงผิดปกติ', W * .25, 34, '#FF6B8A', 13);
+    if (selS === 3) label(x, 'คลื่นลูกแรกถอยกลับ ลูกต่อไปกำลังมา', W * .2, 18, '#FF6B8A', 12.5);
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส
+  var CL = [
+    { L: 'H', q: 'ระหว่างเกิดแผ่นดินไหวขณะอยู่ในห้องเรียน ควรทำอย่างไร', o: ['วิ่งลงบันไดทันที', 'หมอบ ป้อง เกาะ ใต้โต๊ะที่แข็งแรง ห่างหน้าต่าง', 'ยืนพิงหน้าต่าง', 'ใช้ลิฟต์ลงไปข้างล่าง'], a: 1,
+      w: 'ขณะสั่นการวิ่งทำให้ล้มหรือถูกของตกใส่ หมอบลง ป้องศีรษะและคอ เกาะขาโต๊ะไว้จนหยุดสั่น แล้วจึงออกจากอาคารทางบันได' },
+    { L: 'A', q: 'แผ่นดินไหวเกิดขึ้นได้อย่างไร', o: ['ฝนตกหนักทำให้ดินอ่อน', 'หินที่ถูกแรงกระทำสะสมจนแตกและเลื่อนตัวตามรอยเลื่อน ปล่อยพลังงานเป็นคลื่น', 'ดวงจันทร์ดึงดูดแผ่นดิน', 'ลมพัดแรงมาก'], a: 1,
+      w: 'แผ่นธรณีเคลื่อนที่ ทำให้หินบริเวณรอยเลื่อนถูกแรงกระทำ หินโค้งงอสะสมพลังงานจนแตกและเลื่อนตัวทันที พลังงานแผ่ออกเป็นคลื่นไหวสะเทือน' },
+    { L: 'R', q: 'หลังแผ่นดินไหวแรงที่ชายฝั่ง เห็นน้ำทะเลลดลงผิดปกติ ควรทำอย่างไร', o: ['เดินลงไปเก็บหอยเก็บปลา', 'ถ่ายคลิปลงโซเชียล', 'หนีขึ้นที่สูงหรือไกลจากฝั่งทันที', 'ว่ายน้ำออกไปดูคลื่น'], a: 2,
+      w: 'น้ำลดผิดปกติ คือท้องคลื่นของสึนามิมาถึงก่อน ยอดคลื่นจะตามมาในไม่กี่นาที ต้องหนีทันทีโดยไม่รอประกาศ' },
+    { L: 'B', q: 'แผ่นดินไหวครั้งเดียวกัน ข้อใดถูกต้อง', o: ['ขนาดต่างกันในแต่ละเมือง', 'ขนาดมีค่าเดียว แต่ความรุนแรงต่างกันตามระยะทางและพื้นดิน', 'ความรุนแรงเท่ากันทุกเมือง', 'ขนาดและความรุนแรงคือสิ่งเดียวกัน'], a: 1,
+      w: 'ขนาด (แมกนิจูด) วัดพลังงานที่ปล่อยออกมา มีค่าเดียว ส่วนความรุนแรง (เมอร์คัลลี) บอกผลที่แต่ละที่ได้รับ ใกล้ศูนย์เกิดและดินอ่อนจะรุนแรงกว่า' },
+    { L: 'O', q: 'แผ่นดินไหวหยุดแล้ว ต้องออกจากอาคารเรียน 4 ชั้น ควรทำอย่างไร', o: ['ใช้ลิฟต์เพราะเร็วกว่า', 'กลับไปเก็บของในห้องก่อน', 'ลงทางบันได ไปจุดรวมพลที่โล่ง ระวังอาฟเตอร์ช็อก', 'ยืนรออยู่ใต้ตึกสูง'], a: 2,
+      w: 'ลิฟต์อาจค้างหรือไฟดับ ใช้บันได ไปที่โล่งห่างอาคารและเสาไฟ เพราะอาจมีอาฟเตอร์ช็อกตามมา ตรวจแก๊สรั่วก่อนจุดไฟ' },
+    { L: 'R', q: 'คลื่นสึนามิลูกแรกถอยกลับลงทะเลแล้ว ควรทำอย่างไร', o: ['รีบกลับไปดูบ้าน', 'อยู่ในที่สูงจนทางการประกาศยกเลิก', 'ลงไปเล่นน้ำที่ชายหาด', 'ขับรถเลียบชายหาดไปดู'], a: 1,
+      w: 'สึนามิมาเป็นชุดหลายลูก ลูกหลังอาจใหญ่กว่า ต้องรอฟังประกาศจากศูนย์เตือนภัยพิบัติแห่งชาติก่อนกลับ' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- ขั้นที่ 4 คลังพื้นที่เสี่ยงสำหรับสืบค้น
+  var LIB = [
+    { y: 'ไทย · ฝั่งทะเลอันดามัน', n: 'ภูเก็ต พังงา กระบี่ ระนอง ตรัง สตูล', d: 'เสี่ยงสึนามิจากแนวมุดตัวสุมาตรา–อันดามัน มีหอเตือนภัยตามชายหาด ป้ายเส้นทางหนีสึนามิ และซ้อมอพยพทุกปี', i: 'หน่วยงาน : ศูนย์เตือนภัยพิบัติแห่งชาติ กรมป้องกันและบรรเทาสาธารณภัย' },
+    { y: 'ไทย · ภาคเหนือและภาคตะวันตก', n: 'เชียงราย เชียงใหม่ แม่ฮ่องสอน ตาก กาญจนบุรี', d: 'มีรอยเลื่อนมีพลัง เช่น รอยเลื่อนพะเยา (แม่ลาว 2557 ขนาด 6.3) รอยเลื่อนแม่จัน รอยเลื่อนศรีสวัสดิ์ และใกล้รอยเลื่อนสะกายในเมียนมา', i: 'หน่วยงาน : กรมอุตุนิยมวิทยา (ศูนย์เฝ้าระวังแผ่นดินไหว) · กรมทรัพยากรธรณี (แผนที่รอยเลื่อนมีพลัง)' },
+    { y: 'ไทย · กรุงเทพฯ และปริมณฑล', n: 'อาคารสูง บ้าน และโรงเรียนของเรา', d: 'ไม่มีรอยเลื่อนใกล้ แต่ดินเหนียวอ่อนขยายการสั่นจากแผ่นดินไหวไกล เช่น เมียนมา 2568 อาคารสูงโยกมาก ต้องมีแผนอพยพและจุดรวมพล', i: 'ข้อมูล : กรมโยธาธิการและผังเมือง (มาตรฐานอาคารต้านแผ่นดินไหว)' },
+    { y: 'ญี่ปุ่น', n: 'โตเกียว ชายฝั่งโทโฮกุ', d: 'แผ่นดินไหวบ่อยที่สุดประเทศหนึ่ง มีระบบเตือนภัยแผ่นดินไหวล่วงหน้าผ่านมือถือ กำแพงกันคลื่น อาคารหลบภัยสึนามิ และซ้อมทุกปีวันที่ 1 ก.ย.', i: 'หน่วยงาน : สำนักอุตุนิยมวิทยาญี่ปุ่น (JMA)' },
+    { y: 'อินโดนีเซีย', n: 'สุมาตรา (อาเจะห์) และชวา', d: 'อยู่บนแนวมุดตัวซุนดา แผ่นดินไหวและสึนามิบ่อย อาเจะห์เสียหายหนักที่สุดในปี 2547 ปัจจุบันมีอาคารหลบภัยสึนามิหลายแห่ง', i: 'หน่วยงาน : BMKG (อุตุนิยมวิทยา ภูมิอากาศ และธรณีฟิสิกส์)' },
+    { y: 'เนปาล ตุรกี เมียนมา', n: 'เมืองบนแผ่นดินใกล้รอยเลื่อน', d: 'แผ่นดินไหวบนบก ไม่มีสึนามิ แต่อาคารที่สร้างไม่ได้มาตรฐานพังจำนวนมาก แผนรับมือจึงเน้นอาคารแข็งแรง ซ้อมหมอบ ป้อง เกาะ และจุดรวมพล', i: 'ตัวอย่างบทเรียนเรื่องความปลอดภัยของอาคาร' }
+  ];
+  $('lib').innerHTML = LIB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawA();
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (shakeA > 0) shakeA = Math.max(0, shakeA - dt);
+    if (tab === 'A') { stepPlay(dt); drawA(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { if (playC) { pC = Math.min(1, pC + dt / 10); if (pC >= 1) playC = 0; updC1(); } drawC1(); drawC2(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC1(); updC2(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_G5 = { MAGS: MAGS, TOWNS: TOWNS, inten: inten, SITES: SITES, PROBES: PROBES, vkmh: vkmh, htm: htm, ttAt: ttAt, CAUSE: CAUSE, STG: STG, CL: CL,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; shakeA = 0; },
+    setA: function (m, t, p, soil, tt) { playing = 0; mA = m; tw = t; pA = p; sA = soil || 0; if (tt != null) tA = tt; updA(); drawA(); },
+    setB: function (i) { selB = i; updB(); drawB(); },
+    setC1: function (ci, p) { playC = 0; cC = ci; pC = p; updC1(); drawC1(); },
+    setC2: function (i, tt) { selS = i; if (tt != null) tA = tt; updC2(); drawC2(); },
+    recAll: function () { WSK.forEach(function (z) { S.recA[z] = 1; }); SITES.forEach(function (s, i) { S.recB[i] = 2; }); S.recC.dep = 1; CAUSE.forEach(function (z, i) { S.cz[i] = 1; });
+      STG.forEach(function (z, i) { S.st[i] = z.a; }); CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA(); updB(); updC1(); updC2(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
