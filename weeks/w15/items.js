@@ -3,5 +3,7 @@
    type ที่ใช้ได้: slides | worksheet | sim | activity | video | link | doc
    ห้ามวางเฉลย ข้อสอบ หรือข้อมูลนักเรียนในโฟลเดอร์ weeks/ */
 ESJ.week(15, [
-  // { type: "worksheet", code: "A1", title: "...", file: "....pdf", note: "" },
+  { type: "sim",       code: "A1", title: "สถานการณ์จำลอง ภารกิจสถานีพลังงานสุริยะและสายลม (ภารกิจ A B C)", file: "a1-sim-sun-wind.html", note: "ใช้คู่กับใบงาน A1 · ห้องทดลองแสงอาทิตย์ ยานสำรวจฤดูกาล สถานีความกดอากาศ · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-a1-sim.png" },
+  { type: "worksheet", code: "A1", title: "ใบงาน A1 ภารกิจสถานีพลังงานสุริยะและสายลม (1 แผ่น 2 หน้า)", file: "a1-worksheet.pdf", note: "3 คะแนน · ส่งครบ = ได้คะแนน · พิมพ์หน้า-หลัง" },
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 15 A1 พลังงานจากดวงอาทิตย์และความกดอากาศ", file: "w15-slides-a1-sun-pressure.pdf", note: "24 หน้า · คาบคู่และคาบเดี่ยว" }
 ]);

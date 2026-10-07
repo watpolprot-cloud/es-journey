@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A1 ภารกิจสถานีพลังงานสุริยะและสายลม · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ES Journey · สถานการณ์จำลอง A1 (ธีมภารกิจอวกาศ ชุดเดียวกับสไลด์ เว็บ E1-G5) */
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #5a4a1c44, transparent), radial-gradient(900px 500px at 0% 110%, #1b4a6e44, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--cyan); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.gold { border-color: var(--gold); color: var(--gold); }
+.btn.gold.solid { background: var(--gold); color: var(--ink); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.chip:disabled { opacity: .35; cursor: default; }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px 8px; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 4px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #FFD166, #FF6B8A); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.budget { display: grid; grid-template-columns: 1.3fr 1fr; gap: 12px; align-items: center; margin-top: 6px; }
+.budget svg { width: 100%; height: auto; display: block; background: #050a1f; border: 1px solid var(--line-hi); border-radius: 12px; }
+.budget .rows { display: flex; flex-direction: column; gap: 6px; }
+.budget .rows div { border-radius: 10px; padding: 6px 10px; background: #0b1233aa; border: 1.5px solid var(--line); font-size: 15px; line-height: 1.35; }
+.budget .rows b { font-family: var(--head); font-size: 20px; margin-right: 6px; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards, .budget { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .al .opts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · A1 <span class="unit-tag">หน่วยที่ 3</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจสถานี<b>พลังงานสุริยะและสายลม</b></h1>
+  <p class="lead">ทดลองว่าทำไมแต่ละที่บนโลกได้รับพลังงานจากดวงอาทิตย์ไม่เท่ากัน ตามยานสำรวจไปดูฤดูกาลรอบโลก แล้วไขความลับว่าความกดอากาศทำให้เกิดลมได้อย่างไร</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองแสงอาทิตย์<small>มุมตกกระทบ × พื้นผิว</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>ยานสำรวจฤดูกาล<small>ละติจูด × เดือน × ช่วงกลางวัน</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>สถานีความกดอากาศ<small>กล่องควันธูป บอลลูน ชายหาด</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองแสงอาทิตย์ : มุมตกกระทบและพื้นผิว</h2>
+    <p class="how">เลือกมุมของแสงอาทิตย์และชนิดพื้นผิว แล้วกด "เปิดแสง 10 นาที" สังเกตว่าแสงจำนวนเท่าเดิมกระจายบนพื้นที่กว้างแค่ไหน และพื้นร้อนขึ้นเท่าใด เดินเวลาจนสุดแถบจึงบันทึกผลได้</p>
+    <div class="chips" id="angChips"></div>
+    <div class="chips" id="surfChips"></div>
+    <div class="twin">
+      <canvas id="cvA" height="400" aria-label="ลำแสงอาทิตย์ส่องผ่านชั้นบรรยากาศลงบนพื้นผิวที่มุมต่าง ๆ แสดงพื้นที่ที่แสงตกกระทบ ส่วนที่สะท้อนกลับ และเทอร์โมมิเตอร์วัดอุณหภูมิพื้น"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="aCase">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">พื้นที่ที่แสงตกกระทบ</div><div class="v g" id="aArea">-</div></div>
+          <div><div class="k">พลังงานต่อพื้นที่</div><div class="v r" id="aEn">-</div></div>
+          <div><div class="k">ระยะทางที่แสงผ่านบรรยากาศ</div><div class="v c" id="aPath">-</div></div>
+          <div><div class="k">พื้นผิวสะท้อนแสงกลับ</div><div class="v p" id="aRef">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px" id="aTime">-</div>
+        <div class="bar"><i id="aBar"></i></div>
+        <div class="g2" style="margin-top:4px;align-items:center">
+          <div class="k">อุณหภูมิพื้น<br>(เริ่มต้น 25 °C)</div>
+          <div class="v e" id="aTemp" style="font-size:30px">-</div>
+        </div>
+        <div class="k" style="margin-top:4px">ตัวอย่างในชีวิตจริง</div>
+        <div class="d" id="aEx" style="color:#4FD8FF">-</div>
+        <div class="d" id="aWhy" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <input type="range" id="tR" min="0" max="100" step="1" value="0" aria-label="เวลาที่เปิดแสง">
+    <div class="ctrl"><button class="btn" id="playA">เปิดแสง 10 นาที</button><button class="btn" id="resetA">เริ่มใหม่</button><span class="lbl">เลื่อนแถบไปทางขวา = เวลาผ่านไป</span></div>
+    <div class="ctrl"><button class="btn gold solid" id="recA">บันทึกผล</button><span class="lbl" id="recAMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>มุมแสง · พื้นผิว</th><th>พื้นที่ (เท่า)</th><th>พลังงานต่อพื้นที่</th><th>สะท้อน</th><th>อุณหภูมิหลัง 10 นาที</th></tr></thead>
+      <tbody id="logA"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>รู้ไหม</em> พลังงานจากดวงอาทิตย์ 100 ส่วน ไปไหนบ้าง</h2>
+    <div class="budget">
+      <svg viewBox="0 0 420 230" role="img" aria-label="พลังงานจากดวงอาทิตย์ 100 ส่วน สะท้อนกลับสู่อวกาศราว 30 ส่วน บรรยากาศและเมฆดูดกลืนราว 20 ส่วน พื้นผิวโลกดูดกลืนราว 50 ส่วน" font-family="Chakra Petch, Sarabun, sans-serif">
+        <defs><linearGradient id="atm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4FD8FF" stop-opacity=".05"/><stop offset="1" stop-color="#4FD8FF" stop-opacity=".25"/></linearGradient></defs>
+        <rect x="0" y="70" width="420" height="120" fill="url(#atm)"/>
+        <line x1="0" y1="70" x2="420" y2="70" stroke="#4FD8FF" stroke-opacity=".5" stroke-dasharray="5 4"/>
+        <text x="410" y="86" fill="#9AA6CF" font-size="12" text-anchor="end">ชั้นบรรยากาศ</text>
+        <rect x="0" y="190" width="420" height="40" fill="#3b5a2a"/>
+        <text x="410" y="222" fill="#E8EDFF" font-size="12" text-anchor="end">พื้นผิวโลก (ดิน น้ำ ป่า)</text>
+        <circle cx="36" cy="30" r="20" fill="#FFD166"/><circle cx="36" cy="30" r="28" fill="#FFD166" fill-opacity=".2"/>
+        <path d="M62 30 L120 30 L190 190" fill="none" stroke="#FFD166" stroke-width="22" stroke-opacity=".8" stroke-linejoin="round"/>
+        <text x="88" y="20" fill="#FFD166" font-size="15" font-weight="700">100</text>
+        <path d="M150 110 L210 20" fill="none" stroke="#A77BFF" stroke-width="13" stroke-opacity=".85"/>
+        <polygon points="222,4 200,22 216,30" fill="#A77BFF"/>
+        <text x="226" y="30" fill="#A77BFF" font-size="14" font-weight="700">สะท้อนกลับ ~30</text>
+        <ellipse cx="290" cy="110" rx="46" ry="16" fill="#E8EDFF" fill-opacity=".85"/><ellipse cx="270" cy="102" rx="22" ry="13" fill="#E8EDFF" fill-opacity=".85"/>
+        <path d="M168 145 Q230 150 262 128" fill="none" stroke="#4FD8FF" stroke-width="9" stroke-opacity=".85"/>
+        <text x="300" y="150" fill="#4FD8FF" font-size="14" font-weight="700" text-anchor="middle">บรรยากาศ เมฆ</text>
+        <text x="300" y="166" fill="#4FD8FF" font-size="14" font-weight="700" text-anchor="middle">ดูดกลืน ~20</text>
+        <ellipse cx="190" cy="196" rx="34" ry="8" fill="#FF6B8A" fill-opacity=".7"/>
+        <text x="108" y="214" fill="#FF9F6B" font-size="14" font-weight="700" text-anchor="middle">พื้นผิวดูดกลืน ~50</text>
+      </svg>
+      <div class="rows">
+        <div style="border-color:#A77BFF"><b style="color:#A77BFF">~30</b>สะท้อนกลับสู่อวกาศ (เมฆ อากาศ พื้นผิวสีอ่อน เช่น หิมะ)</div>
+        <div style="border-color:#4FD8FF"><b style="color:#4FD8FF">~20</b>แก๊สในบรรยากาศและเมฆดูดกลืนไว้</div>
+        <div style="border-color:#FF9F6B"><b style="color:#FF9F6B">~50</b>พื้นผิวโลกดูดกลืน แล้วถ่ายเทความร้อนให้อากาศ ทำให้อากาศอุ่น</div>
+      </div>
+    </div>
+    <div class="note">แสงอาทิตย์จำนวนเท่าเดิม ถ้าตกกระทบ "ตั้งฉาก" จะรวมอยู่บนพื้นที่แคบ พลังงานต่อพื้นที่มาก พื้นร้อนเร็ว · ถ้าตกกระทบ "เฉียง" แสงกระจายบนพื้นที่กว้าง และต้องผ่านบรรยากาศยาวขึ้น พื้นร้อนช้า · พื้นผิวสีอ่อนสะท้อนแสงมาก ส่วนน้ำร้อนช้าเพราะต้องใช้พลังงานมากกว่าจะร้อนขึ้น</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 4 มุม (ดินและหญ้า) + อุณหภูมิ 4 พื้นผิว (มุม 90°) ตอบข้อ 1–2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> ยานสำรวจฤดูกาล : ละติจูด เดือน และช่วงกลางวัน</h2>
+    <p class="how">ยานลอยอยู่ข้างโลก มองเห็นแสงอาทิตย์ส่องมาจากทางซ้าย เลือกเมืองและเดือน แล้วกด "หมุนโลก 1 วัน" ดูว่าเมืองอยู่ในด้านกลางวันนานเท่าใด และดวงอาทิตย์ตอนเที่ยงอยู่สูงแค่ไหน หมุนครบ 1 วันจึงบันทึกผลได้</p>
+    <div class="chips" id="cityChips"></div>
+    <div class="chips" id="monChips"></div>
+    <div class="twin">
+      <canvas id="cvB" height="440" aria-label="โลกมองจากด้านข้าง แกนโลกเอียง แสงอาทิตย์ส่องจากด้านซ้าย เส้นละติจูดของเมืองแบ่งเป็นส่วนกลางวันและกลางคืน และภาพท้องฟ้าแสดงมุมของดวงอาทิตย์"></canvas>
+      <div class="info">
+        <div class="k">เมือง · เดือน</div>
+        <div class="v c" id="bCase">-</div>
+        <div class="k" id="bLat">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">มุมดวงอาทิตย์<br>ตอนเที่ยงวัน</div><div class="v g" id="bNoon">-</div></div>
+          <div><div class="k">ช่วงกลางวัน<br>(ชั่วโมง)</div><div class="v c" id="bDay">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px">พลังงานที่ได้รับต่อวัน (เทียบเส้นศูนย์สูตรเดือนมีนาคม = 100)</div>
+        <div class="bar"><i id="bBar"></i></div>
+        <div class="v r" id="bEn" style="font-size:18px">-</div>
+        <div class="k" id="bTime" style="margin-top:4px">-</div>
+        <h3 id="bSeason" style="margin-top:4px">-</h3>
+        <div class="d" id="bWhy">-</div>
+      </div>
+    </div>
+    <input type="range" id="tB" min="0" max="100" step="1" value="0" aria-label="เวลาใน 1 วัน">
+    <div class="ctrl"><button class="btn" id="playB">หมุนโลก 1 วัน</button><button class="btn" id="resetB">เริ่มใหม่</button><button class="btn gold solid" id="recB">บันทึกผล</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="leg"><span><i style="background:#FFD166"></i>เส้นละติจูดของเมือง (ด้านกลางวัน)</span><span><i style="background:#6b6440"></i>ด้านกลางคืน</span><span><i style="background:#9AA6CF"></i>เส้นศูนย์สูตร</span><span><i class="dot" style="background:#FF6B8A"></i>ตำแหน่งเมือง</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>เมือง · เดือน</th><th>มุมเที่ยงวัน</th><th>กลางวัน (ชม.)</th><th>พลังงานต่อวัน</th><th>ซีกโลกนี้</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <div class="note">แกนโลกเอียงราว 23.5 องศา ขณะโคจรรอบดวงอาทิตย์ ซีกโลกที่เอียงเข้าหาดวงอาทิตย์ได้แสงเกือบตั้งฉากและกลางวันยาว จึงเป็นฤดูร้อน อีกซีกเป็นฤดูหนาว ฤดูกาลไม่ได้เกิดจากโลกอยู่ใกล้หรือไกลดวงอาทิตย์ (โลกอยู่ใกล้ดวงอาทิตย์ที่สุดช่วงต้นเดือนมกราคม)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 กรณี (กรุงเทพฯ ออสโล ซิดนีย์ เดือน มิ.ย. และ ธ.ค.) ตอบข้อ 3</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> สถานีความกดอากาศ : อากาศร้อน อากาศเย็น และลม</h2>
+    <p class="how">อากาศมีน้ำหนักและกดทับทุกสิ่ง เรียกว่า ความกดอากาศ (ที่ระดับทะเลราว 1,013 เฮกโตปาสกาล) นักบินจะทดลอง 3 ขั้น แล้วไขรหัสสถานี</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> กล่องควันธูป : อากาศร้อนลอยขึ้น อากาศเย็นจมลง</h2>
+    <div class="chips" id="boxChips"></div>
+    <div class="twin">
+      <canvas id="cvC1" height="340" aria-label="กล่องทดลองมีปล่อง 2 ปล่อง จุดเทียนใต้ปล่องหนึ่ง ควันธูปไหลลงอีกปล่อง แล้วไหลตามพื้นไปทางเทียนและลอยออก แสดงความกดอากาศสูงและต่ำ"></canvas>
+      <div class="info">
+        <div class="k">กรณีที่ทดลอง</div>
+        <div class="v c" id="c1Case" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความกดอากาศ<br>ด้านซ้าย (hPa)</div><div class="v g" id="c1L">-</div></div>
+          <div><div class="k">ความกดอากาศ<br>ด้านขวา (hPa)</div><div class="v g" id="c1R">-</div></div>
+        </div>
+        <h3 id="c1Res" style="margin-top:4px">-</h3>
+        <div class="d" id="c1Why">-</div>
+      </div>
+    </div>
+    <input type="range" id="tC1" min="0" max="100" step="1" value="0" aria-label="เวลาหลังจุดเทียน">
+    <div class="ctrl"><button class="btn" id="playC1">จุดเทียน</button><button class="btn" id="resetC1">เริ่มใหม่</button><button class="btn gold solid" id="recC1">บันทึกผล</button><span class="lbl" id="recC1Msg"></span></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> บอลลูนตรวจอากาศ : ยิ่งสูง ความกดอากาศยิ่งเป็นอย่างไร</h2>
+    <p class="how" style="margin-bottom:4px">บอลลูนพาเครื่องวัดความกดอากาศและถุงขนมที่ปิดสนิทจากชายหาดขึ้นไป เลือกจุดหมาย 4 แห่ง เมื่อบอลลูนไปถึงจะบันทึกผลให้อัตโนมัติ</p>
+    <div class="chips" id="stopChips"></div>
+    <div class="twin">
+      <canvas id="cvC2" height="380" aria-label="ภาพตามความสูงตั้งแต่ระดับทะเลถึง 12 กิโลเมตร มีดอยอินทนนท์ ยอดเขาเอเวอเรสต์ เครื่องบิน จุดอากาศบางลงเมื่อสูงขึ้น และบอลลูนพาถุงขนมที่พองขึ้น"></canvas>
+      <div class="info">
+        <div class="k">ตำแหน่งบอลลูน</div>
+        <div class="v c" id="c2Name" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความสูง<br>(เมตร)</div><div class="v g" id="c2H">-</div></div>
+          <div><div class="k">ความกดอากาศ<br>(hPa)</div><div class="v r" id="c2P">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px">ถุงขนมพองขึ้น (เทียบที่ชายหาด)</div>
+        <div class="v p" id="c2Bag">-</div>
+        <div class="d" id="c2Why" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ตำแหน่ง</th><th>ความสูง (ม.)</th><th>ความกดอากาศ (hPa)</th><th>ถุงขนม (เท่า)</th></tr></thead>
+      <tbody id="logC2"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ชายหาดสายลม : ลมบก ลมทะเล</h2>
+    <p class="how" style="margin-bottom:4px">กด "เดินเวลา 1 วัน" ดูอุณหภูมิของบกกับทะเล ความกดอากาศ และธงบนชายหาด จากนั้นเลือกช่วงเวลา แล้วตอบว่าลมพัดไปทางใด ตอบถูกจะบันทึกให้</p>
+    <div class="twin">
+      <canvas id="cvC3" height="340" aria-label="ภาพตัดขวางชายหาด ทะเลอยู่ซ้าย บกอยู่ขวา แสดงอุณหภูมิ ความกดอากาศสูงต่ำ ทิศลมที่ผิวพื้นและลมด้านบน และธงชี้ทิศลมตามเวลาของวัน"></canvas>
+      <div class="info">
+        <div class="k" id="c3Time">-</div>
+        <div class="g2">
+          <div><div class="k">อุณหภูมิทะเล</div><div class="v c" id="c3Ts">-</div></div>
+          <div><div class="k">อุณหภูมิบก</div><div class="v r" id="c3Tl">-</div></div>
+          <div><div class="k">ความกดเหนือทะเล</div><div class="v g" id="c3Ps">-</div></div>
+          <div><div class="k">ความกดเหนือบก</div><div class="v g" id="c3Pl">-</div></div>
+        </div>
+        <h3 id="c3Wind" style="margin-top:4px">-</h3>
+        <div class="chips" id="beachChips" style="margin-top:4px"></div>
+        <div class="k" id="c3Q">ลมที่ผิวพื้นพัดไปทางใด ?</div>
+        <div class="pick" id="c3Ask"></div>
+        <div class="d" id="c3Why" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <input type="range" id="tC3" min="0" max="96" step="1" value="32" aria-label="เวลาของวัน">
+    <div class="ctrl"><button class="btn" id="playC3">เดินเวลา 1 วัน</button><span class="lbl">เลื่อนแถบ = เปลี่ยนเวลา 0:00–24:00 น.</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สถานการณ์</th><th>ด้านที่ร้อนกว่า</th><th>ความกดอากาศต่ำอยู่เหนือ</th><th>ลมที่ผิวพื้นพัด</th></tr></thead>
+      <tbody id="logC3"></tbody>
+    </table></div>
+    <div class="prog" id="progC">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 4</em> ไขรหัสสถานี</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">BREEZE</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · breeze แปลว่า ลมอ่อน ๆ เช่น sea breeze (ลมทะเล) ที่พัดเย็นสบายยามบ่าย</div>
+    </div>
+
+    <h2 class="sub-h"><em>คลังไอเดีย</em> ห้องเย็นสบายด้วยวิทยาศาสตร์ (สำหรับส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">เลือกไอเดียไปใช้ออกแบบห้องเรียนหรือบ้านในส่วนที่ 4 อย่างน้อย 3 ไอเดีย หรือสืบค้นเพิ่มเอง</p>
+    <div class="events" id="lib"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 3 สถานการณ์ (กล่องควันธูป ชายหาดบ่าย ชายหาดใกล้รุ่ง) + ตาราง 4 ความสูง + รหัสผ่าน ข้อ 4 · <b>ส่วนที่ 4</b> : ออกแบบห้องเรียนเย็นสบาย</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ตัวเลขเป็นค่าโดยประมาณ · อุณหภูมิในภารกิจ A คำนวณจากแบบจำลองอย่างง่าย · ภารกิจ B ใช้แกนเอียง 23.5° ไม่คิดการหักเหของแสง พลังงานต่อวันคิดที่ขอบบนบรรยากาศ · ความกดอากาศในขั้นที่ 2 ใช้บรรยากาศมาตรฐาน · ภาพย่อส่วนและขยายเกินจริงเพื่อให้เห็นชัด · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_a1_sim_v1';
+  var S = load() || {};
+  S.recA = S.recA || {}; S.recB = S.recB || {}; S.c1 = S.c1 || {}; S.c2 = S.c2 || {}; S.c3 = S.c3 || {}; S.cl = S.cl || {};
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var RAD = Math.PI / 180;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function chips(id, lbl, arr, cur, attr, done, fn) {
+    var h = '<span class="lbl">' + lbl + '</span>';
+    arr.forEach(function (t, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (done && done(i) ? ' done' : '') + '" data-' + attr + '="' + i + '">' + t + '</button>'; });
+    $(id).innerHTML = h; bindChips($(id), attr, function (v) { fn(+v); });
+  }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function sun(x, cx, cy, r, t) {
+    glow(x, cx, cy, r * 2.6, [255, 209, 102], .45);
+    x.strokeStyle = '#FFD166'; x.lineWidth = 2;
+    for (var i = 0; i < 12; i++) { var a = i * Math.PI / 6 + (t || 0) * .3; x.beginPath(); x.moveTo(cx + Math.cos(a) * r * 1.25, cy + Math.sin(a) * r * 1.25); x.lineTo(cx + Math.cos(a) * r * 1.6, cy + Math.sin(a) * r * 1.6); x.stroke(); }
+    x.fillStyle = '#FFE08A'; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill();
+  }
+  function stars(x, W, H, n) { x.fillStyle = 'rgba(232,237,255,.55)'; for (var i = 0; i < n; i++) { x.fillRect(hash(i, 21) * W, hash(i, 22) * H, 1.3, 1.3); } }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ห้องทดลองแสงอาทิตย์
+  var ANG = [90, 60, 30, 15];
+  var ANGX = ['ดวงอาทิตย์อยู่ตรงศีรษะ เช่น เที่ยงวันที่กรุงเทพฯ ปลายเดือนเมษายน และกลางเดือนสิงหาคม',
+    'เที่ยงวันที่กรุงเทพฯ ช่วงต้นเดือนพฤศจิกายน หรือช่วงสาย ๆ ของวันในฤดูร้อน',
+    'ราว 4 โมงเย็นที่กรุงเทพฯ หรือเที่ยงวันของฤดูหนาวที่กรุงโตเกียว ประเทศญี่ปุ่น',
+    'ช่วงเช้าตรู่หรือใกล้ค่ำ หรือเที่ยงวันของฤดูหนาวในประเทศแถบยุโรปเหนือ'];
+  var SURF = [{ n: 'ดินและหญ้า', a: .20, c: 1, col: '#4f6f34', why: 'ดินและพืชสีเข้มดูดกลืนแสงได้ดี ร้อนขึ้นปานกลาง' },
+    { n: 'ทราย', a: .35, c: .7, col: '#d6bb84', why: 'ทรายสะท้อนแสงมากกว่าดิน แต่ร้อนขึ้นเร็วมาก (ทรายชายหาดตอนบ่ายจึงร้อนจนเดินเท้าเปล่าไม่ไหว)' },
+    { n: 'พื้นขาวแบบหิมะ', a: .85, c: 1, col: '#e9f1ff', why: 'พื้นสีขาวแบบหิมะและน้ำแข็งสะท้อนแสงกลับเกือบหมด จึงแทบไม่ร้อน (ขั้วโลกจึงยิ่งเย็น)' },
+    { n: 'ผืนน้ำ', a: .08, c: 4, col: '#1f5fa8', why: 'น้ำดูดกลืนแสงมาก แต่ต้องใช้พลังงานมากกว่าดินหลายเท่ากว่าจะร้อนขึ้น 1 องศา น้ำจึงร้อนช้าและเย็นช้า' }];
+  var T0 = 25;
+  function tempA(i, s, p) { var f = SURF[s]; return T0 + 20 * Math.sin(ANG[i] * RAD) * (1 - f.a) / f.c * (p == null ? 1 : p); }
+  function areaA(i) { return 1 / Math.sin(ANG[i] * RAD); }
+  function enA(i) { return Math.round(100 * Math.sin(ANG[i] * RAD)); }
+  var WSK = ['0-0', '1-0', '2-0', '3-0', '0-1', '0-2', '0-3'];
+  var aI = 0, aS = 0, pA = 0, playA = 0;
+  function keyA() { return aI + '-' + aS; }
+  function caseA(k) { var z = k.split('-'); return 'มุม ' + ANG[+z[0]] + '° · ' + SURF[+z[1]].n; }
+  function updA() {
+    chips('angChips', 'มุมของแสงอาทิตย์', ANG.map(function (a) { return a + '°'; }), aI, 'a', null, function (v) { aI = v; pA = 0; playA = 0; updA(); drawA(); });
+    chips('surfChips', 'ชนิดพื้นผิว', SURF.map(function (s) { return s.n; }), aS, 's', null, function (v) { aS = v; pA = 0; playA = 0; updA(); drawA(); });
+    $('aCase').textContent = caseA(keyA());
+    $('aArea').textContent = '×' + fmt(areaA(aI), 1);
+    $('aEn').textContent = enA(aI) + '%';
+    $('aPath').textContent = '×' + fmt(areaA(aI), 1);
+    $('aRef').textContent = Math.round(SURF[aS].a * 100) + '%';
+    $('aTime').textContent = 'เวลาที่เปิดแสง ' + fmt(pA * 10, 1) + ' / 10 นาที';
+    $('aBar').style.width = Math.round(pA * 100) + '%';
+    $('aTemp').textContent = fmt(tempA(aI, aS, pA), 0) + ' °C';
+    $('aEx').textContent = ANGX[aI];
+    $('aWhy').textContent = SURF[aS].why;
+    $('tR').value = Math.round(pA * 100);
+    $('playA').textContent = playA ? 'หยุด' : (pA >= 1 ? 'เปิดแสงอีกครั้ง' : 'เปิดแสง 10 นาที');
+    var k = keyA(), inWs = WSK.indexOf(k) >= 0;
+    $('recA').disabled = !inWs || pA < 1 || !!S.recA[k];
+    $('recAMsg').textContent = !inWs ? 'กรณีนี้ทดลองเพิ่มได้ (ไม่ต้องจดลงใบงาน)' : S.recA[k] ? 'บันทึกกรณีนี้แล้ว' : pA < 1 ? 'เปิดแสงให้ครบ 10 นาทีก่อน' : 'พร้อมบันทึก';
+    var n = 0;
+    $('logA').innerHTML = WSK.map(function (z) { var r = S.recA[z], q = z.split('-'); if (r) n++;
+      return '<tr' + (z === k ? ' class="cur"' : '') + '><td class="n">' + caseA(z) + '</td><td>' + (r ? '×' + fmt(areaA(+q[0]), 1) : '-') + '</td><td>' + (r ? enA(+q[0]) + '%' : '-') +
+        '</td><td>' + (r ? Math.round(SURF[+q[1]].a * 100) + '%' : '-') + '</td><td>' + (r ? fmt(tempA(+q[0], +q[1]), 0) + ' °C' : '-') + '</td></tr>'; }).join('');
+  }
+  $('tR').oninput = function () { pA = +this.value / 100; playA = 0; updA(); drawA(); };
+  $('playA').onclick = function () { if (pA >= 1) pA = 0; playA = playA ? 0 : 1; updA(); };
+  $('resetA').onclick = function () { pA = 0; playA = 0; updA(); drawA(); };
+  $('recA').onclick = function () { var k = keyA(); if (WSK.indexOf(k) < 0 || pA < 1) return; S.recA[k] = 1; save(); updA(); };
+  function drawA() {
+    var f = fit($('cvA')), x = f.x, W = f.W, H = f.H, th = ANG[aI] * RAD, sf = SURF[aS];
+    var gY = H * .74, atT = gY - H * .2, xC = W * (.44 + .18 * (1 - Math.sin(th))), w0 = Math.min(W * .15, 66), L = w0 / Math.sin(th);
+    var dx = Math.cos(th), dy = Math.sin(th);
+    x.fillStyle = '#050a1f'; x.fillRect(0, 0, W, H); stars(x, W, atT, 40);
+    var g = x.createLinearGradient(0, atT, 0, gY); g.addColorStop(0, 'rgba(79,216,255,.05)'); g.addColorStop(1, 'rgba(79,216,255,.30)');
+    x.fillStyle = g; x.fillRect(0, atT, W, gY - atT);
+    x.setLineDash([6, 5]); x.strokeStyle = 'rgba(79,216,255,.5)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(0, atT); x.lineTo(W, atT); x.stroke(); x.setLineDash([]);
+    label(x, 'ชั้นบรรยากาศ (ย่อส่วน)', W - 52, atT + 16, '#4FD8FF', 12, 'right');
+    // พื้นผิว
+    x.fillStyle = sf.col; x.fillRect(0, gY, W, H - gY);
+    x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = 1;
+    var tile = w0 / 2; for (var gx = xC % tile; gx < W; gx += tile) { x.beginPath(); x.moveTo(gx, gY); x.lineTo(gx, H); x.stroke(); }
+    if (aS === 3) { x.strokeStyle = 'rgba(200,230,255,.35)'; for (var wv = 0; wv < 4; wv++) { x.beginPath(); for (var wx = 0; wx <= W; wx += 8) { var wy = gY + 10 + wv * 14 + Math.sin(wx * .06 + tA * 2 + wv) * 2; if (wx) x.lineTo(wx, wy); else x.moveTo(wx, wy); } x.stroke(); } }
+    if (aS === 1) { x.fillStyle = 'rgba(120,90,40,.35)'; for (var sd = 0; sd < 160; sd++) x.fillRect(hash(sd, 5) * W, gY + 4 + hash(sd, 6) * (H - gY - 6), 1.6, 1.6); }
+    if (aS === 2) { x.fillStyle = 'rgba(255,255,255,.9)'; for (var sp = 0; sp < 40; sp++) if (hash(sp + Math.floor(tA * 3), 8) > .7) x.fillRect(hash(sp, 9) * W, gY + 4 + hash(sp, 10) * (H - gY - 6), 2, 2); }
+    // ความร้อนบนพื้นตรงที่แสงตก
+    var heat = clamp((tempA(aI, aS, pA) - T0) / 20, 0, 1);
+    var hg = x.createLinearGradient(0, gY, 0, gY + 40); hg.addColorStop(0, 'rgba(255,90,60,' + (.75 * heat) + ')'); hg.addColorStop(1, 'rgba(255,90,60,0)');
+    x.fillStyle = hg; x.fillRect(xC - L / 2, gY, L, 40);
+    // ดวงอาทิตย์และลำแสง
+    var Ds = Math.min(dx > .02 ? (xC - 28) / dx : 1e9, (gY - 26) / dy), sx = xC - dx * Ds, sy = gY - dy * Ds;
+    var nx = -dy, ny = dx, hw = w0 / 2;
+    var S1 = [sx + nx * hw, sy + ny * hw], S2 = [sx - nx * hw, sy - ny * hw];
+    var P1 = [S1[0] + dx * (gY - S1[1]) / dy, gY], P2 = [S2[0] + dx * (gY - S2[1]) / dy, gY];   // ขอบลำแสงแต่ละด้านตกถึงพื้น
+    var bg = x.createLinearGradient(sx, sy, xC, gY); bg.addColorStop(0, 'rgba(255,209,102,.38)'); bg.addColorStop(1, 'rgba(255,209,102,' + (.12 + .35 * Math.sin(th)) + ')');
+    x.fillStyle = bg; x.beginPath(); x.moveTo(S1[0], S1[1]); x.lineTo(P1[0], P1[1]); x.lineTo(P2[0], P2[1]); x.lineTo(S2[0], S2[1]); x.closePath(); x.fill();
+    var on = playA || (pA > 0 && pA < 1);
+    x.setLineDash([10, 9]); x.lineDashOffset = -tA * 60 * (on ? 1 : 0); x.strokeStyle = 'rgba(255,224,138,.9)'; x.lineWidth = 1.6;
+    for (var r = 0; r < 7; r++) { var u = -hw + (r + .5) * w0 / 7, ax = sx + nx * u, ay = sy + ny * u, gx2 = ax + dx * (gY - ay) / dy; x.beginPath(); x.moveTo(ax, ay); x.lineTo(gx2, gY); x.stroke(); }
+    x.setLineDash([]); x.lineDashOffset = 0;
+    sun(x, sx, sy, 15, tA);
+    // แถบพื้นที่ที่แสงตกกระทบ
+    x.fillStyle = 'rgba(255,224,138,' + (.35 + .6 * Math.sin(th)) + ')'; x.fillRect(xC - L / 2, gY - 3, L, 6);
+    x.strokeStyle = '#FFD166'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(xC - L / 2, gY + 12); x.lineTo(xC - L / 2, gY + 22); x.moveTo(xC - L / 2, gY + 17); x.lineTo(xC + L / 2, gY + 17); x.moveTo(xC + L / 2, gY + 12); x.lineTo(xC + L / 2, gY + 22); x.stroke();
+    label(x, 'พื้นที่ ×' + fmt(areaA(aI), 1), xC, gY + 40, '#FFD166', 14);
+    // ระยะทางในบรรยากาศ (แสงเส้นกลาง)
+    var yA = Math.max(atT, sy + 18), xA = xC - dx * (gY - yA) / dy;
+    { x.strokeStyle = '#4FD8FF'; x.lineWidth = 4; x.globalAlpha = .75; x.beginPath(); x.moveTo(xA, yA); x.lineTo(xC, gY); x.stroke(); x.globalAlpha = 1;
+      label(x, 'ผ่านบรรยากาศ ×' + fmt(areaA(aI), 1), (xA + xC) / 2 - 8, (yA + gY) / 2 - 8, '#4FD8FF', 13, 'right'); }
+    // มุมตกกระทบ
+    x.strokeStyle = '#E8EDFF'; x.lineWidth = 1.5; x.beginPath(); x.arc(xC, gY, 30, Math.PI, Math.PI + th); x.stroke();
+    label(x, ANG[aI] + '°', xC + Math.cos(Math.PI + th / 2) * 46, gY + Math.sin(Math.PI + th / 2) * 46 + 5, '#E8EDFF', 14);
+    // แสงสะท้อน
+    var ref = sf.a, rx = xC + L * .2;
+    if (pA > 0) { x.globalAlpha = .3 + .7 * ref; arrow(x, rx, gY - 4, rx + dx * 60, gY - 4 - dy * 60, '#A77BFF', 1 + 7 * ref, 10); x.globalAlpha = 1;
+      label(x, 'สะท้อน ' + Math.round(ref * 100) + '%', rx + dx * 62 + 4, gY - 8 - dy * 62, '#A77BFF', 12, 'left'); }
+    // ไอร้อน
+    if (heat > .05) { x.strokeStyle = 'rgba(255,159,107,' + (.5 * heat) + ')'; x.lineWidth = 1.5;
+      for (var hv = 0; hv < 4; hv++) { var hx = xC - L / 2 + (hv + .5) * L / 4; x.beginPath(); for (var k2 = 0; k2 < 6; k2++) { var yy = gY - 8 - k2 * 6, xx = hx + Math.sin(k2 * 1.3 + tA * 4 + hv) * 3; if (k2) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); } }
+    // เทอร์โมมิเตอร์
+    var tx = W - 30, tT = 26, tB = gY - 14, T = tempA(aI, aS, pA), fr = clamp((T - 20) / 30, 0, 1);
+    x.fillStyle = '#0b1233'; x.strokeStyle = '#9AA6CF'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(tx - 7, tT, 14, tB - tT, 7) : x.rect(tx - 7, tT, 14, tB - tT); x.fill(); x.stroke();
+    x.fillStyle = '#FF6B8A'; x.fillRect(tx - 3.5, tB - 4 - (tB - tT - 8) * fr, 7, (tB - tT - 8) * fr + 4); x.beginPath(); x.arc(tx, tB + 4, 10, 0, 6.283); x.fill();
+    label(x, fmt(T, 0) + '°C', tx - 14, tT + 12, '#FF6B8A', 15, 'right');
+    label(x, 'เวลา ' + fmt(pA * 10, 1) + ' นาที', 8, 18, '#9AA6CF', 13, 'left');
+  }
+
+  // ================================================================ ภารกิจ B ยานสำรวจฤดูกาล
+  var CITIES = [{ n: 'สิงคโปร์', lat: 1.3 }, { n: 'กรุงเทพฯ', lat: 13.7 }, { n: 'โตเกียว', lat: 35.7 }, { n: 'ออสโล', lat: 59.9, c: 'นอร์เวย์' }, { n: 'ซิดนีย์', lat: -33.9, c: 'ออสเตรเลีย' }];
+  var MONTHS = [{ n: 'มีนาคม', s: 'วิษุวัต ~21 มี.ค.', d: 0 }, { n: 'มิถุนายน', s: 'ครีษมายัน ~21 มิ.ย.', d: 23.5 }, { n: 'กันยายน', s: 'วิษุวัต ~23 ก.ย.', d: 0 }, { n: 'ธันวาคม', s: 'เหมายัน ~22 ธ.ค.', d: -23.5 }];
+  function noonAlt(c, m) { return Math.max(0, 90 - Math.abs(CITIES[c].lat - MONTHS[m].d)); }
+  function hourAng(c, m) { var v = -Math.tan(CITIES[c].lat * RAD) * Math.tan(MONTHS[m].d * RAD); return v <= -1 ? Math.PI : v >= 1 ? 0 : Math.acos(v); }
+  function dayLen(c, m) { return 2 * hourAng(c, m) / RAD / 15; }
+  function energy(c, m) { var p = CITIES[c].lat * RAD, d = MONTHS[m].d * RAD, h = hourAng(c, m); return 100 * (h * Math.sin(p) * Math.sin(d) + Math.cos(p) * Math.cos(d) * Math.sin(h)); }
+  function altAt(c, m, t) { var p = CITIES[c].lat * RAD, d = MONTHS[m].d * RAD, h = (t - 12) * 15 * RAD; return Math.asin(Math.sin(p) * Math.sin(d) + Math.cos(p) * Math.cos(d) * Math.cos(h)) / RAD; }
+  function season(c, m) { var lat = CITIES[c].lat, d = MONTHS[m].d; if (!d) return 'ช่วงเปลี่ยนฤดู กลางวันเท่ากลางคืนทั่วโลก'; if (Math.abs(lat) < 10) return 'ใกล้เส้นศูนย์สูตร ร้อนเกือบทั้งปี';
+    return (lat * d > 0) ? 'ซีกโลกนี้เอียงเข้าหาดวงอาทิตย์ : ฤดูร้อน' : 'ซีกโลกนี้เอียงออกจากดวงอาทิตย์ : ฤดูหนาว'; }
+  function hemi(c, m) { var lat = CITIES[c].lat, d = MONTHS[m].d; if (!d) return 'ไม่เอียงเข้าหรือออก'; return lat * d > 0 ? 'เอียงเข้าหา (ฤดูร้อน)' : 'เอียงออก (ฤดูหนาว)'; }
+  var WSB = ['1-1', '1-3', '3-1', '3-3', '4-1', '4-3'];
+  var bC = 1, bM = 1, pB = .25, playB = 0, doneB = 0;
+  function keyB() { return bC + '-' + bM; }
+  function caseB(k) { var z = k.split('-'); return CITIES[+z[0]].n + ' · ' + MONTHS[+z[1]].n; }
+  function hhmm(t) { var h = Math.floor(t + 1e-6) % 24, mm = Math.round((t - Math.floor(t + 1e-6)) * 60); if (mm === 60) { h = (h + 1) % 24; mm = 0; } return (h < 10 ? '0' : '') + h + ':' + (mm < 10 ? '0' : '') + mm + ' น.'; }
+  function updB() {
+    chips('cityChips', 'เมือง', CITIES.map(function (c) { return c.n; }), bC, 'c', null, function (v) { bC = v; pB = .25; doneB = 0; playB = 0; updB(); drawB(); });
+    chips('monChips', 'เดือน', MONTHS.map(function (m) { return m.n; }), bM, 'm', null, function (v) { bM = v; pB = .25; doneB = 0; playB = 0; updB(); drawB(); });
+    var C = CITIES[bC], M = MONTHS[bM], e = energy(bC, bM);
+    $('bCase').textContent = caseB(keyB());
+    $('bLat').textContent = 'ละติจูด ' + fmt(Math.abs(C.lat), 1) + '° ' + (C.lat >= 0 ? 'เหนือ' : 'ใต้') + (C.c ? ' (' + C.c + ')' : '') + ' · ' + M.s;
+    $('bNoon').textContent = Math.round(noonAlt(bC, bM)) + '°';
+    $('bDay').textContent = fmt(dayLen(bC, bM), 1);
+    $('bBar').style.width = clamp(e / 120 * 100, 0, 100) + '%';
+    $('bEn').textContent = Math.round(e) + ' ส่วน';
+    $('bTime').textContent = 'เวลาท้องถิ่น ' + hhmm(pB * 24) + ' · มุมดวงอาทิตย์ตอนนี้ ' + (altAt(bC, bM, pB * 24) > 0 ? Math.round(altAt(bC, bM, pB * 24)) + '°' : 'ใต้ขอบฟ้า (กลางคืน)');
+    $('bSeason').textContent = season(bC, bM);
+    $('bWhy').textContent = Math.abs(C.lat) < 10 ? 'ใกล้เส้นศูนย์สูตร แสงตกเกือบตั้งฉากทั้งปี กลางวันยาวราว 12 ชั่วโมงทุกเดือน' :
+      (!M.d ? 'เดือนนี้แกนโลกไม่ได้เอียงเข้าหรือออกจากดวงอาทิตย์ ทุกที่บนโลกมีกลางวันราว 12 ชั่วโมง' :
+        (C.lat * M.d > 0 ? 'แสงตกกระทบชันกว่า และอยู่ด้านกลางวันนานกว่า จึงได้พลังงานมาก' : 'แสงตกกระทบเฉียง และอยู่ด้านกลางวันสั้น จึงได้พลังงานน้อย'));
+    $('tB').value = Math.round(pB * 100);
+    $('playB').textContent = playB ? 'หยุด' : 'หมุนโลก 1 วัน';
+    var k = keyB(), inWs = WSB.indexOf(k) >= 0;
+    $('recB').disabled = !inWs || !doneB || !!S.recB[k];
+    $('recBMsg').textContent = !inWs ? 'กรณีนี้ทดลองเพิ่มได้ (ไม่ต้องจดลงใบงาน)' : S.recB[k] ? 'บันทึกกรณีนี้แล้ว' : !doneB ? 'กด "หมุนโลก 1 วัน" ให้ครบรอบก่อน' : 'พร้อมบันทึก';
+    $('logB').innerHTML = WSB.map(function (z) { var r = S.recB[z], q = z.split('-'), c = +q[0], m = +q[1];
+      return '<tr' + (z === k ? ' class="cur"' : '') + '><td class="n">' + caseB(z) + '</td><td>' + (r ? Math.round(noonAlt(c, m)) + '°' : '-') + '</td><td>' + (r ? fmt(dayLen(c, m), 1) : '-') +
+        '</td><td>' + (r ? Math.round(energy(c, m)) : '-') + '</td><td>' + (r ? hemi(c, m) : '-') + '</td></tr>'; }).join('');
+  }
+  $('tB').oninput = function () { pB = +this.value / 100; playB = 0; updB(); drawB(); };
+  $('playB').onclick = function () { if (!playB) { pB = 0; doneB = 0; } playB = playB ? 0 : 1; updB(); };
+  $('resetB').onclick = function () { pB = .25; playB = 0; doneB = 0; updB(); drawB(); };
+  $('recB').onclick = function () { var k = keyB(); if (WSB.indexOf(k) < 0 || !doneB) return; S.recB[k] = 1; save(); updB(); };
+  function drawB() {
+    var f = fit($('cvB')), x = f.x, W = f.W, H = f.H, narrow = W < 560;
+    var C = CITIES[bC], M = MONTHS[bM], phi = C.lat * RAD, del = M.d * RAD, t = pB * 24;
+    x.fillStyle = '#050a1f'; x.fillRect(0, 0, W, H); stars(x, W, H, 70);
+    var ex, ey, R, ix, iy, iw, ih;
+    if (narrow) { R = Math.min(W * .22, H * .19); ex = W * .58; ey = H * .3; ix = 8; iy = H * .57; iw = W - 16; ih = H * .43 - 8; }
+    else { R = Math.min(W * .19, H * .36); ex = W * .31; ey = H * .5; ix = W * .58; iy = 18; iw = W * .4; ih = H - 36; }
+    // แสงอาทิตย์จากซ้าย
+    x.setLineDash([12, 10]); x.lineDashOffset = -tA * 40; x.strokeStyle = 'rgba(255,209,102,.55)'; x.lineWidth = 1.4;
+    for (var r = -3; r <= 3; r++) { var yy = ey + r * R * .32; x.beginPath(); x.moveTo(4, yy); x.lineTo(ex - Math.sqrt(Math.max(0, R * R - Math.pow(yy - ey, 2))), yy); x.stroke(); }
+    x.setLineDash([]); x.lineDashOffset = 0;
+    glow(x, 0, ey, R * 1.2, [255, 209, 102], .35);
+    label(x, 'แสงอาทิตย์', 6, ey - R - 8, '#FFD166', 13, 'left');
+    // โลก ด้านกลางวัน/กลางคืน
+    x.fillStyle = '#2f6fb0'; x.beginPath(); x.arc(ex, ey, R, 0, 6.283); x.fill();
+    x.save(); x.beginPath(); x.arc(ex, ey, R, 0, 6.283); x.clip();
+    x.fillStyle = 'rgba(70,140,80,.55)'; for (var lm = 0; lm < 9; lm++) { x.beginPath(); x.ellipse(ex + (hash(lm, 31) - .5) * R * 1.5, ey + (hash(lm, 32) - .5) * R * 1.5, R * (.12 + hash(lm, 33) * .2), R * (.08 + hash(lm, 34) * .14), hash(lm, 35) * 3, 0, 6.283); x.fill(); }
+    x.fillStyle = 'rgba(3,6,20,.72)'; x.fillRect(ex, ey - R - 2, R + 2, 2 * R + 4);
+    x.restore();
+    glow(x, ex - R * .35, ey, R * .9, [255, 240, 200], .12);
+    x.strokeStyle = '#4FD8FF'; x.lineWidth = 1; x.beginPath(); x.arc(ex, ey, R, 0, 6.283); x.stroke();
+    // แกนโลก เส้นศูนย์สูตร
+    var axv = [-Math.sin(del), -Math.cos(del)], pv = [Math.cos(del), -Math.sin(del)];
+    x.strokeStyle = '#E8EDFF'; x.lineWidth = 2; x.beginPath(); x.moveTo(ex - axv[0] * R * 1.28, ey - axv[1] * R * 1.28); x.lineTo(ex + axv[0] * R * 1.28, ey + axv[1] * R * 1.28); x.stroke();
+    label(x, 'N', ex + axv[0] * R * 1.4, ey + axv[1] * R * 1.4 + 4, '#E8EDFF', 14);
+    label(x, 'S', ex - axv[0] * R * 1.4, ey - axv[1] * R * 1.4 + 4, '#E8EDFF', 14);
+    x.setLineDash([4, 4]); x.strokeStyle = '#9AA6CF'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(ex - pv[0] * R, ey - pv[1] * R); x.lineTo(ex + pv[0] * R, ey + pv[1] * R); x.stroke(); x.setLineDash([]);
+    if (M.d) label(x, 'แกนโลกเอียง 23.5°', ex - axv[0] * R * 1.25 + (M.d > 0 ? 62 : -62), ey - axv[1] * R * 1.25 + 4, '#9AA6CF', 12);
+    else label(x, 'แกนเอียงไปทางผู้ชม', ex + R * .2, ey + R + 24, '#9AA6CF', 12, 'left');
+    // เส้นละติจูดของเมือง
+    var c0 = [ex + axv[0] * R * Math.sin(phi), ey + axv[1] * R * Math.sin(phi)], half = R * Math.cos(phi);
+    var uStar = clamp((ex - c0[0]) / pv[0], -half, half);
+    x.lineWidth = 3.5; x.strokeStyle = '#FFD166'; x.beginPath(); x.moveTo(c0[0] - pv[0] * half, c0[1] - pv[1] * half); x.lineTo(c0[0] + pv[0] * uStar, c0[1] + pv[1] * uStar); x.stroke();
+    x.strokeStyle = '#6b6440'; x.beginPath(); x.moveTo(c0[0] + pv[0] * uStar, c0[1] + pv[1] * uStar); x.lineTo(c0[0] + pv[0] * half, c0[1] + pv[1] * half); x.stroke();
+    var Ht = (t - 12) * 15 * RAD, u = -half * Math.cos(Ht), cx2 = c0[0] + pv[0] * u, cy2 = c0[1] + pv[1] * u, front = Math.sin(Ht) < 0;
+    x.globalAlpha = front ? 1 : .55; x.fillStyle = '#FF6B8A'; x.beginPath(); x.arc(cx2, cy2, 6, 0, 6.283); x.fill(); x.strokeStyle = '#fff'; x.lineWidth = 1.5; x.stroke(); x.globalAlpha = 1;
+    label(x, C.n, c0[0] - pv[0] * half - 8, c0[1] - pv[1] * half + 4, '#FFD166', 14, 'right');
+    label(x, 'กลางวัน ' + fmt(dayLen(bC, bM), 1) + ' ชม.', c0[0] - pv[0] * half - 8, c0[1] - pv[1] * half + 20, '#FFD166', 12, 'right');
+    // ภาพท้องฟ้าของเมือง
+    x.fillStyle = 'rgba(11,18,51,.88)'; x.strokeStyle = '#3A4A85'; x.lineWidth = 1.2; x.beginPath(); x.roundRect ? x.roundRect(ix, iy, iw, ih, 12) : x.rect(ix, iy, iw, ih); x.fill(); x.stroke();
+    // มุมเงยของดวงอาทิตย์ (มุมจากขอบฟ้า) : ขึ้นจากขอบฟ้า สูงสุดตอนเที่ยง แล้วลดลง
+    var alt = altAt(bC, bM, t), gy = iy + ih * .82, ocx = ix + iw * .2, rr = Math.min(iw * .7, ih * .66);
+    var sky = x.createLinearGradient(0, gy - rr, 0, gy); var day = smooth(-6, 8, alt);
+    sky.addColorStop(0, 'rgba(' + Math.round(10 + 60 * day) + ',' + Math.round(20 + 110 * day) + ',' + Math.round(60 + 150 * day) + ',1)'); sky.addColorStop(1, 'rgba(' + Math.round(20 + 140 * day) + ',' + Math.round(30 + 150 * day) + ',' + Math.round(70 + 150 * day) + ',1)');
+    x.save(); x.beginPath(); x.moveTo(ocx, gy); x.arc(ocx, gy, rr, -Math.PI / 2, 0); x.closePath(); x.clip(); x.fillStyle = sky; x.fillRect(ocx, gy - rr, rr, rr); x.restore();
+    x.fillStyle = '#3b5a2a'; x.fillRect(ix + 6, gy, iw - 12, iy + ih - gy - 6);
+    label(x, 'มุมเงยของดวงอาทิตย์ที่' + C.n, ix + 10, iy + 20, '#E8EDFF', 13, 'left');
+    label(x, 'ขอบฟ้า', ocx + rr - 4, gy + 16, '#9AA6CF', 12, 'right');
+    var nA = noonAlt(bC, bM);
+    x.strokeStyle = 'rgba(255,209,102,.7)'; x.lineWidth = 3; x.beginPath(); x.arc(ocx, gy, rr * .96, -nA * RAD, 0); x.stroke();
+    var qn = [ocx + rr * .96 * Math.cos(nA * RAD), gy - rr * .96 * Math.sin(nA * RAD)];
+    x.setLineDash([5, 4]); x.strokeStyle = '#E8EDFF'; x.lineWidth = 1.3; x.beginPath(); x.moveTo(ocx, gy); x.lineTo(qn[0], qn[1]); x.stroke(); x.setLineDash([]);
+    x.beginPath(); x.arc(ocx, gy, 30, -nA * RAD, 0); x.stroke();
+    label(x, 'เที่ยงวัน ' + Math.round(nA) + '°', ocx + 36 * Math.cos(nA * RAD / 2) + 4, gy - 36 * Math.sin(nA * RAD / 2) + 2, '#FFD166', 13, 'left');
+    x.fillStyle = '#E8EDFF'; x.beginPath(); x.arc(ocx, gy, 3, 0, 6.283); x.fill();
+    label(x, 'ผู้สังเกต', ocx, gy + 16, '#E8EDFF', 12);
+    if (alt > 0) { sun(x, ocx + rr * .96 * Math.cos(alt * RAD), gy - rr * .96 * Math.sin(alt * RAD), 9, tA); label(x, 'ตอนนี้ ' + Math.round(alt) + '°', ix + iw - 10, iy + 40, '#FFD166', 13, 'right'); }
+    else label(x, 'กลางคืน ดวงอาทิตย์อยู่ใต้ขอบฟ้า', ocx + rr * .5, gy - rr * .45, '#9AA6CF', 13);
+    label(x, hhmm(t), ix + iw - 10, iy + 20, '#4FD8FF', 13, 'right');
+  }
+
+  // ================================================================ ภารกิจ C
+  // ---------------------------------------------------------------- ขั้นที่ 1 กล่องควันธูป
+  var BOX = ['จุดเทียนใต้ปล่องซ้าย', 'จุดเทียนใต้ปล่องขวา', 'ไม่จุดเทียน'];
+  var c1 = 0, p1 = 0, play1 = 0;
+  function pres1(side) { if (c1 === 2) return 1013; var warm = (side === c1); return Math.round(1013 + (warm ? -4 : 4) * p1); }
+  function updC1() {
+    chips('boxChips', 'กรณี', BOX, c1, 'b', function (i) { return S.c1[i]; }, function (v) { c1 = v; p1 = 0; play1 = 0; updC1(); drawC1(); });
+    $('c1Case').textContent = BOX[c1];
+    $('c1L').textContent = pres1(0); $('c1R').textContent = pres1(1);
+    if (c1 === 2) { $('c1Res').textContent = 'อุณหภูมิเท่ากัน ความกดอากาศเท่ากัน ควันไม่ไหล'; $('c1Why').textContent = 'เมื่อไม่มีความแตกต่างของอุณหภูมิ ก็ไม่มีความแตกต่างของความกดอากาศ อากาศจึงไม่เคลื่อนที่เป็นลม'; }
+    else { var w = c1 === 0 ? 'ซ้าย' : 'ขวา', cdd = c1 === 0 ? 'ขวา' : 'ซ้าย';
+      $('c1Res').textContent = p1 < .3 ? 'เริ่มจุดเทียน ...' : 'ควันไหลจากด้าน' + cdd + ' (สูง) ไปด้าน' + w + ' (ต่ำ)';
+      $('c1Why').textContent = 'อากาศเหนือเทียนร้อน ขยายตัว ความหนาแน่นลดลง ลอยขึ้นออกทางปล่อง' + w + ' ความกดอากาศด้าน' + w + 'จึงต่ำ อากาศเย็นด้าน' + cdd + 'หนาแน่นกว่า จมลง ความกดอากาศสูง อากาศจึงไหลจากด้าน' + cdd + 'ไปแทนที่ (ลม)'; }
+    $('tC1').value = Math.round(p1 * 100);
+    $('playC1').textContent = play1 ? 'หยุด' : (c1 === 2 ? 'เดินเวลา' : 'จุดเทียน');
+    $('recC1').disabled = p1 < 1 || !!S.c1[c1];
+    $('recC1Msg').textContent = S.c1[c1] ? 'บันทึกกรณีนี้แล้ว' : p1 < 1 ? 'เดินเวลาจนสุดแถบก่อน' : 'พร้อมบันทึก';
+    updLog3();
+  }
+  $('tC1').oninput = function () { p1 = +this.value / 100; play1 = 0; updC1(); drawC1(); };
+  $('playC1').onclick = function () { if (p1 >= 1) p1 = 0; play1 = play1 ? 0 : 1; updC1(); };
+  $('resetC1').onclick = function () { p1 = 0; play1 = 0; updC1(); drawC1(); };
+  $('recC1').onclick = function () { if (p1 < 1) return; S.c1[c1] = 1; save(); updC1(); };
+  function drawC1() {
+    var f = fit($('cvC1')), x = f.x, W = f.W, H = f.H;
+    x.fillStyle = '#081030'; x.fillRect(0, 0, W, H);
+    var bx = W * .07, bw = W * .86, by = H * .3, bh = H * .58, chw = bw * .13, chh = H * .17;
+    var chx = [bx + bw * .2 - chw / 2, bx + bw * .8 - chw / 2];
+    var warm = c1 === 2 ? -1 : c1, k = c1 === 2 ? 0 : smooth(0, .5, p1);
+    // สีอุณหภูมิ
+    if (warm >= 0) { var wxs = warm === 0 ? bx : bx + bw / 2; x.fillStyle = 'rgba(255,107,138,' + (.16 * k) + ')'; x.fillRect(wxs, by, bw / 2, bh); x.fillStyle = 'rgba(79,216,255,' + (.14 * k) + ')'; x.fillRect(warm === 0 ? bx + bw / 2 : bx, by, bw / 2, bh); }
+    // กล่องและปล่อง
+    x.strokeStyle = '#9AA6CF'; x.lineWidth = 2.5; x.beginPath();
+    x.moveTo(bx, by); x.lineTo(chx[0], by); x.lineTo(chx[0], by - chh); x.moveTo(chx[0] + chw, by - chh); x.lineTo(chx[0] + chw, by); x.lineTo(chx[1], by); x.lineTo(chx[1], by - chh);
+    x.moveTo(chx[1] + chw, by - chh); x.lineTo(chx[1] + chw, by); x.lineTo(bx + bw, by); x.lineTo(bx + bw, by + bh); x.lineTo(bx, by + bh); x.lineTo(bx, by); x.stroke();
+    x.fillStyle = 'rgba(79,216,255,.06)'; x.fillRect(bx, by, bw, bh);
+    // เทียน
+    if (warm >= 0) { var cxn = chx[warm] + chw / 2, cyb = by + bh; x.fillStyle = '#f2ead3'; x.fillRect(cxn - 6, cyb - 34, 12, 34);
+      var fl = k > 0 ? 1 : 0; if (fl) { glow(x, cxn, cyb - 44, 26, [255, 180, 80], .6); x.fillStyle = '#FFD166'; x.beginPath(); x.ellipse(cxn, cyb - 44 + Math.sin(tA * 12) * 1, 5, 10 + Math.sin(tA * 9) * 1.5, 0, 0, 6.283); x.fill(); } }
+    // อนุภาคอากาศ
+    var cxb = bx + bw / 2, cyb2 = by + bh / 2;
+    function loopPt(s, kk) { var hx = bw * (.5 - kk) , hy = bh * (.5 - kk * 1.1), per = 4 * hx + 4 * hy, d = s * per, px, py;
+      if (d < 2 * hy) { px = -hx; py = hy - d; } else if ((d -= 2 * hy) < 2 * hx) { px = -hx + d; py = -hy; } else if ((d -= 2 * hx) < 2 * hy) { px = hx; py = -hy + d; } else { d -= 2 * hy; px = hx - d; py = hy; }
+      if (warm === 1) px = -px; return [cxb + px, cyb2 + py]; }
+    for (var i = 0; i < 70; i++) {
+      var kk = .06 + .3 * hash(i, 1), pt;
+      if (warm < 0 || k <= 0) pt = [bx + 8 + hash(i, 3) * (bw - 16) + Math.sin(tA * 3 + i) * 3, by + 8 + hash(i, 4) * (bh - 16) + Math.cos(tA * 2.6 + i) * 3];
+      else pt = loopPt((hash(i, 2) + tA * .06 * k * (.6 + .8 * hash(i, 7))) % 1, kk);
+      x.fillStyle = 'rgba(232,237,255,.55)'; x.beginPath(); x.arc(pt[0], pt[1], 2, 0, 6.283); x.fill();
+    }
+    // ควันธูป
+    if (warm >= 0) { var cold = 1 - warm, ccx = chx[cold] + chw / 2;
+      x.strokeStyle = '#8a6a4a'; x.lineWidth = 2; x.beginPath(); x.moveTo(ccx + chw * .7, by - chh - 18); x.lineTo(ccx + 4, by - chh - 4); x.stroke(); x.fillStyle = '#FF6B4A'; x.beginPath(); x.arc(ccx + 4, by - chh - 4, 2.5, 0, 6.283); x.fill();
+      var path = [[ccx, by - chh], [ccx, by + bh * .3], [ccx, by + bh - 18], [chx[warm] + chw / 2, by + bh - 18], [chx[warm] + chw / 2, by + bh * .3], [chx[warm] + chw / 2, by - chh - 30]];
+      var segL = [], tot = 0; for (var j = 1; j < path.length; j++) { var l = Math.hypot(path[j][0] - path[j - 1][0], path[j][1] - path[j - 1][1]); segL.push(l); tot += l; }
+      var reach = k * tot * 1.05;
+      for (var sm = 0; sm < 46; sm++) { var dd = ((hash(sm, 11) + tA * .09) % 1) * tot; if (dd > reach) continue; var jj = 0; while (jj < segL.length - 1 && dd > segL[jj]) { dd -= segL[jj]; jj++; }
+        var fr = dd / segL[jj], spx = path[jj][0] + (path[jj + 1][0] - path[jj][0]) * fr + (hash(sm, 12) - .5) * 14, spy = path[jj][1] + (path[jj + 1][1] - path[jj][1]) * fr + (hash(sm, 13) - .5) * 10;
+        x.fillStyle = 'rgba(190,190,200,' + (.25 + .3 * hash(sm, 14)) + ')'; x.beginPath(); x.arc(spx, spy, 4 + 5 * hash(sm, 15), 0, 6.283); x.fill(); }
+    } else { var nx0 = chx[1] + chw / 2; x.fillStyle = 'rgba(190,190,200,.35)'; for (var s2 = 0; s2 < 8; s2++) { x.beginPath(); x.arc(nx0 + Math.sin(tA * 2 + s2) * 4, by - chh - 6 - s2 * 7, 4 + s2 * .6, 0, 6.283); x.fill(); } }
+    // ความกดอากาศ
+    [0, 1].forEach(function (sd) { var gx = bx + (sd === 0 ? bw * .25 : bw * .75), gy = by + bh * .62, P = pres1(sd);
+      var hl = c1 === 2 || p1 < .3 ? '' : (sd === warm ? 'L' : 'H'), col = hl === 'L' ? '#FF6B8A' : hl === 'H' ? '#4FD8FF' : '#9AA6CF';
+      label(x, P + ' hPa', gx, gy + 6, '#FFD166', 14);
+      if (hl) label(x, hl, gx, gy - 18, col, 26);
+      if (hl) label(x, hl === 'L' ? 'ความกดอากาศต่ำ' : 'ความกดอากาศสูง', gx, gy + 24, col, 12);
+    });
+    if (warm >= 0 && p1 >= .3) { var aw = warm === 0 ? -1 : 1; arrow(x, cxb - aw * bw * .12, by + bh - 12, cxb + aw * bw * .12, by + bh - 12, '#5EF2A5', 3, 11); label(x, 'ลม (สูง → ต่ำ)', cxb, by + bh - 20, '#5EF2A5', 12);
+      arrow(x, chx[warm] + chw / 2, by + bh * .25, chx[warm] + chw / 2, by + 6, '#FF6B8A', 3, 10); arrow(x, chx[1 - warm] + chw / 2, by + 10, chx[1 - warm] + chw / 2, by + bh * .22, '#4FD8FF', 3, 10); }
+    label(x, 'ปล่องซ้าย', chx[0] + chw / 2, by - chh - 8 - (warm === 1 ? 14 : 0), '#9AA6CF', 12); label(x, 'ปล่องขวา', chx[1] + chw / 2, by - chh - 8 - (warm === 0 ? 14 : 0), '#9AA6CF', 12);
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 2 บอลลูนตรวจอากาศ
+  var STOPS = [{ n: 'ชายหาด (ระดับทะเล)', h: 0 }, { n: 'ยอดดอยอินทนนท์', h: 2565 }, { n: 'ยอดเขาเอเวอเรสต์', h: 8849 }, { n: 'เครื่องบินโดยสาร', h: 11000 }];
+  var STW = ['อากาศทั้งหมดเหนือศีรษะกดทับลงมา ที่ระดับทะเลมีอากาศอยู่ด้านบนมากที่สุด ความกดอากาศจึงสูงสุด',
+    'ยอดเขาสูงที่สุดของไทย อากาศด้านบนน้อยลง ความกดอากาศต่ำลง ถุงขนมจากพื้นราบจึงพองขึ้น',
+    'ความกดอากาศเหลือราว 1 ใน 3 ของระดับทะเล อากาศเบาบาง นักปีนเขาส่วนใหญ่ต้องใช้ออกซิเจนเสริม',
+    'ห้องโดยสารต้องอัดอากาศเพิ่ม ขณะเครื่องขึ้นลงความกดอากาศเปลี่ยน หูจึงอื้อ'];
+  function press(h) { return 1013.25 * Math.pow(1 - 2.25577e-5 * h, 5.25588); }
+  var c2 = 0, hB = 0;
+  function updC2() {
+    chips('stopChips', 'จุดหมาย', STOPS.map(function (s) { return s.n; }), c2, 'p', function (i) { return S.c2[i]; }, function (v) { c2 = v; updC2(); });
+    var at = Math.abs(hB - STOPS[c2].h) < 1, P = press(hB);
+    $('c2Name').textContent = at ? STOPS[c2].n : 'กำลังเคลื่อนที่ไป ' + STOPS[c2].n;
+    $('c2H').textContent = fmt(hB); $('c2P').textContent = fmt(P); $('c2Bag').textContent = '×' + fmt(1013.25 / P, 1);
+    $('c2Why').textContent = STW[c2];
+    if (at && !S.c2[c2]) { S.c2[c2] = 1; save(); chips('stopChips', 'จุดหมาย', STOPS.map(function (s) { return s.n; }), c2, 'p', function (i) { return S.c2[i]; }, function (v) { c2 = v; updC2(); }); }
+    $('logC2').innerHTML = STOPS.map(function (s, i) { var r = S.c2[i]; return '<tr' + (i === c2 ? ' class="cur"' : '') + '><td class="n">' + s.n + '</td><td>' + fmt(s.h) + '</td><td>' + (r ? fmt(press(s.h)) : '-') + '</td><td>' + (r ? '×' + fmt(1013.25 / press(s.h), 1) : '-') + '</td></tr>'; }).join('');
+    updLog3();
+  }
+  function stepC2(dt) { var tg = STOPS[c2].h; if (hB === tg) return; var sp = Math.max(400, Math.abs(tg - hB) * 1.6) * dt; hB = Math.abs(tg - hB) <= sp ? tg : hB + (tg > hB ? sp : -sp); updC2(); }
+  function drawC2() {
+    var f = fit($('cvC2')), x = f.x, W = f.W, H = f.H, top = 22, bot = H - 26, Y = function (h) { return bot - h / 12000 * (bot - top); };
+    var g = x.createLinearGradient(0, top, 0, bot); g.addColorStop(0, '#060b24'); g.addColorStop(1, '#3d7fc0'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    // จุดอากาศ หนาแน่นตามความกด
+    for (var b = 0; b < 24; b++) { var h0 = b * 500, n = Math.round(30 * press(h0 + 250) / 1013.25);
+      for (var i = 0; i < n; i++) { x.fillStyle = 'rgba(232,237,255,.45)'; x.fillRect(46 + hash(b * 40 + i, 41) * (W - 52), Y(h0 + 500 * hash(b * 40 + i, 42)), 2, 2); } }
+    // แกนความสูง
+    x.strokeStyle = '#9AA6CF'; x.lineWidth = 1; x.beginPath(); x.moveTo(40, top); x.lineTo(40, bot); x.stroke();
+    for (var km = 0; km <= 12; km += 2) { x.beginPath(); x.moveTo(36, Y(km * 1000)); x.lineTo(44, Y(km * 1000)); x.stroke(); label(x, km + ' กม.', 34, Y(km * 1000) + 4, '#9AA6CF', 11, 'right'); }
+    // ภูเขา เครื่องบิน
+    function mtn(cx, h, w, col) { x.fillStyle = col; x.beginPath(); x.moveTo(cx - w, bot); x.lineTo(cx - w * .25, Y(h * .7)); x.lineTo(cx, Y(h)); x.lineTo(cx + w * .3, Y(h * .75)); x.lineTo(cx + w, bot); x.closePath(); x.fill(); }
+    mtn(W * .5, 8849, W * .2, '#4a5276'); x.fillStyle = '#e9f1ff'; x.beginPath(); x.moveTo(W * .5, Y(8849)); x.lineTo(W * .5 - W * .2 * .2, Y(7300)); x.lineTo(W * .5 + W * .2 * .22, Y(7400)); x.closePath(); x.fill();
+    mtn(W * .2, 2565, W * .13, '#2f5a3a');
+    label(x, 'ดอยอินทนนท์ 2,565 ม.', W * .2, Y(2565) - 8, '#5EF2A5', 12);
+    label(x, 'เอเวอเรสต์ 8,849 ม.', W * .5, Y(8849) - 8, '#E8EDFF', 12);
+    var px = W * .9, py = Y(11000); x.fillStyle = '#E8EDFF'; x.beginPath(); x.ellipse(px, py, 22, 4.5, 0, 0, 6.283); x.fill(); x.beginPath(); x.moveTo(px - 4, py); x.lineTo(px + 6, py + 12); x.lineTo(px + 10, py); x.closePath(); x.fill(); x.beginPath(); x.moveTo(px - 18, py); x.lineTo(px - 22, py - 9); x.lineTo(px - 14, py); x.fill();
+    label(x, 'เครื่องบิน 11 กม.', px, py - 12, '#E8EDFF', 12);
+    x.fillStyle = '#d6bb84'; x.fillRect(0, bot, W, H - bot); label(x, 'ชายหาด (ระดับทะเล)', W * .78, H - 8, '#FFD166', 12);
+    // บอลลูน
+    var bxx = W * .73, byy = Y(hB) - 40, bag = 1013.25 / press(hB), rb = 13 + 4 * Math.sqrt(bag);
+    x.setLineDash([4, 4]); x.strokeStyle = 'rgba(255,209,102,.6)'; x.beginPath(); x.moveTo(44, Y(hB)); x.lineTo(bxx - 12, Y(hB)); x.stroke(); x.setLineDash([]);
+    x.fillStyle = '#FF6B8A'; x.beginPath(); x.arc(bxx, byy - rb, rb, 0, 6.283); x.fill(); x.strokeStyle = '#E8EDFF'; x.lineWidth = 1; x.beginPath(); x.moveTo(bxx - 4, byy); x.lineTo(bxx - 4, byy + 22); x.moveTo(bxx + 4, byy); x.lineTo(bxx + 4, byy + 22); x.stroke();
+    var bw2 = 10 + 5 * Math.sqrt(bag), bh2 = 12 + 5 * Math.sqrt(bag);
+    x.fillStyle = '#FFD166'; x.beginPath(); x.ellipse(bxx, byy + 22 + bh2 / 2, bw2 / 2, bh2 / 2, 0, 0, 6.283); x.fill(); x.fillStyle = '#06102A'; x.font = '700 9px ' + HFONT; x.textAlign = 'center'; x.fillText('ขนม', bxx, byy + 26 + bh2 / 2);
+    label(x, fmt(press(hB)) + ' hPa', bxx + rb + 8, byy - rb, '#FFD166', 14, 'left');
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ชายหาดสายลม
+  var TQ = [{ t: 14, n: 'ชายหาด 14:00 น. (บ่าย)', a: 0, hot: 'บก', low: 'บก', w: 'จากทะเลเข้าหาฝั่ง (ลมทะเล)' }, { t: 4, n: 'ชายหาด 04:00 น. (ใกล้รุ่ง)', a: 1, hot: 'ทะเล', low: 'ทะเล', w: 'จากฝั่งออกสู่ทะเล (ลมบก)' }];
+  var OPT3 = ['จากทะเลเข้าหาฝั่ง', 'จากฝั่งออกสู่ทะเล'];
+  function tLand(t) { return 27 + 7 * Math.cos(2 * Math.PI * (t - 14) / 24); }
+  function tSea(t) { return 28 + Math.cos(2 * Math.PI * (t - 15) / 24); }
+  function pOf(t, land) { var d = tLand(t) - tSea(t); return 1012 + (land ? -1 : 1) * .6 * d; }
+  var t3 = 8, play3 = 0, q3 = 0;
+  function updC3() {
+    var dT = tLand(t3) - tSea(t3);
+    $('c3Time').textContent = 'เวลา ' + hhmm(t3);
+    $('c3Ts').textContent = fmt(tSea(t3), 0) + ' °C'; $('c3Tl').textContent = fmt(tLand(t3), 0) + ' °C';
+    $('c3Ps').textContent = fmt(pOf(t3, 0), 0) + ' hPa'; $('c3Pl').textContent = fmt(pOf(t3, 1), 0) + ' hPa';
+    $('c3Wind').textContent = Math.abs(dT) < 1 ? 'ลมสงบ (บกกับทะเลอุณหภูมิใกล้กัน)' : dT > 0 ? 'บกร้อนกว่า : ลมทะเล พัดจากทะเลเข้าฝั่ง' : 'ทะเลอุ่นกว่า : ลมบก พัดจากฝั่งออกทะเล';
+    chips('beachChips', '', TQ.map(function (z) { return z.n; }), q3, 'q', function (i) { return S.c3[i]; }, function (v) { q3 = v; t3 = TQ[v].t; play3 = 0; updC3(); drawC3(); });
+    var Z = TQ[q3], ok = S.c3[q3];
+    $('c3Q').textContent = Z.n + ' ลมที่ผิวพื้นพัดไปทางใด ?';
+    $('c3Ask').innerHTML = OPT3.map(function (o, j) { return '<button data-j="' + j + '" class="' + (ok && j === Z.a ? 'ok' : '') + '">' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($('c3Ask').querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (S.c3[q3]) return; var j = +b.getAttribute('data-j');
+        if (j === TQ[q3].a) { S.c3[q3] = 1; save(); updC3(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('c3Why').textContent = ok ? (q3 === 0 ? 'กลางวันบกร้อนเร็วกว่าทะเล อากาศเหนือบกลอยขึ้น ความกดอากาศต่ำ อากาศเย็นจากทะเล (ความกดสูง) จึงพัดเข้าฝั่ง' : 'กลางคืนบกเย็นเร็วกว่าทะเล อากาศเหนือทะเลอุ่นกว่าลอยขึ้น ความกดอากาศต่ำ อากาศเหนือบก (ความกดสูง) จึงพัดออกสู่ทะเล') : '';
+    $('tC3').value = Math.round(t3 * 4);
+    $('playC3').textContent = play3 ? 'หยุด' : 'เดินเวลา 1 วัน';
+    updLog3();
+  }
+  function updLog3() {
+    var rows = [['กล่องควันธูป จุดเทียนใต้ปล่องซ้าย', S.c1[0], 'ซ้าย', 'ซ้าย', 'จากขวาไปซ้าย'], [TQ[0].n, S.c3[0], TQ[0].hot, TQ[0].low, TQ[0].w], [TQ[1].n, S.c3[1], TQ[1].hot, TQ[1].low, TQ[1].w]];
+    $('logC3').innerHTML = rows.map(function (r) { return '<tr><td class="n">' + r[0] + '</td><td>' + (r[1] ? r[2] : '-') + '</td><td>' + (r[1] ? r[3] : '-') + '</td><td>' + (r[1] ? r[4] : '-') + '</td></tr>'; }).join('');
+    var n = (S.c1[0] ? 1 : 0) + (S.c3[0] ? 1 : 0) + (S.c3[1] ? 1 : 0), n2 = STOPS.filter(function (s, i) { return S.c2[i]; }).length;
+    $('progC').innerHTML = 'บันทึกแล้ว : ตาราง 3 สถานการณ์ <b>' + n + '/3</b> · บอลลูน <b>' + n2 + '/4</b>';
+  }
+  $('tC3').oninput = function () { t3 = +this.value / 4; play3 = 0; updC3(); drawC3(); };
+  $('playC3').onclick = function () { play3 = play3 ? 0 : 1; updC3(); };
+  function drawC3() {
+    var f = fit($('cvC3')), x = f.x, W = f.W, H = f.H, t = t3;
+    var sAlt = Math.sin((t - 6) / 12 * Math.PI), day = smooth(-.15, .25, sAlt);
+    var g = x.createLinearGradient(0, 0, 0, H * .7); g.addColorStop(0, 'rgb(' + Math.round(8 + 60 * day) + ',' + Math.round(14 + 120 * day) + ',' + Math.round(45 + 170 * day) + ')'); g.addColorStop(1, 'rgb(' + Math.round(20 + 150 * day) + ',' + Math.round(30 + 170 * day) + ',' + Math.round(70 + 170 * day) + ')');
+    x.fillStyle = g; x.fillRect(0, 0, W, H); if (day < .5) stars(x, W, H * .5, 50);
+    var shore = W * .5, gl = H * .72;
+    // ดวงอาทิตย์ / ดวงจันทร์
+    var sx = W * (.08 + .84 * clamp((t - 6) / 12, 0, 1)), sy = H * .62 - H * .5 * Math.max(0, sAlt);
+    if (sAlt > -.05) sun(x, sx, sy, 12, tA); else { var mx = W * (.08 + .84 * (((t + 6) % 24) / 12)), my = H * .62 - H * .45 * Math.max(0, Math.sin(((t + 6) % 24) / 12 * Math.PI)); x.fillStyle = '#E8EDFF'; x.beginPath(); x.arc(mx, my, 10, 0, 6.283); x.fill(); }
+    // ทะเลและบก
+    x.fillStyle = '#1f5fa8'; x.fillRect(0, gl, shore + 10, H - gl);
+    x.strokeStyle = 'rgba(200,230,255,.4)'; x.lineWidth = 1.2; for (var wv = 0; wv < 3; wv++) { x.beginPath(); for (var wx = 0; wx <= shore; wx += 8) { var wy = gl + 8 + wv * 14 + Math.sin(wx * .07 + tA * 2 + wv) * 2; if (wx) x.lineTo(wx, wy); else x.moveTo(wx, wy); } x.stroke(); }
+    x.fillStyle = '#d6bb84'; x.beginPath(); x.moveTo(shore - 10, gl); x.lineTo(shore + 30, gl - 6); x.lineTo(W, gl - 8); x.lineTo(W, H); x.lineTo(shore - 10, H); x.closePath(); x.fill();
+    x.fillStyle = '#4f6f34'; x.fillRect(shore + 60, gl - 8, W - shore - 60, H - gl + 8);
+    var dT = tLand(t) - tSea(t), str = clamp(Math.abs(dT) / 7, 0, 1), dir = dT > 0 ? 1 : -1;
+    // ธงชายหาด
+    var fx = shore + 40, fy = gl - 70; x.strokeStyle = '#E8EDFF'; x.lineWidth = 2; x.beginPath(); x.moveTo(fx, gl - 6); x.lineTo(fx, fy); x.stroke();
+    var fl = 26 * (Math.abs(dT) < 1 ? .35 : 1), droop = Math.abs(dT) < 1 ? 14 : 4 * (1 - str);
+    x.fillStyle = '#FF6B8A'; x.beginPath(); x.moveTo(fx, fy); x.quadraticCurveTo(fx + dir * fl * .5, fy + 4 + Math.sin(tA * 8) * 2 * str, fx + dir * fl, fy + droop); x.lineTo(fx + dir * fl, fy + 12 + droop); x.quadraticCurveTo(fx + dir * fl * .5, fy + 16 + Math.sin(tA * 8 + 1) * 2 * str, fx, fy + 14); x.closePath(); x.fill();
+    // ต้นมะพร้าว
+    x.strokeStyle = '#8a6a4a'; x.lineWidth = 4; x.beginPath(); x.moveTo(W * .82, gl - 8); x.quadraticCurveTo(W * .82 + 6, gl - 50, W * .82 - dir * 4 * str, gl - 84); x.stroke();
+    x.strokeStyle = '#3fbf7f'; x.lineWidth = 3; for (var lf = 0; lf < 5; lf++) { var a = -Math.PI / 2 + (lf - 2) * .6 + dir * .35 * str; x.beginPath(); x.moveTo(W * .82 - dir * 4 * str, gl - 84); x.quadraticCurveTo(W * .82 + Math.cos(a) * 18, gl - 84 + Math.sin(a) * 18 - 6, W * .82 + Math.cos(a) * 30 + dir * 6 * str, gl - 84 + Math.sin(a) * 30 + 8); x.stroke(); }
+    // ความกดอากาศและการหมุนเวียน
+    if (Math.abs(dT) >= 1) {
+      var lowX = dT > 0 ? W * .75 : W * .25, hiX = dT > 0 ? W * .25 : W * .75;
+      label(x, 'L', lowX, gl - 30, '#FF6B8A', 26); label(x, 'H', hiX, gl - 30, '#4FD8FF', 26);
+      x.globalAlpha = .4 + .6 * str;
+      arrow(x, hiX + (lowX > hiX ? 26 : -26), gl - 18, lowX + (lowX > hiX ? -26 : 26), gl - 18, '#5EF2A5', 2 + 3 * str, 12);
+      arrow(x, lowX, gl - 60, lowX, H * .22, '#FF6B8A', 2 + 2 * str, 10);
+      arrow(x, lowX, H * .17, hiX, H * .17, '#9AA6CF', 1.5 + 1.5 * str, 10);
+      arrow(x, hiX, H * .22, hiX, gl - 60, '#4FD8FF', 2 + 2 * str, 10);
+      x.globalAlpha = 1;
+      label(x, dT > 0 ? 'ลมทะเล' : 'ลมบก', (lowX + hiX) / 2, gl - 26, '#5EF2A5', 15);
+      if (dT > 3) { x.fillStyle = 'rgba(232,237,255,' + (.25 + .5 * smooth(3, 7, dT)) + ')'; [[0, 0, 22], [18, 4, 16], [-18, 5, 15]].forEach(function (c) { x.beginPath(); x.arc(lowX + c[0], H * .12 + c[1], c[2], 0, 6.283); x.fill(); }); }
+    } else label(x, 'ลมสงบ', W * .5, gl - 30, '#9AA6CF', 15);
+    label(x, 'ทะเล ' + fmt(tSea(t), 0) + '°C', W * .2, H - 12, '#E8EDFF', 13); label(x, 'บก ' + fmt(tLand(t), 0) + '°C', W * .78, H - 12, '#E8EDFF', 13);
+    label(x, hhmm(t), W - 8, 18, '#FFD166', 14, 'right');
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 4 ไขรหัส
+  var CL = [
+    { L: 'B', q: 'ทำไมตอนเที่ยงวันจึงร้อนกว่าตอนเช้า ทั้งที่ดวงอาทิตย์อยู่ห่างโลกเท่าเดิม', o: ['ตอนเที่ยงดวงอาทิตย์อยู่ใกล้โลกกว่า', 'แสงตกกระทบเกือบตั้งฉาก พลังงานต่อพื้นที่มากกว่า', 'ตอนเที่ยงลมพัดแรงกว่า', 'ตอนเช้ามีเมฆมากทุกวัน'], a: 1,
+      w: 'มุมตกกระทบยิ่งชัน แสงจำนวนเท่าเดิมยิ่งรวมอยู่บนพื้นที่แคบ และผ่านบรรยากาศสั้นกว่า พื้นจึงได้พลังงานต่อพื้นที่มากกว่า' },
+    { L: 'R', q: 'พลังงานจากดวงอาทิตย์ 100 ส่วน พื้นผิวโลกดูดกลืนไว้ราวกี่ส่วน', o: ['ราว 10 ส่วน', 'ราว 30 ส่วน', 'ทั้ง 100 ส่วน', 'ราว 50 ส่วน'], a: 3,
+      w: 'สะท้อนกลับสู่อวกาศราว 30 ส่วน บรรยากาศและเมฆดูดกลืนราว 20 ส่วน พื้นผิวโลกดูดกลืนราว 50 ส่วน แล้วถ่ายเทความร้อนให้อากาศ' },
+    { L: 'E', q: 'เดือนมิถุนายน ประเทศออสเตรเลียเป็นฤดูอะไร เพราะอะไร', o: ['ฤดูหนาว เพราะซีกโลกใต้เอียงออกจากดวงอาทิตย์', 'ฤดูร้อน เพราะอยู่ใกล้ดวงอาทิตย์', 'ฤดูร้อน เพราะซีกโลกใต้เอียงเข้าหาดวงอาทิตย์', 'ไม่มีฤดูกาล'], a: 0,
+      w: 'แกนโลกเอียง 23.5° เดือนมิถุนายนซีกโลกเหนือเอียงเข้าหาดวงอาทิตย์ (ฤดูร้อน) ซีกโลกใต้เอียงออก แสงเฉียง กลางวันสั้น จึงเป็นฤดูหนาว' },
+    { L: 'E', q: 'อากาศที่ได้รับความร้อนจะเป็นอย่างไร', o: ['หดตัว หนาแน่นขึ้น แล้วจมลง', 'ไม่เปลี่ยนแปลง', 'ขยายตัว หนาแน่นลดลง ลอยขึ้น เกิดความกดอากาศต่ำ', 'กลายเป็นความกดอากาศสูงทันที'], a: 2,
+      w: 'อากาศร้อนขยายตัว มวลเท่าเดิมแต่ปริมาตรมากขึ้น ความหนาแน่นจึงลดลงและลอยตัวขึ้น บริเวณนั้นเป็นความกดอากาศต่ำ ส่วนอากาศเย็นหนาแน่นจมลงเป็นความกดอากาศสูง' },
+    { L: 'Z', q: 'ลมเกิดขึ้นได้อย่างไร', o: ['อากาศเคลื่อนจากความกดอากาศต่ำไปสูง', 'อากาศเคลื่อนจากความกดอากาศสูงไปต่ำ', 'ต้นไม้โบกไปมาทำให้เกิดลม', 'อากาศเคลื่อนที่แบบสุ่ม'], a: 1,
+      w: 'เมื่อสองบริเวณมีความกดอากาศต่างกัน อากาศจะเคลื่อนจากบริเวณความกดอากาศสูงไปยังบริเวณความกดอากาศต่ำ ยิ่งต่างกันมาก ลมยิ่งแรง' },
+    { L: 'E', q: 'ขนมถุงที่ซื้อจากกรุงเทพฯ พองขึ้นเมื่อขึ้นไปบนยอดดอยอินทนนท์ เพราะอะไร', o: ['อากาศบนดอยร้อนกว่า', 'แสงแดดบนดอยแรงกว่า', 'ถุงขนมดูดความชื้นจากหมอก', 'ความกดอากาศภายนอกต่ำกว่า อากาศในถุงจึงดันให้พองขึ้น'], a: 3,
+      w: 'ยิ่งสูงยิ่งมีอากาศกดทับด้านบนน้อยลง ความกดอากาศภายนอกถุงจึงต่ำกว่าภายในถุง อากาศในถุงขยายตัวดันให้พองขึ้น' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- คลังไอเดีย
+  var LIB = [
+    { y: 'พลังงานจากดวงอาทิตย์ · พื้นผิว', n: 'หลังคาและผนังสีอ่อน', d: 'สีขาวหรือสีอ่อนสะท้อนแสงอาทิตย์กลับมาก ดูดกลืนน้อย ห้องใต้หลังคาจึงร้อนน้อยกว่าหลังคาสีเข้ม', i: 'เชื่อมกับ : ภารกิจ A (พื้นขาวแบบหิมะสะท้อน 85%)' },
+    { y: 'พลังงานจากดวงอาทิตย์ · มุมแสง', n: 'ชายคา กันสาด แผงบังแดด', d: 'บังแสงแดดที่ตกกระทบผนังและหน้าต่าง โดยเฉพาะแดดบ่ายทางทิศตะวันตก ซึ่งแสงเฉียงเข้าห้องได้ลึก', i: 'เชื่อมกับ : ภารกิจ A B (มุมตกกระทบ)' },
+    { y: 'พลังงานจากดวงอาทิตย์ · ร่มเงา', n: 'ต้นไม้ใหญ่และพื้นที่สีเขียว', d: 'ใบไม้ดูดกลืนและบังแสง น้ำระเหยจากใบช่วยให้อากาศเย็นลง ลานคอนกรีตกลางแดดร้อนกว่าสนามหญ้ามาก', i: 'เชื่อมกับ : ภารกิจ A (ชนิดพื้นผิว)' },
+    { y: 'ความกดอากาศ · อากาศร้อนลอยขึ้น', n: 'ช่องลมสูงใต้หลังคา', d: 'อากาศร้อนในห้องลอยขึ้นออกทางช่องด้านบน ความกดอากาศในห้องลดลง อากาศเย็นจากหน้าต่างด้านล่างไหลเข้ามาแทน (เหมือนกล่องควันธูป)', i: 'เชื่อมกับ : ภารกิจ C ขั้นที่ 1' },
+    { y: 'ความกดอากาศ · ลมพัดผ่าน', n: 'หน้าต่างสองฝั่งตรงข้ามกัน', d: 'เปิดหน้าต่างฝั่งรับลมและฝั่งตรงข้าม ลมจากด้านความกดอากาศสูงจะไหลผ่านห้องไปด้านความกดอากาศต่ำได้สะดวก', i: 'เชื่อมกับ : ภารกิจ C ขั้นที่ 1 และ 3' },
+    { y: 'ภูมิปัญญาไทย', n: 'เรือนไทยใต้ถุนสูง หลังคาทรงสูง', d: 'หลังคาสูงชันให้อากาศร้อนลอยขึ้นไปอยู่ด้านบน ใต้ถุนโล่งให้ลมพัดผ่าน บ้านริมน้ำได้ลมเย็นแบบลมทะเลขนาดเล็ก', i: 'เชื่อมกับ : ภารกิจ C ขั้นที่ 1 และ 3' }
+  ];
+  $('lib').innerHTML = LIB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') drawA();
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); drawC3(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') { if (playA) { pA = Math.min(1, pA + dt / 6); if (pA >= 1) playA = 0; updA(); } drawA(); }
+    if (tab === 'B') { if (playB) { pB = Math.min(1, pB + dt / 10); if (pB >= 1) { playB = 0; doneB = 1; } updB(); } drawB(); }
+    if (tab === 'C') {
+      if (play1) { p1 = Math.min(1, p1 + dt / 6); if (p1 >= 1) play1 = 0; updC1(); }
+      stepC2(dt);
+      if (play3) { t3 = (t3 + dt * 2.4) % 24; updC3(); }
+      drawC1(); drawC2(); drawC3();
+    }
+    anim = requestAnimationFrame(loop);
+  }
+  updA(); updB(); updC1(); updC2(); updC3(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_A1 = { ANG: ANG, SURF: SURF, tempA: tempA, areaA: areaA, enA: enA, CITIES: CITIES, MONTHS: MONTHS, noonAlt: noonAlt, dayLen: dayLen, energy: energy, STOPS: STOPS, press: press, CL: CL,
+    tLand: tLand, tSea: tSea, pOf: pOf,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    setA: function (i, s, p, tt) { playA = 0; aI = i; aS = s; pA = p; if (tt != null) tA = tt; updA(); drawA(); },
+    setB: function (c, m, p, tt) { playB = 0; bC = c; bM = m; pB = p; doneB = 1; if (tt != null) tA = tt; updB(); drawB(); },
+    setC1: function (k, p, tt) { play1 = 0; c1 = k; p1 = p; if (tt != null) tA = tt; updC1(); drawC1(); },
+    setC2: function (k) { c2 = k; hB = STOPS[k].h; updC2(); drawC2(); },
+    setC3: function (t, q) { play3 = 0; t3 = t; if (q != null) q3 = q; updC3(); drawC3(); },
+    recAll: function () { WSK.forEach(function (z) { S.recA[z] = 1; }); WSB.forEach(function (z) { S.recB[z] = 1; }); S.c1[0] = 1; S.c1[1] = 1; STOPS.forEach(function (s, i) { S.c2[i] = 1; }); S.c3[0] = 1; S.c3[1] = 1;
+      CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA(); updB(); updC1(); updC2(); updC3(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
