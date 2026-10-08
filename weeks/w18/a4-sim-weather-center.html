@@ -1,0 +1,843 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A4 ภารกิจศูนย์พยากรณ์อากาศ · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #3a4a8a44, transparent), radial-gradient(900px 500px at 0% 110%, #1b4a6e55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--cyan); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+.unit-tag.star { background: var(--gold); }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+.leg i.sq { width: 12px; height: 12px; border-radius: 2px; vertical-align: -1px; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+table.log tr.ws td.n::after { content: " · ใบงาน"; color: var(--gold); font-size: 12.5px; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; text-align: left; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.pick button:disabled { opacity: .4; cursor: default; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 4px; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4FD8FF, #FFD166); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.match { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; font-size: 14.5px; margin-top: 2px; }
+.match .m-ok { color: var(--ok); } .match .m-no { color: var(--err); }
+.dare { margin-top: 12px; border: 1.5px dashed var(--violet); border-radius: 14px; padding: 10px 12px; background: #a77bff12; font-size: 15px; }
+.dare b { color: var(--violet); font-family: var(--head); }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .al .opts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · A4 <span class="unit-tag">หน่วยที่ 3</span><span class="unit-tag star">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจศูนย์<b>พยากรณ์อากาศ</b></h1>
+  <p class="lead">ฝึกถอดรหัสสัญลักษณ์บนแผนที่อากาศ อ่านเส้นไอโซบาร์ หย่อมความกดอากาศสูงและต่ำ ดูภาพถ่ายดาวเทียมและเรดาร์ แล้วใช้ข้อมูลเหล่านี้วางแผนการเดินทาง การเรียน และอาชีพให้เข้ากับลมฟ้าอากาศ</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องถอดรหัสสัญลักษณ์<small>สถานีตรวจอากาศ · ไอโซบาร์ H L</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>แผนที่อากาศ 4 ฤดู<small>แผนที่ ดาวเทียม เรดาร์</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์วางแผนชีวิต<small>ตัดสินใจ 4 สถานการณ์</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องถอดรหัสสัญลักษณ์ลมฟ้าอากาศ</h2>
+    <p class="how">แผนที่อากาศเขียนด้วยภาษาสัญลักษณ์ที่นักอุตุนิยมวิทยาทั่วโลกใช้ร่วมกัน นักบินจะฝึก 2 ขั้น คือ อ่านสัญลักษณ์ของสถานีตรวจอากาศ และทดลองดูว่าเส้นไอโซบาร์บอกอะไรเกี่ยวกับลม</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> สถานีตรวจอากาศ : สร้างสัญลักษณ์ให้ตรงกับรหัสปริศนา</h2>
+    <p class="how" style="margin-bottom:4px">ด้านซ้ายคือสัญลักษณ์ปริศนาจากสถานีตรวจอากาศ ด้านขวาคือสัญลักษณ์ที่นักบินสร้าง เลือกทิศลม ความเร็วลม ปริมาณเมฆ และลักษณะอากาศ จนตรงกันทั้ง 4 อย่าง ระบบจะบันทึกให้ ใช้บัตรถอดรหัสด้านล่างช่วยได้</p>
+    <div class="chips" id="stnChips"></div>
+    <div class="chips" id="dirChips"></div>
+    <div class="chips" id="spdChips"></div>
+    <div class="chips" id="cldChips"></div>
+    <div class="chips" id="wxChips"></div>
+    <div class="twin">
+      <canvas id="cvA1" height="300" aria-label="สัญลักษณ์สถานีตรวจอากาศ 2 อัน ซ้ายเป็นสัญลักษณ์ปริศนา ขวาเป็นสัญลักษณ์ที่นักเรียนสร้าง วงกลมแสดงปริมาณเมฆ ก้านลมชี้ทิศที่ลมพัดมา ขีดที่ปลายก้านบอกความเร็วลม"></canvas>
+      <div class="info">
+        <div class="k">สถานีตรวจอากาศ</div>
+        <div class="v c" id="a1Name" style="font-size:19px">-</div>
+        <div class="k" id="a1TP">-</div>
+        <div class="k" style="margin-top:4px">เทียบกับสัญลักษณ์ปริศนา</div>
+        <div class="match" id="a1Match"></div>
+        <h3 id="a1Res" style="margin-top:6px">-</h3>
+        <div class="d" id="a1Why">-</div>
+      </div>
+    </div>
+    <div class="ctrl"><span class="lbl" id="recA1Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สถานี</th><th>ทิศลม (ลมพัดมาจาก)</th><th>ความเร็วลม</th><th>ปริมาณเมฆ</th><th>ลักษณะอากาศ</th></tr></thead>
+      <tbody id="logA1"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>บัตรถอดรหัส</em> สัญลักษณ์ลมฟ้าอากาศที่สำคัญ</h2>
+    <canvas id="cvKey" height="300" aria-label="บัตรถอดรหัสสัญลักษณ์ ปริมาณเมฆ 5 ระดับ ความเร็วลม ลักษณะอากาศ ฝน ฝนฟ้าคะนอง หมอก และสัญลักษณ์บนแผนที่อากาศ หย่อมความกดอากาศสูง ต่ำ แนวปะทะอากาศเย็น ร่องมรสุม พายุหมุนเขตร้อน เส้นไอโซบาร์"></canvas>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ห้องทดลองไอโซบาร์ : หย่อมความกดอากาศสูงและต่ำ</h2>
+    <p class="how" style="margin-bottom:4px">เส้นไอโซบาร์ลากเชื่อมจุดที่มีความกดอากาศเท่ากัน (หน่วยเฮกโตพาสคัล hPa ห่างกันเส้นละ 4 hPa) เลือกชนิดของหย่อมความกดอากาศและระยะห่างของเส้น แล้วกด "เดินเวลา 1 วัน" สังเกตอากาศ (จุดสีขาว) ว่าเคลื่อนที่อย่างไร ครบ 1 วันแล้วบันทึกให้อัตโนมัติ</p>
+    <div class="chips" id="sysChips"></div>
+    <div class="chips" id="gapChips"></div>
+    <div class="twin">
+      <canvas id="cvA2" height="330" aria-label="แผนที่จำลองเส้นไอโซบาร์วงรอบหย่อมความกดอากาศสูง H หรือต่ำ L ในซีกโลกเหนือ ลมพัดออกจาก H วนตามเข็มนาฬิกา และพัดเข้าหา L วนทวนเข็มนาฬิกา เส้นยิ่งชิด ลมยิ่งแรง"></canvas>
+      <div class="info">
+        <div class="k">หย่อมความกดอากาศ · ระยะห่างไอโซบาร์</div>
+        <div class="v c" id="a2Case" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความกดอากาศ<br>ที่ศูนย์กลาง</div><div class="v g" id="a2P">-</div></div>
+          <div><div class="k">ความเร็วลม<br>เฉลี่ย</div><div class="v r" id="a2V">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px">ลมพัด</div>
+        <div class="v p" id="a2Dir" style="font-size:16px">-</div>
+        <div class="k" style="margin-top:4px">ลักษณะอากาศ</div>
+        <div class="v o" id="a2Wx" style="font-size:16px">-</div>
+        <div class="bar" style="margin-top:4px"><i id="a2Bar"></i></div>
+        <div class="d" id="a2Why" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <div class="ctrl"><button class="btn" id="playA2">เดินเวลา 1 วัน</button><button class="btn" id="resetA2">เริ่มใหม่</button><span class="lbl" id="recA2Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>หย่อมความกดอากาศ · ระยะห่างไอโซบาร์</th><th>ลมพัด</th><th>ความเร็วลม</th><th>ลักษณะอากาศ</th></tr></thead>
+      <tbody id="logA2"></tbody>
+    </table></div>
+    <div class="note">สัญลักษณ์ลม : <b>ก้านลมชี้ไปทางทิศที่ลมพัดมา</b> (ก้านชี้ไปทางเหนือ = ลมเหนือ) ขีดยาว 1 ขีด = 10 นอต ขีดสั้น = 5 นอต (1 นอต ประมาณ 1.85 กม./ชม.) · วงกลมทึบมากขึ้น = เมฆมากขึ้น · <b>เส้นไอโซบาร์ยิ่งชิดกัน ลมยิ่งแรง</b> · ในซีกโลกเหนือ ลมพัดออกจากหย่อมความกดอากาศสูง (H) วนตามเข็มนาฬิกา อากาศจมตัว ท้องฟ้าโปร่ง และพัดเข้าหาหย่อมความกดอากาศต่ำ (L) วนทวนเข็มนาฬิกา อากาศยกตัว เกิดเมฆและฝน (เหมือนภารกิจ A2)</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตารางสถานี 4 แห่ง + ตารางไอโซบาร์ 4 กรณี ตอบข้อ 1</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> แผนที่อากาศ 4 ฤดู : แผนที่ ดาวเทียม เรดาร์</h2>
+    <p class="how">นักพยากรณ์อากาศไม่ได้ดูข้อมูลอย่างเดียว แต่ดู 3 ชั้นข้อมูลประกอบกัน เลือกแผนที่ ก–ง แล้วเปิดดูให้ครบทั้ง 3 ชั้นข้อมูล (แผนที่อากาศ ภาพถ่ายดาวเทียม เรดาร์ฝน) จึงตอบคำถามได้ ตอบถูกครบ 2 ข้อจึงบันทึก</p>
+    <div class="chips" id="dayChips"></div>
+    <div class="chips" id="layChips"></div>
+    <div class="twin">
+      <canvas id="cvB" height="440" aria-label="แผนที่อากาศจำลองของประเทศไทยและเอเชียตะวันออกเฉียงใต้ แสดงเส้นไอโซบาร์ หย่อมความกดอากาศสูงและต่ำ ลม ภาพถ่ายดาวเทียมเมฆ และเรดาร์ฝน"></canvas>
+      <div class="info">
+        <div class="k">แผนที่ที่เลือก</div>
+        <div class="v c" id="bName" style="font-size:19px">-</div>
+        <div class="k" id="bLayer">-</div>
+        <div class="d" id="bClue">-</div>
+        <div class="k" id="bSeen" style="margin-top:4px">-</div>
+        <div class="k" style="margin-top:4px">1) ระบบอากาศหลักที่มีผลต่อประเทศไทย คือ ?</div>
+        <div class="pick" id="bAsk1"></div>
+        <div id="bQ2" class="hide">
+          <div class="k" style="margin-top:6px">2) คาดว่าประเทศไทยจะมีอากาศอย่างไร ?</div>
+          <div class="pick" id="bAsk2"></div>
+        </div>
+        <div class="d" id="bWhy" style="color:#5EF2A5;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="leg" id="bLeg"></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>แผนที่</th><th>ระบบอากาศหลัก</th><th>ความกดอากาศ</th><th>อากาศที่คาดในประเทศไทย</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>แฟ้มความรู้</em> 3 ชั้นข้อมูลของนักพยากรณ์อากาศ</h2>
+    <div class="events" id="libB"></div>
+    <div class="note"><b>แผนที่อากาศ</b> บอกระบบอากาศ (H L แนวปะทะ ร่องมรสุม พายุ) และลม · <b>ภาพถ่ายดาวเทียม</b> มองจากอวกาศเห็นเมฆทั้งภูมิภาค เมฆยิ่งขาวสว่าง ยอดเมฆยิ่งสูงและเย็น มักเป็นเมฆฝนฟ้าคะนอง · <b>เรดาร์ตรวจอากาศ</b> ส่งคลื่นจากพื้นดินไปสะท้อนเม็ดฝน เห็นฝนที่กำลังตกในรัศมีของสถานีเรดาร์ สีเขียวฝนเล็กน้อย จนถึงสีแดงฝนหนัก · ฤดูหนาวไทยได้รับอิทธิพลจาก <b>มรสุมตะวันออกเฉียงเหนือ</b> ฤดูฝนจาก <b>มรสุมตะวันตกเฉียงใต้และร่องมรสุม</b></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตารางแผนที่ 4 แผ่น ตอบข้อ 2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์วางแผนชีวิตตามลมฟ้าอากาศ</h2>
+    <p class="how">ข้อมูลลมฟ้าอากาศมีค่าเมื่อเรานำไปใช้ตัดสินใจ นักบินจะช่วยคน 4 กลุ่มวางแผนจากแผนที่อากาศในภารกิจ B แล้วไขรหัสศูนย์พยากรณ์อากาศ</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ห้องวางแผน : ช่วยคน 4 กลุ่มตัดสินใจ</h2>
+    <p class="how" style="margin-bottom:4px">เลือกสถานการณ์ อ่านแผนที่อากาศและข้อมูลประกอบ (วงสีทองคือพื้นที่ของสถานการณ์) แล้วเลือกแผนที่เหมาะสมที่สุด ตอบถูกจึงบันทึก</p>
+    <div class="chips" id="planChips"></div>
+    <div class="twin">
+      <canvas id="cvC" height="420" aria-label="แผนที่อากาศของสถานการณ์ที่เลือก มีวงสีทองล้อมพื้นที่ที่ต้องวางแผน"></canvas>
+      <div class="info">
+        <div class="k">สถานการณ์</div>
+        <div class="v c" id="cName" style="font-size:19px">-</div>
+        <div class="d" id="cWho">-</div>
+        <div class="k" style="margin-top:4px">แผนที่อากาศบอกว่า</div>
+        <div class="v g" id="cInfo" style="font-size:16px">-</div>
+        <div class="k" style="margin-top:6px">ควรวางแผนอย่างไร ?</div>
+        <div class="pick" id="cAsk"></div>
+        <div class="d" id="cWhy" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สถานการณ์</th><th>แผนที่อากาศบอกว่า</th><th>ควรวางแผน</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ไขรหัสศูนย์พยากรณ์อากาศ</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">ISOBAR</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · ไอโซบาร์ (isobar) มาจากภาษากรีก iso แปลว่า เท่ากัน และ baros แปลว่า น้ำหนัก เส้นไอโซบาร์จึงเป็นเส้นที่ความกดอากาศเท่ากัน และเป็นหัวใจของแผนที่อากาศทุกฉบับ</div>
+    </div>
+
+    <h2 class="sub-h"><em>คลังข้อมูลจริง</em> หาแผนที่อากาศของวันนี้ (สำหรับส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">ภารกิจปลายทางในส่วนที่ 4 ต้องใช้ข้อมูลจริงของวันที่ทำงาน เริ่มจากแหล่งข้อมูลเหล่านี้ (ใช้ AI ช่วยอธิบายได้ แต่ต้องตรวจกับเว็บไซต์หน่วยงาน)</p>
+    <div class="events" id="libC"></div>
+    <div class="dare"><b>ภารกิจท้าทาย (ไม่บังคับ)</b> เปิดแผนที่อากาศของกรมอุตุนิยมวิทยาวันนี้ หา H และ L ที่อยู่ใกล้ประเทศไทยที่สุด จดค่าความกดอากาศ แล้วเปิดภาพถ่ายดาวเทียมเวลาเดียวกัน ดูว่าเมฆหนาอยู่ใกล้ L หรือแนวร่องจริงไหม เล่าให้เพื่อนในกลุ่มฟังว่าพรุ่งนี้ควรพกร่มหรือไม่ เพราะอะไร</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 สถานการณ์ + รหัสผ่าน ข้อ 3 · <b>ส่วนที่ 4</b> : ภารกิจปลายทาง แผนชีวิต 3 วันจากแผนที่อากาศจริง</div>
+  </section>
+
+  <footer>แผนที่อากาศ ภาพถ่ายดาวเทียม และเรดาร์ในภารกิจนี้เป็นข้อมูลจำลองเพื่อการเรียนรู้ ไม่ใช่ของวันจริง · รูปร่างประเทศย่อส่วนโดยประมาณ · ค่าความเร็วลมในห้องทดลองไอโซบาร์เป็นแบบจำลองอย่างง่าย · ติดตามพยากรณ์อากาศจริงได้ที่กรมอุตุนิยมวิทยา · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_a4_sim_v1';
+  var S = load() || {};
+  ['a1', 'a2', 'b', 'bv', 'c', 'cl'].forEach(function (k) { S[k] = S[k] || {}; });
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: false }); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function fit(cv, ratio, mn, mx) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h;
+    if (ratio) h = Math.round(clamp(w * ratio, mn, mx)); else h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  var RAD = Math.PI / 180;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function chips(id, lbl, arr, cur, attr, done, fn) {
+    var h = '<span class="lbl">' + lbl + '</span>';
+    arr.forEach(function (t, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (done && done(i) ? ' done' : '') + '" data-' + attr + '="' + i + '">' + t + '</button>'; });
+    $(id).innerHTML = h; bindChips($(id), attr, function (v) { fn(+v); });
+  }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function askUI(id, opts, ans, okNow, onOk, onNo, disabled) {
+    $(id).innerHTML = opts.map(function (o, j) { return '<button data-j="' + j + '" class="' + (okNow && j === ans ? 'ok' : '') + '"' + (disabled ? ' disabled' : '') + '>' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($(id).querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (okNow || disabled) return; var j = +b.getAttribute('data-j'); if (j === ans) { if (onOk()) return; } else { onNo && onNo(); }
+        b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); };
+    });
+  }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ สัญลักษณ์สถานีตรวจอากาศ
+  var DIRS = ['เหนือ', 'ตะวันออกเฉียงเหนือ', 'ตะวันออก', 'ตะวันออกเฉียงใต้', 'ใต้', 'ตะวันตกเฉียงใต้', 'ตะวันตก', 'ตะวันตกเฉียงเหนือ'];
+  var DIRS_S = ['เหนือ', 'ตอ.เฉียงเหนือ', 'ตะวันออก', 'ตอ.เฉียงใต้', 'ใต้', 'ตต.เฉียงใต้', 'ตะวันตก', 'ตต.เฉียงเหนือ'];
+  var SPD = [0, 5, 10, 15, 25];
+  var CLD = ['ไม่มีเมฆ', 'เมฆ 1/4', 'เมฆ 1/2', 'เมฆ 3/4', 'เมฆเต็มท้องฟ้า'];
+  var WX = ['ไม่มี', 'ฝน', 'ฝนฟ้าคะนอง', 'หมอก'];
+  function spdTxt(s) { return s ? s + ' นอต' : 'ลมสงบ'; }
+  function dirTxt(d, s) { return SPD[s] ? 'ลม' + DIRS[d] : 'ลมสงบ'; }
+  // วาดสัญลักษณ์สถานี : วงกลม = เมฆ ก้าน = ทิศที่ลมพัดมา ขีด = ความเร็ว
+  function station(x, cx, cy, r, o, col) {
+    col = col || '#E8EDFF';
+    var spd = SPD[o.s];
+    x.lineWidth = Math.max(1.6, r * .16); x.strokeStyle = col; x.fillStyle = col; x.lineCap = 'round';
+    if (o.nowind) {} else if (spd) {
+      var th = o.d * 45 * RAD, ux = Math.sin(th), uy = -Math.cos(th), px = -uy, py = ux, L = r * 3.4;
+      var ex = cx + ux * (r + L), ey = cy + uy * (r + L);
+      x.beginPath(); x.moveTo(cx + ux * r, cy + uy * r); x.lineTo(ex, ey); x.stroke();
+      var full = Math.floor(spd / 10), half = spd % 10 >= 5 ? 1 : 0, gap = r * .62, bl = r * 1.5, k = 0;
+      if (!full && half) k = 1;                     // ขีดสั้นตัวเดียวเว้นจากปลายก้าน
+      for (var i = 0; i < full + half; i++, k++) {
+        var bx = ex - ux * gap * k, by = ey - uy * gap * k, len = i < full ? bl : bl * .55;
+        x.beginPath(); x.moveTo(bx, by); x.lineTo(bx + px * len + ux * len * .38, by + py * len + uy * len * .38); x.stroke();
+      }
+    } else {
+      x.beginPath(); x.arc(cx, cy, r * 1.55, 0, 6.283); x.stroke();
+    }
+    x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fillStyle = '#0b1233'; x.fill(); x.stroke();
+    var f = [0, .25, .5, .75, 1][o.c];
+    if (f) { x.fillStyle = col; x.beginPath(); x.moveTo(cx, cy); x.arc(cx, cy, r, -Math.PI / 2, -Math.PI / 2 + f * 6.283); x.closePath(); x.fill(); }
+    wxSym(x, cx - r * 2.4, cy, r, o.w);
+    x.lineCap = 'butt';
+  }
+  function wxSym(x, wx, wy, r, w) {   // ลักษณะอากาศ (วาดทางซ้ายของวงกลมสถานี)
+    x.lineCap = 'round'; x.strokeStyle = '#5EF2A5'; x.fillStyle = '#5EF2A5'; x.lineWidth = Math.max(1.6, r * .15);
+    if (w === 1) { [-1, 1].forEach(function (s) { x.beginPath(); x.arc(wx + s * r * .42, wy, r * .26, 0, 6.283); x.fill(); }); }
+    if (w === 2) {
+      var s2 = r * .8; x.strokeStyle = '#FFD166'; x.fillStyle = '#FFD166';
+      x.beginPath(); x.moveTo(wx - s2 * .5, wy + s2); x.lineTo(wx - s2 * .5, wy - s2); x.lineTo(wx + s2 * .55, wy - s2); x.stroke();
+      x.beginPath(); x.moveTo(wx + s2 * .55, wy - s2); x.lineTo(wx + s2 * .1, wy - s2 * .1); x.lineTo(wx + s2 * .6, wy - s2 * .1); x.lineTo(wx + s2 * .2, wy + s2 * .75); x.stroke();
+      arrow(x, wx + s2 * .4, wy + s2 * .3, wx + s2 * .18, wy + s2 * .95, '#FFD166', Math.max(1.6, r * .15), r * .5);
+    }
+    if (w === 3) { x.strokeStyle = '#9AA6CF'; [-1, 0, 1].forEach(function (s) { x.beginPath(); x.moveTo(wx - r * .75, wy + s * r * .42); x.lineTo(wx + r * .75, wy + s * r * .42); x.stroke(); }); }
+    x.lineCap = 'butt';
+  }
+
+  // ================================================================ ภารกิจ A ขั้นที่ 1
+  var STN = [
+    { n: 'เชียงใหม่', d: 0, s: 1, c: 1, w: 3, T: 16, P: 1018 },
+    { n: 'กรุงเทพมหานคร', d: 1, s: 2, c: 2, w: 0, T: 24, P: 1014 },
+    { n: 'ภูเก็ต', d: 5, s: 3, c: 3, w: 1, T: 27, P: 1009 },
+    { n: 'สงขลา', d: 2, s: 4, c: 4, w: 2, T: 25, P: 1006 }];
+  var st = 0, me = { d: 4, s: 0, c: 0, w: 0 };
+  function same(a, b) { return a.s === b.s && (a.s === 0 || a.d === b.d) && a.c === b.c && a.w === b.w; }
+  function wxRead(o) { return dirTxt(o.d, o.s) + ' ' + spdTxt(SPD[o.s]) + ' · ' + CLD[o.c] + (o.w ? ' · ' + WX[o.w] : ''); }
+  function updA1() {
+    var T = STN[st];
+    if (same(me, T) && !S.a1[st]) { S.a1[st] = 1; save(); }
+    chips('stnChips', 'สถานีปริศนา', STN.map(function (s, i) { return (i + 1) + ' ' + s.n; }), st, 's', function (i) { return S.a1[i]; }, function (v) { st = v; updA1(); drawA1(); });
+    chips('dirChips', 'ก้านลมชี้ไปทาง', DIRS_S, me.d, 'd', null, function (v) { me.d = v; updA1(); drawA1(); });
+    chips('spdChips', 'ความเร็วลม', SPD.map(spdTxt), me.s, 'v', null, function (v) { me.s = v; updA1(); drawA1(); });
+    chips('cldChips', 'ปริมาณเมฆ', CLD, me.c, 'c', null, function (v) { me.c = v; updA1(); drawA1(); });
+    chips('wxChips', 'ลักษณะอากาศ', WX, me.w, 'w', null, function (v) { me.w = v; updA1(); drawA1(); });
+    $('a1Name').textContent = (st + 1) + ' · ' + T.n;
+    $('a1TP').textContent = 'อุณหภูมิ ' + T.T + ' °C · ความกดอากาศ ' + T.P + ' hPa (ตัวเลขซ้ายบน ขวาบนของสัญลักษณ์)';
+    var items = [
+      ['ทิศลม', T.s === 0 ? me.s === 0 : me.d === T.d], ['ความเร็วลม', me.s === T.s], ['ปริมาณเมฆ', me.c === T.c], ['ลักษณะอากาศ', me.w === T.w]];
+    $('a1Match').innerHTML = items.map(function (z) { return '<span>' + z[0] + '</span><span class="' + (z[1] ? 'm-ok">ตรงแล้ว' : 'm-no">ยังไม่ตรง') + '</span>'; }).join('');
+    var done = same(me, T);
+    $('a1Res').textContent = done ? 'ถอดรหัสสำเร็จ' : 'ปรับสัญลักษณ์ด้านขวาให้ตรงกับด้านซ้าย';
+    $('a1Why').textContent = done ? 'อ่านได้ว่า ' + wxRead(T) :
+      'เริ่มจากก้านลม : ก้านชี้ไปทางไหน ลมพัดมาจากทางนั้น · นับขีดที่ปลายก้าน ขีดยาว 10 นอต ขีดสั้น 5 นอต · ดูว่าวงกลมทึบกี่ส่วน · ดูสัญลักษณ์ทางซ้ายของวงกลม';
+    $('logA1').innerHTML = STN.map(function (s, i) { var r = S.a1[i];
+      return '<tr class="' + (i === st ? 'cur ' : '') + 'ws"><td class="n">' + (i + 1) + ' ' + s.n + '</td><td>' + (r ? dirTxt(s.d, s.s) : '-') + '</td><td>' + (r ? spdTxt(SPD[s.s]) : '-') + '</td><td>' + (r ? CLD[s.c] : '-') + '</td><td>' + (r ? WX[s.w] : '-') + '</td></tr>'; }).join('');
+    var n = STN.filter(function (s, i) { return S.a1[i]; }).length;
+    $('recA1Msg').textContent = n === 4 ? 'ถอดรหัสครบ 4 สถานีแล้ว ไปขั้นที่ 2 ต่อ' : 'ถอดรหัสแล้ว ' + n + ' / 4 สถานี (ตรงครบ 4 อย่างบันทึกอัตโนมัติ)';
+  }
+  function drawA1() {
+    var f = fit($('cvA1'), .55, 230, 330), x = f.x, W = f.W, H = f.H, T = STN[st], sm = W < 480 ? 11 : 13, r = Math.min(W * .035, H * .07, 17);
+    x.fillStyle = '#081430'; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(120,170,230,.08)'; x.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 30) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, H); x.stroke(); }
+    for (var gy = 0; gy < H; gy += 30) { x.beginPath(); x.moveTo(0, gy); x.lineTo(W, gy); x.stroke(); }
+    x.strokeStyle = 'rgba(154,166,207,.35)'; x.setLineDash([5, 5]); x.beginPath(); x.moveTo(W / 2, 30); x.lineTo(W / 2, H - 10); x.stroke(); x.setLineDash([]);
+    var cy = H * .56, done = same(me, T);
+    [[W * .25, T, 'สัญลักษณ์ปริศนา', '#FFD166'], [W * .75, me, 'สัญลักษณ์ของนักบิน', done ? '#5EF2A5' : '#4FD8FF']].forEach(function (z) {
+      label(x, z[2], z[0], 22, z[3], sm + 1);
+      station(x, z[0], cy, r, z[1], '#E8EDFF');
+      label(x, String(T.T), z[0] - r * 2.2, cy - r * 1.8, '#FF9F6B', sm + 1);
+      label(x, String(T.P), z[0] + r * 2.4, cy - r * 1.8, '#A77BFF', sm + 1);
+    });
+    label(x, T.n, W * .25, H - 12, '#9AA6CF', sm);
+    label(x, done ? 'ตรงกันแล้ว' : 'ยังไม่ตรง', W * .75, H - 12, done ? '#5EF2A5' : '#FF6B8A', sm);
+    var nx = W - 22, ny = 56; x.strokeStyle = '#9AA6CF'; x.lineWidth = 1.5; x.beginPath(); x.arc(nx, ny, 12, 0, 6.283); x.stroke();
+    arrow(x, nx, ny + 7, nx, ny - 10, '#E8EDFF', 2, 7); label(x, 'เหนือ', nx, ny + 26, '#9AA6CF', 10);
+  }
+  // บัตรถอดรหัส
+  function drawKey() {
+    var f = fit($('cvKey'), .42, 250, 380), x = f.x, W = f.W, H = f.H, sm = W < 520 ? 10 : 12, r = Math.min(W * .024, 11);
+    x.fillStyle = '#081430'; x.fillRect(0, 0, W, H);
+    var rows = [H * .16, H * .45, H * .78], c5 = function (i) { return W * (.1 + .2 * i); };
+    label(x, 'ปริมาณเมฆ', 8, rows[0] - r * 2.2, '#FFD166', sm, 'left');
+    CLD.forEach(function (t, i) { station(x, c5(i), rows[0] + 4, r, { d: 0, s: 0, c: i, w: 0, nowind: 1 }, '#E8EDFF'); label(x, t, c5(i), rows[0] + r * 3.2, '#E8EDFF', sm); });
+    label(x, 'ความเร็วลม (ก้านลมชี้ไปทางทิศเหนือ = ลมเหนือ)', 8, rows[1] - r * 4.6, '#FFD166', sm, 'left');
+    SPD.forEach(function (s, i) { station(x, c5(i), rows[1] + r, r * .8, { d: 0, s: i, c: 0, w: 0 }, '#E8EDFF'); label(x, spdTxt(s), c5(i), rows[1] + r * 3.6, '#E8EDFF', sm); });
+    label(x, 'ลักษณะอากาศ และสัญลักษณ์บนแผนที่อากาศ', 8, rows[2] - r * 3, '#FFD166', sm, 'left');
+    var ky = rows[2] + r * .4, items = W < 520 ? 4 : 6, step = W / (items + 1);
+    [[1, 'ฝน'], [2, 'ฝนฟ้าคะนอง'], [3, 'หมอก']].forEach(function (z, i) {
+      wxSym(x, step * (i + 1), ky, r * 1.1, z[0]);
+      label(x, z[1], step * (i + 1), ky + r * 2.8, '#E8EDFF', sm);
+    });
+    var mx = step * 4, my = ky;
+    if (items > 4) {
+      x.font = '700 ' + (sm + 12) + 'px ' + HFONT; x.textAlign = 'center'; x.fillStyle = '#4FD8FF'; x.fillText('H', mx - step * .22, my + 8); x.fillStyle = '#FF6B8A'; x.fillText('L', mx + step * .22, my + 8);
+      label(x, 'ความกดอากาศสูง / ต่ำ', mx, ky + r * 2.8, '#E8EDFF', sm);
+      front(x, [[step * 4.6, my + 4], [step * 5.4, my - 4]], '#4FD8FF', 7);
+      label(x, 'แนวปะทะอากาศเย็น', step * 5, ky + r * 2.8, '#E8EDFF', sm);
+      tstorm(x, step * 6, my, r * .9, '#FF6B8A');
+      label(x, 'พายุหมุนเขตร้อน', step * 6, ky + r * 2.8, '#E8EDFF', sm);
+    } else {
+      x.font = '700 ' + (sm + 10) + 'px ' + HFONT; x.textAlign = 'center'; x.fillStyle = '#4FD8FF'; x.fillText('H', mx - 12, my + 7); x.fillStyle = '#FF6B8A'; x.fillText('L', mx + 12, my + 7);
+      label(x, 'สูง / ต่ำ', mx, ky + r * 2.8, '#E8EDFF', sm);
+    }
+  }
+  function front(x, pts, col, sz) {   // แนวปะทะอากาศเย็น : เส้นสีฟ้า สามเหลี่ยมชี้ไปทางที่อากาศเย็นเคลื่อนไป (ลงด้านล่าง)
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = 2.4; x.beginPath(); pts.forEach(function (p, i) { if (i) x.lineTo(p[0], p[1]); else x.moveTo(p[0], p[1]); }); x.stroke();
+    for (var i = 1; i < pts.length; i++) {
+      var a = pts[i - 1], b = pts[i], L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.floor(L / (sz * 2.6))), dx = (b[0] - a[0]) / L, dy = (b[1] - a[1]) / L, nx = -dy, ny = dx;
+      if (ny < 0) { nx = -nx; ny = -ny; }
+      for (var k = 0; k < n; k++) { var t = (k + .5) / n, cx = a[0] + (b[0] - a[0]) * t, cy = a[1] + (b[1] - a[1]) * t;
+        x.beginPath(); x.moveTo(cx - dx * sz * .8, cy - dy * sz * .8); x.lineTo(cx + dx * sz * .8, cy + dy * sz * .8); x.lineTo(cx + nx * sz, cy + ny * sz); x.closePath(); x.fill(); }
+    }
+  }
+  function tstorm(x, cx, cy, r, col) {   // สัญลักษณ์พายุหมุนเขตร้อน (ซีกโลกเหนือ)
+    x.strokeStyle = col; x.lineWidth = Math.max(2, r * .3); x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.stroke();
+    x.beginPath(); x.arc(cx + r * .9, cy - r * 1.1, r * 1.5, Math.PI * .55, Math.PI * 1.05); x.stroke();
+    x.beginPath(); x.arc(cx - r * .9, cy + r * 1.1, r * 1.5, Math.PI * 1.55, Math.PI * 2.05); x.stroke();
+  }
+
+  // ================================================================ ภารกิจ A ขั้นที่ 2 ห้องทดลองไอโซบาร์
+  var SYS = [{ n: 'หย่อมความกดอากาศสูง (H)', k: 'H', p0: 1030, s: 1 }, { n: 'หย่อมความกดอากาศต่ำ (L)', k: 'L', p0: 1002, s: -1 }];
+  var GAP = [{ n: 'เส้นห่างกัน', v: 10, ring: 4 }, { n: 'เส้นชิดกัน', v: 40, ring: 8 }];
+  function isoDir(s) { return SYS[s].s > 0 ? 'ออกจากศูนย์กลาง วนตามเข็มนาฬิกา' : 'เข้าหาศูนย์กลาง วนทวนเข็มนาฬิกา'; }
+  function isoWx(s, g) { return SYS[s].s > 0 ? (g ? 'ท้องฟ้าโปร่ง ลมแรง' : 'ท้องฟ้าโปร่ง อากาศแห้ง') : (g ? 'พายุ ฝนหนัก ลมแรง' : 'เมฆมาก มีฝน'); }
+  var ISOL = [[0, 0], [0, 1], [1, 0], [1, 1]];
+  var as = 0, ag = 0, pA2 = 0, playA2 = 0, PART = [];
+  for (var pi = 0; pi < 70; pi++) PART.push({ r: .15 + .8 * hash(pi, 1), a: hash(pi, 2) * 6.283 });
+  function updA2() {
+    var key = as * 2 + ag;
+    if (pA2 >= 1 && !S.a2[key]) { S.a2[key] = 1; save(); }
+    chips('sysChips', 'หย่อมความกดอากาศ', SYS.map(function (s) { return s.n; }), as, 'y', null, function (v) { as = v; pA2 = 0; playA2 = 0; updA2(); drawA2(); });
+    chips('gapChips', 'ระยะห่างไอโซบาร์', GAP.map(function (g) { return g.n; }), ag, 'g', null, function (v) { ag = v; pA2 = 0; playA2 = 0; updA2(); drawA2(); });
+    var done = pA2 >= 1;
+    $('a2Case').textContent = SYS[as].n + ' · ' + GAP[ag].n;
+    $('a2P').textContent = SYS[as].p0 + ' hPa';
+    $('a2V').textContent = fmt(GAP[ag].v * smooth(0, .25, pA2)) + ' กม./ชม.';
+    $('a2Dir').textContent = done ? isoDir(as) : '-';
+    $('a2Wx').textContent = done ? isoWx(as, ag) : '-';
+    $('a2Bar').style.width = (pA2 * 100) + '%';
+    $('a2Why').textContent = !done ? 'อากาศเคลื่อนจากที่ความกดอากาศสูงไปหาที่ต่ำ และเบี่ยงไปทางขวาเพราะโลกหมุน สังเกตทิศของจุดสีขาว' :
+      SYS[as].s > 0 ? 'ศูนย์กลาง H อากาศจมตัวลงแล้วไหลออกด้านข้าง วนตามเข็มนาฬิกา อากาศที่จมตัวอุ่นขึ้นและแห้ง จึงไม่ค่อยมีเมฆ' + (ag ? ' เส้นชิดกัน ความกดอากาศเปลี่ยนเร็วในระยะสั้น ลมจึงแรง' : '') :
+      'อากาศไหลเข้าหา L วนทวนเข็มนาฬิกา แล้วยกตัวขึ้นที่ศูนย์กลาง เย็นลง ไอน้ำกลั่นตัวเป็นเมฆและฝน' + (ag ? ' เส้นชิดกันมาก ลมแรงจัด เป็นลักษณะของพายุ' : '');
+    $('playA2').textContent = playA2 ? 'หยุด' : 'เดินเวลา 1 วัน';
+    $('logA2').innerHTML = ISOL.map(function (z) { var k = z[0] * 2 + z[1], r = S.a2[k];
+      return '<tr class="' + (k === key ? 'cur ' : '') + 'ws"><td class="n">' + SYS[z[0]].k + ' · ' + GAP[z[1]].n + '</td><td>' + (r ? isoDir(z[0]) : '-') + '</td><td>' + (r ? GAP[z[1]].v + ' กม./ชม.' : '-') + '</td><td>' + (r ? isoWx(z[0], z[1]) : '-') + '</td></tr>'; }).join('');
+    var n = ISOL.filter(function (z) { return S.a2[z[0] * 2 + z[1]]; }).length;
+    $('recA2Msg').textContent = n === 4 ? 'บันทึกครบ 4 กรณีแล้ว ไปภารกิจ B ต่อ' : 'บันทึกแล้ว ' + n + ' / 4 กรณี';
+  }
+  $('playA2').onclick = function () { if (pA2 >= 1) pA2 = 0; playA2 = playA2 ? 0 : 1; updA2(); };
+  $('resetA2').onclick = function () { pA2 = 0; playA2 = 0; updA2(); drawA2(); };
+  function drawA2() {
+    var f = fit($('cvA2'), .62, 240, 400), x = f.x, W = f.W, H = f.H, sm = W < 480 ? 11 : 13, sy = SYS[as], G = GAP[ag];
+    var g = x.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, W * .7); g.addColorStop(0, '#0d2550'); g.addColorStop(1, '#050d24'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var cx = W / 2, cy = H / 2, R = Math.min(W, H) * .47, on = pA2 > 0 || playA2;
+    // เมฆ/ฝนรอบ L
+    if (sy.s < 0 && pA2 > 0) { var q = smooth(0, .8, pA2);
+      for (var i = 0; i < 26; i++) { var ca = hash(i, 7) * 6.283 - tA * .3, cr = R * (.08 + .45 * hash(i, 8));
+        var gx2 = cx + Math.cos(ca) * cr, gy2 = cy + Math.sin(ca) * cr, gr = R * (.12 + .1 * hash(i, 9));
+        var gg = x.createRadialGradient(gx2, gy2, 0, gx2, gy2, gr); gg.addColorStop(0, 'rgba(220,228,245,' + (.33 * q) + ')'); gg.addColorStop(1, 'rgba(220,228,245,0)'); x.fillStyle = gg; x.beginPath(); x.arc(gx2, gy2, gr, 0, 6.283); x.fill(); }
+      if (ag && q > .3) { x.strokeStyle = 'rgba(79,216,255,.5)'; x.lineWidth = 1.2; for (var k = 0; k < 40; k++) { var rx = cx + (hash(k, 3) - .5) * R * 1.1, ry = ((hash(k, 4) * H + tA * 160) % H); x.beginPath(); x.moveTo(rx, ry); x.lineTo(rx - 3, ry + 9); x.stroke(); } }
+    }
+    // ไอโซบาร์
+    var n = G.ring, step = R / n;
+    x.lineWidth = 1.6;
+    for (var j = 1; j <= n + 3; j++) {
+      var rr = step * j * .95; if (rr > Math.max(W, H)) break;
+      x.strokeStyle = 'rgba(232,237,255,' + (j <= n ? .75 : .35) + ')'; x.beginPath();
+      for (var a = 0; a <= 6.3; a += .08) { var wob = 1 + .06 * Math.sin(a * 2 + j) + .04 * Math.cos(a * 3 - j * .7); var px = cx + Math.cos(a) * rr * wob * 1.15, py = cy + Math.sin(a) * rr * wob * .9; if (a) x.lineTo(px, py); else x.moveTo(px, py); }
+      x.closePath(); x.stroke();
+      var val = sy.p0 - sy.s * 4 * j; if (j <= n && (n < 6 || j % 2 === 0)) label(x, String(val), cx + rr * 1.15 * (1 + .06 * Math.sin(j)) , cy + 4, '#9AA6CF', sm - 1);
+    }
+    // อากาศ (จุดสีขาว) วนและเข้า/ออก
+    var sp = G.v / 40, t = on ? tA : 0;
+    PART.forEach(function (p, i) {
+      var life = (t * (.08 + .1 * sp) + hash(i, 5)) % 1, r0 = sy.s > 0 ? lerp(.1, 1.1, life) : lerp(1.1, .1, life);
+      var ang = p.a + sy.s * (t * (.25 + .9 * sp)) / Math.max(.35, r0);
+      var px = cx + Math.cos(ang) * r0 * R * 1.15, py = cy + Math.sin(ang) * r0 * R * .9;
+      var tx = -Math.sin(ang) * sy.s, ty = Math.cos(ang) * sy.s, ox = Math.cos(ang) * sy.s * .45, oy = Math.sin(ang) * sy.s * .45, L = 6 + 12 * sp;
+      x.strokeStyle = 'rgba(255,255,255,' + (on ? .55 : .25) + ')'; x.lineWidth = 1.4;
+      if (on) { x.beginPath(); x.moveTo(px, py); x.lineTo(px - (tx + ox) * L, py - (ty + oy) * L); x.stroke(); }
+      x.fillStyle = 'rgba(255,255,255,.9)'; x.beginPath(); x.arc(px, py, 2, 0, 6.283); x.fill();
+    });
+    // ลูกศรทิศลม 4 ตัว
+    if (pA2 > .05) for (var m = 0; m < 4; m++) { var a2 = m * Math.PI / 2 + .6, rr2 = R * .62, ax = cx + Math.cos(a2) * rr2 * 1.15, ay = cy + Math.sin(a2) * rr2 * .9;
+      var tx2 = -Math.sin(a2) * sy.s, ty2 = Math.cos(a2) * sy.s, ox2 = Math.cos(a2) * sy.s * .5, oy2 = Math.sin(a2) * sy.s * .5, Lr = 18 + 18 * sp;
+      arrow(x, ax - (tx2 + ox2) * Lr / 2, ay - (ty2 + oy2) * Lr / 2, ax + (tx2 + ox2) * Lr / 2, ay + (ty2 + oy2) * Lr / 2, '#FFD166', 3, 11); }
+    x.font = '700 ' + (sm + 26) + 'px ' + HFONT; x.textAlign = 'center'; x.fillStyle = sy.s > 0 ? '#4FD8FF' : '#FF6B8A'; x.fillText(sy.k, cx, cy + 14);
+    label(x, sy.s > 0 ? 'สูง ' + sy.p0 : 'ต่ำ ' + sy.p0, cx, cy + 34, sy.s > 0 ? '#4FD8FF' : '#FF6B8A', sm);
+    label(x, 'ซีกโลกเหนือ · เส้นละ 4 hPa', 8, 18, '#5EF2A5', sm, 'left');
+    if (sy.s > 0 && pA2 > .5) label(x, 'ท้องฟ้าโปร่ง', W - 8, H - 12, '#FFD166', sm, 'right');
+    if (sy.s < 0 && pA2 > .5) label(x, ag ? 'ฝนหนัก ลมแรง' : 'เมฆมาก มีฝน', W - 8, H - 12, '#4FD8FF', sm, 'right');
+  }
+
+  // ================================================================ แผนที่ภูมิภาค (ภารกิจ B และ C)
+  var LON0 = 88, LON1 = 126, LAT0 = -4, LAT1 = 30;
+  var LAND = [
+    [[85, 22], [90, 22.4], [91.5, 22.6], [92.3, 20.7], [93.5, 19.4], [94.3, 18], [94.4, 16.2], [95.3, 15.8], [96.5, 16.6], [97.6, 16.4], [97.7, 15], [98.1, 13.6], [98.6, 12.2], [98.6, 10.6], [98.6, 9.9], [98.25, 8.6], [98.3, 7.9], [98.6, 8.1], [99.1, 7.2], [99.7, 6.5], [100.2, 6.6], [100.4, 5.4], [100.4, 4.1], [101.3, 2.9], [102.5, 1.9], [103.5, 1.3], [104.2, 1.4], [103.5, 2.8], [103.4, 4.3], [103.1, 5.5], [102.1, 6.2], [101.8, 6.4], [101.3, 6.9], [100.6, 7.2], [100.3, 8.4], [100.0, 9.0], [99.3, 9.3], [99.2, 10.4], [99.5, 11.0], [99.7, 11.8], [99.95, 12.6], [100.1, 13.4], [100.9, 13.4], [100.9, 12.7], [101.5, 12.6], [102.3, 12.2], [102.9, 11.7], [103.6, 10.5], [104.4, 10.4], [104.8, 9.6], [105.1, 8.6], [106.2, 9.4], [106.8, 10.4], [107.6, 10.5], [108.9, 11.3], [109.3, 12.5], [109.2, 13.8], [108.8, 15.3], [108.3, 16.1], [107.2, 16.8], [106.5, 17.9], [105.7, 18.9], [105.8, 19.9], [106.7, 20.7], [107.6, 21.5], [108.5, 21.6], [109.7, 21.5], [110.4, 20.5], [110.5, 21.3], [111.7, 21.8], [113.3, 22.2], [114.2, 22.3], [115.5, 22.8], [116.6, 23.2], [117.6, 24], [118.6, 24.6], [119.6, 25.8], [119.6, 26.7], [120.6, 28], [121.5, 29.5], [122, 31], [122, 34], [85, 34]],
+    [[108.6, 19.2], [109.6, 18.2], [110.5, 18.7], [111, 19.7], [110.4, 20.1], [109.3, 20], [108.6, 19.2]],
+    [[120.1, 23], [120.7, 22], [121.5, 23.5], [122, 25], [121.2, 25.2], [120.2, 23.9]],
+    [[95.3, 5.6], [97.5, 5.2], [98.7, 3.8], [100.4, 2.2], [101.6, 1.5], [103.6, .6], [104.4, -1], [106, -3], [105.8, -5.8], [104.5, -5.9], [102.3, -4], [101, -2.5], [100, -.5], [98.7, 1.7], [97.5, 2.5], [96, 4]],
+    [[109, 1.5], [109.6, 2], [111, 1.6], [113, 3.2], [114, 4.6], [115.4, 5.3], [116.7, 6.9], [117.7, 6], [119.2, 5.2], [118.2, 4.4], [117.6, 3.4], [118, 1], [117.5, 0], [116.6, -1.5], [116, -3.8], [114.5, -4], [111.5, -3.2], [110.2, -2.9], [109.5, -.5]],
+    [[120, 18.5], [120.6, 18.6], [122.2, 18.5], [122.5, 17], [121.6, 15.9], [121.6, 14.2], [123.9, 13.8], [124.2, 12.6], [123, 13], [121.8, 13.8], [120.6, 14.3], [120.9, 15.6], [120.3, 16.6]],
+    [[122, 7.5], [123.5, 7.8], [124.3, 8.6], [125.5, 9.8], [126.5, 7.5], [126, 6.3], [125.4, 5.6], [124, 6.3]],
+    [[122.5, 11.8], [124, 11], [125.6, 11.2], [125, 10], [123.3, 9.6], [122.4, 10.6]],
+    [[117.2, 8.4], [118.7, 9.8], [119.6, 10.6], [119.3, 11.3], [117.8, 9.6]]];
+  var TH = [[99.9, 20.4], [100.5, 20.15], [100.4, 19.6], [101.2, 19.5], [101.05, 18.4], [101.7, 17.9], [102.6, 17.9], [103.3, 18.4], [104.0, 18.3], [104.7, 17.4], [104.8, 16.5], [105.6, 15.9], [105.5, 14.4], [104.8, 14.4], [103.7, 14.4], [102.9, 14.2], [102.4, 13.6], [102.6, 12.2], [102.9, 11.7], [102.3, 12.2], [101.5, 12.6], [100.9, 12.7], [100.9, 13.4], [100.1, 13.4], [99.95, 12.6], [99.7, 11.8], [99.5, 11.0], [99.2, 10.4], [99.3, 9.3], [100.0, 9.0], [100.3, 8.4], [100.6, 7.2], [101.3, 6.9], [101.8, 6.4], [102.1, 6.2], [101.6, 5.8], [101.1, 5.7], [100.9, 6.3], [100.2, 6.6], [99.7, 6.5], [99.1, 7.2], [98.6, 8.1], [98.3, 7.9], [98.25, 8.6], [98.6, 9.9], [98.75, 10.4], [99.2, 11.1], [99.45, 11.8], [99.15, 12.6], [99.2, 13.2], [99.0, 14.0], [98.4, 14.9], [98.5, 15.6], [98.9, 16.3], [98.5, 17.0], [97.7, 18.0], [97.8, 18.6], [97.4, 18.5], [97.7, 19.6], [98.3, 19.7], [99.0, 19.8], [99.5, 20.2]];
+  var CITY = { bkk: [100.5, 13.75, 'กรุงเทพฯ'], cm: [98.98, 18.79, 'เชียงใหม่'], kk: [102.83, 16.43, 'ขอนแก่น'], ub: [104.85, 15.23, 'อุบลฯ'], pk: [98.39, 7.88, 'ภูเก็ต'], sk: [100.6, 7.2, 'สงขลา'] };
+  var RADAR = [[98.97, 18.77], [100.27, 16.82], [102.8, 16.43], [104.87, 15.25], [100.6, 13.73], [99.95, 12.6], [99.33, 9.13], [100.6, 7.18], [98.4, 7.9], [102.5, 12.6]];
+  function gs(lon, lat, cx, cy, sx, sy) { var a = (lon - cx) / sx, b = (lat - cy) / sy; return Math.exp(-(a * a + b * b)); }
+  function frontLat(lon) { return 21.5 - .9 * Math.sin((lon - 96) / 22 * Math.PI); }
+  function vnoise(x, y) {
+    var ix = Math.floor(x), iy = Math.floor(y), fx = x - ix, fy = y - iy, h = function (a, b) { var s = Math.sin(a * 127.1 + b * 311.7) * 43758.5453; return s - Math.floor(s); };
+    var u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+    return lerp(lerp(h(ix, iy), h(ix + 1, iy), u), lerp(h(ix, iy + 1), h(ix + 1, iy + 1), u), v);
+  }
+  function fbm(x, y) { return .55 * vnoise(x, y) + .3 * vnoise(x * 2.1 + 5, y * 2.1 + 1) + .15 * vnoise(x * 4.3 + 9, y * 4.3 + 7); }
+  var DAYS = [
+    { n: 'แผนที่ ก', m: 'วันที่ 15 ม.ค. · ฤดูหนาว', sys: 0, wx: 0,
+      P: function (lo, la) { return 1008 + 28 * gs(lo, la, 110, 27.5, 14, 13) - 3 * gs(lo, la, 113, 1, 8, 5); },
+      C: function (lo, la) { return .85 * gs(lo, la, 102.8, 6.6, 2.2, 2.4) + .7 * gs(lo, la, 121, 11, 5, 3) + .5 * gs(lo, la, 109, 4, 5, 3) + .45 * Math.exp(-Math.pow((la + 1) / 2.5, 2)) + .35 * gs(lo, la, 118, 17, 4, 2); },
+      mark: [{ t: 'H', lo: 110, la: 27.5 }, { t: 'L', lo: 113, la: 1 }] },
+    { n: 'แผนที่ ข', m: 'วันที่ 10 เม.ย. · ฤดูร้อน', sys: 1, wx: 1,
+      P: function (lo, la) { return 1010 - 6 * gs(lo, la, 100, 17.5, 5, 4) + 12 * gs(lo, la, 113, 28.5, 8, 6); },
+      C: function (lo, la) { return .98 * gs(lo, la, 101, 18.6, 1.4, 1.1) + .95 * gs(lo, la, 103.4, 16.6, 1.3, 1.1) + .85 * gs(lo, la, 99.2, 19.6, 1.1, .9) + .7 * gs(lo, la, 104.6, 17.6, 1, .8)
+        + (lo > 95 && lo < 119 ? .55 * Math.exp(-Math.pow((la - frontLat(lo)) / 1.1, 2)) : 0) + .3 * gs(lo, la, 110, 2, 6, 3); },
+      mark: [{ t: 'L', lo: 100, la: 17.5 }, { t: 'H', lo: 113, la: 28.5 }] },
+    { n: 'แผนที่ ค', m: 'วันที่ 20 ส.ค. · ฤดูฝน', sys: 2, wx: 2,
+      P: function (lo, la) { return 1008 - 5 * Math.exp(-Math.pow((la - 18) / 3, 2)) * smooth(84, 92, lo) * (1 - smooth(106, 114, lo)) + 6 * gs(lo, la, 92, -8, 14, 9) + 3 * gs(lo, la, 125, 26, 8, 6); },
+      C: function (lo, la) { return .8 * Math.exp(-Math.pow((la - 17.5) / 2.4, 2)) * (1 - smooth(106, 112, lo)) + .95 * gs(lo, la, 95.5, 11, 2.6, 4) + .75 * gs(lo, la, 98.3, 8.5, 1.4, 2.5) + .45 * gs(lo, la, 100.8, 14, 2, 1.6) + .35 * gs(lo, la, 118, 12, 6, 3); },
+      mark: [{ t: 'L', lo: 98, la: 18.6 }] },
+    { n: 'แผนที่ ง', m: 'วันที่ 10 ต.ค. · ปลายฤดูฝน', sys: 3, wx: 3,
+      P: function (lo, la) { return 1009 - 20 * gs(lo, la, 111, 15.5, 1.6, 1.6) - 3 * gs(lo, la, 111, 15.5, 5, 5) + 8 * gs(lo, la, 112, 29, 8, 6); },
+      C: function (lo, la) { var dx = lo - 111, dy = la - 15.5, r = Math.sqrt(dx * dx + dy * dy), th = Math.atan2(dy, dx);
+        var arm = r > 1.2 ? .75 * Math.pow(Math.max(0, Math.cos(2 * th + 1.15 * r)), 2) * Math.exp(-Math.pow(r / 6.5, 2)) : 0;
+        return .98 * Math.exp(-Math.pow(r / 1.7, 2)) + arm + .8 * gs(lo, la, 104, 16.3, 2.4, 1.8) + .4 * gs(lo, la, 100, 8, 3, 3); },
+      mark: [{ t: 'TS', lo: 111, la: 15.5 }, { t: 'H', lo: 112, la: 29 }],
+      path: [[115, 14.6], [113, 15.1], [111, 15.5], [108.6, 16.1], [106, 16.3], [103.5, 16.6]] }];
+  DAYS.forEach(function (d) { d.mark.forEach(function (m) { m.p = Math.round(d.P(m.lo, m.la)); }); });
+  var SYSO = ['หย่อมความกดอากาศสูงกำลังแรงจากจีนแผ่ลงมา', 'หย่อมความกดอากาศต่ำจากความร้อน ปะทะมวลอากาศเย็นจากจีน', 'ร่องมรสุม และมรสุมตะวันตกเฉียงใต้', 'พายุหมุนเขตร้อน (พายุโซนร้อน) จากทะเลจีนใต้'];
+  var SYSS = ['H จากจีน (มรสุมตะวันออกเฉียงเหนือ)', 'L ความร้อน ปะทะ H จากจีน', 'ร่องมรสุม + มรสุมตะวันตกเฉียงใต้', 'พายุโซนร้อน'];
+  var WXO = ['อากาศเย็นถึงหนาว ท้องฟ้าโปร่ง ลมตะวันออกเฉียงเหนือพัดแรง', 'ร้อนอบอ้าว แล้วมีพายุฝนฟ้าคะนอง ลมกระโชกแรง ลูกเห็บตกบางแห่ง', 'ฝนตกชุกเกือบทั่วไป ทะเลอันดามันคลื่นสูง 2–3 เมตร', 'ฝนตกหนักถึงหนักมาก ภาคอีสาน ระวังน้ำท่วมฉับพลัน'];
+  var WXS = ['เย็นถึงหนาว ท้องฟ้าโปร่ง', 'ร้อน พายุฤดูร้อน ลูกเห็บ', 'ฝนชุก คลื่นทะเลสูง', 'ฝนหนักมาก น้ำท่วมฉับพลัน'];
+  var PERM = [[2, 0, 3, 1], [1, 3, 0, 2], [3, 2, 1, 0], [0, 1, 2, 3]];   // ลำดับตัวเลือกของแต่ละแผนที่
+  function pText(d) { var m = DAYS[d].mark[0]; return (m.t === 'TS' ? 'พายุ' : m.t) + ' ' + m.p + ' hPa'; }
+  var LAYERS = ['แผนที่อากาศ', 'ภาพถ่ายดาวเทียม', 'เรดาร์ฝน'];
+  var CLUE = [
+    ['เส้นไอโซบาร์ไล่จาก H ทางเหนือลงมาคลุมไทย ลูกศรลมพัดจากทิศตะวันออกเฉียงเหนือ', 'ไทยตอนบนแทบไม่มีเมฆ มีเมฆเฉพาะภาคใต้ฝั่งตะวันออกที่ลมพัดผ่านอ่าวไทย', 'แทบไม่มีฝน มีฝนเล็กน้อย (สีเขียว) ที่ภาคใต้ฝั่งตะวันออก'],
+    ['มี L เหนือไทย (อากาศร้อนจัด) และ H จากจีนดันแนวปะทะอากาศเย็น (เส้นฟ้าสามเหลี่ยม) ลงมา', 'เมฆก้อนใหญ่ขาวสว่างหลายก้อนเหนือภาคเหนือและอีสาน = เมฆยอดสูง ฝนฟ้าคะนอง', 'มีกลุ่มฝนสีส้ม แดง เป็นหย่อม ๆ ภาคเหนือและอีสาน = ฝนหนักเฉพาะที่'],
+    ['ร่องมรสุม (เส้นประสีส้ม) พาดภาคเหนือ ลูกศรลมพัดจากทะเลอันดามัน (ตะวันตกเฉียงใต้) เข้าไทย', 'แถบเมฆยาวตามร่องมรสุม และเมฆหนาบนทะเลอันดามันฝั่งตะวันตกของไทย', 'ฝนกระจายหลายภาค ภาคใต้ฝั่งอันดามันมีสีเหลือง ส้ม'],
+    ['L ที่ไอโซบาร์ชิดกันมากกลางทะเลจีนใต้ = พายุ ลูกศรประบอกทางที่คาดว่าพายุจะเคลื่อนเข้าเวียดนาม ลาว และอีสาน', 'เมฆหมุนเป็นเกลียวรอบศูนย์กลาง และแถบเมฆด้านนอกเริ่มเข้าภาคอีสาน', 'ภาคอีสานเริ่มมีฝนหนัก (สีส้ม แดง) ตัวพายุยังอยู่นอกรัศมีเรดาร์ของไทย']];
+  var bd = 0, bl = 0;
+  function proj(W, H) { var sx = W / (LON1 - LON0), sy = H / (LAT1 - LAT0); return { X: function (lo) { return (lo - LON0) * sx; }, Y: function (la) { return (LAT1 - la) * sy; }, sx: sx, sy: sy }; }
+  function poly(x, pr, pts) { x.beginPath(); pts.forEach(function (p, i) { var px = pr.X(p[0]), py = pr.Y(p[1]); if (i) x.lineTo(px, py); else x.moveTo(px, py); }); x.closePath(); }
+  var CACHE = {};
+  function overlay(d, kind, W, H) {   // ภาพเมฆหรือเรดาร์ความละเอียดต่ำ เก็บไว้ใช้ซ้ำ
+    var k = d + kind + W + 'x' + H; if (CACHE[k]) return CACHE[k];
+    var w = Math.max(80, Math.round(W / 3)), h = Math.max(70, Math.round(H / 3)), c = document.createElement('canvas'); c.width = w; c.height = h;
+    var cx = c.getContext('2d'), im = cx.createImageData(w, h), D = DAYS[d];
+    for (var j = 0; j < h; j++) for (var i = 0; i < w; i++) {
+      var lo = LON0 + (i + .5) / w * (LON1 - LON0), la = LAT1 - (j + .5) / h * (LAT1 - LAT0), o = (j * w + i) * 4;
+      var tex = fbm(lo * .9, la * .9), cl = clamp(D.C(lo, la) * (.55 + .7 * tex) - .12, 0, 1);
+      if (kind === 's') { im.data[o] = 255; im.data[o + 1] = 255; im.data[o + 2] = 255; im.data[o + 3] = Math.round(255 * Math.pow(cl, .85)); }
+      else {
+        var cov = RADAR.some(function (r) { var a = lo - r[0], b = la - r[1]; return a * a + b * b < 4.6; });
+        var rn = clamp((cl - .38) / .55, 0, 1); if (!cov || rn < .06) continue;
+        var col = rn < .35 ? [40, 200, 90] : rn < .6 ? [250, 225, 60] : rn < .8 ? [255, 140, 40] : [235, 40, 50];
+        im.data[o] = col[0]; im.data[o + 1] = col[1]; im.data[o + 2] = col[2]; im.data[o + 3] = 215;
+      }
+    }
+    cx.putImageData(im, 0, 0); CACHE[k] = c; return c;
+  }
+  function contours(x, pr, D, W, H, sm) {
+    var nx = 64, ny = 58, lv = {}, G = [], placed = [];
+    for (var j = 0; j <= ny; j++) { G[j] = []; for (var i = 0; i <= nx; i++) G[j][i] = D.P(LON0 + i / nx * (LON1 - LON0), LAT1 - j / ny * (LAT1 - LAT0)); }
+    var mn = 1e9, mx = -1e9; G.forEach(function (r) { r.forEach(function (v) { mn = Math.min(mn, v); mx = Math.max(mx, v); }); });
+    var cw = W / nx, ch = H / ny;
+    for (var L = Math.ceil(mn / 2) * 2; L <= mx; L += 2) {
+      var seg = [];
+      for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
+        var a = G[j][i], b = G[j][i + 1], c = G[j + 1][i + 1], dd = G[j + 1][i], e = [];
+        var it = function (p, q) { return (L - p) / (q - p); };
+        if ((a < L) !== (b < L)) e.push([(i + it(a, b)) * cw, j * ch]);
+        if ((b < L) !== (c < L)) e.push([(i + 1) * cw, (j + it(b, c)) * ch]);
+        if ((dd < L) !== (c < L)) e.push([(i + it(dd, c)) * cw, (j + 1) * ch]);
+        if ((a < L) !== (dd < L)) e.push([i * cw, (j + it(a, dd)) * ch]);
+        if (e.length >= 2) seg.push([e[0], e[1]]); if (e.length === 4) seg.push([e[2], e[3]]);
+      }
+      var major = L % 4 === 0;
+      x.strokeStyle = major ? 'rgba(232,237,255,.8)' : 'rgba(232,237,255,.42)'; x.lineWidth = major ? 1.4 : 1;
+      x.beginPath(); seg.forEach(function (s) { x.moveTo(s[0][0], s[0][1]); x.lineTo(s[1][0], s[1][1]); }); x.stroke();
+      if (major && seg.length) {
+        var best = null; seg.forEach(function (s) { var mx2 = (s[0][0] + s[1][0]) / 2, my2 = (s[0][1] + s[1][1]) / 2;
+          if (mx2 < 30 || mx2 > W - 30 || my2 < 26 || my2 > H - 16) return; if (pr.X(98) < mx2 && mx2 < pr.X(106) && pr.Y(21) < my2 && my2 < pr.Y(5)) return;
+          var sc = mx2 + my2 * .25; if (!best || sc > best[2]) best = [mx2, my2, sc]; });
+        if (best && !placed.some(function (p) { return Math.hypot(p[0] - best[0], p[1] - best[1]) < 30; })) { placed.push(best); label(x, String(L), best[0], best[1] + 4, '#E8EDFF', sm - 1); }
+      }
+    }
+  }
+  function winds(x, pr, D, W, H) {
+    var e = .25, ang = 65 * RAD, ca = Math.cos(ang), sa = Math.sin(ang);
+    for (var lo = LON0 + 2; lo < LON1; lo += 3.2) for (var la = LAT0 + 2; la < LAT1; la += 3.2) {
+      var gx = (D.P(lo + e, la) - D.P(lo - e, la)) / (2 * e), gy = (D.P(lo, la + e) - D.P(lo, la - e)) / (2 * e), m = Math.hypot(gx, gy);
+      if (m < .12) continue;
+      var vx = -gx, vy = -gy, wx = vx * ca + vy * sa, wy = -vx * sa + vy * ca, L = clamp(m * 9, 8, 22) * Math.min(1, W / 600 + .3), n = Math.hypot(wx, wy);
+      var px = pr.X(lo), py = pr.Y(la), dx = wx / n * L, dy = -wy / n * L;
+      x.globalAlpha = .55; arrow(x, px - dx / 2, py - dy / 2, px + dx / 2, py + dy / 2, '#E8EDFF', 1.3, 6); x.globalAlpha = 1;
+    }
+  }
+  function drawMap(cv, d, layer, opt) {
+    opt = opt || {};
+    var f = fit(cv, .9, 300, 620), x = f.x, W = f.W, H = f.H, pr = proj(W, H), D = DAYS[d], sm = W < 480 ? 10 : 12;
+    x.fillStyle = layer === 1 ? '#05070f' : layer === 2 ? '#0a1a36' : '#0d3070'; x.fillRect(0, 0, W, H);
+    LAND.forEach(function (p) { poly(x, pr, p); x.fillStyle = layer === 1 ? '#151b28' : layer === 2 ? '#222a3a' : '#363a48'; x.fill(); x.strokeStyle = layer === 1 ? 'rgba(160,170,190,.35)' : 'rgba(150,170,210,.55)'; x.lineWidth = 1; x.stroke(); });
+    poly(x, pr, TH); x.fillStyle = layer === 1 ? 'rgba(255,209,102,.06)' : 'rgba(255,209,102,.13)'; x.fill(); x.strokeStyle = 'rgba(255,209,102,.85)'; x.lineWidth = 1.6; x.stroke();
+    // เส้นละติจูด ลองจิจูด
+    x.strokeStyle = 'rgba(154,166,207,.12)'; x.lineWidth = 1;
+    for (var lo = 90; lo <= 125; lo += 5) { x.beginPath(); x.moveTo(pr.X(lo), 0); x.lineTo(pr.X(lo), H); x.stroke(); }
+    for (var la = 0; la <= 30; la += 5) { x.beginPath(); x.moveTo(0, pr.Y(la)); x.lineTo(W, pr.Y(la)); x.stroke(); }
+    if (layer === 0) {
+      contours(x, pr, D, W, H, sm);
+      winds(x, pr, D, W, H);
+      if (d === 1) front(x, [[96, frontLat(96)], [101, frontLat(101)], [106, frontLat(106)], [111, frontLat(111)], [117, frontLat(117)]].map(function (p) { return [pr.X(p[0]), pr.Y(p[1])]; }), '#4FD8FF', W < 480 ? 5 : 7);
+      if (d === 2) { x.setLineDash([9, 6]); x.strokeStyle = '#FF9F6B'; x.lineWidth = 3; x.beginPath(); x.moveTo(pr.X(89), pr.Y(20.2)); x.bezierCurveTo(pr.X(95), pr.Y(19.2), pr.X(101), pr.Y(18.4), pr.X(108), pr.Y(18.8)); x.stroke(); x.setLineDash([]);
+        label(x, 'ร่องมรสุม', pr.X(104), pr.Y(20.2), '#FF9F6B', sm + 1); }
+      if (D.path) { x.setLineDash([5, 5]); x.strokeStyle = '#FF6B8A'; x.lineWidth = 2; x.beginPath(); D.path.forEach(function (p, i) { if (i) x.lineTo(pr.X(p[0]), pr.Y(p[1])); else x.moveTo(pr.X(p[0]), pr.Y(p[1])); }); x.stroke(); x.setLineDash([]);
+        var q = D.path[D.path.length - 1], q2 = D.path[D.path.length - 2]; arrow(x, pr.X(q2[0]), pr.Y(q2[1]), pr.X(q[0]), pr.Y(q[1]), '#FF6B8A', 2, 9); label(x, 'ทางที่คาด', pr.X(106), pr.Y(17.6), '#FF6B8A', sm); }
+      // ลูกศรใหญ่ลมมรสุม
+      var big = d === 0 ? [[111, 19], [103.5, 12.5], 'มรสุมตะวันออกเฉียงเหนือ'] : d === 1 ? [[112, 25.5], [108, 22.2], 'มวลอากาศเย็น'] : d === 2 ? [[89.5, 6], [96.5, 13], 'มรสุมตะวันตกเฉียงใต้'] : null;
+      if (big) { x.globalAlpha = .85; arrow(x, pr.X(big[0][0]), pr.Y(big[0][1]), pr.X(big[1][0]), pr.Y(big[1][1]), '#5EF2A5', W < 480 ? 5 : 7, W < 480 ? 16 : 22); x.globalAlpha = 1;
+        label(x, big[2], pr.X(big[0][0]) + (d === 2 ? 4 : -4), pr.Y(big[0][1]) + (d === 2 ? 16 : -8), '#5EF2A5', sm + 1, d === 2 ? 'left' : 'right'); }
+      D.mark.forEach(function (m) { var px = pr.X(m.lo), py = pr.Y(m.la);
+        if (m.t === 'TS') { tstorm(x, px, py, W < 480 ? 6 : 8, '#FF6B8A'); label(x, 'พายุโซนร้อน ' + m.p, px, py + (W < 480 ? 26 : 32), '#FF6B8A', sm); return; }
+        x.font = '700 ' + (sm + 16) + 'px ' + HFONT; x.textAlign = 'center'; x.lineWidth = 4; x.strokeStyle = 'rgba(5,8,26,.85)'; x.strokeText(m.t, px, py + 9);
+        x.fillStyle = m.t === 'H' ? '#4FD8FF' : '#FF6B8A'; x.fillText(m.t, px, py + 9); label(x, String(m.p), px, py + 26, m.t === 'H' ? '#4FD8FF' : '#FF6B8A', sm); });
+    } else {
+      var ov = overlay(d, layer === 1 ? 's' : 'r', Math.round(W), Math.round(H));
+      x.imageSmoothingEnabled = true; x.drawImage(ov, 0, 0, W, H);
+      LAND.forEach(function (p) { poly(x, pr, p); x.strokeStyle = layer === 1 ? 'rgba(255,209,102,.35)' : 'rgba(150,170,210,.55)'; x.lineWidth = 1; x.stroke(); });
+      poly(x, pr, TH); x.strokeStyle = 'rgba(255,209,102,.9)'; x.lineWidth = 1.5; x.stroke();
+      if (layer === 2) { x.strokeStyle = 'rgba(154,166,207,.25)'; x.setLineDash([3, 4]); RADAR.forEach(function (r) { x.beginPath(); x.ellipse(pr.X(r[0]), pr.Y(r[1]), 2.14 * pr.sx, 2.14 * pr.sy, 0, 0, 6.283); x.stroke(); }); x.setLineDash([]); }
+    }
+    // เมือง
+    var cs = opt.cities || ['bkk'];
+    cs.forEach(function (k) { var c = CITY[k], px = pr.X(c[0]), py = pr.Y(c[1]); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(px, py, 3.2, 0, 6.283); x.fill(); label(x, c[2], px + 6, py + 4, '#FFD166', sm, 'left'); });
+    if (opt.ring) { var rc = CITY[opt.ring], rx = pr.X(rc[0]), ry = pr.Y(rc[1]), rr = Math.max(18, W * .045) * (1 + .08 * Math.sin(tA * 3));
+      x.strokeStyle = '#FFD166'; x.lineWidth = 3; x.beginPath(); x.arc(rx, ry, rr, 0, 6.283); x.stroke(); }
+    label(x, D.n + ' · ' + D.m, 8, 18, '#4FD8FF', sm + 1, 'left');
+    label(x, LAYERS[layer] + (layer ? ' (จำลอง)' : ' (จำลอง) · เส้นละ 2 hPa'), 8, H - 10, '#9AA6CF', sm, 'left');
+    if (W >= 480) { label(x, 'ทะเลจีนใต้', pr.X(114), pr.Y(12), 'rgba(154,166,207,.9)', sm); label(x, 'อ่าวไทย', pr.X(101.6), pr.Y(9.6), 'rgba(154,166,207,.9)', sm); label(x, 'ทะเลอันดามัน', pr.X(95), pr.Y(9), 'rgba(154,166,207,.9)', sm); }
+  }
+
+  // ================================================================ ภารกิจ B
+  function updB() {
+    var D = DAYS[bd], seen = S.bv[bd] || 0;
+    seen |= 1 << bl; if (seen !== (S.bv[bd] || 0)) { S.bv[bd] = seen; save(); }
+    var all = seen === 7, st2 = S.b[bd] || 0;
+    chips('dayChips', 'เลือกแผนที่', DAYS.map(function (z) { return z.n + ' ' + z.m.split('· ')[1]; }), bd, 'b', function (i) { return S.b[i] === 2; }, function (v) { bd = v; bl = 0; updB(); drawB(); });
+    chips('layChips', 'ชั้นข้อมูล', LAYERS, bl, 'l', function (i) { return (S.bv[bd] || 0) & (1 << i); }, function (v) { bl = v; updB(); drawB(); });
+    $('bName').textContent = D.n + ' · ' + D.m;
+    $('bLayer').textContent = 'กำลังดู : ' + LAYERS[bl];
+    $('bClue').textContent = CLUE[bd][bl];
+    var nseen = [0, 1, 2].filter(function (i) { return seen & (1 << i); }).length;
+    $('bSeen').textContent = all ? 'ดูครบ 3 ชั้นข้อมูลแล้ว ตอบคำถามได้' : 'ดูแล้ว ' + nseen + ' / 3 ชั้นข้อมูล (เปิดให้ครบจึงตอบได้)';
+    var P = PERM[bd];
+    askUI('bAsk1', P.map(function (k) { return SYSO[k]; }), P.indexOf(D.sys), st2 >= 1, function () { S.b[bd] = 1; save(); updB(); drawB(); return true; }, null, !all);
+    $('bQ2').classList.toggle('hide', st2 < 1);
+    if (st2 >= 1) askUI('bAsk2', P.map(function (k) { return WXO[k]; }), P.indexOf(D.wx), st2 >= 2, function () { S.b[bd] = 2; save(); updB(); drawB(); return true; });
+    $('bWhy').textContent = st2 >= 2 ? WHYB[bd] : '';
+    $('logB').innerHTML = DAYS.map(function (z, i) { var r = S.b[i] === 2;
+      return '<tr class="' + (i === bd ? 'cur ' : '') + 'ws"><td class="n">' + z.n + ' ' + z.m.split('· ')[1] + '</td><td>' + (r ? SYSS[i] : '-') + '</td><td>' + (r ? pText(i) : '-') + '</td><td>' + (r ? WXS[i] : '-') + '</td></tr>'; }).join('');
+    $('bLeg').innerHTML = bl === 0 ? '<span><i style="background:#E8EDFF"></i>เส้นไอโซบาร์ (hPa)</span><span><i style="background:#E8EDFF;height:2px"></i>ลูกศรเล็ก = ทิศลม</span><span><i style="background:#5EF2A5"></i>ลมมรสุม / มวลอากาศ</span><span><i style="background:#4FD8FF"></i>แนวปะทะอากาศเย็น</span><span><i style="background:#FF9F6B"></i>ร่องมรสุม</span><span><i class="dot" style="background:#FFD166"></i>ประเทศไทย เมือง</span>'
+      : bl === 1 ? '<span><i class="sq" style="background:#ffffff"></i>เมฆหนา ยอดสูง (ขาวสว่าง)</span><span><i class="sq" style="background:#8a8f99"></i>เมฆบาง</span><span><i class="sq" style="background:#151b28"></i>ไม่มีเมฆ</span>'
+      : '<span><i class="sq" style="background:#28c85a"></i>ฝนเล็กน้อย</span><span><i class="sq" style="background:#fae13c"></i>ฝนปานกลาง</span><span><i class="sq" style="background:#ff8c28"></i>ฝนหนัก</span><span><i class="sq" style="background:#eb2832"></i>ฝนหนักมาก</span><span><i style="background:#9AA6CF"></i>วงรัศมีสถานีเรดาร์</span>';
+  }
+  var WHYB = [
+    'ฤดูหนาว หย่อมความกดอากาศสูงกำลังแรง (มวลอากาศเย็น) จากจีนแผ่ลงมา ลมพัดออกจาก H เป็นมรสุมตะวันออกเฉียงเหนือ พาอากาศเย็นและแห้งมาที่ไทย ภาคใต้ฝั่งตะวันออกมีฝนเพราะลมพัดผ่านอ่าวไทยนำความชื้นมา',
+    'ต้นฤดูร้อน แผ่นดินร้อนจัดเกิด L จากความร้อน เมื่อมวลอากาศเย็นจากจีนแผ่ลงมาปะทะ อากาศร้อนชื้นถูกดันให้ยกตัวเร็ว เกิดเมฆยอดสูง พายุฤดูร้อน ลมกระโชกแรง และลูกเห็บ มักเกิดช่วงบ่ายถึงค่ำ',
+    'ฤดูฝน ร่องมรสุมพาดผ่าน (แนวที่อากาศยกตัวเกิดเมฆฝน) และมรสุมตะวันตกเฉียงใต้พัดความชื้นจากมหาสมุทรอินเดียเข้าไทย ฝนตกชุก ทะเลอันดามันคลื่นลมแรง',
+    'L ที่ไอโซบาร์ชิดกันมาก ความกดอากาศศูนย์กลางต่ำมาก คือพายุหมุนเขตร้อน ลมแรงจัดรอบศูนย์กลาง เมื่อเคลื่อนขึ้นฝั่งจะอ่อนกำลังลง แต่ยังให้ฝนตกหนักมากต่อเนื่อง เสี่ยงน้ำท่วมฉับพลันและน้ำป่า'];
+  function drawB() { drawMap($('cvB'), bd, bl, { cities: bd === 0 ? ['bkk', 'cm'] : bd === 1 ? ['bkk', 'kk'] : bd === 2 ? ['bkk', 'pk'] : ['bkk', 'ub'] }); }
+  var LIBB = [
+    { c: '', y: 'ชั้นที่ 1 · แผนที่อากาศ', n: 'บอกระบบอากาศและลม', d: 'กรมอุตุนิยมวิทยาวาดจากค่าที่ตรวจวัดจริงพร้อมกันทั่วภูมิภาค ความกดอากาศ ลม อุณหภูมิ เมฆ แล้วลากเส้นไอโซบาร์ ระบุ H L แนวปะทะ ร่องมรสุม และพายุ', i: 'ใช้ตอบ : อากาศจะเป็นอย่างไร เพราะอะไร' },
+    { c: '', y: 'ชั้นที่ 2 · ภาพถ่ายดาวเทียม', n: 'มองเมฆจากอวกาศ', d: 'ดาวเทียมค้างฟ้าอยู่สูงราว 36,000 กม. ถ่ายภาพทุกไม่กี่นาที ภาพอินฟราเรดวัดความเย็นของยอดเมฆ ยอดเมฆยิ่งสูงยิ่งเย็นยิ่งขาว มักเป็นเมฆฝนฟ้าคะนอง', i: 'ใช้ดู : พายุ แนวเมฆฝน ทั่วภูมิภาค' },
+    { c: '', y: 'ชั้นที่ 3 · เรดาร์ตรวจอากาศ', n: 'เห็นฝนที่กำลังตก', d: 'สถานีเรดาร์บนพื้นดินส่งคลื่นไมโครเวฟไปสะท้อนเม็ดฝน เห็นตำแหน่งและความแรงของฝนในรัศมีราว 200–250 กม. อัปเดตทุกไม่กี่นาที', i: 'ใช้ดู : ฝนอีก 1–2 ชั่วโมงข้างหน้า ใกล้บ้าน' }];
+  $('libB').innerHTML = LIBB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 วางแผน
+  var PLAN = [
+    { m: 0, city: 'cm', n: 'เที่ยวดอยอินทนนท์', who: 'ครอบครัวของนักบินจะขับรถขึ้นไปเที่ยวยอดดอยอินทนนท์ จังหวัดเชียงใหม่ ในวันเสาร์ที่ตรงกับแผนที่ ก',
+      info: 'อากาศเย็นถึงหนาว ท้องฟ้าโปร่ง', o: ['ใส่เสื้อยืดบาง ๆ ไปก็พอ เพราะประเทศไทยร้อนตลอดปี', 'เตรียมเสื้อกันหนาว หมวก ถุงมือ เพราะยอดดอยอาจหนาวจัดใกล้ 0 °C', 'ยกเลิกการเดินทาง เพราะจะมีพายุเข้า', 'เตรียมเสื้อกันฝนอย่างเดียว เพราะจะฝนตกทั้งวัน'], a: 1,
+      s: 'เตรียมเสื้อกันหนาว หมวก ถุงมือ', why: 'H จากจีนทำให้อากาศเย็นและแห้ง ยิ่งสูงยิ่งหนาว ยอดดอยสูงราว 2,565 เมตร ตอนเช้ามืดอาจหนาวจนเกิดน้ำค้างแข็ง (แม่คะนิ้ง) ต้องเตรียมเสื้อผ้ากันหนาวให้พอ' },
+    { m: 1, city: 'kk', n: 'แข่งกีฬาสีกลางแจ้ง', who: 'โรงเรียนในจังหวัดขอนแก่นจะแข่งกีฬาสีกลางสนามช่วงบ่ายถึงเย็น ในวันที่ตรงกับแผนที่ ข',
+      info: 'ร้อนจัด แล้วเกิดพายุฤดูร้อนช่วงบ่ายถึงค่ำ', o: ['แข่งตามเดิม ถ้าฝนตกค่อยหลบใต้ต้นไม้ใหญ่', 'ยกเลิกการแข่งขันไปจนถึงปีหน้า', 'ย้ายการแข่งขันมาช่วงเช้า เตรียมอาคารแข็งแรงไว้หลบ ไม่อยู่ใต้ต้นไม้หรือป้ายโฆษณา', 'แข่งต่อกลางสายฝน เพราะฝนช่วยคลายร้อน'], a: 2,
+      s: 'ย้ายแข่งช่วงเช้า เตรียมที่หลบในอาคาร', why: 'พายุฤดูร้อนมักเกิดช่วงบ่ายถึงค่ำ มีฟ้าผ่า ลมกระโชกแรงทำให้ต้นไม้และป้ายล้ม ลูกเห็บตก การย้ายเวลาและเตรียมที่หลบในอาคารแข็งแรงจึงปลอดภัยที่สุด' },
+    { m: 2, city: 'pk', n: 'ออกเรือประมงเรือเล็ก', who: 'ชาวประมงเรือเล็กที่ภูเก็ตจะออกเรือไปหาปลาในทะเลอันดามัน ในวันที่ตรงกับแผนที่ ค',
+      info: 'มรสุมตะวันตกเฉียงใต้กำลังแรง ทะเลอันดามันคลื่นสูง 2–3 เมตร', o: ['งดออกจากฝั่ง เพราะคลื่นสูง อันตรายต่อเรือเล็ก', 'ออกเรือได้ตามปกติ เพราะฝนไม่เกี่ยวกับคลื่น', 'ออกเรือไปไกลกว่าปกติ เพราะปลาชุม', 'ออกเรือตอนกลางคืนแทน เพื่อหลบฝน'], a: 0,
+      s: 'งดออกเรือ ติดตามประกาศ', why: 'มรสุมตะวันตกเฉียงใต้กำลังแรงพัดผ่านทะเลอันดามัน คลื่นสูง 2–3 เมตร เรือเล็กอาจล่มได้ กรมอุตุนิยมวิทยามักประกาศให้เรือเล็กงดออกจากฝั่ง' },
+    { m: 3, city: 'ub', n: 'บ้านริมน้ำและนาข้าว', who: 'ครอบครัวชาวนาในจังหวัดอุบลราชธานี บ้านอยู่ริมแม่น้ำมูล ข้าวใกล้เก็บเกี่ยว ในวันที่ตรงกับแผนที่ ง',
+      info: 'พายุจะเคลื่อนเข้าอีสาน ฝนตกหนักถึงหนักมาก', o: ['ไม่ต้องทำอะไร เพราะพายุยังอยู่ในทะเล', 'ออกไปดูระดับน้ำที่ริมตลิ่งขณะฝนตกหนัก', 'ตากข้าวที่เกี่ยวแล้วไว้กลางลานทั้งสัปดาห์', 'ติดตามประกาศ ขนของขึ้นที่สูง เกี่ยวข้าวส่วนที่ทำได้ เตรียมเส้นทางอพยพ'], a: 3,
+      s: 'ติดตามประกาศ ขนของขึ้นที่สูง เตรียมอพยพ', why: 'พายุจะเคลื่อนตามเส้นทางที่คาดเข้ามาภายใน 1–2 วัน ฝนตกหนักต่อเนื่องทำให้แม่น้ำล้นตลิ่งได้ การเตรียมตัวล่วงหน้าตามพยากรณ์ช่วยลดความเสียหาย' }];
+  var cp = 0;
+  function updC() {
+    var P = PLAN[cp];
+    chips('planChips', 'สถานการณ์', PLAN.map(function (p, i) { return (i + 1) + ' ' + p.n; }), cp, 'p', function (i) { return S.c[i]; }, function (v) { cp = v; updC(); drawC(); });
+    $('cName').textContent = (cp + 1) + ' · ' + P.n;
+    $('cWho').textContent = P.who;
+    $('cInfo').textContent = DAYS[P.m].n + ' : ' + P.info;
+    askUI('cAsk', P.o, P.a, !!S.c[cp], function () { S.c[cp] = 1; save(); updC(); return true; });
+    $('cWhy').textContent = S.c[cp] ? P.why : '';
+    $('logC').innerHTML = PLAN.map(function (p, i) { var r = S.c[i];
+      return '<tr class="' + (i === cp ? 'cur ' : '') + 'ws"><td class="n">' + (i + 1) + ' ' + p.n + '</td><td>' + (r ? p.info : '-') + '</td><td>' + (r ? p.s : '-') + '</td></tr>'; }).join('');
+  }
+  function drawC() { var P = PLAN[cp]; drawMap($('cvC'), P.m, 0, { cities: [P.city], ring: P.city }); }
+
+  // ---------------------------------------------------------------- ขั้นที่ 2 ไขรหัส
+  var CL = [
+    { L: 'I', q: 'เส้นบนแผนที่อากาศที่ลากเชื่อมจุดที่มีความกดอากาศเท่ากัน เรียกว่าอะไร', o: ['เส้นศูนย์สูตร', 'เส้นไอโซบาร์', 'เส้นชั้นความสูง', 'เส้นทางพายุ'], a: 1,
+      w: 'เส้นไอโซบาร์เชื่อมจุดที่มีความกดอากาศเท่ากัน มีตัวเลขกำกับเป็นเฮกโตพาสคัล (hPa) กรมอุตุนิยมวิทยาลากห่างกันเส้นละ 2 hPa' },
+    { L: 'S', q: 'บริเวณที่เส้นไอโซบาร์อยู่ชิดกันมาก หมายความว่าอย่างไร', o: ['ลมสงบ', 'อากาศหนาว', 'ลมพัดแรง', 'ไม่มีเมฆ'], a: 2,
+      w: 'เส้นชิดกัน แปลว่าความกดอากาศเปลี่ยนมากในระยะสั้น อากาศจึงเคลื่อนที่เร็ว ลมแรง เช่น รอบพายุหมุนเขตร้อน' },
+    { L: 'O', q: 'หย่อมความกดอากาศต่ำ (L) มักทำให้เกิดลักษณะอากาศแบบใด', o: ['อากาศยกตัว เกิดเมฆและฝน', 'ท้องฟ้าโปร่ง แห้งแล้ง', 'อากาศจมตัว ลมสงบ', 'หิมะตก'], a: 0,
+      w: 'ลมพัดเข้าหา L แล้วยกตัวขึ้น อากาศเย็นลง ไอน้ำกลั่นตัวเป็นเมฆและฝน ส่วน H อากาศจมตัว ท้องฟ้าโปร่ง' },
+    { L: 'B', q: 'ภาพจากเรดาร์ตรวจอากาศ บริเวณที่เป็นสีแดง หมายถึงอะไร', o: ['อุณหภูมิสูงมาก', 'เกิดไฟป่า', 'ฝนตกหนักมาก', 'ฝุ่น PM2.5 สูง'], a: 2,
+      w: 'เรดาร์วัดคลื่นที่สะท้อนจากเม็ดฝน ยิ่งสะท้อนแรงยิ่งเป็นฝนหนัก ใช้สีเขียว เหลือง ส้ม แดง ตามลำดับความแรง' },
+    { L: 'A', q: 'สัญลักษณ์สถานีที่ก้านลมชี้ไปทางทิศเหนือ หมายความว่าอย่างไร', o: ['ลมพัดมาจากทิศเหนือ (ลมเหนือ)', 'ลมพัดไปทางทิศเหนือ', 'ลมสงบ', 'มีพายุอยู่ทางทิศเหนือ'], a: 0,
+      w: 'ก้านลมชี้ไปทางทิศที่ลมพัดมา และเรียกชื่อลมตามทิศที่พัดมา ลมเหนือจึงพัดจากเหนือลงใต้' },
+    { L: 'R', q: 'กรมอุตุนิยมวิทยาเตือนพายุฤดูร้อนช่วงบ่ายวันนี้ นักบินควรทำอย่างไร', o: ['เล่นฟุตบอลกลางสนามต่อ', 'หลบใต้ต้นไม้ใหญ่', 'จอดรถใต้ป้ายโฆษณา', 'อยู่ในอาคารที่แข็งแรง ห่างต้นไม้และป้ายโฆษณา'], a: 3,
+      w: 'พายุฤดูร้อนมีฟ้าผ่า ลมกระโชกแรง ลูกเห็บ ต้นไม้และป้ายล้มได้ ที่ปลอดภัยคืออาคารที่แข็งแรง' }];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- คลังข้อมูลจริง
+  var LIBC = [
+    { y: 'กรมอุตุนิยมวิทยา · tmd.go.th', n: 'แผนที่อากาศผิวพื้น', d: 'แผนที่อากาศของจริงหลายช่วงเวลาต่อวัน มีเส้นไอโซบาร์ H L ร่องมรสุม พายุ พร้อมคำอธิบายลักษณะอากาศเป็นภาษาไทย', i: 'ใช้ทำ : ส่วนที่ 4 ก' },
+    { y: 'ภาพถ่ายดาวเทียม', n: 'ดาวเทียมฮิมาวาริ', d: 'ภาพเมฆจากดาวเทียมค้างฟ้าฮิมาวาริของญี่ปุ่น ดูได้จากเว็บกรมอุตุนิยมวิทยา เห็นพายุและแนวเมฆฝนทั้งภูมิภาค', i: 'ใช้ดู : เมฆอยู่ตรงไหน กำลังมาไหม' },
+    { y: 'เรดาร์ตรวจอากาศ', n: 'ฝนใกล้บ้านตอนนี้', d: 'เรดาร์ของกรมอุตุนิยมวิทยา และเรดาร์ของกรุงเทพมหานคร (สำนักการระบายน้ำ) เห็นกลุ่มฝนที่กำลังตกและทิศที่เคลื่อน', i: 'ใช้ดู : ควรออกจากบ้านตอนนี้ไหม' },
+    { y: 'พยากรณ์อากาศ 7 วัน', n: 'แอป Thai Weather', d: 'แอปของกรมอุตุนิยมวิทยา พยากรณ์รายจังหวัด อุณหภูมิสูงสุด ต่ำสุด โอกาสเกิดฝน (%) และลม', i: 'ใช้ทำ : แผนชีวิต 3 วัน' },
+    { y: 'ประกาศเตือนภัย', n: 'พายุ คลื่นลมแรง อากาศหนาว', d: 'ประกาศจากกรมอุตุนิยมวิทยา และกรมป้องกันและบรรเทาสาธารณภัย (ปภ.) บอกพื้นที่เสี่ยงและช่วงเวลา', i: 'ใช้ทำ : สิ่งที่ควรเตรียมตัว' },
+    { y: 'คุณภาพอากาศ · Air4Thai', n: 'ฝุ่น PM2.5', d: 'กรมควบคุมมลพิษรายงานค่าฝุ่นรายชั่วโมง ช่วงฤดูหนาวถึงต้นฤดูร้อนอากาศนิ่ง ฝุ่นสะสมสูงได้', i: 'ใช้ทำ : วางแผนกิจกรรมกลางแจ้ง' }];
+  $('libC').innerHTML = LIBC.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawA1(); drawKey(); drawA2(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') drawC();
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') { if (playA2) { pA2 = Math.min(1, pA2 + dt / 5); if (pA2 >= 1) playA2 = 0; updA2(); } drawA2(); }
+    if (tab === 'C') drawC();
+    anim = requestAnimationFrame(loop);
+  }
+  updA1(); updA2(); updB(); updC(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_A4 = { STN: STN, DIRS: DIRS, SPD: SPD, CLD: CLD, WX: WX, dirTxt: dirTxt, spdTxt: spdTxt, SYS: SYS, GAP: GAP, ISOL: ISOL, isoDir: isoDir, isoWx: isoWx,
+    DAYS: DAYS, SYSS: SYSS, WXS: WXS, pText: pText, PLAN: PLAN, CL: CL,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    tick: function (t) { tA = t; },
+    setA1: function (i, m) { st = i; if (m) me = { d: m.d, s: m.s, c: m.c, w: m.w }; updA1(); drawA1(); },
+    setA2: function (s, g, p) { playA2 = 0; as = s; ag = g; pA2 = p; updA2(); drawA2(); },
+    setB: function (d, l) { bd = d; bl = l; updB(); drawB(); },
+    setC: function (i) { cp = i; updC(); drawC(); },
+    recAll: function () { STN.forEach(function (s, i) { S.a1[i] = 1; }); ISOL.forEach(function (z) { S.a2[z[0] * 2 + z[1]] = 1; }); DAYS.forEach(function (d, i) { S.b[i] = 2; S.bv[i] = 7; });
+      PLAN.forEach(function (p, i) { S.c[i] = 1; }); CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA1(); updA2(); updB(); updC(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
