@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A5 ภารกิจกู้สมดุลพลังงานโลก · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #3a4a8a44, transparent), radial-gradient(900px 500px at 0% 110%, #1b4a6e55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--cyan); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+.unit-tag.star { background: var(--gold); }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn.g { border-color: var(--gold); color: var(--gold); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+table.log tr.ws td.n::after { content: " · ใบงาน"; color: var(--gold); font-size: 12.5px; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; text-align: left; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.pick button:disabled { opacity: .4; cursor: default; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr; gap: 5px; margin-top: 4px; }
+.pick.two { grid-template-columns: 1fr 1fr; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4FD8FF, #FFD166); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.dare { margin-top: 12px; border: 1.5px dashed var(--violet); border-radius: 14px; padding: 10px 12px; background: #a77bff12; font-size: 15px; }
+.dare b { color: var(--violet); font-family: var(--head); }
+.snap { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px; }
+.snap div { border: 1px solid var(--line-hi); border-radius: 10px; padding: 6px 10px; background: #0b1233aa; font-size: 14px; color: var(--muted); }
+.snap b { display: block; font-family: var(--head); font-size: 22px; color: var(--gold); line-height: 1.15; }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .al .opts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · A5 <span class="unit-tag">หน่วยที่ 3</span><span class="unit-tag star">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจกู้<b>สมดุลพลังงานโลก</b></h1>
+  <p class="lead">ทดลองว่าแก๊สเรือนกระจกทำให้โลกอุ่นได้อย่างไร แยกปัจจัยธรรมชาติกับปัจจัยจากมนุษย์ อ่านหลักฐานจริงจากสถานีเฝ้าระวังโลก แล้วออกแบบแนวปฏิบัติลดการปล่อยแก๊สเรือนกระจกของตัวเอง</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองสมดุลพลังงาน<small>เรือนกระจก · ปัจจัย 6 อย่าง</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>สถานีเฝ้าระวังโลก<small>หลักฐาน 4 กราฟ · ผลต่อไทย</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์บัญชาการลดคาร์บอน<small>4 สถานการณ์ · คาร์บอนของฉัน</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองสมดุลพลังงานของโลก</h2>
+    <p class="how">โลกได้รับพลังงานจากดวงอาทิตย์ และแผ่พลังงานความร้อนกลับออกสู่อวกาศตลอดเวลา ถ้าพลังงานเข้าเท่ากับพลังงานออก อุณหภูมิเฉลี่ยจะคงที่ (สมดุล) นักบินจะทดลอง 2 ขั้น คือ ปรับปริมาณแก๊สเรือนกระจก และแยกปัจจัยที่ทำให้สมดุลเปลี่ยน</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> โลกในเรือนกระจก : ปรับแก๊สเรือนกระจกแล้วเดินเวลา</h2>
+    <p class="how" style="margin-bottom:4px">ทุกกรณีเริ่มจากโลกที่อุณหภูมิเฉลี่ย 14 °C เลือกบรรยากาศ แล้วกด "เดินเวลา 100 ปี" สังเกตแสงอาทิตย์ (สีเหลือง) และรังสีความร้อน (สีส้ม) ที่แก๊สเรือนกระจกดูดกลืนแล้วแผ่กลับลงมา (สีชมพู) เดินเวลาครบแล้วบันทึกให้อัตโนมัติ</p>
+    <div class="chips" id="caseChips"></div>
+    <div class="twin">
+      <canvas id="cvA1" height="340" aria-label="ภาพจำลองโลกในเรือนกระจก ดวงอาทิตย์ส่งแสงลงมา เมฆสะท้อนบางส่วนกลับ ผิวโลกแผ่รังสีความร้อนขึ้นไป แก๊สเรือนกระจกในชั้นบรรยากาศดูดกลืนแล้วแผ่บางส่วนกลับลงมาที่ผิวโลก มีเทอร์โมมิเตอร์แสดงอุณหภูมิเฉลี่ย"></canvas>
+      <div class="info">
+        <div class="k">บรรยากาศ</div>
+        <div class="v c" id="a1Name" style="font-size:18px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">พลังงานเข้า<br>(W/m²)</div><div class="v g" id="a1In">240</div></div>
+          <div><div class="k">พลังงานออก<br>สู่อวกาศ (W/m²)</div><div class="v r" id="a1Out">-</div></div>
+        </div>
+        <div class="k" style="margin-top:4px">อุณหภูมิเฉลี่ยผิวโลก · <span id="a1Yr">ปีที่ 0</span></div>
+        <div class="v o" id="a1T">-</div>
+        <div class="bar" style="margin-top:2px"><i id="a1Bar"></i></div>
+        <h3 id="a1Res" style="margin-top:6px;font-size:18px">-</h3>
+        <div class="d" id="a1Why">-</div>
+      </div>
+    </div>
+    <div class="ctrl"><button class="btn" id="playA1">เดินเวลา 100 ปี</button><button class="btn" id="resetA1">เริ่มใหม่</button><span class="lbl" id="recA1Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>บรรยากาศ</th><th>พลังงานออกตอนเริ่ม (W/m²)</th><th>โลกจะ</th><th>อุณหภูมิเมื่อสมดุล</th></tr></thead>
+      <tbody id="logA1"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> เครื่องชั่งสมดุลพลังงาน : ปัจจัย 6 อย่าง</h2>
+    <p class="how" style="margin-bottom:4px">เลือกปัจจัย อ่านเหตุการณ์ แล้วตอบ 2 ข้อ ว่าเป็นปัจจัยจากธรรมชาติหรือจากมนุษย์ และทำให้โลกร้อนขึ้นหรือเย็นลง ตอบถูกครบเครื่องชั่งจะเอียงให้ดูและบันทึกให้</p>
+    <div class="chips" id="facChips"></div>
+    <div class="twin">
+      <canvas id="cvA2" height="300" aria-label="ภาพปัจจัยที่เลือก และเครื่องชั่งพลังงานเข้ากับพลังงานออก เครื่องชั่งเอียงไปทางพลังงานเข้าเมื่อโลกร้อนขึ้น และเอียงไปทางพลังงานออกเมื่อโลกเย็นลง"></canvas>
+      <div class="info">
+        <div class="k">ปัจจัย</div>
+        <div class="v c" id="a2Name" style="font-size:19px">-</div>
+        <div class="d" id="a2Desc">-</div>
+        <div class="k" style="margin-top:4px">1) เป็นปัจจัยจาก ?</div>
+        <div class="pick two" id="a2Ask1"></div>
+        <div id="a2Q2" class="hide">
+          <div class="k" style="margin-top:6px">2) ทำให้โลก ?</div>
+          <div class="pick two" id="a2Ask2"></div>
+        </div>
+        <div class="d" id="a2Why" style="color:#5EF2A5;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ปัจจัย</th><th>ธรรมชาติ / มนุษย์</th><th>ทำให้โลก</th><th>เพราะ</th></tr></thead>
+      <tbody id="logA2"></tbody>
+    </table></div>
+    <div class="note"><b>สมดุลพลังงานของโลก</b> : พลังงานที่โลกดูดกลืนจากดวงอาทิตย์ (เฉลี่ยราว 240 W/m²) เท่ากับพลังงานความร้อนที่โลกแผ่ออกสู่อวกาศ อุณหภูมิจึงคงที่ · <b>แก๊สเรือนกระจก</b> (CO₂ มีเทน CH₄ ไอน้ำ ไนตรัสออกไซด์) ให้แสงอาทิตย์ผ่านลงมาได้ แต่ดูดกลืนรังสีความร้อนจากผิวโลกแล้วแผ่บางส่วนกลับลงมา ถ้าไม่มีเลย โลกจะเย็นถึง −18 °C · เมื่อแก๊สเรือนกระจกเพิ่ม พลังงานออกน้อยกว่าพลังงานเข้า โลกจึงสะสมความร้อนจนเข้าสู่สมดุลใหม่ที่อุ่นขึ้น · ปัจจัยธรรมชาติทำให้ภูมิอากาศแกว่งขึ้นลง แต่<b>สาเหตุหลักที่โลกร้อนขึ้นตั้งแต่ยุคอุตสาหกรรม คือแก๊สเรือนกระจกจากกิจกรรมของมนุษย์</b></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตารางบรรยากาศ 4 กรณี + ตารางปัจจัย 6 อย่าง ตอบข้อ 1</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> สถานีเฝ้าระวังโลก : หลักฐานการเปลี่ยนแปลงภูมิอากาศ</h2>
+    <p class="how">นักวิทยาศาสตร์ทั่วโลกวัดข้อมูลต่อเนื่องหลายสิบปี เลือกข้อมูล 1 ชุด กด "วาดกราฟ" แตะบนกราฟเพื่ออ่านค่าแต่ละปีได้ แล้วตอบ 2 ข้อ ตอบถูกครบจึงบันทึก</p>
+    <div class="chips" id="dsChips"></div>
+    <div class="twin">
+      <canvas id="cvB" height="360" aria-label="กราฟข้อมูลจริงโดยประมาณ แกนนอนเป็นปี พ.ศ. แกนตั้งเป็นค่าที่วัด แตะบนกราฟเพื่ออ่านค่าของแต่ละปี"></canvas>
+      <div class="info">
+        <div class="k">ข้อมูล</div>
+        <div class="v c" id="bName" style="font-size:19px">-</div>
+        <div class="k" id="bSrc">-</div>
+        <div class="k" style="margin-top:4px">ค่าที่อ่านได้</div>
+        <div class="v g" id="bRead" style="font-size:18px">แตะบนกราฟ</div>
+        <div class="k" style="margin-top:4px">1) ข้อมูลชุดนี้มีแนวโน้มอย่างไร ?</div>
+        <div class="pick two" id="bAsk1"></div>
+        <div id="bQ2" class="hide">
+          <div class="k" style="margin-top:6px" id="bQ2t">2) ค่าในปีล่าสุดประมาณเท่าใด ?</div>
+          <div class="pick two" id="bAsk2"></div>
+        </div>
+        <div class="d" id="bWhy" style="color:#5EF2A5;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="ctrl"><button class="btn" id="playB">วาดกราฟ</button><span class="lbl" id="recBMsg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ข้อมูล</th><th>ปีแรก → ปีล่าสุด</th><th>แนวโน้ม</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>แฟ้มผลกระทบ</em> การเปลี่ยนแปลงภูมิอากาศกับประเทศไทย</h2>
+    <div class="events" id="libB"></div>
+    <div class="note"><b>สาเหตุ → ผล</b> : มนุษย์เผาเชื้อเพลิงซากดึกดำบรรพ์และตัดไม้ → <b>CO₂ เพิ่มขึ้น</b> → บรรยากาศกักความร้อนมากขึ้น → <b>อุณหภูมิเฉลี่ยโลกสูงขึ้น</b> → น้ำแข็งละลาย น้ำทะเลขยายตัว → <b>ระดับน้ำทะเลสูงขึ้น</b> · เมื่อน้ำแข็งสีขาวลดลง พื้นน้ำสีเข้มดูดกลืนแสงมากขึ้น โลกยิ่งร้อน เรียกว่า <b>ผลป้อนกลับ</b> · ข้อมูลในกราฟเป็นค่าโดยประมาณจาก NOAA NASA และ NSIDC เพื่อการเรียนรู้</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตารางหลักฐาน 4 ชุด ตอบข้อ 2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์บัญชาการลดคาร์บอน</h2>
+    <p class="how">รู้สาเหตุแล้วต้องลงมือ นักบินจะช่วยคน 4 กลุ่มเลือกแนวปฏิบัติที่ลดการปล่อยแก๊สเรือนกระจกได้จริง คำนวณคาร์บอนของตัวเอง แล้วไขรหัสศูนย์บัญชาการ</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ห้องบัญชาการ : ช่วยคน 4 กลุ่มลดคาร์บอน</h2>
+    <p class="how" style="margin-bottom:4px">เลือกสถานการณ์ อ่านปัญหา แล้วเลือกแนวปฏิบัติที่ลดการปล่อยแก๊สเรือนกระจกได้และทำได้จริง ตอบถูกจะเห็นว่าลดได้เท่าใด</p>
+    <div class="chips" id="planChips"></div>
+    <div class="twin">
+      <canvas id="cvC" height="300" aria-label="แผนภูมิแท่งเปรียบเทียบการปล่อยแก๊สเรือนกระจกก่อนและหลังใช้แนวปฏิบัติ"></canvas>
+      <div class="info">
+        <div class="k">สถานการณ์</div>
+        <div class="v c" id="cName" style="font-size:19px">-</div>
+        <div class="d" id="cWho">-</div>
+        <div class="k" style="margin-top:6px">ควรทำอย่างไร ?</div>
+        <div class="pick" id="cAsk"></div>
+        <div class="d" id="cWhy" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สถานการณ์</th><th>แนวปฏิบัติที่เลือก</th><th>ลดได้ประมาณ</th></tr></thead>
+      <tbody id="logC"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> เครื่องคำนวณคาร์บอนของฉัน 1 วัน (ใช้ในส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">เลือกให้ตรงกับวันปกติของตัวเอง กด "บันทึกวันปกติของฉัน" แล้วลองเปลี่ยนเป็นสิ่งที่ทำได้จริง กด "บันทึกแผนลดคาร์บอน" (ค่าประมาณ หน่วย กก. CO₂ เทียบเท่า)</p>
+    <div id="calcChips"></div>
+    <div class="twin">
+      <canvas id="cvCalc" height="270" aria-label="แผนภูมิแท่งซ้อนแสดงการปล่อยแก๊สเรือนกระจกต่อวันแยกตามกิจกรรม ของวันปกติ ตอนนี้ และแผนลดคาร์บอน"></canvas>
+      <div class="info">
+        <div class="k">ตอนนี้ฉันปล่อย</div>
+        <div class="v g" id="calcNow">-</div>
+        <div class="k" id="calcTree">-</div>
+        <div class="k" style="margin-top:4px">ปล่อยมากที่สุดจาก</div>
+        <div class="v r" id="calcTop" style="font-size:17px">-</div>
+        <div class="snap"><div>วันปกติของฉัน<b id="snapBase">-</b></div><div>แผนลดคาร์บอน<b id="snapPlan">-</b></div></div>
+        <div class="d" id="calcCut" style="color:#5EF2A5">-</div>
+      </div>
+    </div>
+    <div class="leg" id="calcLeg"></div>
+    <div class="ctrl"><button class="btn g" id="saveBase">บันทึกวันปกติของฉัน</button><button class="btn" id="savePlan">บันทึกแผนลดคาร์บอน</button></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ไขรหัสศูนย์บัญชาการ</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">CARBON</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · คาร์บอน (carbon) เป็นธาตุที่อยู่ในทั้ง CO₂ และมีเทน CH₄ คำว่า "ลดคาร์บอน" จึงหมายถึงลดการปล่อยแก๊สเรือนกระจก ข้อตกลงปารีส (พ.ศ. 2558) ตั้งเป้าคุมให้โลกร้อนขึ้นไม่เกิน 2 °C และพยายามไม่ให้เกิน 1.5 °C</div>
+    </div>
+
+    <h2 class="sub-h"><em>คลังแหล่งข้อมูล</em> สำหรับภารกิจปลายทาง ส่วนที่ 4</h2>
+    <p class="how" style="margin-bottom:4px">ส่วนที่ 4 ต้องสืบค้นผลกระทบจริงในประเทศไทย 1 เรื่อง และใช้คาร์บอนของตัวเองจากขั้นที่ 2 (ใช้ AI ช่วยอธิบายได้ แต่ต้องตรวจกับแหล่งข้อมูลจริง)</p>
+    <div class="events" id="libC"></div>
+    <div class="dare"><b>ภารกิจท้าทาย (ไม่บังคับ)</b> เปิดกราฟ CO₂ ในภารกิจ B แตะอ่านค่า พ.ศ. 2503 กับ 2513 แล้ว พ.ศ. 2553 กับ 2563 คำนวณว่าแต่ละช่วง CO₂ เพิ่มขึ้นปีละกี่ ppm ช่วงหลังเพิ่มเร็วกว่าช่วงแรกกี่เท่า และถ้ายังเพิ่มด้วยอัตราล่าสุด CO₂ จะถึง 560 ppm (กรณีอนาคตในภารกิจ A) ประมาณ พ.ศ. ใด เล่าให้เพื่อนในกลุ่มฟัง</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 4 สถานการณ์ + รหัสผ่าน ข้อ 3 · <b>ส่วนที่ 4</b> : ภารกิจปลายทาง แนวปฏิบัติลดโลกร้อนของฉัน</div>
+  </section>
+
+  <footer>ตัวเลขในภารกิจนี้เป็นแบบจำลองอย่างง่ายและค่าประมาณเพื่อการเรียนรู้ · กราฟในภารกิจ B ปรับจากข้อมูลจริงของ NOAA NASA และ NSIDC (ค่าโดยประมาณ) · ค่าการปล่อยแก๊สเรือนกระจกเป็นค่าประมาณ ใช้เปรียบเทียบเท่านั้น · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_a5_sim_v1';
+  var S = load() || {};
+  ['a1', 'a2', 'b', 'c', 'cl'].forEach(function (k) { S[k] = S[k] || {}; });
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0, useGrouping: false }); }
+  function sgn(n, d) { var s = fmt(Math.abs(n), d); return (n > 0.0001 ? '+' : n < -0.0001 ? '−' : '') + s; }
+  function deg(n) { return (n < 0 ? '−' + fmt(-n, 1) : fmt(n, 1)) + ' °C'; }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function fit(cv) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    if (w < 480) h = Math.round(h * .88);
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function frac(v) { return v - Math.floor(v); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function chips(id, lbl, arr, cur, attr, done, fn) {
+    var h = '<span class="lbl">' + lbl + '</span>';
+    arr.forEach(function (t, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (done && done(i) ? ' done' : '') + '" data-' + attr + '="' + i + '">' + t + '</button>'; });
+    $(id).innerHTML = h; bindChips($(id), attr, function (v) { fn(+v); });
+  }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function askUI(id, opts, ans, okNow, onOk, onNo, disabled) {
+    $(id).innerHTML = opts.map(function (o, j) { return '<button data-j="' + j + '" class="' + (okNow && j === ans ? 'ok' : '') + '"' + (disabled ? ' disabled' : '') + '>' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($(id).querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (okNow || disabled) return; var j = +b.getAttribute('data-j'); if (j === ans) { if (onOk()) return; } else { onNo && onNo(); }
+        b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); };
+    });
+  }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ขั้นที่ 1 เรือนกระจก
+  var IN = 240, T0 = 14, KOUT = 1.4;   // แบบจำลองอย่างง่าย : พลังงานออก = 240 + 1.4 × (T − Tสมดุล)
+  var CASES = [
+    { n: 'ไม่มีแก๊สเรือนกระจกเลย', s: 'ไม่มีแก๊สเรือนกระจก', c: 0, g: 0, teq: -18 },
+    { n: 'CO₂ 280 ppm (ก่อนยุคอุตสาหกรรม พ.ศ. 2393)', s: 'CO₂ 280 ppm', c: 280, g: 1, teq: 14 },
+    { n: 'CO₂ 420 ppm (ปัจจุบัน)', s: 'CO₂ 420 ppm', c: 420, g: 1.5, teq: 15.5 },
+    { n: 'CO₂ 560 ppm (อนาคต ถ้าไม่ลด)', s: 'CO₂ 560 ppm', c: 560, g: 2, teq: 17 }];
+  function outAt(i, T) { return IN + (T - CASES[i].teq) * KOUT; }
+  function startOut(i) { return outAt(i, T0); }
+  function trend(i) { var d = CASES[i].teq - T0; return d > 0 ? 'ร้อนขึ้น' : d < 0 ? 'เย็นลง' : 'คงที่'; }
+  function tempAt(i, p) { var e = Math.exp(-4), f = (Math.exp(-4 * p) - e) / (1 - e); return CASES[i].teq + (T0 - CASES[i].teq) * f; }
+  var ac = 2, pA1 = 0, playA1 = 0;
+  function updA1() {
+    var C = CASES[ac], T = tempAt(ac, pA1), out = outAt(ac, T), diff = IN - out;
+    chips('caseChips', 'บรรยากาศ', CASES.map(function (c) { return c.s; }), ac, 'k', function (i) { return S.a1[i]; }, function (v) { ac = v; pA1 = 0; playA1 = 0; updA1(); drawA1(); });
+    $('a1Name').textContent = C.n;
+    $('a1Out').textContent = fmt(out, 1);
+    $('a1T').textContent = deg(T);
+    $('a1Yr').textContent = 'ปีที่ ' + Math.round(pA1 * 100);
+    $('a1Bar').style.width = (pA1 * 100) + '%';
+    var bal = Math.abs(diff) < 0.05;
+    $('a1Res').textContent = bal ? (pA1 >= 1 && ac !== 1 ? 'เข้าสู่สมดุลใหม่แล้ว' : 'สมดุล : พลังงานเข้า = ออก') : diff > 0 ? 'พลังงานเข้า มากกว่า ออก' : 'พลังงานออก มากกว่า เข้า';
+    $('a1Res').style.color = bal ? '#5EF2A5' : diff > 0 ? '#FF9F6B' : '#4FD8FF';
+    $('a1Why').textContent = bal ? (ac === 0 ? 'ความร้อนหนีออกสู่อวกาศได้หมด โลกเย็นจนน้ำกลายเป็นน้ำแข็ง แก๊สเรือนกระจกจึงจำเป็นต่อชีวิต' : ac === 1 ? 'แก๊สเรือนกระจกตามธรรมชาติทำให้โลกอุ่นพอดี อุณหภูมิเฉลี่ยราว 14 °C' : 'แก๊สเรือนกระจกมากขึ้น โลกต้องอุ่นขึ้นจึงจะแผ่พลังงานออกได้เท่ากับที่รับเข้า สมดุลใหม่จึงร้อนกว่าเดิม')
+      : diff > 0 ? 'แก๊สเรือนกระจกกักความร้อนไว้มากขึ้น ความร้อนสะสม โลกร้อนขึ้นเรื่อย ๆ' : 'ความร้อนหนีออกสู่อวกาศได้ง่าย โลกเสียความร้อน เย็นลงเรื่อย ๆ';
+    $('playA1').textContent = playA1 ? 'หยุด' : (pA1 >= 1 ? 'เดินเวลาอีกครั้ง' : 'เดินเวลา 100 ปี');
+    if (pA1 >= 1 && !S.a1[ac]) { S.a1[ac] = 1; save(); }
+    $('recA1Msg').textContent = S.a1[ac] ? 'บันทึกกรณีนี้แล้ว' : 'เดินเวลาให้ครบ 100 ปีเพื่อบันทึก';
+    $('logA1').innerHTML = CASES.map(function (c, i) { var r = S.a1[i];
+      return '<tr class="' + (i === ac ? 'cur ' : '') + 'ws"><td class="n">' + c.s + '</td><td>' + (r ? fmt(startOut(i), 1) : '-') + '</td><td>' + (r ? trend(i) : '-') + '</td><td>' + (r ? deg(c.teq) : '-') + '</td></tr>'; }).join('');
+    var n = CASES.filter(function (c, i) { return S.a1[i]; }).length;
+    if (n === CASES.length) $('recA1Msg').textContent = 'บันทึกครบ 4 กรณีแล้ว';
+  }
+  $('playA1').onclick = function () { if (pA1 >= 1) pA1 = 0; playA1 = playA1 ? 0 : 1; updA1(); };
+  $('resetA1').onclick = function () { pA1 = 0; playA1 = 0; updA1(); drawA1(); };
+  function tColor(T) {   // สีผิวโลกตามอุณหภูมิ
+    if (T < 0) return [210, 230, 245];
+    var k = clamp((T - 13) / 4, 0, 1);
+    return [Math.round(lerp(46, 214, k)), Math.round(lerp(140, 120, k)), Math.round(lerp(96, 60, k))];
+  }
+  function drawA1() {
+    var f = fit($('cvA1')), x = f.x, W = f.W, H = f.H, C = CASES[ac], T = tempAt(ac, pA1), sm = W < 480 ? 11 : 13;
+    var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#02040f'); g.addColorStop(1, '#0a1640'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    for (var i = 0; i < 40; i++) { x.fillStyle = 'rgba(255,255,255,' + (.25 + .5 * hash(i, 9)) + ')'; x.fillRect(hash(i, 1) * W, hash(i, 2) * H * .3, 1.2, 1.2); }
+    var TW = W < 480 ? 46 : 64, PW = W - TW;     // พื้นที่ภาพ / แถบเทอร์โมมิเตอร์
+    var ys = H * .82, yTop = H * .24, yb = lerp(yTop, ys, .45);
+    // ดวงอาทิตย์
+    var sx = PW * .1, sy = H * .1, sr = Math.min(W, H) * .07;
+    var sg = x.createRadialGradient(sx, sy, sr * .3, sx, sy, sr * 2.6); sg.addColorStop(0, 'rgba(255,209,102,.8)'); sg.addColorStop(1, 'rgba(255,209,102,0)');
+    x.fillStyle = sg; x.beginPath(); x.arc(sx, sy, sr * 2.6, 0, 6.283); x.fill(); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(sx, sy, sr, 0, 6.283); x.fill();
+    // ชั้นบรรยากาศ (แก๊สเรือนกระจก)
+    var al = .04 + .1 * C.g;
+    var ag = x.createLinearGradient(0, yTop, 0, ys); ag.addColorStop(0, 'rgba(167,123,255,0)'); ag.addColorStop(.35, 'rgba(167,123,255,' + al + ')'); ag.addColorStop(1, 'rgba(79,216,255,' + (al * .6) + ')');
+    x.fillStyle = ag; x.fillRect(0, yTop, PW, ys - yTop);
+    if (C.g > 0) { x.strokeStyle = 'rgba(167,123,255,' + (.25 + .15 * C.g) + ')'; x.setLineDash([4, 6]); x.beginPath(); x.moveTo(0, yb); x.lineTo(PW, yb); x.stroke(); x.setLineDash([]);
+      label(x, 'ชั้นแก๊สเรือนกระจก ' + (C.c ? C.c + ' ppm' : ''), PW - 8, yb - 6, '#C9B3FF', sm, 'right'); }
+    else label(x, 'ไม่มีแก๊สเรือนกระจก', PW - 8, yb - 6, '#9AA6CF', sm, 'right');
+    // เมฆ
+    [[.42, .36], [.7, .3]].forEach(function (c, k) { var cx = PW * c[0], cy = H * c[1];
+      x.fillStyle = 'rgba(232,237,255,.75)'; [[-18, 2, 16], [0, -4, 20], [18, 3, 15], [-4, 6, 16]].forEach(function (b) { x.beginPath(); x.ellipse(cx + b[0], cy + b[1], b[2] * 1.2, b[2] * .7, 0, 0, 6.283); x.fill(); }); });
+    // ผิวโลก
+    var col = tColor(T);
+    x.fillStyle = 'rgb(' + col.join(',') + ')'; x.beginPath(); x.moveTo(0, ys + 6); x.quadraticCurveTo(PW / 2, ys - 14, PW, ys + 6); x.lineTo(PW, H); x.lineTo(0, H); x.closePath(); x.fill();
+    x.fillStyle = 'rgba(18,60,120,.55)'; x.fillRect(PW * .55, ys + 4, PW * .45, H - ys);
+    label(x, T < 0 ? 'ผิวโลกเป็นน้ำแข็ง' : 'ผิวโลก', PW * .2, H - 10, '#E8EDFF', sm);
+    // แสงอาทิตย์ (เหลือง) : 30% สะท้อนที่เมฆ
+    var NS = W < 480 ? 9 : 13, t = tA;
+    for (i = 0; i < NS; i++) {
+      var ph = frac(t * .35 + hash(i, 3)), tx = PW * (.25 + .7 * hash(i, 4)), refl = hash(i, 5) < .3;
+      var x0 = sx + 10, y0 = sy + 10, ry = H * .33, px, py, up = false;
+      if (refl) { if (ph < .5) { px = lerp(x0, tx, ph * 2); py = lerp(y0, ry, ph * 2); } else { up = true; px = lerp(tx, tx + PW * .15, (ph - .5) * 2); py = lerp(ry, -10, (ph - .5) * 2); } }
+      else { px = lerp(x0, tx, ph); py = lerp(y0, ys - 4, ph); }
+      var dx = up ? .5 : (tx - x0), dy = up ? -1 : ((refl ? ry : ys) - y0), dl = Math.hypot(dx, dy) || 1;
+      arrow(x, px - dx / dl * 14, py - dy / dl * 14, px, py, up ? 'rgba(255,209,102,.55)' : '#FFD166', 2, 7);
+    }
+    // รังสีความร้อน (ส้ม) จากผิวโลก : บางส่วนถูกแก๊สเรือนกระจกดูดกลืนแล้วแผ่กลับ (ชมพู)
+    var NI = W < 480 ? 10 : 15, pAbs = C.g * .3, warmK = clamp((T + 18) / 35, .2, 1.1);
+    for (i = 0; i < NI; i++) {
+      var ph2 = frac(t * .3 * (.7 + .3 * warmK) + hash(i, 6)), bx = PW * (.06 + .88 * hash(i, 7)), ab = hash(i, 8) < pAbs, yy, cc, dir;
+      if (ab) { if (ph2 < .5) { yy = lerp(ys - 4, yb, ph2 * 2); cc = '#FF9F6B'; dir = -1; } else { yy = lerp(yb, ys - 4, (ph2 - .5) * 2); cc = '#FF6BC1'; dir = 1; } }
+      else { yy = lerp(ys - 4, -6, ph2); cc = 'rgba(255,159,107,.9)'; dir = -1; }
+      x.strokeStyle = cc; x.lineWidth = 2; x.beginPath();
+      for (var s = 0; s <= 10; s++) { var yv = yy - dir * s * 2.2, xv = bx + Math.sin(s * 1.3 + t * 6) * 3; if (s) x.lineTo(xv, yv); else x.moveTo(xv, yv); }
+      x.stroke(); x.fillStyle = cc; x.beginPath(); x.moveTo(bx - 4, yy + (dir < 0 ? 0 : 0)); x.lineTo(bx + 4, yy); x.lineTo(bx, yy + dir * 6); x.closePath(); x.fill();
+    }
+    // เทอร์โมมิเตอร์
+    var tx0 = PW + TW / 2, ty0 = H * .1, ty1 = H * .82, tmin = -20, tmax = 20;
+    x.fillStyle = '#0b1233'; x.strokeStyle = '#3A4A85'; x.lineWidth = 1.5; x.beginPath(); x.roundRect ? x.roundRect(tx0 - 7, ty0, 14, ty1 - ty0, 7) : x.rect(tx0 - 7, ty0, 14, ty1 - ty0); x.fill(); x.stroke();
+    var yT = lerp(ty1, ty0, (clamp(T, tmin, tmax) - tmin) / (tmax - tmin));
+    x.fillStyle = T < 0 ? '#4FD8FF' : T > 15.2 ? '#FF6B8A' : '#5EF2A5'; x.fillRect(tx0 - 4, yT, 8, ty1 - yT);
+    x.beginPath(); x.arc(tx0, ty1 + 8, 11, 0, 6.283); x.fill();
+    [-18, 0, 14, 17].forEach(function (v) { var yv = lerp(ty1, ty0, (v - tmin) / (tmax - tmin)); x.strokeStyle = '#9AA6CF'; x.beginPath(); x.moveTo(tx0 + 8, yv); x.lineTo(tx0 + 13, yv); x.stroke(); if (W >= 480) label(x, String(v), tx0 + 15, yv + 4, '#9AA6CF', 11, 'left'); });
+    label(x, deg(T).replace(' ', ''), tx0, ty0 - 6, '#E8EDFF', sm);
+    label(x, 'แสงอาทิตย์', sx + sr + 6, sy + 4, '#FFD166', sm, 'left');
+  }
+
+  // ================================================================ ภารกิจ A ขั้นที่ 2 ปัจจัย
+  var TYPES = ['ธรรมชาติ', 'มนุษย์'], EFF = ['โลกร้อนขึ้น', 'โลกเย็นลง'];
+  var FACT = [
+    { n: 'ภูเขาไฟระเบิดรุนแรง', ic: 'volcano', t: 0, e: 1, d: 'ภูเขาไฟปินาตูโบ ประเทศฟิลิปปินส์ ระเบิดเมื่อ พ.ศ. 2534 พ่นเถ้าและแก๊สกำมะถันขึ้นสูงถึงชั้นสตราโทสเฟียร์',
+      s: 'ละอองสะท้อนแสงอาทิตย์ (ชั่วคราว)', why: 'ละอองกำมะถันลอยอยู่สูงนาน 1–2 ปี สะท้อนแสงอาทิตย์กลับสู่อวกาศ พลังงานเข้าลดลง โลกเย็นลงชั่วคราวราว 0.5 °C' },
+    { n: 'ดวงอาทิตย์ปลดปล่อยพลังงานมากขึ้น', ic: 'sun', t: 0, e: 0, d: 'ช่วงที่ดวงอาทิตย์มีจุดมืดมาก (วัฏจักรสุริยะราว 11 ปี เหมือนสัปดาห์ที่ 7) พลังงานที่ส่งมาถึงโลกเพิ่มขึ้นเล็กน้อย',
+      s: 'พลังงานเข้าเพิ่มเล็กน้อยมาก', why: 'พลังงานเข้าเพิ่มขึ้นเพียงราว 0.1% จึงอธิบายโลกร้อนในปัจจุบันไม่ได้ เพราะหลายสิบปีหลังดวงอาทิตย์ไม่ได้แรงขึ้น แต่โลกยังร้อนขึ้นต่อเนื่อง' },
+    { n: 'ปรากฏการณ์เอลนีโญ', ic: 'enso', t: 0, e: 0, d: 'น้ำทะเลอุ่นแผ่ไปทั่วมหาสมุทรแปซิฟิกเขตร้อน (เหมือนภารกิจ A3 สัปดาห์ที่ 17)',
+      s: 'มหาสมุทรคายความร้อน (ชั่วคราว)', why: 'มหาสมุทรคายความร้อนสู่บรรยากาศ ปีเอลนีโญ เช่น พ.ศ. 2559 และ 2566–67 อุณหภูมิเฉลี่ยโลกสูงเป็นสถิติ แต่เป็นการแกว่งขึ้นลง 1–2 ปี' },
+    { n: 'เผาถ่านหิน น้ำมัน แก๊สธรรมชาติ', ic: 'factory', t: 1, e: 0, d: 'ผลิตไฟฟ้า โรงงานอุตสาหกรรม รถยนต์ เรือ เครื่องบิน ทั่วโลกเผาเชื้อเพลิงซากดึกดำบรรพ์ทุกวัน',
+      s: 'ปล่อย CO₂ กักความร้อน', why: 'ปล่อย CO₂ ซึ่งเป็นแก๊สเรือนกระจกที่มนุษย์ปล่อยมากที่สุด ราว 3 ใน 4 ของทั้งหมด และค้างอยู่ในบรรยากาศได้นานหลายร้อยปี' },
+    { n: 'ตัดไม้ทำลายป่า เผาป่า', ic: 'forest', t: 1, e: 0, d: 'เปลี่ยนป่าเป็นพื้นที่เกษตรและเมือง เผาป่าเพื่อเตรียมพื้นที่',
+      s: 'CO₂ เพิ่ม ต้นไม้ดูดซับลดลง', why: 'คาร์บอนที่เก็บอยู่ในเนื้อไม้กลายเป็น CO₂ และเหลือต้นไม้ช่วยดูดซับ CO₂ จากบรรยากาศน้อยลง' },
+    { n: 'นาข้าวขังน้ำ ปศุสัตว์ ขยะฝังกลบ', ic: 'farm', t: 1, e: 0, d: 'จุลินทรีย์ย่อยสลายในที่ไม่มีออกซิเจน (นาที่ขังน้ำตลอด บ่อขยะ) และวัวเรอระหว่างย่อยอาหาร',
+      s: 'ปล่อยมีเทน CH₄', why: 'ปล่อยมีเทน (CH₄) ซึ่งกักความร้อนได้มากกว่า CO₂ ราว 28 เท่า (เมื่อเทียบในช่วง 100 ปี)' }];
+  var af = 0;
+  function updA2() {
+    var F = FACT[af], st = S.a2[af] || 0;
+    chips('facChips', 'ปัจจัย', FACT.map(function (f, i) { return (i + 1) + ' ' + f.n; }), af, 'f', function (i) { return S.a2[i] === 2; }, function (v) { af = v; updA2(); drawA2(); });
+    $('a2Name').textContent = (af + 1) + ' · ' + F.n;
+    $('a2Desc').textContent = F.d;
+    askUI('a2Ask1', TYPES, F.t, st >= 1, function () { S.a2[af] = 1; save(); updA2(); drawA2(); return true; });
+    $('a2Q2').classList.toggle('hide', st < 1);
+    if (st >= 1) askUI('a2Ask2', EFF, F.e, st >= 2, function () { S.a2[af] = 2; save(); updA2(); drawA2(); return true; });
+    $('a2Why').textContent = st >= 2 ? F.why : '';
+    $('logA2').innerHTML = FACT.map(function (f, i) { var r = S.a2[i] === 2;
+      return '<tr class="' + (i === af ? 'cur ' : '') + 'ws"><td class="n">' + (i + 1) + ' ' + f.n + '</td><td>' + (r ? TYPES[f.t] : '-') + '</td><td>' + (r ? EFF[f.e] : '-') + '</td><td>' + (r ? f.s : '-') + '</td></tr>'; }).join('');
+  }
+  function icon(x, k, cx, cy, s) {
+    x.save(); x.translate(cx, cy); x.lineJoin = 'round';
+    if (k === 'volcano') {
+      x.fillStyle = '#6b4a3a'; x.beginPath(); x.moveTo(-s, s * .8); x.lineTo(-s * .2, -s * .3); x.lineTo(s * .2, -s * .3); x.lineTo(s, s * .8); x.closePath(); x.fill();
+      x.fillStyle = '#FF6B3D'; x.beginPath(); x.moveTo(-s * .2, -s * .3); x.lineTo(-s * .05, s * .2); x.lineTo(s * .05, -s * .05); x.lineTo(s * .2, -s * .3); x.closePath(); x.fill();
+      x.fillStyle = 'rgba(180,180,195,.85)'; [[0, -.55, .3], [-.25, -.8, .26], [.25, -.85, .28], [0, -1.05, .32]].forEach(function (b) { x.beginPath(); x.arc(b[0] * s, b[1] * s, b[2] * s, 0, 6.283); x.fill(); });
+      x.fillStyle = 'rgba(255,240,170,.85)'; for (var i = 0; i < 18; i++) { x.fillRect((hash(i, 21) - .5) * s * 1.8, -s * (1.1 + hash(i, 22) * .5), 2, 2); }
+    } else if (k === 'sun') {
+      x.fillStyle = '#FFB547'; x.beginPath(); x.arc(0, 0, s * .7, 0, 6.283); x.fill();
+      x.strokeStyle = '#FFD166'; x.lineWidth = 3; for (i = 0; i < 12; i++) { var a = i * .5236; x.beginPath(); x.moveTo(Math.cos(a) * s * .82, Math.sin(a) * s * .82); x.lineTo(Math.cos(a) * s, Math.sin(a) * s); x.stroke(); }
+      x.fillStyle = '#8a4a10'; [[-.25, -.1, .09], [.2, .15, .07], [.05, -.3, .06], [-.1, .3, .05]].forEach(function (b) { x.beginPath(); x.arc(b[0] * s, b[1] * s, b[2] * s, 0, 6.283); x.fill(); });
+    } else if (k === 'enso') {
+      var gr = x.createLinearGradient(-s, 0, s, 0); gr.addColorStop(0, '#1d5fa0'); gr.addColorStop(.5, '#ff7a45'); gr.addColorStop(1, '#ff5a3a');
+      x.fillStyle = gr; x.beginPath(); x.rect(-s, -s * .2, s * 2, s * .9); x.fill();
+      x.strokeStyle = '#E8EDFF'; x.lineWidth = 2; for (i = 0; i < 3; i++) { x.beginPath(); for (var j = 0; j <= 20; j++) { var xx = -s + j * s / 10, yy = -s * .2 + i * s * .3 + Math.sin(j * .9 + tA * 3) * 3; if (j) x.lineTo(xx, yy); else x.moveTo(xx, yy); } x.stroke(); }
+      x.strokeStyle = 'rgba(255,159,107,.9)'; x.lineWidth = 2.5; for (i = 0; i < 3; i++) { var bx = (i - 1) * s * .5; x.beginPath(); for (j = 0; j <= 8; j++) { var yv = -s * .3 - j * s * .08, xv = bx + Math.sin(j * 1.4 + tA * 5) * 4; if (j) x.lineTo(xv, yv); else x.moveTo(xv, yv); } x.stroke(); }
+    } else if (k === 'factory') {
+      x.fillStyle = '#5a6788'; x.fillRect(-s, 0, s * 2, s * .8); x.fillRect(-s * .7, -s * .9, s * .25, s * .9); x.fillRect(s * .1, -s * .7, s * .25, s * .7);
+      x.fillStyle = 'rgba(150,150,160,.8)'; [[-.58, -1.1, .2], [-.45, -1.35, .26], [.22, -.9, .18], [.36, -1.15, .24]].forEach(function (b) { x.beginPath(); x.arc(b[0] * s, b[1] * s, b[2] * s, 0, 6.283); x.fill(); });
+      x.fillStyle = '#FFD166'; for (i = 0; i < 4; i++) x.fillRect(-s * .8 + i * s * .45, s * .25, s * .2, s * .2);
+      label(x, 'CO₂', s * .75, -s * .9, '#FF9F6B', 14);
+    } else if (k === 'forest') {
+      for (i = 0; i < 3; i++) { var fx = -s * .7 + i * s * .55; x.fillStyle = '#5a3d22'; x.fillRect(fx - 3, s * .2, 6, s * .45); x.fillStyle = i === 2 ? '#3d3d3d' : '#2f9d5a'; x.beginPath(); x.arc(fx, s * .05, s * .32, 0, 6.283); x.fill(); }
+      x.fillStyle = '#5a3d22'; x.fillRect(s * .7, s * .5, s * .22, s * .15);
+      x.fillStyle = '#FF6B3D'; x.beginPath(); x.moveTo(s * .25, s * .65); x.quadraticCurveTo(s * .2, s * .05, s * .45, -s * .2); x.quadraticCurveTo(s * .5, s * .2, s * .65, s * .65); x.closePath(); x.fill();
+      label(x, 'CO₂', s * .45, -s * .4, '#FF9F6B', 14);
+    } else if (k === 'farm') {
+      x.fillStyle = '#2b5f86'; x.fillRect(-s, s * .3, s * 1.1, s * .4);
+      x.strokeStyle = '#7cd67c'; x.lineWidth = 2; for (i = 0; i < 7; i++) { var rx = -s * .9 + i * s * .15; x.beginPath(); x.moveTo(rx, s * .5); x.lineTo(rx - 3, s * .1); x.moveTo(rx, s * .5); x.lineTo(rx + 3, s * .12); x.stroke(); }
+      x.fillStyle = '#e8e2d4'; x.beginPath(); x.ellipse(s * .55, s * .3, s * .38, s * .22, 0, 0, 6.283); x.fill(); x.beginPath(); x.ellipse(s * .95, s * .18, s * .14, s * .12, 0, 0, 6.283); x.fill();
+      x.fillStyle = '#e8e2d4'; [.3, .45, .65, .8].forEach(function (lx) { x.fillRect(s * lx, s * .45, 4, s * .3); });
+      x.fillStyle = '#333'; x.beginPath(); x.arc(s * .5, s * .3, s * .07, 0, 6.283); x.fill();
+      label(x, 'CH₄', -s * .4, -s * .1, '#FF9F6B', 14); label(x, 'CH₄', s * .9, -s * .15, '#FF9F6B', 14);
+    }
+    x.restore();
+  }
+  function drawA2() {
+    var f = fit($('cvA2')), x = f.x, W = f.W, H = f.H, F = FACT[af], st = S.a2[af] || 0, sm = W < 480 ? 11 : 13;
+    var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#04081c'); g.addColorStop(1, '#0d1a44'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    var s = Math.min(W * .14, H * .26);
+    icon(x, F.ic, W * .24, H * .48, s);
+    label(x, F.n, W * .24, H * .9, '#E8EDFF', sm);
+    // เครื่องชั่ง : ซ้าย = พลังงานเข้า ขวา = พลังงานออก
+    var cx = W * .7, cy = H * .5, L = Math.min(W * .22, 190);
+    var tilt = st >= 2 ? (F.e === 0 ? 1 : -1) * .26 * (reduce ? 1 : (.85 + .15 * Math.sin(tA * 3))) : 0;
+    x.fillStyle = '#3A4A85'; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx - 18, H * .86); x.lineTo(cx + 18, H * .86); x.closePath(); x.fill();
+    x.fillRect(cx - 40, H * .86, 80, 5);
+    var lx = cx - Math.cos(tilt) * L, ly = cy + Math.sin(tilt) * L, rx = cx + Math.cos(tilt) * L, ry = cy - Math.sin(tilt) * L;
+    x.strokeStyle = '#E8EDFF'; x.lineWidth = 4; x.beginPath(); x.moveTo(lx, ly); x.lineTo(rx, ry); x.stroke();
+    x.fillStyle = '#FFD166'; x.beginPath(); x.arc(cx, cy, 6, 0, 6.283); x.fill();
+    [[lx, ly, 'พลังงานเข้า', '#FFD166'], [rx, ry, 'พลังงานออก', '#FF9F6B']].forEach(function (p) {
+      x.strokeStyle = 'rgba(232,237,255,.6)'; x.lineWidth = 1.5; x.beginPath(); x.moveTo(p[0], p[1]); x.lineTo(p[0] - 22, p[1] + 34); x.moveTo(p[0], p[1]); x.lineTo(p[0] + 22, p[1] + 34); x.stroke();
+      x.fillStyle = p[3]; x.beginPath(); x.ellipse(p[0], p[1] + 36, 30, 7, 0, 0, 6.283); x.fill();
+      label(x, p[2], p[0], p[1] + 58, p[3], sm);
+    });
+    label(x, st >= 2 ? (F.e === 0 ? 'เข้า > ออก : โลกร้อนขึ้น' : 'เข้า < ออก : โลกเย็นลง') : 'ตอบให้ครบ 2 ข้อ', cx, H * .14, st >= 2 ? (F.e === 0 ? '#FF9F6B' : '#4FD8FF') : '#9AA6CF', sm + 1);
+    if (st >= 2) label(x, F.t ? 'ปัจจัยจากมนุษย์' : 'ปัจจัยธรรมชาติ', W * .24, H * .1, F.t ? '#FF6B8A' : '#5EF2A5', sm);
+  }
+
+  // ================================================================ ภารกิจ B หลักฐาน
+  var TR = ['เพิ่มขึ้น', 'ลดลง', 'คงที่', 'ขึ้นลงไม่มีแนวโน้ม'];
+  var DS = [
+    { n: 'CO₂ ในบรรยากาศ', sh: 'CO₂', src: 'สถานีเมานาโลอา ฮาวาย (NOAA) ค่าเฉลี่ยรายปีโดยประมาณ', u: 'ppm', lo: 300, hi: 440, step: 20, col: '#FF9F6B', tr: 0, d: 0,
+      pts: [[1960, 317], [1965, 320], [1970, 326], [1975, 331], [1980, 339], [1985, 346], [1990, 354], [1995, 361], [2000, 370], [2005, 380], [2010, 390], [2015, 401], [2020, 414], [2024, 425]],
+      q2: 'ปี พ.ศ. 2567 มี CO₂ ประมาณเท่าใด ?', o: ['280 ppm', '350 ppm', '425 ppm', '560 ppm'], a: 2,
+      why: 'CO₂ เพิ่มจาก 317 เป็นราว 425 ppm สูงกว่าช่วงก่อนยุคอุตสาหกรรม (280 ppm) ถึงราว 50% และเพิ่มเร็วขึ้นเรื่อย ๆ มาจากการเผาเชื้อเพลิงซากดึกดำบรรพ์ = สาเหตุของโลกร้อน' },
+    { n: 'อุณหภูมิเฉลี่ยของโลก', sh: 'อุณหภูมิโลก', src: 'NASA NOAA เทียบกับช่วงก่อนยุคอุตสาหกรรม (พ.ศ. 2393–2443) ค่าโดยประมาณ', u: '°C', lo: -0.4, hi: 1.8, step: 0.4, col: '#FF6B8A', tr: 0, d: 1, sign: 1,
+      pts: [[1880, 0.0], [1890, -0.1], [1900, 0.0], [1910, -0.2], [1920, 0.0], [1930, 0.1], [1940, 0.3], [1950, 0.1], [1960, 0.2], [1970, 0.2], [1980, 0.4], [1990, 0.6], [2000, 0.7], [2010, 1.0], [2016, 1.3], [2020, 1.3], [2023, 1.45], [2024, 1.5]],
+      q2: 'ปี พ.ศ. 2567 โลกร้อนกว่าช่วงก่อนยุคอุตสาหกรรมประมาณเท่าใด ?', o: ['+0.5 °C', '+1.0 °C', '+1.5 °C', '+3.0 °C'], a: 2,
+      why: 'ช่วงแรกขึ้นลงเล็กน้อย แต่ตั้งแต่ราว พ.ศ. 2523 สูงขึ้นชัดเจน ปี 2567 ร้อนที่สุดเท่าที่เคยวัด ราว +1.5 °C (ปีเอลนีโญยิ่งสูง) แม้ฟังดูน้อย แต่เป็นค่าเฉลี่ยทั้งโลก ทำให้อากาศสุดขั้วเกิดบ่อยขึ้น' },
+    { n: 'น้ำแข็งทะเลอาร์กติก (เดือนกันยายน)', sh: 'น้ำแข็งอาร์กติก', src: 'NSIDC พื้นที่น้ำแข็งต่ำสุดของแต่ละปี (เดือนกันยายน) ค่าโดยประมาณ', u: 'ล้าน ตร.กม.', lo: 0, hi: 8, step: 2, col: '#4FD8FF', tr: 1, d: 1,
+      pts: [[1979, 7.0], [1985, 6.9], [1990, 6.1], [1996, 7.9], [2000, 6.3], [2005, 5.5], [2007, 4.3], [2010, 4.9], [2012, 3.4], [2015, 4.6], [2020, 3.9], [2024, 4.3]],
+      q2: 'ปี พ.ศ. 2567 น้ำแข็งเหลือประมาณเท่าใด ?', o: ['1.0 ล้าน ตร.กม.', '4.3 ล้าน ตร.กม.', '7.0 ล้าน ตร.กม.', '9.5 ล้าน ตร.กม.'], a: 1,
+      why: 'แม้บางปีจะเพิ่มขึ้น แต่ภาพรวมลดลงจากราว 7 เหลือราว 4.3 ล้าน ตร.กม. (หายไปราว 40%) เป็นผลกระทบของโลกร้อน และน้ำแข็งที่ลดลงทำให้ทะเลสีเข้มดูดกลืนแสงมากขึ้น โลกยิ่งร้อน (ผลป้อนกลับ)' },
+    { n: 'ระดับน้ำทะเลเฉลี่ยของโลก', sh: 'ระดับน้ำทะเล', src: 'วัดจากดาวเทียม (NASA) เทียบกับ พ.ศ. 2536 ค่าโดยประมาณ', u: 'ซม.', lo: -1, hi: 12, step: 2, col: '#5EF2A5', tr: 0, d: 1, sign: 1,
+      pts: [[1993, 0], [1996, 0.8], [2000, 2.2], [2004, 3.5], [2008, 4.5], [2012, 6.2], [2016, 8.2], [2020, 9.4], [2024, 10.5]],
+      q2: 'ปี พ.ศ. 2567 น้ำทะเลสูงกว่าปี 2536 ประมาณเท่าใด ?', o: ['+1 ซม.', '+10 ซม.', '+50 ซม.', '+100 ซม.'], a: 1,
+      why: 'สูงขึ้นราว 10 ซม. ใน 31 ปี และเร็วขึ้นเรื่อย ๆ เพราะธารน้ำแข็งบนแผ่นดินละลาย และน้ำทะเลขยายตัวเมื่ออุ่นขึ้น ชายฝั่งต่ำอย่างอ่าวไทยจึงเสี่ยงถูกกัดเซาะ' }];
+  function be(y) { return y + 543; }
+  function dsVal(D, v) { return (D.sign && v > 0 ? '+' : '') + (v < 0 ? '−' + fmt(-v, D.d) : fmt(v, D.d)); }
+  function firstLast(D) { var a = D.pts[0], b = D.pts[D.pts.length - 1]; return 'พ.ศ. ' + be(a[0]) + ' ' + dsVal(D, a[1]) + ' → ' + be(b[0]) + ' ' + dsVal(D, b[1]) + ' ' + D.u; }
+  var bd = 0, pB = S.b[0] === 2 ? 1 : 0, playB = 0, pickY = null;
+  function updB() {
+    var D = DS[bd], st = S.b[bd] || 0, drawn = pB >= 1;
+    chips('dsChips', 'ข้อมูล', DS.map(function (d, i) { return (i + 1) + ' ' + d.sh; }), bd, 'd', function (i) { return S.b[i] === 2; }, function (v) { bd = v; pB = S.b[v] === 2 ? 1 : 0; playB = 0; pickY = null; updB(); drawB(); });
+    $('bName').textContent = (bd + 1) + ' · ' + D.n;
+    $('bSrc').textContent = D.src;
+    var rp = pickY != null ? D.pts[pickY] : null;
+    $('bRead').textContent = rp ? 'พ.ศ. ' + be(rp[0]) + ' : ' + dsVal(D, rp[1]) + ' ' + D.u : (drawn ? 'แตะบนกราฟเพื่ออ่านค่า' : 'กด "วาดกราฟ" ก่อน');
+    askUI('bAsk1', TR, D.tr, st >= 1, function () { S.b[bd] = 1; save(); updB(); return true; }, null, !drawn);
+    $('bQ2').classList.toggle('hide', st < 1);
+    $('bQ2t').textContent = '2) ' + D.q2;
+    if (st >= 1) askUI('bAsk2', D.o, D.a, st >= 2, function () { S.b[bd] = 2; save(); updB(); drawB(); return true; });
+    $('bWhy').textContent = st >= 2 ? D.why : '';
+    $('playB').textContent = playB ? 'กำลังวาด...' : (drawn ? 'วาดกราฟอีกครั้ง' : 'วาดกราฟ');
+    $('recBMsg').textContent = st >= 2 ? 'บันทึกข้อมูลชุดนี้แล้ว' : drawn ? 'ตอบให้ถูกครบ 2 ข้อเพื่อบันทึก' : 'วาดกราฟให้ครบก่อนตอบ';
+    $('logB').innerHTML = DS.map(function (d, i) { var r = S.b[i] === 2;
+      return '<tr class="' + (i === bd ? 'cur ' : '') + 'ws"><td class="n">' + (i + 1) + ' ' + d.n + '</td><td>' + (r ? firstLast(d) : '-') + '</td><td>' + (r ? TR[d.tr] : '-') + '</td></tr>'; }).join('');
+  }
+  $('playB').onclick = function () { if (playB) return; pB = 0; playB = 1; pickY = null; updB(); if (reduce) { pB = 1; playB = 0; updB(); drawB(); } };
+  var GEO = null;
+  function drawB() {
+    var f = fit($('cvB')), x = f.x, W = f.W, H = f.H, D = DS[bd], sm = W < 480 ? 11 : 13;
+    x.fillStyle = '#060b22'; x.fillRect(0, 0, W, H);
+    var L = W < 480 ? 46 : 60, R = 14, T = 30, B = 40, gw = W - L - R, gh = H - T - B;
+    var y0 = D.pts[0][0], y1 = D.pts[D.pts.length - 1][0];
+    var X = function (y) { return L + (y - y0) / (y1 - y0) * gw; }, Y = function (v) { return T + (D.hi - v) / (D.hi - D.lo) * gh; };
+    GEO = { X: X, Y: Y, L: L, gw: gw };
+    x.strokeStyle = 'rgba(154,166,207,.18)'; x.lineWidth = 1; x.font = '600 ' + (sm - 1) + 'px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right';
+    for (var v = Math.ceil(D.lo / D.step) * D.step; v <= D.hi + 1e-9; v += D.step) { var yy = Y(v); x.beginPath(); x.moveTo(L, yy); x.lineTo(W - R, yy); x.stroke(); x.fillText(dsVal(D, +v.toFixed(2)).replace('+0', '0'), L - 6, yy + 4); }
+    x.textAlign = 'center';
+    var ystep = (y1 - y0) > 80 ? 20 : 10;
+    for (var yr = Math.ceil(y0 / ystep) * ystep; yr <= y1; yr += ystep) { var xx = X(yr); x.beginPath(); x.moveTo(xx, T); x.lineTo(xx, T + gh); x.stroke(); x.fillText(String(be(yr)), xx, H - B + 16); }
+    label(x, 'ปี พ.ศ.', W - R - 20, H - 6, '#9AA6CF', sm - 1);
+    label(x, D.u, L, T - 12, '#9AA6CF', sm - 1, 'left');
+    if (D.sign) { x.strokeStyle = 'rgba(232,237,255,.45)'; x.setLineDash([4, 4]); x.beginPath(); x.moveTo(L, Y(0)); x.lineTo(W - R, Y(0)); x.stroke(); x.setLineDash([]); }
+    // เส้นข้อมูล (วาดตามเวลา)
+    var yEnd = lerp(y0, y1, clamp(pB, 0, 1)), pts = [];
+    D.pts.forEach(function (p, i) { if (p[0] <= yEnd) pts.push(p); else if (i && D.pts[i - 1][0] < yEnd) { var q = D.pts[i - 1], t = (yEnd - q[0]) / (p[0] - q[0]); pts.push([yEnd, lerp(q[1], p[1], t)]); } });
+    if (pts.length > 1) {
+      var ga = x.createLinearGradient(0, T, 0, T + gh); ga.addColorStop(0, D.col + '55'); ga.addColorStop(1, D.col + '00');
+      x.fillStyle = ga; x.beginPath(); x.moveTo(X(pts[0][0]), Y(D.lo)); pts.forEach(function (p) { x.lineTo(X(p[0]), Y(p[1])); }); x.lineTo(X(pts[pts.length - 1][0]), Y(D.lo)); x.closePath(); x.fill();
+      x.strokeStyle = D.col; x.lineWidth = 2.6; x.beginPath(); pts.forEach(function (p, i) { if (i) x.lineTo(X(p[0]), Y(p[1])); else x.moveTo(X(p[0]), Y(p[1])); }); x.stroke();
+      x.fillStyle = D.col; D.pts.forEach(function (p) { if (p[0] <= yEnd) { x.beginPath(); x.arc(X(p[0]), Y(p[1]), 3, 0, 6.283); x.fill(); } });
+    }
+    if (pB >= 1) {
+      var a = D.pts[0], b = D.pts[D.pts.length - 1];
+      label(x, dsVal(D, a[1]), X(a[0]) + 4, Y(a[1]) - 10, '#E8EDFF', sm, 'left');
+      label(x, dsVal(D, b[1]), X(b[0]) - 4, Y(b[1]) - 10, '#FFD166', sm + 1, 'right');
+      if ((S.b[bd] || 0) >= 2) { arrow(x, X(a[0]) + gw * .1, Y(a[1]) + (D.tr ? -10 : 10), X(b[0]) - gw * .12, Y(b[1]) + (D.tr ? -10 : 10), 'rgba(255,209,102,.7)', 2.5, 11); }
+    }
+    if (pickY != null && pB >= 1) {
+      var pp = D.pts[pickY], px = X(pp[0]), py = Y(pp[1]);
+      x.strokeStyle = 'rgba(255,209,102,.8)'; x.setLineDash([3, 3]); x.beginPath(); x.moveTo(px, T + gh); x.lineTo(px, py); x.lineTo(L, py); x.stroke(); x.setLineDash([]);
+      x.fillStyle = '#FFD166'; x.beginPath(); x.arc(px, py, 5, 0, 6.283); x.fill();
+      label(x, 'พ.ศ. ' + be(pp[0]) + ' : ' + dsVal(D, pp[1]), px, py - 12, '#FFD166', sm);
+    }
+    label(x, D.n, L + 6, T + 16, '#E8EDFF', sm, 'left');
+  }
+  $('cvB').addEventListener('click', function (ev) {
+    if (!GEO || pB < 1) return; var r = $('cvB').getBoundingClientRect(), mx = ev.clientX - r.left, D = DS[bd], best = 0, bdst = 1e9;
+    D.pts.forEach(function (p, i) { var dd = Math.abs(GEO.X(p[0]) - mx); if (dd < bdst) { bdst = dd; best = i; } });
+    pickY = best; updB(); drawB();
+  });
+  var LIBB = [
+    { y: 'ทะเลไทย · พ.ศ. 2567', n: 'ปะการังฟอกขาว', d: 'น้ำทะเลอุ่นผิดปกตินานหลายสัปดาห์ ปะการังขับสาหร่ายที่อาศัยอยู่ด้วยกันออกจนเหลือแต่สีขาว ถ้าน้ำไม่เย็นลงปะการังจะตาย กระทบแหล่งอาหารของสัตว์ทะเลและการท่องเที่ยว', i: 'ผลต่อ : สิ่งมีชีวิต ประมง ท่องเที่ยว' },
+    { y: 'ทั่วประเทศ · ฤดูร้อน', n: 'คลื่นความร้อน', d: 'เมษายน 2566 จังหวัดตากร้อนถึง 45.4 °C สูงที่สุดเท่าที่ประเทศไทยเคยบันทึก ปี 2567 ดัชนีความร้อนหลายจังหวัดอยู่ระดับอันตราย มีผู้ป่วยโรคลมแดด', i: 'ผลต่อ : สุขภาพ ค่าไฟ การเกษตร' },
+    { y: 'ชายฝั่งอ่าวไทย', n: 'น้ำทะเลสูงขึ้น ชายฝั่งถูกกัดเซาะ', d: 'ชายฝั่งบางขุนเทียน กรุงเทพฯ ถูกกัดเซาะหายไปในทะเลราว 1 กิโลเมตรในเวลาหลายสิบปี จากทั้งน้ำทะเลสูงขึ้น แผ่นดินทรุด และป่าชายเลนลดลง', i: 'ผลต่อ : บ้านเรือน ป่าชายเลน' },
+    { y: 'ภาคเกษตร', n: 'ฝนแปรปรวน แล้งสลับท่วม', d: 'ปีเอลนีโญฝนน้อย น้ำในเขื่อนลด ผลผลิตข้าวและอ้อยลดลง บางปีฝนตกหนักจนน้ำท่วม อากาศสุดขั้วเกิดบ่อยและรุนแรงขึ้นในโลกที่ร้อนขึ้น', i: 'ผลต่อ : อาหาร รายได้เกษตรกร' },
+    { y: 'สาธารณสุข', n: 'โรคที่มากับยุง', d: 'อากาศร้อนชื้นและฝนแปรปรวนทำให้ยุงลายเพิ่มจำนวนเร็ว โรคไข้เลือดออกระบาดได้กว้างขึ้นและนานขึ้น', i: 'ผลต่อ : สุขภาพ' },
+    { y: 'เป้าหมายของประเทศไทย', n: 'สู่ความเป็นกลางทางคาร์บอน', d: 'ประเทศไทยตั้งเป้าเป็นกลางทางคาร์บอนภายใน พ.ศ. 2593 และปล่อยแก๊สเรือนกระจกสุทธิเป็นศูนย์ภายใน พ.ศ. 2608 (ประกาศในการประชุม COP26)', i: 'ผลต่อ : ทุกคนต้องช่วยกัน' }];
+  $('libB').innerHTML = LIBB.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 ห้องบัญชาการ
+  var PLAN = [
+    { n: 'เดินทางไปโรงเรียน', u: 'กก. CO₂ ต่อวัน', b: 4.3, a: 0.5, who: 'บ้านห่างโรงเรียน 6 กม. ผู้ปกครองขับรถยนต์มาส่งและมารับทุกวัน รถวิ่งไปกลับ 2 รอบ รวมวันละ 24 กม.',
+      o: ['เปลี่ยนเป็นรถยนต์คันใหญ่ขึ้น จะได้นั่งสบาย', 'ให้ผู้ปกครองขับเร็วขึ้น จะได้ถึงไวขึ้น', 'นั่งรถเมล์ รถไฟฟ้า หรือปั่นจักรยานถ้าเส้นทางปลอดภัย', 'จอดรถติดเครื่องเปิดแอร์รอหน้าโรงเรียนตอนเย็น'], ans: 2,
+      s: 'ใช้รถสาธารณะ หรือปั่นจักรยาน', why: 'รถยนต์ส่วนตัวปล่อย CO₂ ราว 0.18 กก. ต่อกิโลเมตร รถเมล์และรถไฟฟ้าแบ่งกันนั่งหลายคน ต่อคนจึงปล่อยน้อยกว่ามาก การปั่นจักรยานหรือเดินแทบไม่ปล่อยเลย' },
+    { n: 'ห้องนอนติดแอร์', u: 'กก. CO₂ ต่อวัน', b: 6.0, a: 3.0, who: 'เปิดแอร์ 10 ชั่วโมงทุกคืน ตั้ง 20 °C เปิดประตูแง้มไว้ และไม่เคยล้างแผ่นกรองอากาศ',
+      o: ['ตั้ง 18 °C ให้เย็นเร็ว แล้วห่มผ้าห่มหนา', 'ตั้ง 26 °C เปิดพัดลมช่วย ปิดประตูหน้าต่าง และล้างแผ่นกรอง', 'เปิดตู้เย็นทิ้งไว้ให้ช่วยทำความเย็น', 'เปิดแอร์ทิ้งไว้ตอนไปโรงเรียน กลับมาจะได้เย็นทันที'], ans: 1,
+      s: 'ตั้ง 26 °C + พัดลม ปิดห้อง ล้างแผ่นกรอง', why: 'ไฟฟ้าของไทยส่วนใหญ่ผลิตจากแก๊สธรรมชาติ ใช้ไฟ 1 หน่วยปล่อย CO₂ ราว 0.5 กก. ตั้งอุณหภูมิสูงขึ้น 1 °C ประหยัดไฟได้ราว 10% และห้องที่ปิดสนิทกับแผ่นกรองที่สะอาดทำให้แอร์ไม่ต้องทำงานหนัก' },
+    { n: 'โรงอาหารของโรงเรียน', u: 'กก. CO₂ เทียบเท่า ต่อวัน', b: 100, a: 20, who: 'แต่ละวันมีอาหารเหลือทิ้งราว 50 กก. ใส่ถุงพลาสติกรวมกับขยะอื่น ส่งไปบ่อฝังกลบ',
+      o: ['ตักแต่พอกิน แยกเศษอาหารไปหมักปุ๋ยหรือทำแก๊สชีวภาพ', 'รวมขยะทั้งหมดไปเผาหลังโรงเรียน', 'ใส่ถุงพลาสติก 2 ชั้นให้แน่นก่อนทิ้ง', 'เทเศษอาหารลงท่อระบายน้ำ'], ans: 0,
+      s: 'ตักแต่พอกิน แยกเศษอาหารไปหมักปุ๋ย', why: 'เศษอาหารในบ่อฝังกลบเน่าในที่ไม่มีออกซิเจน ปล่อยมีเทน การกินให้หมดช่วยลดขยะตั้งแต่ต้นทาง และการหมักปุ๋ยแบบมีอากาศหรือทำแก๊สชีวภาพลดมีเทนได้มาก แถมได้ปุ๋ยกลับมา' },
+    { n: 'นาข้าวหลังเก็บเกี่ยว', u: 'ตัน CO₂ เทียบเท่า ต่อฤดู', b: 4.0, a: 2.0, who: 'ชาวนา 10 ไร่ เผาฟางและตอซังข้าวทุกครั้งหลังเก็บเกี่ยว และขังน้ำในนาไว้ตลอดฤดูปลูก',
+      o: ['เผาให้เสร็จเร็วขึ้นตอนกลางวัน', 'ไม่เผา ไถกลบหรือทำปุ๋ย นำฟางไปเลี้ยงวัวหรือเพาะเห็ด และทำนาแบบเปียกสลับแห้ง', 'ขังน้ำในนาให้ลึกกว่าเดิม', 'ทิ้งนาเดิม แล้วถางป่าเปิดนาใหม่'], ans: 1,
+      s: 'ไม่เผา ไถกลบ/ทำปุ๋ย ทำนาเปียกสลับแห้ง', why: 'การเผาปล่อยแก๊สเรือนกระจกและฝุ่น PM2.5 ส่วนนาที่ขังน้ำตลอดปล่อยมีเทน การปล่อยให้ดินแห้งเป็นช่วง ๆ (เปียกสลับแห้ง) ลดมีเทนได้มากและประหยัดน้ำ' }];
+  function pct(P) { return Math.round((P.b - P.a) / P.b * 100); }
+  var cp = 0;
+  function updC() {
+    var P = PLAN[cp];
+    chips('planChips', 'สถานการณ์', PLAN.map(function (p, i) { return (i + 1) + ' ' + p.n; }), cp, 'p', function (i) { return S.c[i]; }, function (v) { cp = v; updC(); drawC(); });
+    $('cName').textContent = (cp + 1) + ' · ' + P.n;
+    $('cWho').textContent = P.who;
+    askUI('cAsk', P.o, P.ans, !!S.c[cp], function () { S.c[cp] = 1; save(); updC(); drawC(); return true; });
+    $('cWhy').textContent = S.c[cp] ? P.why : '';
+    $('logC').innerHTML = PLAN.map(function (p, i) { var r = S.c[i];
+      return '<tr class="' + (i === cp ? 'cur ' : '') + 'ws"><td class="n">' + (i + 1) + ' ' + p.n + '</td><td>' + (r ? p.s : '-') + '</td><td>' + (r ? pct(p) + '%' : '-') + '</td></tr>'; }).join('');
+  }
+  function drawC() {
+    var f = fit($('cvC')), x = f.x, W = f.W, H = f.H, P = PLAN[cp], ok = !!S.c[cp], sm = W < 480 ? 11 : 13;
+    x.fillStyle = '#060b22'; x.fillRect(0, 0, W, H);
+    var base = H * .8, top = H * .18, bw = Math.min(W * .2, 120), mx = P.b * 1.3;
+    label(x, P.u, 10, 20, '#9AA6CF', sm, 'left');
+    [[W * .3, P.b, 'ก่อน', '#FF6B8A'], [W * .7, ok ? P.a : null, 'หลังใช้แนวปฏิบัติ', '#5EF2A5']].forEach(function (c) {
+      x.strokeStyle = 'rgba(154,166,207,.35)'; x.strokeRect(c[0] - bw / 2, top, bw, base - top);
+      if (c[1] != null) { var h = (base - top) * c[1] / mx; x.fillStyle = c[3]; x.fillRect(c[0] - bw / 2, base - h, bw, h); label(x, fmt(c[1], c[1] < 10 ? 1 : 0), c[0], base - h - 8, '#E8EDFF', sm + 3); }
+      else label(x, '?', c[0], (base + top) / 2, '#9AA6CF', 30);
+      label(x, c[2], c[0], base + 22, c[3], sm);
+    });
+    x.strokeStyle = '#3A4A85'; x.beginPath(); x.moveTo(20, base); x.lineTo(W - 20, base); x.stroke();
+    if (ok) label(x, 'ลดได้ประมาณ ' + pct(P) + '%', W / 2, top - 4, '#FFD166', sm + 3);
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 2 เครื่องคำนวณ
+  var CAT = [
+    { n: 'เดินทางไป-กลับโรงเรียน', col: '#FF9F6B', o: [['เดินหรือปั่นจักรยาน', 0], ['รถไฟฟ้า รถเมล์', 0.5], ['รถสองแถว รถตู้', 0.8], ['จักรยานยนต์', 1.0], ['รถยนต์ส่วนตัว', 3.0]], d: 3 },
+    { n: 'ความเย็นในห้องนอน', col: '#4FD8FF', o: [['พัดลมอย่างเดียว', 0.3], ['แอร์ 26 °C 6 ชม.', 2.0], ['แอร์ 25 °C 8 ชม.', 3.5], ['แอร์ 20 °C 10 ชม.', 6.0]], d: 2 },
+    { n: 'อาหารวันนี้', col: '#FFD166', o: [['ผัก ไข่ เต้าหู้ ปลา', 0.8], ['หมู ไก่', 1.8], ['มีเนื้อวัว 1 มื้อ', 5.0]], d: 1 },
+    { n: 'ของใช้ครั้งเดียวทิ้ง', col: '#A77BFF', o: [['พกขวดน้ำ ถุงผ้า', 0.05], ['ถุง แก้ว หลอด 5 ชิ้น', 0.3], ['10 ชิ้นขึ้นไป', 0.6]], d: 1 },
+    { n: 'อาหารเหลือทิ้ง', col: '#5EF2A5', o: [['กินหมดจาน', 0], ['เหลือเล็กน้อย', 0.3], ['เหลือครึ่งจาน', 0.8]], d: 1 },
+    { n: 'ไฟ จอ ที่ชาร์จ', col: '#FF6B8A', o: [['ปิดและถอดปลั๊กเมื่อไม่ใช้', 0.3], ['เปิดทีวี ไฟ ชาร์จทิ้งไว้', 0.8]], d: 1 }];
+  var my = S.my || CAT.map(function (c) { return c.d; });
+  function tot(sel) { return sel.reduce(function (s, v, i) { return s + CAT[i].o[v][1]; }, 0); }
+  function kg(v) { return fmt(v, 1) + ' กก.'; }
+  function updCalc() {
+    var h = '';
+    CAT.forEach(function (c, i) { h += '<div class="chips" id="cat' + i + '"></div>'; });
+    $('calcChips').innerHTML = h;
+    CAT.forEach(function (c, i) { chips('cat' + i, c.n, c.o.map(function (o) { return o[0]; }), my[i], 'o', null, function (v) { my[i] = v; S.my = my; save(); updCalc(); drawCalc(); }); });
+    var t = tot(my), top = 0; my.forEach(function (v, i) { if (CAT[i].o[v][1] > CAT[top].o[my[top]][1]) top = i; });
+    $('calcNow').textContent = kg(t) + ' CO₂ ต่อวัน';
+    $('calcTree').textContent = 'ทั้งปีต้องใช้ต้นไม้ใหญ่ราว ' + Math.round(t * 365 / 20) + ' ต้นช่วยดูดซับ (ต้นละราว 20 กก. ต่อปี)';
+    $('calcTop').textContent = CAT[top].n + ' (' + kg(CAT[top].o[my[top]][1]) + ')';
+    $('snapBase').textContent = S.base ? kg(tot(S.base)) : '-';
+    $('snapPlan').textContent = S.plan ? kg(tot(S.plan)) : '-';
+    if (S.base && S.plan) { var b = tot(S.base), p = tot(S.plan), d = b - p;
+      $('calcCut').textContent = d > 0.001 ? 'แผนนี้ลดได้วันละ ' + kg(d) + ' (' + Math.round(d / b * 100) + '%) ทั้งปีราว ' + fmt(d * 365, 0) + ' กก. จดลงใบงานส่วนที่ 4' : 'แผนยังไม่ลดลง ลองเปลี่ยนกิจกรรมที่ปล่อยมากที่สุดก่อน';
+    } else $('calcCut').textContent = S.base ? 'ลองเปลี่ยนเป็นสิ่งที่ทำได้จริง แล้วกด "บันทึกแผนลดคาร์บอน"' : 'เลือกให้ตรงกับวันปกติของตัวเอง แล้วกด "บันทึกวันปกติของฉัน"';
+  }
+  $('calcLeg').innerHTML = CAT.map(function (c) { return '<span><i class="dot" style="background:' + c.col + '"></i>' + c.n + '</span>'; }).join('');
+  $('saveBase').onclick = function () { S.base = my.slice(); save(); updCalc(); drawCalc(); };
+  $('savePlan').onclick = function () { S.plan = my.slice(); save(); updCalc(); drawCalc(); };
+  function drawCalc() {
+    var f = fit($('cvCalc')), x = f.x, W = f.W, H = f.H, sm = W < 480 ? 11 : 13;
+    x.fillStyle = '#060b22'; x.fillRect(0, 0, W, H);
+    var cols = [['วันปกติ', S.base], ['ตอนนี้', my], ['แผนลด', S.plan]], base = H - 30, top = 26, mx = 14, bw = Math.min(W * .16, 90);
+    x.strokeStyle = 'rgba(154,166,207,.18)'; x.font = '600 ' + (sm - 1) + 'px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right';
+    for (var v = 0; v <= mx; v += 2) { var yy = base - (base - top) * v / mx; x.beginPath(); x.moveTo(40, yy); x.lineTo(W - 10, yy); x.stroke(); x.fillText(String(v), 34, yy + 4); }
+    label(x, 'กก. CO₂ ต่อวัน', 6, 14, '#9AA6CF', sm - 1, 'left');
+    var ty = base - (base - top) * 10 / mx; x.strokeStyle = 'rgba(255,209,102,.6)'; x.setLineDash([5, 4]); x.beginPath(); x.moveTo(40, ty); x.lineTo(W - 10, ty); x.stroke(); x.setLineDash([]);
+    label(x, 'คนไทยเฉลี่ยราว 10 กก. (รวมทุกภาคส่วน)', W - 12, ty - 5, '#FFD166', sm - 1, 'right');
+    cols.forEach(function (c, k) {
+      var cx = 40 + (W - 50) * (k + .5) / 3, y = base;
+      if (c[1]) c[1].forEach(function (o, i) { var h = (base - top) * CAT[i].o[o][1] / mx; x.fillStyle = CAT[i].col; x.fillRect(cx - bw / 2, y - h, bw, h); y -= h; });
+      label(x, c[1] ? fmt(tot(c[1]), 1) : '-', cx, y - 6, '#E8EDFF', sm + 1);
+      label(x, c[0], cx, base + 18, k === 1 ? '#FFD166' : '#9AA6CF', sm);
+    });
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส
+  var CL = [
+    { L: 'C', q: 'แก๊สเรือนกระจกที่มนุษย์ปล่อยมากที่สุด จากการเผาถ่านหิน น้ำมัน และแก๊สธรรมชาติ คือข้อใด', o: ['ออกซิเจน', 'ไนโตรเจน', 'คาร์บอนไดออกไซด์', 'ไอน้ำจากกาต้มน้ำ'], a: 2,
+      w: 'การเผาเชื้อเพลิงซากดึกดำบรรพ์ปล่อย CO₂ ราว 3 ใน 4 ของแก๊สเรือนกระจกที่มนุษย์ปล่อย CO₂ ในอากาศเพิ่มจาก 280 เป็นราว 425 ppm' },
+    { L: 'A', q: 'ถ้าโลกไม่มีแก๊สเรือนกระจกเลย อุณหภูมิเฉลี่ยผิวโลกจะเป็นประมาณเท่าใด', o: ['−18 °C', '0 °C', '14 °C', '40 °C'], a: 0,
+      w: 'แก๊สเรือนกระจกตามธรรมชาติทำให้โลกอุ่นราว 14 °C ถ้าไม่มีเลยจะเย็นถึง −18 °C ปัญหาจึงไม่ใช่การมีแก๊สเรือนกระจก แต่คือการที่มันเพิ่มเร็วเกินไป' },
+    { L: 'R', q: 'เมื่อพลังงานที่โลกได้รับ มากกว่า พลังงานที่โลกแผ่ออกสู่อวกาศ จะเกิดอะไรขึ้น', o: ['โลกเย็นลงทันที', 'โลกร้อนขึ้นจนกว่าจะเข้าสู่สมดุลใหม่', 'ไม่มีอะไรเปลี่ยนแปลง', 'ดวงอาทิตย์จะร้อนขึ้น'], a: 1,
+      w: 'พลังงานที่เกินสะสมเป็นความร้อน โลกร้อนขึ้นจนแผ่พลังงานออกได้เท่ากับที่รับเข้า จึงกลับมาสมดุลที่อุณหภูมิสูงกว่าเดิม' },
+    { L: 'B', q: 'ปัจจัยใดทำให้โลก "เย็นลง" ชั่วคราว', o: ['ปรากฏการณ์เอลนีโญ', 'การตัดไม้ทำลายป่า', 'ภูเขาไฟระเบิดรุนแรง', 'การเผาถ่านหิน'], a: 2,
+      w: 'ละอองกำมะถันจากภูเขาไฟระเบิดรุนแรงสะท้อนแสงอาทิตย์ โลกเย็นลง 1–2 ปี แล้วกลับมาร้อนตามเดิม' },
+    { L: 'O', q: 'ข้อมูลใดเป็น "ผลกระทบ" ของการที่โลกร้อนขึ้น', o: ['น้ำแข็งทะเลอาร์กติกลดลง', 'จำนวนรถยนต์เพิ่มขึ้น', 'โรงไฟฟ้าถ่านหินเพิ่มขึ้น', 'การตัดไม้เพิ่มขึ้น'], a: 0,
+      w: 'รถยนต์ โรงไฟฟ้า การตัดไม้เป็นสาเหตุ ส่วนน้ำแข็งละลาย น้ำทะเลสูงขึ้น ปะการังฟอกขาว คลื่นความร้อน เป็นผลกระทบ' },
+    { L: 'N', q: 'ข้อใดเป็นแนวปฏิบัติที่ช่วยลดการปล่อยแก๊สเรือนกระจกได้', o: ['เปิดแอร์ 18 °C ทั้งวัน', 'เผาฟางข้าวหลังเก็บเกี่ยว', 'ใช้ถุงพลาสติกครั้งเดียวทิ้งทุกวัน', 'นั่งรถสาธารณะ ตั้งแอร์ 26 °C กินอาหารให้หมด'], a: 3,
+      w: 'แนวปฏิบัติที่ดีต้องลดได้จริงและทำได้ต่อเนื่อง เริ่มจากกิจกรรมที่ปล่อยมากที่สุดของตัวเอง แล้วชวนคนรอบตัวทำด้วย' }];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  var LIBC = [
+    { y: 'องค์การบริหารจัดการก๊าซเรือนกระจก (อบก.)', n: 'คาร์บอนฟุตพริ้นท์', d: 'ข้อมูลการปล่อยแก๊สเรือนกระจกจากกิจกรรมและสินค้าในชีวิตประจำวัน ฉลากคาร์บอนบนสินค้า และวิธีคำนวณคาร์บอนของตัวเอง', i: 'ใช้ทำ : ส่วนที่ 4 ก ข' },
+    { y: 'กรมการเปลี่ยนแปลงสภาพภูมิอากาศและสิ่งแวดล้อม', n: 'สถานการณ์ในประเทศไทย', d: 'หน่วยงานหลักของไทยด้านการเปลี่ยนแปลงสภาพภูมิอากาศ มีรายงานผลกระทบ เป้าหมาย และแผนการปรับตัวของประเทศ', i: 'ใช้ทำ : ส่วนที่ 4 ก' },
+    { y: 'NASA Climate · climate.nasa.gov', n: 'หลักฐานและกราฟล่าสุด', d: 'กราฟ CO₂ อุณหภูมิ น้ำแข็ง ระดับน้ำทะเลที่อัปเดตทุกปี (ภาษาอังกฤษ ใช้ AI ช่วยแปลได้)', i: 'ใช้ดู : ตัวเลขล่าสุด' },
+    { y: 'ข่าวและรายงานจากหน่วยงาน', n: 'ผลกระทบที่เกิดขึ้นจริงในไทย', d: 'กรมทรัพยากรทางทะเลและชายฝั่ง (ปะการังฟอกขาว ชายฝั่งกัดเซาะ) กรมอุตุนิยมวิทยา (คลื่นความร้อน ฝนแล้ง) กรมควบคุมโรค (ไข้เลือดออก)', i: 'ใช้ทำ : ส่วนที่ 4 ก' },
+    { y: 'ฉลากประหยัดไฟเบอร์ 5', n: 'ลดค่าไฟ ลด CO₂', d: 'เลือกเครื่องใช้ไฟฟ้าเบอร์ 5 ตั้งแอร์ 26 °C ปิดไฟเมื่อไม่ใช้ ช่วยลดค่าไฟของบ้านและลด CO₂ ไปพร้อมกัน', i: 'ใช้ทำ : แนวปฏิบัติที่บ้าน' },
+    { y: 'ใช้ AI ช่วยได้', n: 'แต่ต้องตรวจแหล่งข้อมูล', d: 'ให้ AI ช่วยสรุปหรืออธิบาย แล้วตรวจกับเว็บหน่วยงานหรือสำนักข่าวที่เชื่อถือได้ เขียนชื่อแหล่งข้อมูลจริงลงใบงานทุกครั้ง', i: 'ใช้ทำ : ทุกส่วน' }];
+  $('libC').innerHTML = LIBC.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawA1(); drawA2(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC(); drawCalc(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') { if (playA1) { pA1 = Math.min(1, pA1 + dt / 6); if (pA1 >= 1) playA1 = 0; updA1(); } drawA1(); drawA2(); }
+    if (tab === 'B' && playB) { pB = Math.min(1, pB + dt / 3.5); if (pB >= 1) { playB = 0; updB(); } drawB(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA1(); updA2(); updB(); updC(); updCalc(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_A5 = { CASES: CASES, startOut: startOut, trend: trend, deg: deg, FACT: FACT, TYPES: TYPES, EFF: EFF, DS: DS, TR: TR, firstLast: firstLast,
+    PLAN: PLAN, pct: pct, CAT: CAT, CL: CL, fmt: fmt,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    tick: function (t) { tA = t; },
+    setA1: function (i, p) { playA1 = 0; ac = i; pA1 = p; updA1(); drawA1(); },
+    setA2: function (i) { af = i; updA2(); drawA2(); },
+    setB: function (i, p, pick) { playB = 0; bd = i; pB = p; pickY = pick == null ? null : pick; updB(); drawB(); },
+    setC: function (i) { cp = i; updC(); drawC(); },
+    setCalc: function (base, plan, cur) { S.base = base; S.plan = plan; my = cur.slice(); S.my = my; updCalc(); drawCalc(); },
+    recAll: function () { CASES.forEach(function (c, i) { S.a1[i] = 1; }); FACT.forEach(function (f, i) { S.a2[i] = 2; }); DS.forEach(function (d, i) { S.b[i] = 2; });
+      PLAN.forEach(function (p, i) { S.c[i] = 1; }); CL.forEach(function (a, i) { S.cl[i] = a.a; }); updA1(); updA2(); updB(); updC(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
