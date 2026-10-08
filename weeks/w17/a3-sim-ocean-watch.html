@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>A3 ภารกิจศูนย์เฝ้าระวังมหาสมุทรโลก · สถานการณ์จำลอง ES Journey</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070C22; --panel: rgba(17, 26, 61, .82); --line: #2C3A73; --line-hi: #3A4A85;
+  --text: #E8EDFF; --muted: #9AA6CF; --cyan: #4FD8FF; --violet: #A77BFF; --gold: #FFD166; --orange: #FF9F6B;
+  --ok: #5EF2A5; --err: #FF6B8A; --ink: #06102A;
+  --head: "Chakra Petch", "Sarabun", sans-serif; --body: "Sarabun", "Chakra Petch", sans-serif;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(1200px 600px at 80% -10%, #1b5a7a44, transparent), radial-gradient(900px 500px at 0% 110%, #1b4a6e55, transparent), var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 17px; line-height: 1.55; min-height: 100vh; overflow-x: hidden; }
+a { color: var(--cyan); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 14px 16px 40px; }
+.brand { font-family: var(--head); font-weight: 700; letter-spacing: .08em; color: var(--cyan); font-size: 14px; }
+.brand span { color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.unit-tag { display: inline-block; font-family: var(--head); font-weight: 700; font-size: 13px; color: var(--ink); background: var(--cyan); border-radius: 999px; padding: 0 10px; margin-left: 6px; letter-spacing: 0; vertical-align: 1px; }
+.brand .unit-tag { color: var(--ink); }
+.unit-tag.star { background: var(--gold); }
+h1 { font-family: var(--head); font-size: 30px; line-height: 1.15; margin: 4px 0 2px; }
+h1 b { color: var(--gold); }
+.lead { color: var(--muted); margin: 2px 0 8px; font-size: 16px; }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 14px; }
+.tab { font-family: var(--head); background: var(--panel); border: 1.5px solid var(--line); color: var(--text); border-radius: 12px;
+  padding: 8px 10px; cursor: pointer; text-align: left; line-height: 1.2; font-size: 15px; }
+.tab small { display: block; color: var(--muted); font-family: var(--body); font-size: 13px; margin-top: 2px; }
+.tab b { color: var(--gold); font-size: 13px; display: block; letter-spacing: .05em; }
+.tab.on { border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan) inset, 0 0 18px #4fd8ff33; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+.hide { display: none !important; }
+.mission-h { font-family: var(--head); font-size: 22px; margin: 0 0 4px; }
+.mission-h em { font-style: normal; color: var(--gold); }
+.how { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+canvas { display: block; width: 100%; border-radius: 12px; background: #000; border: 1px solid var(--line-hi); touch-action: pan-y; }
+.btn { font-family: var(--head); font-weight: 600; font-size: 16px; border-radius: 10px; padding: 8px 14px; cursor: pointer;
+  border: 1.5px solid var(--cyan); background: transparent; color: var(--cyan); }
+.btn:disabled { opacity: .35; cursor: default; }
+.ctrl { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+.lbl { font-size: 14px; color: var(--muted); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 4px; align-items: center; }
+.chips .lbl { min-width: 118px; }
+.chip { font-family: var(--head); font-size: 14px; border: 1.5px solid var(--line-hi); background: #0b1233; color: var(--text); border-radius: 999px; padding: 3px 12px; cursor: pointer; }
+.chip.on { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 12px #ffd16633; }
+.chip.done { border-color: var(--ok); color: var(--ok); }
+.chip.done.on { color: var(--gold); border-color: var(--gold); }
+.twin { display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; align-items: stretch; }
+.info { background: #0b1233cc; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.info .k { font-size: 13.5px; color: var(--muted); line-height: 1.2; }
+.info .v { font-family: var(--head); font-size: 22px; font-weight: 700; line-height: 1.15; }
+.v.c { color: var(--cyan); } .v.g { color: var(--gold); } .v.o { color: var(--ok); } .v.p { color: var(--violet); } .v.r { color: var(--orange); } .v.e { color: var(--err); }
+.info h3 { font-family: var(--head); font-size: 20px; margin: 0; color: var(--gold); line-height: 1.2; }
+.info .d { font-size: 15px; line-height: 1.5; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; }
+.leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; line-height: 1.35; margin-top: 6px; }
+.leg i { display: inline-block; width: 14px; height: 4px; border-radius: 2px; margin-right: 5px; vertical-align: 4px; }
+.leg i.dot { width: 10px; height: 10px; border-radius: 50%; vertical-align: 0; }
+table.log { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+table.log th, table.log td { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: center; }
+table.log th { color: var(--muted); font-weight: 600; font-family: var(--head); font-size: 13.5px; }
+table.log td.n { text-align: left; }
+table.log tr.cur td { background: #ffd16612; }
+table.log tr.ws td.n::after { content: " · ใบงาน"; color: var(--gold); font-size: 12.5px; }
+.tblwrap { overflow-x: auto; }
+.note { margin-top: 10px; border-left: 3px solid var(--gold); padding: 4px 10px; font-size: 15px; color: var(--text); background: #ffd16610; border-radius: 0 8px 8px 0; }
+.ws { margin-top: 10px; font-size: 14.5px; color: var(--muted); }
+.ws b { color: var(--gold); }
+.sub-h { font-family: var(--head); font-size: 19px; margin: 18px 0 4px; }
+.sub-h em { font-style: normal; color: var(--gold); }
+input[type=range] { width: 100%; accent-color: #FFD166; margin: 6px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.al { border: 1.5px solid var(--line-hi); border-radius: 14px; padding: 9px 11px; background: #0b123388; }
+.al.ok { border-color: var(--ok); }
+.al .t { font-family: var(--head); font-size: 13px; color: var(--err); letter-spacing: .04em; }
+.al.ok .t { color: var(--ok); }
+.al .q { font-size: 15px; color: var(--text); margin: 2px 0 4px; line-height: 1.45; }
+.al .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+.al button, .pick button { font-family: var(--head); font-size: 14px; line-height: 1.2; padding: 6px 6px; border-radius: 9px; border: 1.3px solid var(--line-hi); background: #0b1233; color: var(--text); cursor: pointer; }
+.al button.ok, .pick button.ok { border-color: var(--ok); background: #5ef2a51f; color: var(--ok); }
+.al button.bad, .pick button.bad { border-color: var(--err); color: var(--err); animation: shake .35s; }
+.al .why { font-size: 14px; color: var(--ok); margin-top: 6px; line-height: 1.4; }
+.al .letter { float: right; font-family: var(--head); font-size: 22px; font-weight: 700; color: var(--gold); line-height: 1; }
+.pick { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 4px; }
+.pick.one { grid-template-columns: 1fr; }
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.win { margin-top: 12px; border: 1.5px solid var(--ok); border-radius: 14px; padding: 12px; text-align: center; background: #5ef2a510; }
+.win .code { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--gold); letter-spacing: .12em; }
+.prog { font-family: var(--head); font-size: 15px; color: var(--muted); margin-top: 8px; }
+.prog b { color: var(--gold); letter-spacing: .1em; }
+.bar { height: 10px; border-radius: 999px; background: #0b1233; border: 1px solid var(--line-hi); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #4FD8FF, #FFD166); transition: width .15s; }
+.events { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 8px; }
+.ev { border: 1px solid var(--line); border-radius: 12px; padding: 9px 11px; background: #0b1233aa; font-size: 15px; line-height: 1.45; }
+.ev .y { font-family: var(--head); color: var(--cyan); font-size: 13.5px; }
+.ev .n { font-family: var(--head); color: var(--gold); font-size: 17px; line-height: 1.25; }
+.ev .id { color: var(--ok); font-size: 14px; margin-top: 4px; }
+.ev.en .y { color: var(--orange); } .ev.ln .y { color: var(--cyan); }
+footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+@media (max-width: 760px) {
+  h1 { font-size: 25px; }
+  .twin, .cards { grid-template-columns: 1fr; }
+  .events { grid-template-columns: 1fr; }
+  .tab { font-size: 14px; padding: 7px 8px; }
+  .tab small { display: none; }
+  .info .v { font-size: 20px; }
+  .chips .lbl { min-width: 0; width: 100%; }
+  .al .opts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">ES JOURNEY · A3 <span class="unit-tag">หน่วยที่ 3</span><span class="unit-tag star">ภารกิจปลายทาง</span> <span>สถานการณ์จำลอง · ว30114 วิทยาศาสตร์โลกและอวกาศ</span></div>
+  <h1>ภารกิจศูนย์เฝ้าระวัง<b>มหาสมุทรโลก</b></h1>
+  <p class="lead">ทดลองว่าลมและการหมุนของโลกทำให้น้ำในมหาสมุทรไหลอย่างไร ตามหากระแสน้ำอุ่นและกระแสน้ำเย็นรอบโลก แล้วเฝ้าระวังปรากฏการณ์เอลนีโญและลานีญาที่ส่งผลถึงฝน ความแห้งแล้ง และสิ่งมีชีวิตในประเทศไทย</p>
+
+  <nav class="tabs">
+    <button class="tab on" data-t="A"><b>ภารกิจ A</b>ห้องทดลองกระแสน้ำ<small>ลม × โลกหมุน · น้ำผุด น้ำจม</small></button>
+    <button class="tab" data-t="B"><b>ภารกิจ B</b>แผนที่กระแสน้ำโลก<small>กระแสน้ำอุ่น เย็น 6 สาย</small></button>
+    <button class="tab" data-t="C"><b>ภารกิจ C</b>ศูนย์เฝ้าระวังเอลนีโญ<small>ปกติ เอลนีโญ ลานีญา</small></button>
+  </nav>
+
+  <!-- ===================== ภารกิจ A ===================== -->
+  <section id="mA" class="panel">
+    <h2 class="mission-h"><em>ภารกิจ A</em> ห้องทดลองกระแสน้ำ : ลมพัด น้ำจึงไหล</h2>
+    <p class="how">น้ำในมหาสมุทรไม่ได้นิ่ง น้ำผิวหน้าไหลเป็นกระแสน้ำขนาดใหญ่ไปได้ไกลหลายพันกิโลเมตร นักบินจะทดลอง 2 ขั้นว่าอะไรทำให้น้ำไหล และการไหลนั้นส่งผลต่อทะเลชายฝั่งอย่างไร</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ทะเลทดลอง : ลมพัดผ่านผิวน้ำ</h2>
+    <p class="how" style="margin-bottom:4px">ภาพมองจากด้านบน ลมพัดจากทิศตะวันตกไปตะวันออก (ลูกศรประสีขาว) จุดสีฟ้าคือน้ำผิวหน้า ลูกศรสีทองคือทิศที่น้ำผิวหน้าไหลจริง เลือกแรงลมและที่ตั้งของทะเล แล้วกด "เปิดลม 1 วัน" ครบ 1 วันแล้วบันทึกให้อัตโนมัติ</p>
+    <div class="chips" id="windChips"></div>
+    <div class="chips" id="earthChips"></div>
+    <div class="twin">
+      <canvas id="cvA1" height="330" aria-label="ภาพมองจากด้านบนของผิวทะเล ลมพัดไปทางตะวันออก น้ำผิวหน้าไหลตามลม หรือเบี่ยงไปทางขวาในซีกโลกเหนือ ทางซ้ายในซีกโลกใต้"></canvas>
+      <div class="info">
+        <div class="k">ลมที่พัดผ่านผิวน้ำ</div>
+        <div class="v c" id="a1Case" style="font-size:19px">-</div>
+        <div class="k" id="a1Sub">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ความเร็ว<br>กระแสน้ำผิวหน้า</div><div class="v g" id="a1V">-</div></div>
+          <div><div class="k">ทิศกระแสน้ำ<br>เทียบกับทิศลม</div><div class="v r" id="a1Dev" style="font-size:17px">-</div></div>
+        </div>
+        <div class="k" id="a1Km" style="margin-top:4px">-</div>
+        <div class="bar"><i id="a1Bar"></i></div>
+        <h3 id="a1Res" style="margin-top:4px">-</h3>
+        <div class="d" id="a1Why">-</div>
+      </div>
+    </div>
+    <input type="range" id="tA1" min="0" max="100" step="1" value="0" aria-label="เวลาที่ลมพัด 0 ถึง 24 ชั่วโมง">
+    <div class="ctrl"><button class="btn" id="playA1">เปิดลม 1 วัน</button><button class="btn" id="resetA1">เริ่มใหม่</button><span class="lbl" id="recA1Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ลม · ที่ตั้งของทะเล</th><th>ความเร็วกระแสน้ำ (ม./วินาที)</th><th>ทิศกระแสน้ำผิวหน้า</th><th>1 วันไหลไป</th></tr></thead>
+      <tbody id="logA1"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ชายฝั่งทดลอง : น้ำผุด น้ำจม</h2>
+    <p class="how" style="margin-bottom:4px">ภาพตัดขวางทะเลกับชายฝั่ง น้ำผิวหน้าอุ่น (สีส้ม) ลอยอยู่บนน้ำเย็นด้านล่าง (สีน้ำเงิน) ซึ่งมีธาตุอาหารมาก (จุดสีเขียว) เลือกทิศที่ลมพัดน้ำผิวหน้า แล้วกด "เดินเวลา 1 เดือน" ครบแล้วบันทึกให้อัตโนมัติ</p>
+    <div class="chips" id="coastChips"></div>
+    <div class="twin">
+      <canvas id="cvA2" height="320" aria-label="ภาพตัดขวางทะเลและชายฝั่ง เมื่อน้ำผิวหน้าถูกพัดออกจากฝั่ง น้ำเย็นด้านล่างผุดขึ้นมาแทน นำธาตุอาหารขึ้นมา แพลงก์ตอนและปลามากขึ้น เมื่อน้ำถูกพัดเข้าหาฝั่ง น้ำผิวหน้าจมลง"></canvas>
+      <div class="info">
+        <div class="k">ลมพัดน้ำผิวหน้า</div>
+        <div class="v c" id="a2Case" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">อุณหภูมิผิวน้ำ<br>ใกล้ชายฝั่ง</div><div class="v g" id="a2T">-</div></div>
+          <div><div class="k">การเคลื่อนที่<br>ของน้ำใกล้ฝั่ง</div><div class="v p" id="a2Type" style="font-size:18px">-</div></div>
+          <div><div class="k">ธาตุอาหาร<br>ที่ผิวน้ำ</div><div class="v o" id="a2Nut" style="font-size:18px">-</div></div>
+          <div><div class="k">แพลงก์ตอน<br>และปลา</div><div class="v r" id="a2Fish" style="font-size:18px">-</div></div>
+        </div>
+        <div class="bar" style="margin-top:4px"><i id="a2Bar"></i></div>
+        <div class="d" id="a2Why" style="margin-top:4px">-</div>
+      </div>
+    </div>
+    <div class="ctrl"><button class="btn" id="playA2">เดินเวลา 1 เดือน</button><button class="btn" id="resetA2">เริ่มใหม่</button><span class="lbl" id="recA2Msg"></span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ลมพัดน้ำผิวหน้า</th><th>เกิด</th><th>อุณหภูมิผิวน้ำใกล้ฝั่ง</th><th>ธาตุอาหาร</th><th>ปลา</th></tr></thead>
+      <tbody id="logA2"></tbody>
+    </table></div>
+    <div class="note">กระแสน้ำผิวหน้าเกิดจาก <b>ลมที่พัดผ่านผิวน้ำ</b> เป็นหลัก ลมแรงน้ำยิ่งไหลเร็ว (ราว 3% ของความเร็วลม) และเพราะโลกหมุน น้ำจึง <b>เบี่ยงไปทางขวาในซีกโลกเหนือ ทางซ้ายในซีกโลกใต้</b> (แรงคอริออลิส เหมือนลมในภารกิจ A2) · เมื่อน้ำผิวหน้าถูกพัดออกจากชายฝั่ง น้ำเย็นด้านล่างที่มีธาตุอาหารมากจะผุดขึ้นมาแทน เรียกว่า <b>น้ำผุด</b> แพลงก์ตอนเติบโต ปลาชุกชุม เช่น ชายฝั่งเปรู (ของจริงลมพัดขนานชายฝั่ง แล้วแรงคอริออลิสเบนน้ำผิวหน้าออกจากฝั่ง) · ถ้าน้ำถูกพัดเข้าหาฝั่ง น้ำผิวหน้าจะ <b>จม</b> ลง</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 1</b> : ตาราง 4 กรณี (ลมอ่อน ลมแรง ทะเลทดลอง ซีกโลกเหนือ ซีกโลกใต้) + ตารางชายฝั่ง 2 กรณี ตอบข้อ 1</div>
+  </section>
+
+  <!-- ===================== ภารกิจ B ===================== -->
+  <section id="mB" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ B</em> แผนที่กระแสน้ำโลก : ตามหากระแสน้ำอุ่น กระแสน้ำเย็น</h2>
+    <p class="how">กระแสน้ำผิวหน้าถูกลมประจำพัด เบี่ยงเพราะโลกหมุน และถูกทวีปขวางกั้น จึงไหลวนเป็นวงใหญ่ในแต่ละมหาสมุทร เลือกกระแสน้ำหมายเลข 1–6 อ่านว่าไหลจากไหนไปไหน แล้วตอบว่าเป็นกระแสน้ำอุ่นหรือเย็น และทำให้ชายฝั่งเป็นอย่างไร ตอบถูกครบ 2 ข้อจึงบันทึก</p>
+    <div class="chips" id="layChips"></div>
+    <div class="chips" id="curChips"></div>
+    <div class="twin">
+      <canvas id="cvB" height="420" aria-label="แผนที่โลกแสดงกระแสน้ำผิวหน้าในมหาสมุทร กระแสน้ำอุ่นสีส้ม กระแสน้ำเย็นสีฟ้า ไหลวนตามเข็มนาฬิกาในซีกโลกเหนือ ทวนเข็มนาฬิกาในซีกโลกใต้ และลมประจำ"></canvas>
+      <div class="info">
+        <div class="k">กระแสน้ำที่เลือก</div>
+        <div class="v c" id="bName" style="font-size:19px">-</div>
+        <div class="k" id="bOcean">-</div>
+        <div class="d" id="bClue">-</div>
+        <div class="k" style="margin-top:4px">1) เป็นกระแสน้ำอุ่นหรือกระแสน้ำเย็น ?</div>
+        <div class="pick" id="bAsk1"></div>
+        <div id="bQ2" class="hide">
+          <div class="k" style="margin-top:6px">2) ทำให้ภูมิอากาศชายฝั่งเป็นอย่างไร ?</div>
+          <div class="pick one" id="bAsk2"></div>
+        </div>
+        <div class="d" id="bWhy" style="color:#5EF2A5;margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="leg"><span><i style="background:#FF9F6B"></i>กระแสน้ำอุ่น</span><span><i style="background:#4FD8FF"></i>กระแสน้ำเย็น</span><span><i style="background:#E8EDFF"></i>กระแสน้ำที่ยังไม่ได้ตามหา</span><span><i style="background:#9AA6CF"></i>ลมประจำ</span><span><i class="dot" style="background:#FFD166"></i>ประเทศไทย</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>กระแสน้ำ</th><th>มหาสมุทร</th><th>อุ่น / เย็น</th><th>ผลต่อภูมิอากาศชายฝั่ง</th></tr></thead>
+      <tbody id="logB"></tbody>
+    </table></div>
+    <h2 class="sub-h"><em>แฟ้มสิ่งมีชีวิต</em> กระแสน้ำกับชีวิตในทะเล</h2>
+    <div class="events" id="libB"></div>
+    <div class="note">ในซีกโลกเหนือ กระแสน้ำวนใหญ่ <b>หมุนตามเข็มนาฬิกา</b> ซีกโลกใต้ <b>หมุนทวนเข็มนาฬิกา</b> (ลมค้าพัดน้ำไปทางตะวันตก ลมตะวันตกพัดกลับไปทางตะวันออก ทวีปขวางกั้นให้น้ำเลี้ยว) · <b>กระแสน้ำอุ่น</b> ไหลจากเขตร้อนไปทางขั้วโลก อยู่ฝั่งตะวันตกของมหาสมุทร (ชายฝั่งตะวันออกของทวีป) ทำให้ชายฝั่งอบอุ่น ชื้น ฝนมาก · <b>กระแสน้ำเย็น</b> ไหลจากเขตหนาวมาทางเส้นศูนย์สูตร ทำให้ชายฝั่งเย็น แห้ง เกิดหมอกและทะเลทรายชายฝั่ง</div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 2</b> : ตาราง 6 กระแสน้ำ ตอบข้อ 2</div>
+  </section>
+
+  <!-- ===================== ภารกิจ C ===================== -->
+  <section id="mC" class="panel hide">
+    <h2 class="mission-h"><em>ภารกิจ C</em> ศูนย์เฝ้าระวังเอลนีโญและลานีญา</h2>
+    <p class="how">มหาสมุทรแปซิฟิกแถบเส้นศูนย์สูตรกว้างเกือบครึ่งโลก ลมค้าที่พัดผ่านทำให้น้ำอุ่นสะสมอยู่ฝั่งตะวันตก บางปีลมค้าเปลี่ยนแรง น้ำและฝนจึงย้ายที่ ส่งผลถึงประเทศไทย นักบินจะเฝ้าระวัง 3 ขั้น แล้วไขรหัสศูนย์เฝ้าระวัง</p>
+
+    <h2 class="sub-h"><em>ขั้นที่ 1</em> ภาพตัดขวางแปซิฟิก : ปกติ เอลนีโญ ลานีญา</h2>
+    <p class="how" style="margin-bottom:4px">ภาพตัดขวางตามแนวเส้นศูนย์สูตร ซ้ายคืออินโดนีเซียและออสเตรเลีย (ใกล้ประเทศไทย) ขวาคือทวีปอเมริกาใต้ (เปรู) เลือกสภาวะ กด "เดินเวลา 6 เดือน" ดูลม น้ำอุ่น และฝนเปลี่ยนไป แล้วตอบว่าประเทศไทยมีแนวโน้มเป็นอย่างไร ตอบถูกจึงบันทึก</p>
+    <div class="chips" id="stChips"></div>
+    <div class="twin">
+      <canvas id="cvC1" height="420" aria-label="ภาพตัดขวางมหาสมุทรแปซิฟิกแถบเส้นศูนย์สูตร แสดงลมค้า เมฆฝน ชั้นน้ำอุ่น และน้ำผุดที่ชายฝั่งเปรู ในสภาวะปกติ เอลนีโญ และลานีญา"></canvas>
+      <div class="info">
+        <div class="k">สภาวะ</div>
+        <div class="v c" id="c1Name">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">ลมค้า</div><div class="v g" id="c1Tw" style="font-size:16px">-</div></div>
+          <div><div class="k">อุณหภูมิผิวน้ำ<br>ตะวันตก · ตะวันออก</div><div class="v r" id="c1Sst" style="font-size:18px">-</div></div>
+          <div><div class="k">ฝนตกมากที่</div><div class="v p" id="c1Rain" style="font-size:16px">-</div></div>
+          <div><div class="k">ชายฝั่งเปรู</div><div class="v o" id="c1Peru" style="font-size:16px">-</div></div>
+        </div>
+        <div class="k" id="c1Time" style="margin-top:4px">-</div>
+        <div class="bar"><i id="c1Bar"></i></div>
+        <div class="k" style="margin-top:6px">ประเทศไทยมีแนวโน้มเป็นอย่างไร ?</div>
+        <div class="pick one" id="c1Ask"></div>
+        <div class="d" id="c1Why" style="color:#5EF2A5"></div>
+      </div>
+    </div>
+    <input type="range" id="tC1" min="0" max="100" step="1" value="0" aria-label="เวลา 0 ถึง 6 เดือน">
+    <div class="ctrl"><button class="btn" id="playC1">เดินเวลา 6 เดือน</button><button class="btn" id="resetC1">เริ่มใหม่</button><span class="lbl" id="recC1Msg"></span></div>
+    <div class="leg"><span><i style="background:#E8EDFF"></i>ลมค้าที่ผิวพื้น</span><span><i style="background:#FF9F6B"></i>น้ำอุ่นผิวหน้า</span><span><i style="background:#2a5fb0"></i>น้ำเย็นด้านล่าง</span><span><i style="background:#4FD8FF"></i>น้ำผุด</span><span><i style="background:#9AA6CF"></i>การหมุนเวียนของอากาศ</span></div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>สภาวะ</th><th>ลมค้า</th><th>ฝนตกมากที่</th><th>ชายฝั่งเปรู</th><th>ประเทศไทย</th></tr></thead>
+      <tbody id="logC1"></tbody>
+    </table></div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 2</em> ห้องข่าวดัชนีมหาสมุทร : ปีไหนเป็นอะไร</h2>
+    <p class="how" style="margin-bottom:4px">นักวิทยาศาสตร์เฝ้าดูอุณหภูมิผิวน้ำทะเลแปซิฟิกตอนกลางเทียบกับค่าปกติ ถ้าอุ่นกว่าปกติตั้งแต่ +0.5 °C ต่อเนื่องหลายเดือน = เอลนีโญ ถ้าเย็นกว่าปกติตั้งแต่ −0.5 °C = ลานีญา เลือกเหตุการณ์จริง แล้วตอบว่าเป็นปรากฏการณ์ใด ตอบถูกจึงเปิดข่าว</p>
+    <div class="chips" id="evChips"></div>
+    <div class="twin">
+      <canvas id="cvC2" height="320" aria-label="กราฟแท่งค่าความต่างของอุณหภูมิผิวน้ำทะเลแปซิฟิกตอนกลางจากค่าปกติใน 6 เหตุการณ์ มีเส้นเกณฑ์ บวก 0.5 และ ลบ 0.5 องศาเซลเซียส"></canvas>
+      <div class="info">
+        <div class="k">เหตุการณ์</div>
+        <div class="v c" id="c2Name" style="font-size:19px">-</div>
+        <div class="g2" style="margin-top:4px">
+          <div><div class="k">อุณหภูมิผิวน้ำ<br>ต่างจากปกติ</div><div class="v g" id="c2Val">-</div></div>
+          <div><div class="k">ปรากฏการณ์</div><div class="v r" id="c2Cls" style="font-size:18px">-</div></div>
+        </div>
+        <div class="k" style="margin-top:6px">ปีนี้เป็นปรากฏการณ์ใด ?</div>
+        <div class="pick one" id="c2Ask"></div>
+        <div class="d" id="c2News" style="margin-top:4px"></div>
+      </div>
+    </div>
+    <div class="tblwrap"><table class="log">
+      <thead><tr><th>ปี</th><th>ต่างจากปกติ</th><th>ปรากฏการณ์</th><th>ผลที่เกิดขึ้น</th></tr></thead>
+      <tbody id="logC2"></tbody>
+    </table></div>
+    <div class="prog" id="progC">-</div>
+
+    <h2 class="sub-h"><em>ขั้นที่ 3</em> ไขรหัสศูนย์เฝ้าระวัง</h2>
+    <p class="how" style="margin-bottom:4px">อ่านคำถาม แล้วแตะคำตอบที่ถูกต้อง ตอบถูกได้ตัวอักษรรหัสผ่าน 1 ตัว</p>
+    <div class="cards" id="clues"></div>
+    <div class="prog" id="prog">-</div>
+    <div class="win hide" id="winC">
+      <div>ไขรหัสครบทุกข้อแล้ว รหัสผ่านภารกิจ</div>
+      <div class="code">WALKER</div>
+      <div class="lbl">เขียนรหัสนี้ลงใบงาน ส่วนที่ 3 · เซอร์กิลเบิร์ต วอล์กเกอร์ (Sir Gilbert Walker) นักวิทยาศาสตร์ชาวอังกฤษที่ศึกษาฝนมรสุมของอินเดีย พบว่าความกดอากาศสองฝั่งมหาสมุทรแปซิฟิกขึ้นลงสลับกัน (ราว ค.ศ. 1920) วงจรอากาศเหนือแปซิฟิกแถบเส้นศูนย์สูตรจึงเรียกว่า การหมุนเวียนวอล์กเกอร์</div>
+    </div>
+
+    <h2 class="sub-h"><em>คลังผลกระทบ</em> เอลนีโญ ลานีญา กับชีวิตเรา (สำหรับส่วนที่ 4)</h2>
+    <p class="how" style="margin-bottom:4px">ใช้เป็นจุดเริ่มต้นสืบค้นภารกิจปลายทางในส่วนที่ 4 แล้วหาข้อมูลเพิ่มจากเว็บไซต์หน่วยงาน ข่าว หรือ AI</p>
+    <div class="events" id="libC"></div>
+    <div class="ws">ใบงาน <b>ส่วนที่ 3</b> : ตาราง 3 สภาวะ + รหัสผ่าน ข้อ 3 (ดัชนีมหาสมุทร) · <b>ส่วนที่ 4</b> : ภารกิจปลายทาง ประกาศเฝ้าระวังเอลนีโญ–ลานีญาเพื่อชุมชน</div>
+  </section>
+
+  <footer>ข้อมูลจำลองเพื่อการเรียนรู้ ภาพย่อส่วนและขยายเกินจริงเพื่อให้เห็นชัด · ความเร็วกระแสน้ำผิวหน้าราว 3% ของความเร็วลม เบี่ยง 45° เป็นแบบจำลองอย่างง่าย · เส้นทางกระแสน้ำเป็นภาพรวมโดยประมาณ · ค่าดัชนีเป็นค่าสูงสุดหรือต่ำสุดโดยประมาณของแต่ละเหตุการณ์ · ไม่มีการบันทึกข้อมูลนักเรียน</footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = 'esj_a3_sim_v1';
+  var S = load() || {};
+  ['a1', 'a2', 'b', 'c1', 'c2', 'cl'].forEach(function (k) { S[k] = S[k] || {}; });
+  function load() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function fmt(n, d) { return (+n).toLocaleString('en-US', { minimumFractionDigits: d || 0, maximumFractionDigits: d || 0 }); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function fit(cv, ratio, mn, mx) {
+    var d = window.devicePixelRatio || 1, w = cv.clientWidth || 600, h;
+    if (ratio) h = Math.round(clamp(w * ratio, mn, mx)); else h = +(cv.dataset.h || (cv.dataset.h = cv.getAttribute('height')));
+    cv.style.height = h + 'px';
+    if (cv.width !== Math.round(w * d) || cv.height !== Math.round(h * d)) { cv.width = Math.round(w * d); cv.height = Math.round(h * d); }
+    var x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); return { x: x, W: w, H: h };
+  }
+  function hash(i, k) { var s = Math.sin(i * 127.1 + (k || 0) * 311.7) * 43758.5453; return s - Math.floor(s); }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + a + ')'; }
+  function wrap(v, m) { return ((v % m) + m) % m; }
+  var RAD = Math.PI / 180, D2R = RAD;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function glow(x, cx, cy, r, col, a) { var g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0)); x.fillStyle = g; x.beginPath(); x.arc(cx, cy, r, 0, 6.283); x.fill(); }
+  function bindChips(box, attr, fn) { Array.prototype.forEach.call(box.querySelectorAll('[data-' + attr + ']'), function (b) { b.onclick = function () { fn(b.getAttribute('data-' + attr), b); }; }); }
+  function chips(id, lbl, arr, cur, attr, done, fn) {
+    var h = '<span class="lbl">' + lbl + '</span>';
+    arr.forEach(function (t, i) { h += '<button class="chip' + (i === cur ? ' on' : '') + (done && done(i) ? ' done' : '') + '" data-' + attr + '="' + i + '">' + t + '</button>'; });
+    $(id).innerHTML = h; bindChips($(id), attr, function (v) { fn(+v); });
+  }
+  function arrow(x, x1, y1, x2, y2, col, w, head) {
+    var a = Math.atan2(y2 - y1, x2 - x1), hl = head || 8;
+    x.strokeStyle = col; x.fillStyle = col; x.lineWidth = w || 2;
+    x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2 - Math.cos(a) * hl * .6, y2 - Math.sin(a) * hl * .6); x.stroke();
+    x.beginPath(); x.moveTo(x2, y2); x.lineTo(x2 - Math.cos(a - .45) * hl, y2 - Math.sin(a - .45) * hl); x.lineTo(x2 - Math.cos(a + .45) * hl, y2 - Math.sin(a + .45) * hl); x.closePath(); x.fill();
+  }
+  var HFONT = '"Chakra Petch", "Sarabun", sans-serif';
+  function label(x, t, px, py, col, size, align) {
+    x.font = '700 ' + (size || 13) + 'px ' + HFONT; x.textAlign = align || 'center'; x.lineJoin = 'round';
+    var cw = x.canvas.clientWidth || 9999, tw = x.measureText(t).width;   // กันข้อความหลุดขอบภาพ
+    if (x.textAlign === 'center') px = clamp(px, tw / 2 + 4, cw - tw / 2 - 4); else if (x.textAlign === 'left') px = clamp(px, 4, cw - tw - 4); else px = clamp(px, tw + 4, cw - 4);
+    x.strokeStyle = 'rgba(5,8,26,.85)'; x.lineWidth = 3.5; x.strokeText(t, px, py); x.fillStyle = col; x.fillText(t, px, py);
+  }
+  function askUI(id, opts, ans, okNow, onOk, onNo) {
+    $(id).innerHTML = opts.map(function (o, j) { return '<button data-j="' + j + '" class="' + (okNow && j === ans ? 'ok' : '') + '">' + o + '</button>'; }).join('');
+    Array.prototype.forEach.call($(id).querySelectorAll('button'), function (b) {
+      b.onclick = function () { if (okNow) return; var j = +b.getAttribute('data-j'); if (j === ans) { if (onOk()) return; } else { onNo && onNo(); }
+        b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); };
+    });
+  }
+  function fish(x, fx, fy, s, dir, col) {   // ปลาตัวเล็ก หันไปทาง dir (1 = ขวา)
+    x.fillStyle = col; x.beginPath(); x.ellipse(fx, fy, 6 * s, 2.8 * s, 0, 0, 6.283); x.fill();
+    x.beginPath(); x.moveTo(fx - dir * 5 * s, fy); x.lineTo(fx - dir * 10 * s, fy - 3.5 * s); x.lineTo(fx - dir * 10 * s, fy + 3.5 * s); x.closePath(); x.fill();
+  }
+
+  var tab = 'A', tA = 0, lastT = 0;
+  Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (b) {
+    b.onclick = function () {
+      tab = b.getAttribute('data-t');
+      Array.prototype.forEach.call(document.querySelectorAll('.tab'), function (x) { x.classList.toggle('on', x === b); });
+      ['A', 'B', 'C'].forEach(function (k) { $('m' + k).classList.toggle('hide', k !== tab); });
+      drawAll();
+    };
+  });
+
+  // ================================================================ ภารกิจ A ขั้นที่ 1 ลมพัดผิวน้ำ
+  var WINDS = [{ n: 'ไม่มีลม', v: 0 }, { n: 'ลมอ่อน 5 ม./วินาที', v: 5 }, { n: 'ลมแรง 15 ม./วินาที', v: 15 }];
+  var EARTH = [{ n: 'ทะเลทดลอง (โลกไม่หมุน)', s: 0 }, { n: 'ซีกโลกเหนือ', s: -1 }, { n: 'ซีกโลกใต้', s: 1 }];
+  var DEV = 45;                                  // มุมที่น้ำผิวหน้าเบี่ยงจากทิศลม (แบบจำลองอย่างง่าย)
+  var A1L = [[1, 0], [2, 0], [2, 1], [2, 2], [0, 0]], A1WS = 4;   // แถวในตาราง (4 แถวแรกอยู่ในใบงาน)
+  function curV(w) { return Math.round(WINDS[w].v * .03 * 100) / 100; }
+  function curDir(w, e) { if (!WINDS[w].v) return 'ไม่เกิดกระแสน้ำ'; var s = EARTH[e].s; return s === 0 ? 'ไปทางเดียวกับลม' : s < 0 ? 'เบี่ยงไปทางขวาของลม' : 'เบี่ยงไปทางซ้ายของลม'; }
+  function curKm(w) { return Math.round(curV(w) * 86400 / 1000); }
+  var aw = 2, ae = 1, pA1 = 0, playA1 = 0;
+  function updA1() {
+    var key = aw * 3 + ae;
+    if (pA1 >= 1 && !S.a1[key]) { S.a1[key] = 1; save(); }
+    chips('windChips', 'แรงลม', WINDS.map(function (w) { return w.n; }), aw, 'w', null, function (v) { aw = v; pA1 = 0; playA1 = 0; updA1(); drawA1(); });
+    chips('earthChips', 'ที่ตั้งของทะเล', EARTH.map(function (e) { return e.n; }), ae, 'e', null, function (v) { ae = v; pA1 = 0; playA1 = 0; updA1(); drawA1(); });
+    var done = pA1 >= 1, v = WINDS[aw].v;
+    $('a1Case').textContent = v ? WINDS[aw].n.replace('ลม', 'ลมตะวันตก ') : 'ไม่มีลม';
+    $('a1Sub').textContent = EARTH[ae].n + (EARTH[ae].s ? ' · โลกหมุนรอบตัวเอง' : ' · เหมือนถังน้ำในห้องทดลอง');
+    $('a1V').textContent = fmt(curV(aw), 2) + ' ม./วินาที';
+    $('a1Dev').textContent = curDir(aw, ae).replace('เบี่ยงไปทาง', '');
+    var hr = Math.round(pA1 * 24);
+    $('a1Km').textContent = 'ลมพัดมาแล้ว ' + hr + ' ชั่วโมง · น้ำผิวหน้าไหลไปได้ราว ' + fmt(curKm(aw) * pA1) + ' กม.';
+    $('a1Bar').style.width = (pA1 * 100) + '%';
+    $('a1Res').textContent = done ? (v ? 'กระแสน้ำ' + curDir(aw, ae) : 'น้ำนิ่ง ไม่เกิดกระแสน้ำ') : (pA1 > 0 ? 'ลมกำลังพัด...' : 'กด "เปิดลม 1 วัน"');
+    $('a1Why').textContent = !done ? 'ลมพัดผ่านผิวน้ำจะลากน้ำผิวหน้าให้ไหลไปด้วย สังเกตจุดสีฟ้าและลูกศรสีทอง' :
+      !v ? 'ไม่มีลมมาลากผิวน้ำ น้ำผิวหน้าจึงไม่ไหลเป็นกระแส' :
+      EARTH[ae].s === 0 ? 'ในทะเลทดลองที่ไม่หมุน น้ำผิวหน้าไหลไปทางเดียวกับลม ลมยิ่งแรง น้ำยิ่งไหลเร็ว (ราว 3% ของความเร็วลม)' :
+      EARTH[ae].s < 0 ? 'บนโลกที่หมุน น้ำที่ไหลไปไกลถูกแรงคอริออลิสทำให้เบี่ยงไปทางขวาของลมราว 45° เหมือนลมในซีกโลกเหนือ' :
+      'ในซีกโลกใต้ แรงคอริออลิสทำให้น้ำผิวหน้าเบี่ยงไปทางซ้ายของลมราว 45°';
+    $('tA1').value = Math.round(pA1 * 100); $('playA1').textContent = playA1 ? 'หยุด' : 'เปิดลม 1 วัน';
+    $('logA1').innerHTML = A1L.map(function (z, i) { var k = z[0] * 3 + z[1], r = S.a1[k];
+      return '<tr class="' + (k === key ? 'cur ' : '') + (i < A1WS ? 'ws' : '') + '"><td class="n">' + WINDS[z[0]].n.replace(' ม./วินาที', '') + ' · ' + EARTH[z[1]].n + '</td><td>' + (r ? fmt(curV(z[0]), 2) : '-') + '</td><td>' + (r ? curDir(z[0], z[1]) : '-') + '</td><td>' + (r ? curKm(z[0]) + ' กม.' : '-') + '</td></tr>'; }).join('');
+    var n = A1L.slice(0, A1WS).filter(function (z) { return S.a1[z[0] * 3 + z[1]]; }).length;
+    $('recA1Msg').textContent = n === A1WS ? 'บันทึกครบ 4 กรณีในใบงานแล้ว ไปขั้นที่ 2 ต่อ' : 'บันทึกกรณีในใบงานแล้ว ' + n + ' / 4 (ครบ 1 วันบันทึกอัตโนมัติ)';
+  }
+  $('tA1').oninput = function () { pA1 = +this.value / 100; playA1 = 0; updA1(); drawA1(); };
+  $('playA1').onclick = function () { if (pA1 >= 1) pA1 = 0; playA1 = playA1 ? 0 : 1; updA1(); };
+  $('resetA1').onclick = function () { pA1 = 0; playA1 = 0; updA1(); drawA1(); };
+  function drawA1() {
+    var f = fit($('cvA1'), .66, 230, 420), x = f.x, W = f.W, H = f.H, v = WINDS[aw].v, sm = W < 480 ? 11 : 13;
+    var g = x.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#0b3466'); g.addColorStop(1, '#061a3c'); x.fillStyle = g; x.fillRect(0, 0, W, H);
+    x.strokeStyle = 'rgba(120,170,230,.10)'; x.lineWidth = 1;
+    for (var gx = 0; gx < W; gx += 40) { x.beginPath(); x.moveTo(gx, 0); x.lineTo(gx, H); x.stroke(); }
+    for (var gy = 0; gy < H; gy += 40) { x.beginPath(); x.moveTo(0, gy); x.lineTo(W, gy); x.stroke(); }
+    var on = pA1 > 0 || playA1, run = tA, ang = EARTH[ae].s * DEV * RAD;   // ทิศน้ำ (คณิตศาสตร์ ทวนเข็มเป็นบวก)
+    var vc = curV(aw), cdx = Math.cos(ang), cdy = -Math.sin(ang);
+    // ลม : เส้นขาวเลื่อนไปทางขวา
+    if (v && on) { x.lineCap = 'round';
+      for (var i = 0; i < 26; i++) { var wx = wrap(hash(i, 1) * W + run * v * 9, W + 60) - 30, wy = hash(i, 2) * H, L = 18 + v * 1.6;
+        x.strokeStyle = 'rgba(232,237,255,' + (.18 + .25 * hash(i, 3)) + ')'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(wx, wy); x.lineTo(wx + L, wy); x.stroke(); }
+      x.lineCap = 'butt'; }
+    // น้ำผิวหน้า : จุดสีฟ้าไหลตามทิศกระแสน้ำ
+    var sp = on ? vc * 70 : 0;
+    for (var j = 0; j < 90; j++) {
+      var px = wrap(hash(j, 4) * W + cdx * sp * run, W), py = wrap(hash(j, 5) * H + cdy * sp * run, H), bob = Math.sin(run * 2 + j) * 1.2;
+      x.strokeStyle = 'rgba(79,216,255,.35)'; x.lineWidth = 1.4;
+      if (sp) { x.beginPath(); x.moveTo(px, py + bob); x.lineTo(px - cdx * (6 + sp * .12), py + bob - cdy * (6 + sp * .12)); x.stroke(); }
+      x.fillStyle = 'rgba(160,236,255,.9)'; x.beginPath(); x.arc(px, py + bob, 2.1, 0, 6.283); x.fill();
+    }
+    var cx = W * .42, cy = H * .55, Lw = Math.min(W * .34, 170);
+    x.setLineDash([7, 6]); if (v) arrow(x, cx - Lw * .15, cy, cx + Lw, cy, 'rgba(232,237,255,.85)', 2.4, 11); x.setLineDash([]);
+    if (v) label(x, 'ทิศลม', cx + Lw + 4, cy + 4, '#E8EDFF', sm, 'left');
+    if (v && pA1 > .05) {
+      var Lc = Lw * (.45 + .55 * vc / .45) * Math.min(1, pA1 * 3);
+      glow(x, cx, cy, 30, [255, 209, 102], .3);
+      arrow(x, cx, cy, cx + cdx * Lc, cy + cdy * Lc, '#FFD166', 4.5, 14);
+      label(x, 'กระแสน้ำ', cx + cdx * Lc + (EARTH[ae].s ? 0 : 0), cy + cdy * Lc + (cdy > .1 ? 18 : cdy < -.1 ? -8 : 20), '#FFD166', sm);
+      if (EARTH[ae].s) { x.strokeStyle = 'rgba(255,209,102,.8)'; x.lineWidth = 1.5; x.beginPath(); x.arc(cx, cy, 42, Math.min(0, -ang), Math.max(0, -ang)); x.stroke();
+        label(x, '45°', cx + 50 * Math.cos(-ang / 2), cy + 50 * Math.sin(-ang / 2) + 4, '#FFD166', sm, 'left'); }
+    }
+    if (!v) label(x, 'ไม่มีลม น้ำผิวหน้าอยู่นิ่ง', W / 2, H / 2 - 30, '#E8EDFF', sm + 2);
+    // เข็มทิศ และป้าย
+    var nx = W - 26, ny = 30; x.strokeStyle = '#9AA6CF'; x.lineWidth = 1.5; x.beginPath(); x.arc(nx, ny, 14, 0, 6.283); x.stroke();
+    arrow(x, nx, ny + 8, nx, ny - 11, '#E8EDFF', 2, 7); label(x, 'เหนือ', nx, ny + 30, '#9AA6CF', 10);
+    label(x, EARTH[ae].n, 8, 18, EARTH[ae].s ? '#5EF2A5' : '#FF9F6B', sm + 1, 'left');
+    if (EARTH[ae].s) { var rx = 22, ry = H - 26; x.strokeStyle = '#A77BFF'; x.lineWidth = 2; x.beginPath(); x.arc(rx, ry, 12, 0, 6.283); x.stroke();
+      arrow(x, rx + 12 * Math.cos(.3), ry + (EARTH[ae].s < 0 ? -1 : 1) * 12 * Math.sin(.3), rx + 12 * Math.cos(1.2), ry + (EARTH[ae].s < 0 ? -1 : 1) * 12 * Math.sin(1.2), '#A77BFF', 2, 7);
+      label(x, 'โลกหมุน', rx + 18, ry + 4, '#A77BFF', 11, 'left'); }
+  }
+
+  // ================================================================ ภารกิจ A ขั้นที่ 2 น้ำผุด น้ำจม
+  var COAST = [
+    { n: 'พัดออกจากฝั่ง', s: 1, type: 'น้ำผุด', T: 17, nut: 'มาก', fish: 'ชุกชุม',
+      why: 'น้ำผิวหน้าถูกพัดออกไป น้ำเย็นด้านล่างจึงผุดขึ้นมาแทน นำธาตุอาหารขึ้นมาที่ผิวน้ำที่มีแสงแดด แพลงก์ตอนพืชเติบโตเร็ว เป็นอาหารของปลา ทะเลแบบนี้ปลาชุกชุม เช่น ชายฝั่งเปรู แคลิฟอร์เนีย นามิเบีย' },
+    { n: 'พัดเข้าหาฝั่ง', s: -1, type: 'น้ำจม', T: 26, nut: 'น้อย', fish: 'น้อย',
+      why: 'น้ำผิวหน้าที่อุ่นถูกดันเข้ามาสะสมที่ชายฝั่งแล้วจมลง ชั้นน้ำอุ่นหนาขึ้น น้ำเย็นที่มีธาตุอาหารอยู่ลึกลงไป แพลงก์ตอนและปลาจึงน้อยลง' },
+    { n: 'ไม่มีลม', s: 0, type: 'ไม่เกิด', T: 22, nut: 'ปานกลาง', fish: 'ปานกลาง', why: 'ไม่มีลมพัด น้ำชั้นบนกับชั้นล่างไม่ค่อยผสมกัน อุณหภูมิและธาตุอาหารคงเดิม' }];
+  var A2WS = 2;
+  var ac = 0, pA2 = 0, playA2 = 0;
+  function updA2() {
+    if (pA2 >= 1 && !S.a2[ac]) { S.a2[ac] = 1; save(); }
+    chips('coastChips', 'ลมพัดน้ำผิวหน้า', COAST.map(function (c) { return c.n; }), ac, 'c', function (i) { return S.a2[i]; }, function (v) { ac = v; pA2 = 0; playA2 = 0; updA2(); drawA2(); });
+    var C = COAST[ac], done = pA2 >= 1, T0 = 22;
+    $('a2Case').textContent = C.n;
+    $('a2T').textContent = fmt(lerp(T0, C.T, smooth(0, 1, pA2))) + ' °C';
+    $('a2Type').textContent = done ? C.type : '-';
+    $('a2Nut').textContent = done ? C.nut : '-';
+    $('a2Fish').textContent = done ? C.fish : '-';
+    $('a2Bar').style.width = (pA2 * 100) + '%';
+    $('a2Why').textContent = done ? C.why : 'เริ่มต้นทุกกรณีผิวน้ำ 22 °C กด "เดินเวลา 1 เดือน" แล้วสังเกตน้ำใกล้ชายฝั่ง (ขวา)';
+    $('playA2').textContent = playA2 ? 'หยุด' : 'เดินเวลา 1 เดือน';
+    $('logA2').innerHTML = COAST.map(function (c, i) { var r = S.a2[i];
+      return '<tr class="' + (i === ac ? 'cur ' : '') + (i < A2WS ? 'ws' : '') + '"><td class="n">' + c.n + '</td><td>' + (r ? c.type : '-') + '</td><td>' + (r ? c.T + ' °C' : '-') + '</td><td>' + (r ? c.nut : '-') + '</td><td>' + (r ? c.fish : '-') + '</td></tr>'; }).join('');
+    var n = COAST.slice(0, A2WS).filter(function (c, i) { return S.a2[i]; }).length;
+    $('recA2Msg').textContent = n === A2WS ? 'บันทึกครบ 2 กรณีในใบงานแล้ว ไปภารกิจ B ต่อ' : 'บันทึกกรณีในใบงานแล้ว ' + n + ' / 2';
+  }
+  $('playA2').onclick = function () { if (pA2 >= 1) pA2 = 0; playA2 = playA2 ? 0 : 1; updA2(); };
+  $('resetA2').onclick = function () { pA2 = 0; playA2 = 0; updA2(); drawA2(); };
+  function drawA2() {
+    var f = fit($('cvA2'), .6, 230, 400), x = f.x, W = f.W, H = f.H, C = COAST[ac], q = smooth(0, 1, pA2), s = C.s, sm = W < 480 ? 11 : 13;
+    var yS = H * .26, xC = W * .74;                         // ผิวน้ำ และแนวชายฝั่ง
+    var gs = x.createLinearGradient(0, 0, 0, yS); gs.addColorStop(0, '#0a1440'); gs.addColorStop(1, '#25407e'); x.fillStyle = gs; x.fillRect(0, 0, W, yS);
+    function bed(xx) { return xx < W * .55 ? H - 6 : lerp(H - 6, yS + 6, smooth(W * .55, xC + 4, xx)); }
+    function zT(xx) { var r = clamp(xx / xC, 0, 1); return clamp(.32 - s * q * .30 * smooth(.35, 1, r), .02, .7); }   // ความลึกชั้นน้ำอุ่น (สัดส่วนของ 0.74H)
+    var D = H - yS;
+    x.fillStyle = '#0d2c66'; x.fillRect(0, yS, W, D);
+    // ชั้นน้ำอุ่น
+    x.beginPath(); x.moveTo(0, yS);
+    for (var xx = 0; xx <= xC + 6; xx += 4) x.lineTo(xx, yS + zT(xx) * D);
+    x.lineTo(xC + 6, yS); x.closePath();
+    var gw = x.createLinearGradient(0, yS, 0, yS + D * .45); gw.addColorStop(0, 'rgba(255,159,107,.85)'); gw.addColorStop(1, 'rgba(255,159,107,.25)'); x.fillStyle = gw; x.fill();
+    x.setLineDash([5, 5]); x.strokeStyle = 'rgba(232,237,255,.5)'; x.lineWidth = 1.2; x.beginPath();
+    for (var x2 = 0; x2 <= xC; x2 += 4) { var yy = yS + zT(x2) * D; if (x2) x.lineTo(x2, yy); else x.moveTo(x2, yy); } x.stroke(); x.setLineDash([]);
+    // ธาตุอาหาร
+    for (var i = 0; i < 70; i++) {
+      var nx = hash(i, 11) * xC * .98, base = yS + (.45 + .5 * hash(i, 12)) * D, r = nx / xC, rise = s > 0 ? q * smooth(.45, .95, r) * hash(i, 13) : 0;
+      var ny = lerp(base, yS + (.04 + .12 * hash(i, 14)) * D, rise) + Math.sin(tA + i) * 1.5;
+      if (ny > bed(nx) - 4) continue;
+      x.fillStyle = 'rgba(94,242,165,' + (.55 + .3 * hash(i, 15)) + ')'; x.beginPath(); x.arc(nx, ny, 2, 0, 6.283); x.fill();
+    }
+    // แพลงก์ตอนใกล้ผิวน้ำ
+    if (s > 0 && q > .2) { var gp = x.createRadialGradient(xC * .82, yS + 8, 4, xC * .82, yS + 8, W * .28); gp.addColorStop(0, 'rgba(94,242,165,' + (.45 * q) + ')'); gp.addColorStop(1, 'rgba(94,242,165,0)'); x.fillStyle = gp; x.fillRect(0, yS, xC, D * .4); }
+    // พื้นทะเลและแผ่นดิน
+    x.beginPath(); x.moveTo(W * .5, H); for (var b = W * .5; b <= xC + 4; b += 4) x.lineTo(b, bed(b));
+    x.lineTo(xC + 4, yS - 2); x.lineTo(W * .84, yS - H * .06); x.lineTo(W * .93, yS - H * .16); x.lineTo(W, yS - H * .1); x.lineTo(W, H); x.closePath();
+    x.fillStyle = '#3b3326'; x.fill(); x.strokeStyle = '#6b5a3c'; x.lineWidth = 1.2; x.stroke();
+    label(x, 'ชายฝั่ง', W * .88, yS + 22, '#E8EDFF', sm);
+    // ลม
+    if (s) { for (var k = 0; k < 3; k++) { var ph = (tA * .6 + k / 3) % 1, wx = s > 0 ? lerp(xC - 10, W * .12, ph) : lerp(W * .12, xC - 10, ph), wy = yS * (.35 + .18 * k);
+        x.globalAlpha = Math.sin(ph * Math.PI); arrow(x, wx + s * 22, wy, wx - s * 22, wy, '#E8EDFF', 2.2, 8); x.globalAlpha = 1; }
+      label(x, 'ลม', s > 0 ? W * .1 : xC - 20, yS * .25, '#E8EDFF', sm); }
+    // ลูกศรน้ำ
+    if (s && q > .05) {
+      x.globalAlpha = Math.min(1, q * 2);
+      arrow(x, s > 0 ? xC * .78 : xC * .3, yS + 10, s > 0 ? xC * .3 : xC * .78, yS + 10, '#FFD166', 3, 11);
+      var vx = xC * .9, y1 = yS + D * .62, y2 = yS + D * .1;
+      if (s > 0) { arrow(x, vx, y1, vx, y2, '#4FD8FF', 3.5, 12); label(x, 'น้ำผุด', vx - 8, yS + D * .4, '#4FD8FF', sm + 1, 'right'); arrow(x, xC * .45, yS + D * .7, xC * .8, yS + D * .68, 'rgba(79,216,255,.6)', 2, 9); }
+      else { arrow(x, vx, y2, vx, y1, '#FF9F6B', 3.5, 12); label(x, 'น้ำจม', vx - 8, yS + D * .4, '#FF9F6B', sm + 1, 'right'); arrow(x, xC * .8, yS + D * .74, xC * .45, yS + D * .76, 'rgba(255,159,107,.6)', 2, 9); }
+      x.globalAlpha = 1;
+    }
+    // ปลา
+    var nf = Math.round(s > 0 ? lerp(3, 10, q) : s < 0 ? lerp(3, 1, q) : 3);
+    for (var m = 0; m < nf; m++) { var fx = xC * (.42 + .5 * hash(m, 21)) + Math.sin(tA * .8 + m) * 10, fy = yS + D * (.08 + .14 * hash(m, 22));
+      fish(x, fx, fy, W < 480 ? .8 : 1, Math.cos(tA * .8 + m) > 0 ? 1 : -1, 'rgba(232,237,255,.85)'); }
+    label(x, 'น้ำอุ่นผิวหน้า', 10, yS + 18, '#FFD7BE', sm, 'left');
+    label(x, 'น้ำเย็นด้านล่าง ธาตุอาหารมาก', 10, H - 12, '#9fd0ff', sm, 'left');
+    var tv = fmt(lerp(22, C.T, q)) + ' °C'; glow(x, xC - 18, yS + 4, 18, s > 0 ? [79, 216, 255] : [255, 159, 107], .4 * q + .1);
+    label(x, tv, xC - 18, yS - 8, '#FFD166', sm + 2);
+    label(x, C.n === 'ไม่มีลม' ? 'ไม่มีลม' : 'ลม' + C.n, 8, 18, '#4FD8FF', sm + 1, 'left');
+  }
+
+  // ================================================================ ภารกิจ B แผนที่กระแสน้ำโลก
+/*GEO-START*/var GEO = {"NA":[[[-166,68],[-156,71],[-140,70],[-125,70],[-110,68],[-95,72],[-85,70],[-80,66],[-90,63],[-94,59],[-88,56],[-82,54],[-78,58],[-77,62],[-70,61],[-64,60],[-60,55],[-56,52],[-53,47],[-60,47],[-66,45],[-70,42],[-74,40],[-76,35],[-81,31],[-80,26],[-82,28],[-84,30],[-89,30],[-95,29],[-97,26],[-97,21],[-94,18.3],[-91,18.6],[-90.4,21],[-87,21.5],[-87.5,18.5],[-88.3,17.8],[-92.2,14.6],[-96,16],[-102,18],[-105,21],[-109,25],[-112,29],[-114,31],[-110,23],[-112,25],[-115,28],[-117,32],[-120,34.5],[-123,38],[-124,42],[-124,47],[-127,50],[-131,54],[-135,57],[-140,59.8],[-147,61],[-152,59],[-158,57],[-163,55],[-158,58.5],[-162,60],[-165,62],[-166,65]],[[-73,78],[-60,82],[-30,83.5],[-20,82],[-20,75],[-22,70],[-32,68],[-40,65],[-43,60],[-48,61],[-52,65],[-54,69],[-58,75],[-66,77]]],"CA":[[[-88.3,17.8],[-88,16],[-84,15],[-83,10],[-79,9],[-77.5,8],[-80,7.5],[-85,10],[-88,13],[-92.2,14.6]]],"SA":[[[-77,8],[-72,12],[-62,10.7],[-60,8.5],[-57,6.5],[-52,5],[-50,0],[-44,-2.5],[-35,-5.5],[-35,-9],[-39,-14],[-39,-18],[-41,-22],[-48,-26],[-48.6,-28],[-53,-34],[-58,-34.5],[-57,-38],[-62,-39],[-65,-42],[-64,-47],[-68,-50],[-69,-53],[-68,-55],[-72,-54],[-75,-50],[-74,-44],[-73,-38],[-71.5,-30],[-70,-18],[-76,-14],[-81,-6],[-80,-2],[-80,1],[-77,4]]],"EU":[[[-9,37],[-9,43],[-2,43.5],[-1.5,46],[-4.5,48.5],[2,51],[5,53],[8.5,54],[8,57],[10.5,57.7],[12,55.5],[14,54],[21,55],[23,59.5],[28,60],[22,60.5],[21.5,65],[24,66],[21,63],[17,61],[19,60],[16,56],[12.5,56.3],[11,59],[5.5,58.5],[5,62],[10,64],[14,67],[19,70],[26,71],[31,70],[41,67],[43,68.5],[53,68],[60,69.5],[70,73],[80,73.5],[88,75.5],[100,78],[113,73.5],[130,72],[140,72.5],[150,71],[160,69.5],[170,70],[180,68.5],[178,62],[165,60],[162,55],[156,51],[155,58],[143,59],[137,54],[141,52],[140,48],[135,43],[130,42.5],[129,35.5],[126,34.5],[126,37.5],[125,39.5],[121,40],[122,37],[119,35],[121,32],[122,29],[119,25],[114,22.3],[109,21.5],[106,20],[108,16],[109,12],[105,8.6],[103,10.5],[100,13.5],[99,10],[102.5,6],[103.5,1.5],[101,2.8],[98,8],[98.5,13],[97.5,16.5],[94.5,16],[94,19],[92,21],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27],[67,24],[62,25],[57,25.7],[56.5,27],[54,26.6],[51.5,24],[51.5,26],[50,30],[48,30],[50,26],[51.5,24],[56,24],[56.4,26.3],[59.8,22.5],[55,17],[52,16],[43.5,12.7],[42.5,15],[39,21.5],[35,28],[34.5,31.5],[35.5,34.5],[36,36.8],[32,36.2],[28,36.6],[26.5,39.5],[29,41],[31,41.2],[35,42],[41,41],[41.5,42.5],[37.5,45],[34,44.5],[33,46],[30,45.5],[28.5,43.5],[28,41.5],[24,40.5],[23,39],[22.5,36.5],[21,38.5],[19.5,41.5],[16,43.5],[13.5,45.5],[12.3,44.5],[16,41.5],[18.5,40],[16,38],[15.5,40],[12.5,42],[10.5,43.5],[8,44],[5,43.2],[3.2,42],[0,39.5],[-0.5,38],[-2,36.7],[-5.5,36],[-7,37]],[[-5.5,50],[1.5,51],[1.7,52.8],[0,53.5],[-2,55.8],[-1.8,57.6],[-3,58.6],[-5,58.6],[-6.2,56.5],[-5,55],[-3.2,54.5],[-4.5,53.3],[-5,51.7]],[[130,31],[132,33.5],[135,34],[140,35],[141,38],[141.5,41.5],[145,43.5],[142,45.5],[140,42],[139.5,39],[137,37],[133,35.5],[130,33.5]]],"AF":[[[-17,21],[-16,15],[-17,14.7],[-15,11],[-13,8],[-8,4.5],[-2,5],[4,6.3],[9,4],[9.5,1],[9,-1],[12,-6],[13.5,-11],[12,-17],[14.5,-23],[15.5,-27],[18,-32],[18.5,-34.5],[20,-35],[25,-34],[28,-33],[32,-28.5],[33,-26],[35.5,-24],[35,-19],[40,-15.5],[40.5,-10],[39,-6],[42,-1],[46,2],[51,11.8],[44,11],[43,13],[39,16],[37,20],[35,24],[33.5,28],[32,31],[29,31],[25,31.8],[20,30.5],[19,32],[15,32.5],[11,33.5],[10,37],[3,36.7],[-2,35.1],[-6,35.8],[-9,32],[-10,29],[-13,27.5]]],"MG":[[[44,-25],[47,-25],[50,-15],[49.3,-12],[46,-15.5],[44,-16.5],[43.5,-22]]],"IN":[[[67,24],[70,21],[72.8,19],[73.5,15.5],[75,12],[76.5,8.5],[77.5,8],[80,10],[80.3,13.5],[82,16.5],[86.5,20],[89,22],[88,26.5],[84,27.5],[80,29],[75,32.5],[72,34],[70,31],[68,27]]],"AU":[[[113,-22],[114,-26],[115,-34],[118,-35],[123,-34],[129,-31.5],[132,-32],[135,-34.5],[138,-35.5],[140,-38],[144,-38.5],[147,-38],[150,-37],[153,-31],[153,-25],[149,-21],[146,-19],[145,-15],[143,-11],[141.5,-13],[141,-17],[138,-16.5],[136,-12],[132,-11.5],[130,-13],[127,-14],[125,-15],[122,-18],[117,-20.5]],[[131,-1],[138,-1.5],[141,-2.6],[147,-6],[150,-10.5],[144,-8],[141,-9],[138,-8],[135,-4]],[[144.6,-40.7],[148.3,-40.9],[148,-43.2],[146,-43.6],[145,-42]]],"AN":[[[-180,-78],[-165,-78.5],[-158,-77.5],[-150,-76.5],[-140,-75.5],[-120,-74],[-100,-74.5],[-90,-73],[-80,-73],[-75,-72],[-70,-69],[-66,-66.5],[-63,-64.5],[-58,-63.3],[-60,-65.5],[-62,-68],[-62,-71],[-60,-74],[-55,-77],[-45,-78],[-35,-77.5],[-28,-75.5],[-20,-73],[-10,-71],[0,-70],[15,-70],[30,-69.5],[40,-69],[45,-67.5],[55,-66.5],[60,-67],[70,-68],[75,-69.5],[80,-68],[90,-66.5],[100,-66],[110,-66],[120,-66.5],[130,-66.2],[140,-66.5],[150,-68.5],[160,-70],[165,-71],[170,-73],[167,-77],[170,-78],[180,-78],[180,-90],[-180,-90]]]};/*GEO-END*/
+  function eqe(lon, lat) {
+    var A1 = 1.340264, A2 = -0.081106, A3 = 0.000893, A4 = 0.003796, M = Math.sqrt(3) / 2;
+    var th = Math.asin(M * Math.sin(lat * D2R)), t2 = th * th, t6 = t2 * t2 * t2;
+    return [lon * D2R * Math.cos(th) / (M * (A1 + 3 * A2 * t2 + t6 * (7 * A3 + 9 * A4 * t2))), th * (A1 + A2 * t2 + t6 * (A3 + A4 * t2))];
+  }
+  // กระแสน้ำผิวหน้าหลัก (ภาพรวมโดยประมาณ) t : w อุ่น c เย็น · g = ลำดับกระแสน้ำที่ต้องตามหา · ลองจิจูดเกิน 180 = เลยเส้นวันที่ไปแล้ว
+  var ACC = []; for (var lo = 0; lo <= 360; lo += 15) ACC.push([lo, lo > 270 && lo < 310 ? -58 : -53 + 2 * Math.sin(lo * RAD * 2)]);
+  var CURS = [
+    { t: 'w', g: 0, p: [[-81, 25], [-79.5, 30], [-75, 35], [-66, 39], [-52, 42]] },
+    { t: 'w', p: [[-50, 43], [-38, 47], [-24, 52], [-12, 57], [0, 62], [10, 67]] },
+    { t: 'c', p: [[-11, 42], [-15, 33], [-18, 25], [-20, 17]] },
+    { t: 'w', p: [[-22, 13], [-36, 13], [-50, 14], [-62, 16], [-72, 19], [-79, 23]] },
+    { t: 'c', p: [[-62, 62], [-56, 54], [-51, 47]] },
+    { t: 'w', p: [[-34, -7], [-37, -14], [-41, -22], [-47, -29], [-53, -36]] },
+    { t: 'w', p: [[9, -3], [-5, -5], [-20, -6], [-32, -7]] },
+    { t: 'c', g: 4, p: [[16, -35], [13, -28], [11, -21], [10, -13], [9, -6]] },
+    { t: 'c', p: [[-50, -41], [-30, -39], [-10, -37], [8, -36], [15, -35.5]] },
+    { t: 'w', p: [[42, -13], [37, -24], [31, -31], [22, -36]] },
+    { t: 'c', p: [[113, -34], [111, -27], [109, -20], [105, -15]] },
+    { t: 'w', p: [[100, -14], [82, -14], [64, -14], [48, -14]] },
+    { t: 'w', g: 1, p: [[123, 22], [126, 26], [132, 30.5], [141, 35.5], [150, 38]] },
+    { t: 'w', p: [[153, 40], [170, 42], [190, 43], [210, 44], [228, 45]] },
+    { t: 'c', g: 2, p: [[-129, 45], [-125, 38], [-120, 31], [-115, 24], [-111, 19]] },
+    { t: 'w', p: [[248, 14], [220, 12], [190, 12], [160, 13], [138, 15], [125, 19]] },
+    { t: 'c', g: 3, p: [[-77, -44], [-76, -35], [-74, -26], [-78, -16], [-82, -6]] },
+    { t: 'w', p: [[278, -2], [260, -3], [235, -4], [210, -5], [185, -6], [168, -9], [158, -13]] },
+    { t: 'w', g: 5, p: [[150, -15], [154, -22], [154.5, -28], [152.5, -33], [154, -38]] },
+    { t: 'c', p: ACC }
+  ];
+  var TG = [
+    { n: 'กัลฟ์สตรีม', o: 'มหาสมุทรแอตแลนติกเหนือ', clue: 'ไหลจากทะเลแคริบเบียนในเขตร้อน ขึ้นไปทางเหนือเลียบชายฝั่งตะวันออกของสหรัฐอเมริกา แล้วข้ามมหาสมุทรไปทางยุโรป', w: 0, e: 0,
+      why: 'นำน้ำอุ่นจากเขตร้อนขึ้นไปถึงยุโรปตะวันตก ลมตะวันตกพัดอากาศอุ่นชื้นเข้าฝั่ง ลอนดอนและปารีสจึงอบอุ่นกว่าเมืองในแคนาดาที่ละติจูดเดียวกัน ท่าเรือนอร์เวย์ไม่เป็นน้ำแข็งในฤดูหนาว' },
+    { n: 'คุโรชิโอะ', o: 'มหาสมุทรแปซิฟิกเหนือ', clue: 'ไหลจากทะเลฟิลิปปินส์ในเขตร้อน ขึ้นไปทางเหนือเลียบเกาะไต้หวันและหมู่เกาะญี่ปุ่น', w: 0, e: 0,
+      why: 'น้ำอุ่นทำให้ญี่ปุ่นตอนใต้อบอุ่นและชื้น ฝนชุก หมู่เกาะโอกินาวามีแนวปะการัง คุโรชิโอะแปลว่ากระแสน้ำดำ เพราะน้ำใสจนเห็นเป็นสีน้ำเงินเข้ม' },
+    { n: 'แคลิฟอร์เนีย', o: 'มหาสมุทรแปซิฟิกเหนือ', clue: 'ไหลจากแปซิฟิกเหนือที่หนาวเย็น ลงมาทางใต้เลียบชายฝั่งตะวันตกของสหรัฐอเมริกา', w: 1, e: 1,
+      why: 'น้ำเย็นทำให้อากาศเหนือชายฝั่งเย็นและแห้ง เกิดหมอกบ่อย เช่น หมอกที่ปกคลุมสะพานโกลเดนเกต ซานฟรานซิสโก ฤดูร้อนที่นั่นจึงเย็นสบายกว่าเมืองในแผ่นดิน' },
+    { n: 'ฮัมโบลต์ (เปรู)', o: 'มหาสมุทรแปซิฟิกใต้', clue: 'ไหลจากเขตหนาวทางใต้ใกล้แอนตาร์กติกา ขึ้นมาทางเหนือเลียบชายฝั่งชิลีและเปรู', w: 1, e: 1,
+      why: 'น้ำเย็นทำให้อากาศเหนือชายฝั่งเย็นและจมตัว ไม่เกิดฝน ทะเลทรายอาตากามาจึงแห้งที่สุดในโลก และมีน้ำผุดนำธาตุอาหารขึ้นมา ทะเลเปรูจึงจับปลาแอนโชวีได้มากที่สุดในโลก' },
+    { n: 'เบงเกวลา', o: 'มหาสมุทรแอตแลนติกใต้', clue: 'ไหลจากเขตหนาวทางใต้ ขึ้นมาทางเหนือเลียบชายฝั่งตะวันตกของทวีปแอฟริกา', w: 1, e: 1,
+      why: 'น้ำเย็นทำให้ชายฝั่งนามิเบียแห้งแล้ง เกิดทะเลทรายนามิบที่เนินทรายอยู่ติดทะเล หมอกจากทะเลเป็นแหล่งน้ำของด้วงและพืชบางชนิดในทะเลทราย' },
+    { n: 'ออสเตรเลียตะวันออก', o: 'มหาสมุทรแปซิฟิกใต้', clue: 'ไหลจากทะเลคอรัลในเขตร้อน ลงไปทางใต้เลียบชายฝั่งตะวันออกของทวีปออสเตรเลีย', w: 0, e: 0,
+      why: 'น้ำอุ่นทำให้ชายฝั่งตะวันออกของออสเตรเลียอบอุ่นและชื้น ช่วยให้มีแนวปะการังเกรตแบร์ริเออร์รีฟ และพาตัวอ่อนปะการังและปลาเขตร้อนลงไปทางใต้ (กระแสน้ำในภาพยนตร์ Finding Nemo)' }
+  ];
+  var WC = ['กระแสน้ำอุ่น', 'กระแสน้ำเย็น'], EFF = ['อบอุ่น ชื้น ฝนมาก', 'เย็น แห้ง ฝนน้อย'];
+  var EFFL = ['ชายฝั่งอบอุ่น ชื้น ฝนมาก', 'ชายฝั่งเย็น แห้ง ฝนน้อย มีหมอก'];
+  function wcB(i) { return TG[i].w === 0 ? 'อุ่น' : 'เย็น'; }
+  function effB(i) { return EFF[TG[i].e]; }
+  var lay = { c: 1, w: 0 }, selB = 0;
+  function updB() {
+    var h = '<span class="lbl">ชั้นข้อมูล</span>';
+    [['c', 'กระแสน้ำผิวหน้า'], ['w', 'ลมประจำ']].forEach(function (z) { h += '<button class="chip' + (lay[z[0]] ? ' on' : '') + '" data-l="' + z[0] + '">' + z[1] + '</button>'; });
+    $('layChips').innerHTML = h; bindChips($('layChips'), 'l', function (v) { lay[v] = lay[v] ? 0 : 1; updB(); drawB(); });
+    chips('curChips', 'กระแสน้ำ', TG.map(function (t, i) { return (i + 1) + ' ' + t.n; }), selB, 's', function (i) { return S.b[i] === 2; }, function (v) { selB = v; updB(); drawB(); });
+    var T = TG[selB], st = S.b[selB] || 0;
+    $('bName').textContent = (selB + 1) + ' กระแสน้ำ' + T.n;
+    $('bOcean').textContent = T.o;
+    $('bClue').textContent = T.clue;
+    askUI('bAsk1', WC, T.w, st >= 1, function () { S.b[selB] = 1; save(); updB(); drawB(); return true; });
+    $('bQ2').classList.toggle('hide', st < 1);
+    askUI('bAsk2', EFFL, T.e, st >= 2, function () { S.b[selB] = 2; save(); updB(); drawB(); return true; });
+    $('bWhy').textContent = st >= 2 ? T.why : st === 1 ? (T.w === 0 ? 'ถูกต้อง ไหลมาจากเขตร้อน จึงเป็นกระแสน้ำอุ่น' : 'ถูกต้อง ไหลมาจากเขตหนาว จึงเป็นกระแสน้ำเย็น') : 'ใบ้ : น้ำที่ไหลมาจากเขตร้อนจะอุ่นกว่าน้ำรอบข้าง น้ำที่ไหลมาจากเขตหนาวจะเย็นกว่า';
+    $('logB').innerHTML = TG.map(function (t, i) { var r = S.b[i] || 0;
+      return '<tr' + (i === selB ? ' class="cur"' : '') + '><td class="n">' + (i + 1) + ' ' + t.n + '</td><td>' + t.o.replace('มหาสมุทร', '') + '</td><td>' + (r >= 1 ? wcB(i) : '-') + '</td><td>' + (r >= 2 ? effB(i) : '-') + '</td></tr>'; }).join('');
+  }
+  var BIO = [
+    { y: 'น้ำผุด · เปรู', n: 'ปลาแอนโชวีและนกทะเล', d: 'น้ำเย็นที่ผุดขึ้นนำธาตุอาหารมาเลี้ยงแพลงก์ตอน ปลาแอนโชวีจำนวนมหาศาลเป็นอาหารของนกทะเล สิงโตทะเล และเป็นอาหารสัตว์ส่งออกทั่วโลก', i: 'ปีเอลนีโญ น้ำผุดหยุด ปลาลดฮวบ' },
+    { y: 'กระแสน้ำอุ่น', n: 'ปะการังและปลาเขตร้อน', d: 'ปะการังเติบโตในน้ำอุ่นใส กระแสน้ำอุ่นพาตัวอ่อนปะการังและปลาไปไกล แต่ถ้าน้ำอุ่นเกินปกตินาน ๆ ปะการังจะฟอกขาวและตายได้', i: 'น้ำอุ่นพอดี = ดี · ร้อนเกิน = ฟอกขาว' },
+    { y: 'นักเดินทาง', n: 'เต่าทะเลและวาฬ', d: 'ลูกเต่าทะเลลอยไปกับกระแสน้ำวนนานหลายปีก่อนกลับมาวางไข่ที่ชายหาดเดิม วาฬหลายชนิดอพยพตามแหล่งน้ำเย็นที่มีอาหารมาก', i: 'กระแสน้ำเป็นทางด่วนของสัตว์ทะเล' },
+    { y: 'กระแสน้ำเย็นถึงศูนย์สูตร', n: 'นกเพนกวินกาลาปากอส', d: 'หมู่เกาะกาลาปากอสอยู่บนเส้นศูนย์สูตร แต่กระแสน้ำเย็นและน้ำผุดทำให้น้ำเย็นพอที่นกเพนกวินอาศัยอยู่ได้ เป็นเพนกวินชนิดเดียวที่อยู่ทางเหนือของเส้นศูนย์สูตร', i: 'กระแสน้ำเย็นกำหนดที่อยู่ของสัตว์' },
+    { y: 'กระแสน้ำวน', n: 'ขยะพลาสติกกลางแปซิฟิก', d: 'กระแสน้ำวนในแปซิฟิกเหนือพาขยะพลาสติกจากชายฝั่งหลายประเทศมาสะสมกลางวง เกิดเป็นแพขยะขนาดใหญ่ เป็นอันตรายต่อเต่า นก และปลาที่กินพลาสติกเข้าไป', i: 'ขยะจากบกไปไกลได้ทั้งมหาสมุทร' },
+    { y: 'พ.ศ. 2535', n: 'เป็ดยางเดินทางรอบโลก', d: 'ตู้สินค้าตกเรือกลางแปซิฟิกเหนือ ของเล่นยางราว 29,000 ชิ้นลอยไปตามกระแสน้ำ เก็บได้ทั้งที่อะแลสกา ฮาวาย และอีกหลายปีต่อมาที่ชายฝั่งแอตแลนติก นักวิทยาศาสตร์ใช้ศึกษาเส้นทางกระแสน้ำ', i: 'ของลอยน้ำช่วยติดตามกระแสน้ำ' }];
+  $('libB').innerHTML = BIO.map(function (e) { return '<div class="ev"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+  function drawB() {
+    var cv = $('cvB'), w = cv.clientWidth || 600; cv.dataset.h = Math.round(clamp(w * .52, 200, 440));
+    var c = fit(cv), x = c.x, W = c.W, H = c.H, sm = W < 500;
+    x.fillStyle = '#05081a'; x.fillRect(0, 0, W, H);
+    var sc = Math.min((W - 10) / 5.45, (H - 10) / 2.66), cx = W / 2, cy = H / 2;
+    var P = function (lon, lat) { lon = lon > 180 ? lon - 360 : lon; var q = eqe(lon, lat); return [cx + q[0] * sc, cy - q[1] * sc]; };
+    x.beginPath(); for (var la = -90; la <= 90; la += 3) { var q = P(-180, la); if (la === -90) x.moveTo(q[0], q[1]); else x.lineTo(q[0], q[1]); }
+    for (var lb = 90; lb >= -90; lb -= 3) { var q2 = P(180, lb); x.lineTo(q2[0], q2[1]); } x.closePath(); x.fillStyle = '#0c1c4a'; x.fill();
+    x.strokeStyle = 'rgba(120,150,220,.12)'; x.lineWidth = 1;
+    for (var lo = -150; lo <= 150; lo += 30) { x.beginPath(); for (var l2 = -90; l2 <= 90; l2 += 5) { var g = P(lo, l2); if (l2 === -90) x.moveTo(g[0], g[1]); else x.lineTo(g[0], g[1]); } x.stroke(); }
+    for (var lt = -60; lt <= 60; lt += 30) { x.beginPath(); for (var o2 = -180; o2 <= 180; o2 += 5) { var g2 = P(o2, lt); if (o2 === -180) x.moveTo(g2[0], g2[1]); else x.lineTo(g2[0], g2[1]); } x.stroke(); }
+    x.setLineDash([4, 4]); x.strokeStyle = 'rgba(232,237,255,.3)'; x.beginPath(); for (var o3 = -180; o3 <= 180; o3 += 5) { var g3 = P(o3, 0); if (o3 === -180) x.moveTo(g3[0], g3[1]); else x.lineTo(g3[0], g3[1]); } x.stroke(); x.setLineDash([]);
+    if (GEO) Object.keys(GEO).forEach(function (k) { GEO[k].forEach(function (ring) {
+      x.beginPath(); ring.forEach(function (p, i) { var q3 = P(p[0], p[1]); if (i) x.lineTo(q3[0], q3[1]); else x.moveTo(q3[0], q3[1]); }); x.closePath();
+      x.fillStyle = '#2f3d68'; x.fill(); x.strokeStyle = '#4c5d96'; x.lineWidth = .8; x.stroke(); }); });
+    // ลมประจำ
+    if (lay.w) [[15, -1, -.35], [-15, -1, .35], [45, 1, .3], [-45, 1, -.3]].forEach(function (z) {
+      [-150, -115, -40, -15, 65, 90, 165].forEach(function (lon) { var a = P(lon, z[0]), m = Math.hypot(z[1], z[2]), L = sm ? 16 : 24, ph = (tA * .4 + lon / 97) % 1, o = (ph - .5) * L * .5;
+        x.globalAlpha = .4 + .5 * Math.sin(ph * Math.PI);
+        arrow(x, a[0] - z[1] / m * L / 2 + z[1] / m * o, a[1] + z[2] / m * L / 2 - z[2] / m * o, a[0] + z[1] / m * L / 2 + z[1] / m * o, a[1] - z[2] / m * L / 2 - z[2] / m * o, '#9AA6CF', 1.6, 6); x.globalAlpha = 1; });
+    });
+    // กระแสน้ำ
+    if (lay.c) CURS.forEach(function (cu) {
+      var tg = cu.g != null, st = tg ? (S.b[cu.g] || 0) : 2, on = tg && cu.g === selB;
+      var col = st >= 1 ? (cu.t === 'w' ? '#FF9F6B' : '#4FD8FF') : '#E8EDFF', a = tg ? 1 : .55;
+      var pts = []; cu.p.forEach(function (p) { pts.push(P(p[0], p[1])); });
+      x.globalAlpha = a; x.strokeStyle = col; x.lineWidth = on ? (sm ? 3.2 : 4.2) : tg ? (sm ? 2.2 : 3) : (sm ? 1.4 : 2); x.lineCap = 'round';
+      if (on) { x.save(); x.shadowColor = '#FFD166'; x.shadowBlur = 12; }
+      x.setLineDash([sm ? 7 : 10, sm ? 5 : 7]); x.lineDashOffset = -tA * 18;
+      x.beginPath(); pts.forEach(function (q4, i) { if (i && Math.abs(q4[0] - pts[i - 1][0]) < W / 3) x.lineTo(q4[0], q4[1]); else x.moveTo(q4[0], q4[1]); }); x.stroke();
+      x.setLineDash([]); if (on) x.restore();
+      var n = pts.length, e1 = pts[n - 2], e2 = pts[n - 1];
+      if (Math.abs(e2[0] - e1[0]) < W / 3) arrow(x, e1[0] + (e2[0] - e1[0]) * .3, e1[1] + (e2[1] - e1[1]) * .3, e2[0], e2[1], col, on ? 3 : 2, on ? 11 : 8);
+      x.globalAlpha = 1; x.lineCap = 'butt';
+      if (tg) { var mid = pts[Math.floor(n / 2)], r = sm ? 7 : 9;
+        if (on) { var pr = 13 + 4 * Math.sin(tA * 4); x.strokeStyle = '#FFD166'; x.lineWidth = 2.5; x.beginPath(); x.arc(mid[0], mid[1], pr, 0, 6.283); x.stroke(); }
+        x.fillStyle = st === 2 ? '#5EF2A5' : on ? '#FFD166' : '#E8EDFF'; x.strokeStyle = '#05081a'; x.lineWidth = 2; x.beginPath(); x.arc(mid[0], mid[1], r, 0, 6.283); x.fill(); x.stroke();
+        x.font = '700 ' + (sm ? 9 : 11) + 'px ' + HFONT; x.fillStyle = '#06102A'; x.textAlign = 'center'; x.fillText(String(cu.g + 1), mid[0], mid[1] + (sm ? 3 : 4)); }
+    });
+    if (!sm) { [['แปซิฟิก', -150, 25], ['แปซิฟิก', -130, -25], ['แอตแลนติก', -40, 30], ['อินเดีย', 75, -25]].forEach(function (o) { var p = P(o[1], o[2]); label(x, o[0], p[0], p[1], 'rgba(154,166,207,.85)', 12); }); }
+    var bk = P(100.5, 13.75); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(bk[0], bk[1], 3.4, 0, 6.283); x.fill(); x.strokeStyle = '#05081a'; x.lineWidth = 1; x.stroke();
+    label(x, 'ไทย', bk[0] + 6, bk[1] + (sm ? 12 : 15), '#FFD166', sm ? 10 : 12, 'left');
+    label(x, 'ซีกโลกเหนือ วงวนตามเข็ม · ซีกโลกใต้ วงวนทวนเข็ม', 8, H - 8, '#9AA6CF', sm ? 10 : 12, 'left');
+  }
+
+  // ================================================================ ภารกิจ C ขั้นที่ 1 ภาพตัดขวางแปซิฟิก
+  // dW dE = ความหนาชั้นน้ำอุ่นฝั่งตะวันตก ตะวันออก (สัดส่วนความลึก) · tw = ความแรงลมค้า · cx = ตำแหน่งเมฆฝน · up = น้ำผุดที่เปรู
+  var ST = [
+    { n: 'ปกติ', dW: .44, dE: .09, tw: 1, cx: .17, up: 1, sW: 29, sE: 22,
+      tws: 'แรงตามปกติ', rains: 'ฝั่งตะวันตก (อินโดนีเซีย)', perus: 'น้ำผุด น้ำเย็น ปลาชุม', ths: 'ฝนตามฤดูกาลปกติ', ans: 0,
+      twl: 'พัดแรงตามปกติ จากตะวันออกไปตะวันตก', rainl: 'ฝั่งตะวันตก อินโดนีเซีย ออสเตรเลีย', perul: 'น้ำผุดแรง น้ำเย็น ปลาชุม อากาศแห้ง',
+      why: 'ลมค้าพัดน้ำอุ่นผิวหน้าไปสะสมทางตะวันตก อากาศเหนือน้ำอุ่นลอยตัวขึ้นเป็นเมฆฝนแถบอินโดนีเซีย ส่วนฝั่งเปรูน้ำเย็นผุดขึ้นมาแทน ประเทศไทยได้ฝนตามฤดูกาล' },
+    { n: 'เอลนีโญ', dW: .28, dE: .27, tw: .2, cx: .6, up: .15, sW: 28, sE: 27,
+      tws: 'อ่อนลง', rains: 'กลางมหาสมุทร ถึงเปรู', perus: 'น้ำอุ่น ปลาลดลง', ths: 'ฝนน้อย แห้งแล้ง', ans: 1,
+      twl: 'อ่อนลงมาก บางช่วงพัดกลับทิศ', rainl: 'กลางมหาสมุทรถึงชายฝั่งเปรู', perul: 'น้ำผุดอ่อนลง น้ำอุ่น ปลาลดลง ฝนตกหนัก น้ำท่วม',
+      why: 'ลมค้าอ่อนลง น้ำอุ่นไหลย้อนกลับไปทางตะวันออก เมฆฝนย้ายตามไปกลางมหาสมุทร ฝั่งตะวันตกรวมทั้งประเทศไทยจึงฝนน้อย แห้งแล้ง ร้อนกว่าปกติ ส่วนเปรูน้ำทะเลอุ่น ปลาหาย และฝนตกหนัก' },
+    { n: 'ลานีญา', dW: .54, dE: .04, tw: 1.6, cx: .12, up: 1.5, sW: 30, sE: 20,
+      tws: 'แรงขึ้น', rains: 'ฝั่งตะวันตก มากกว่าปกติ', perus: 'น้ำเย็นจัด ปลาชุม', ths: 'ฝนมาก เสี่ยงน้ำท่วม', ans: 2,
+      twl: 'แรงกว่าปกติ', rainl: 'ฝั่งตะวันตก มากกว่าปกติ', perul: 'น้ำผุดแรงมาก น้ำเย็นจัด ปลาชุม แห้งแล้ง',
+      why: 'ลมค้าแรงกว่าปกติ พัดน้ำอุ่นไปสะสมทางตะวันตกมากขึ้น เมฆฝนแถบอินโดนีเซียหนาแน่นกว่าปกติ ประเทศไทยจึงฝนมาก เสี่ยงน้ำท่วม ส่วนเปรูน้ำผุดแรง น้ำเย็นจัด อากาศแห้ง' }];
+  var TH3 = ['ฝนตามฤดูกาลปกติ', 'ฝนน้อย แห้งแล้ง ร้อนกว่าปกติ', 'ฝนมากกว่าปกติ เสี่ยงน้ำท่วม'];
+  var cs = 0, pC1 = 0, playC1 = 0;
+  function stNow() { var A = ST[0], B = ST[cs], q = smooth(0, 1, pC1), o = {}; ['dW', 'dE', 'tw', 'cx', 'up', 'sW', 'sE'].forEach(function (k) { o[k] = lerp(A[k], B[k], q); }); return o; }
+  function updC1() {
+    chips('stChips', 'สภาวะ', ST.map(function (s) { return s.n; }), cs, 's', function (i) { return S.c1[i]; }, function (v) { cs = v; pC1 = 0; playC1 = 0; updC1(); drawC1(); });
+    var T = ST[cs], done = pC1 >= 1, rec = !!S.c1[cs], o = stNow();
+    $('c1Name').textContent = T.n;
+    $('c1Tw').textContent = done ? T.twl : '-';
+    $('c1Sst').textContent = fmt(o.sW) + ' · ' + fmt(o.sE) + ' °C';
+    $('c1Rain').textContent = done ? T.rainl : '-';
+    $('c1Peru').textContent = done ? T.perul : '-';
+    $('c1Time').textContent = 'เวลาผ่านไป ' + fmt(pC1 * 6) + ' เดือน' + (cs ? ' (เริ่มจากสภาวะปกติ)' : '');
+    $('c1Bar').style.width = (pC1 * 100) + '%';
+    askUI('c1Ask', TH3, T.ans, rec, function () { if (pC1 < 1) { $('c1Why').textContent = 'กด "เดินเวลา 6 เดือน" ให้ครบก่อน แล้วจึงตอบ'; return false; } S.c1[cs] = 1; save(); updC1(); return true; });
+    $('c1Why').textContent = rec ? T.why : done ? 'ดูว่าเมฆฝนอยู่ฝั่งไหน ประเทศไทยอยู่ทางฝั่งตะวันตกของมหาสมุทรแปซิฟิก' : '';
+    $('tC1').value = Math.round(pC1 * 100); $('playC1').textContent = playC1 ? 'หยุด' : 'เดินเวลา 6 เดือน';
+    $('logC1').innerHTML = ST.map(function (s, i) { var r = S.c1[i];
+      return '<tr' + (i === cs ? ' class="cur"' : '') + '><td class="n">' + s.n + '</td><td>' + (r ? s.tws : '-') + '</td><td>' + (r ? s.rains : '-') + '</td><td>' + (r ? s.perus : '-') + '</td><td>' + (r ? s.ths : '-') + '</td></tr>'; }).join('');
+    updProg();
+  }
+  $('tC1').oninput = function () { pC1 = +this.value / 100; playC1 = 0; updC1(); drawC1(); };
+  $('playC1').onclick = function () { if (pC1 >= 1) pC1 = 0; playC1 = playC1 ? 0 : 1; updC1(); };
+  $('resetC1').onclick = function () { pC1 = 0; playC1 = 0; updC1(); drawC1(); };
+  function cloud(x, cx, cy, s, a) {
+    x.fillStyle = 'rgba(232,237,255,' + a + ')';
+    [[0, 0, 1], [-.9, .35, .7], [.9, .35, .75], [-.4, -.55, .75], [.45, -.5, .7], [0, -1.05, .6]].forEach(function (b) { x.beginPath(); x.arc(cx + b[0] * s, cy + b[1] * s, b[2] * s, 0, 6.283); x.fill(); });
+  }
+  function drawC1() {
+    var f = fit($('cvC1'), .64, 250, 470), x = f.x, W = f.W, H = f.H, o = stNow(), sm = W < 480 ? 10 : 12;
+    var yS = H * .46, xL = W * .1, xR = W * .9, D = H - yS - 6;
+    var gs = x.createLinearGradient(0, 0, 0, yS); gs.addColorStop(0, '#081238'); gs.addColorStop(1, '#203a78'); x.fillStyle = gs; x.fillRect(0, 0, W, yS);
+    x.fillStyle = '#0b2a63'; x.fillRect(0, yS, W, H - yS);
+    function zW(xx) { var r = clamp((xx - xL) / (xR - xL), 0, 1); return lerp(o.dW, o.dE, r * r * (3 - 2 * r) * .55 + r * .45); }
+    // ชั้นน้ำอุ่น : ไล่สีตามอุณหภูมิผิวน้ำ
+    x.beginPath(); x.moveTo(xL, yS); for (var xx = xL; xx <= xR; xx += 4) x.lineTo(xx, yS + zW(xx) * D); x.lineTo(xR, yS); x.closePath();
+    var gw = x.createLinearGradient(xL, 0, xR, 0), tc = function (t) { var k = clamp((t - 20) / 10, 0, 1); return 'rgba(' + Math.round(lerp(79, 255, k)) + ',' + Math.round(lerp(216, 120, k)) + ',' + Math.round(lerp(255, 80, k)) + ',.85)'; };
+    gw.addColorStop(0, tc(o.sW)); gw.addColorStop(.5, tc(lerp(o.sW, o.sE, .4))); gw.addColorStop(1, tc(o.sE)); x.fillStyle = gw; x.fill();
+    x.setLineDash([5, 5]); x.strokeStyle = 'rgba(232,237,255,.55)'; x.lineWidth = 1.2; x.beginPath();
+    for (var x2 = xL; x2 <= xR; x2 += 4) { var yy = yS + zW(x2) * D; if (x2 > xL) x.lineTo(x2, yy); else x.moveTo(x2, yy); } x.stroke(); x.setLineDash([]);
+    if (W > 420) label(x, 'แนวแบ่งน้ำอุ่น–น้ำเย็น', lerp(xL, xR, .5), yS + zW(lerp(xL, xR, .5)) * D + 16, 'rgba(232,237,255,.75)', sm);
+    // น้ำผุดที่เปรู
+    if (o.up > .2) { var ua = clamp(o.up / 1.5, 0, 1);
+      for (var u = 0; u < 3; u++) { var ph = (tA * .5 + u / 3) % 1, ux = xR - 16 - u * 14, uy = lerp(yS + D * .8, yS + D * .1, ph);
+        x.globalAlpha = ua * Math.sin(ph * Math.PI); arrow(x, ux, uy + 16, ux, uy - 6, '#4FD8FF', 2.6, 9); x.globalAlpha = 1; }
+      label(x, 'น้ำผุด', xR - 34, yS + D * .9, '#4FD8FF', sm, 'right'); }
+    // กระแสน้ำผิวหน้า (ตามลมค้า)
+    var sp = o.tw;
+    for (var k = 0; k < 5; k++) { var ph2 = (tA * .25 * Math.max(.2, sp) + k / 5) % 1, cxw = lerp(xR - 20, xL + 20, ph2), cyw = yS + 9;
+      x.globalAlpha = Math.min(1, sp) * Math.sin(ph2 * Math.PI) * .9; arrow(x, cxw + 12, cyw, cxw - 12, cyw, '#FFD166', 2, 7); x.globalAlpha = 1; }
+    // แผ่นดิน
+    x.fillStyle = '#3b4a2e'; x.strokeStyle = '#6b7f4f'; x.lineWidth = 1.2;
+    x.beginPath(); x.moveTo(0, H); x.lineTo(0, yS - H * .05); x.lineTo(xL * .6, yS - H * .07); x.lineTo(xL, yS); x.lineTo(xL + 6, H); x.closePath(); x.fill(); x.stroke();
+    x.beginPath(); x.moveTo(W, H); x.lineTo(W, yS - H * .3); x.lineTo(W - (W - xR) * .5, yS - H * .34); x.lineTo(xR + 4, yS - H * .08); x.lineTo(xR, yS); x.lineTo(xR - 6, H); x.closePath(); x.fill(); x.stroke();
+    label(x, 'ตะวันตก : อินโดนีเซีย', 8, H - 10, '#E8EDFF', sm, 'left'); label(x, 'ตะวันออก : เปรู', W - 8, H - 10, '#E8EDFF', sm, 'right');
+    label(x, '← ประเทศไทย', 6, 16, '#FFD166', sm + 1, 'left');
+    // การหมุนเวียนวอล์กเกอร์ + เมฆฝน
+    var ccx = lerp(xL, xR, o.cx), yTop = H * .13, ca = .5 + .4 * Math.min(1, o.tw + (cs === 1 ? pC1 : 0));
+    var sink = cs === 1 ? lerp(xR - 30, xL + 30, smooth(0, 1, pC1)) : xR - 30;
+    x.strokeStyle = 'rgba(154,166,207,.7)'; x.lineWidth = 2;
+    if (o.tw > .35) {
+      arrow(x, ccx, yS - H * .1, ccx, yTop + 18, 'rgba(154,166,207,.8)', 2, 8);
+      arrow(x, ccx + 20, yTop + 8, sink - 10, yTop + 8, 'rgba(154,166,207,.8)', 2, 8);
+      arrow(x, sink, yTop + 18, sink, yS - H * .12, 'rgba(154,166,207,.8)', 2, 8);
+    } else {
+      arrow(x, ccx, yS - H * .1, ccx, yTop + 18, 'rgba(154,166,207,.8)', 2, 8);
+      arrow(x, ccx - 20, yTop + 8, xL + 30, yTop + 8, 'rgba(154,166,207,.7)', 2, 8); arrow(x, ccx + 20, yTop + 8, xR - 20, yTop + 8, 'rgba(154,166,207,.7)', 2, 8);
+    }
+    // ลมค้าที่ผิวพื้น
+    for (var m = 0; m < 4; m++) { var ph3 = (tA * .35 * Math.max(.25, sp) + m / 4) % 1, wx = lerp(xR - 10, xL + 10, ph3), wy = yS - H * .05, L = 14 + 18 * Math.min(1.6, sp);
+      x.globalAlpha = clamp(sp, .15, 1) * Math.sin(ph3 * Math.PI); arrow(x, wx + L / 2, wy, wx - L / 2, wy, '#E8EDFF', 1.6 + sp, 8 + sp * 2); x.globalAlpha = 1; }
+    if (W >= 480) label(x, o.tw < .5 ? 'ลมค้าอ่อน' : o.tw > 1.3 ? 'ลมค้าแรง' : 'ลมค้า', lerp(xL, xR, o.cx > .4 ? .25 : .62), yS - H * .1, '#E8EDFF', sm);
+    var cs2 = W * (.05 + .015 * clamp(o.tw, .6, 1.6)), cyy = yS - H * .22;
+    for (var rr = 0; rr < 22; rr++) { var rx = ccx + (hash(rr, 31) - .5) * cs2 * 2.2, ry = wrap(tA * 90 + hash(rr, 32) * 60, yS - cyy - 8); x.strokeStyle = 'rgba(170,210,255,.85)'; x.lineWidth = 1.6; x.beginPath(); x.moveTo(rx, cyy + 8 + ry); x.lineTo(rx - 2, cyy + 16 + ry); x.stroke(); }
+    cloud(x, ccx, cyy, cs2, ca); if (W >= 480) label(x, 'เมฆฝน ฝนตกหนัก', ccx + cs2 * 1.9, cyy + cs2 * .9, '#E8EDFF', sm, 'left');
+    label(x, fmt(o.sW) + ' °C', xL + 30, yS + 24, '#FFFFFF', sm + 2, 'left');
+    label(x, fmt(o.sE) + ' °C', xR - 30, yS + 24, '#FFFFFF', sm + 2, 'right');
+    label(x, 'สภาวะ : ' + (pC1 < .02 && cs ? 'ปกติ → ' + ST[cs].n : ST[cs].n), W / 2, 16, cs === 1 ? '#FF9F6B' : cs === 2 ? '#4FD8FF' : '#5EF2A5', sm + 2);
+  }
+
+  // ================================================================ ภารกิจ C ขั้นที่ 2 ดัชนีมหาสมุทร
+  var EV = [
+    { n: '2540–2541', v: 2.4, a: 0, news: 'เอลนีโญรุนแรงมาก ไฟป่าในอินโดนีเซียลุกลาม หมอกควันพัดมาถึงภาคใต้ของไทย ปะการังฟอกขาวทั่วโลก เปรูฝนตกหนักน้ำท่วม', s: 'แล้ง ไฟป่า ปะการังฟอกขาว' },
+    { n: '2553–2554', v: -1.6, a: 2, news: 'ลานีญากำลังแรง ประเทศไทยฝนตกมากกว่าปกติ เป็นปัจจัยหนึ่งของน้ำท่วมใหญ่ปี 2554 ในภาคเหนือ ภาคกลาง และบางส่วนของกรุงเทพฯ', s: 'ฝนมาก น้ำท่วมใหญ่ในไทย' },
+    { n: '2556–2557', v: -0.4, a: 1, news: 'ค่าอยู่ระหว่าง −0.5 ถึง +0.5 °C ถือเป็นสภาวะปกติ ลมค้าและฝนเป็นไปตามฤดูกาล', s: 'ฝนตามฤดูกาล' },
+    { n: '2558–2559', v: 2.6, a: 0, news: 'เอลนีโญรุนแรง ประเทศไทยแห้งแล้งหนัก น้ำในเขื่อนใหญ่เหลือน้อย ต้องงดทำนาปรัง ปะการังแนวเกรตแบร์ริเออร์รีฟฟอกขาวครั้งใหญ่', s: 'ภัยแล้ง เขื่อนน้ำน้อย' },
+    { n: '2563–2565', v: -1.3, a: 2, news: 'ลานีญาเกิดต่อเนื่องเกือบ 3 ปี ประเทศไทยฝนมากกว่าปกติ ปี 2565 น้ำท่วมหลายจังหวัด ฤดูร้อนไม่ร้อนจัดเท่าปีก่อน ๆ', s: 'ฝนมาก น้ำท่วมหลายจังหวัด' },
+    { n: '2566–2567', v: 2.0, a: 0, news: 'เอลนีโญ ฝนน้อย ฤดูร้อนปี 2567 ร้อนจัดหลายพื้นที่ ผลผลิตอ้อยและข้าวลดลง ปะการังในทะเลไทยฟอกขาว บางแหล่งดำน้ำต้องปิดชั่วคราว', s: 'ร้อนจัด ฝนน้อย ปะการังฟอกขาว' }];
+  var CLS = ['เอลนีโญ', 'ปกติ', 'ลานีญา'];
+  var ce = 0;
+  function updC2() {
+    chips('evChips', 'ปี พ.ศ.', EV.map(function (e) { return e.n; }), ce, 'v', function (i) { return S.c2[i]; }, function (v) { ce = v; updC2(); drawC2(); });
+    var E = EV[ce], rec = !!S.c2[ce];
+    $('c2Name').textContent = 'ปี ' + E.n;
+    $('c2Val').textContent = (E.v > 0 ? '+' : E.v < 0 ? '−' : '') + fmt(Math.abs(E.v), 1) + ' °C';
+    $('c2Cls').textContent = rec ? CLS[E.a] : '?';
+    askUI('c2Ask', CLS, E.a, rec, function () { S.c2[ce] = 1; save(); updC2(); drawC2(); return true; });
+    $('c2News').innerHTML = rec ? '<b style="color:#FFD166">ข่าว : </b>' + E.news : 'เกณฑ์ : ตั้งแต่ +0.5 °C = เอลนีโญ · ตั้งแต่ −0.5 °C ลงไป = ลานีญา · ระหว่างนั้น = ปกติ';
+    $('logC2').innerHTML = EV.map(function (e, i) { var r = S.c2[i];
+      return '<tr' + (i === ce ? ' class="cur"' : '') + '><td class="n">' + e.n + '</td><td>' + (e.v > 0 ? '+' : e.v < 0 ? '−' : '') + fmt(Math.abs(e.v), 1) + ' °C</td><td>' + (r ? CLS[e.a] : '-') + '</td><td>' + (r ? e.s : '-') + '</td></tr>'; }).join('');
+    updProg();
+  }
+  function drawC2() {
+    var f = fit($('cvC2'), .6, 220, 360), x = f.x, W = f.W, H = f.H, sm = W < 480 ? 10 : 12;
+    x.fillStyle = '#050a1f'; x.fillRect(0, 0, W, H);
+    var l = 44, r = W - 10, t = 26, b = H - 34, y0 = (t + b) / 2, k = (b - t) / 2 / 3;
+    var Y = function (v) { return y0 - v * k; };
+    x.strokeStyle = 'rgba(154,166,207,.25)'; x.lineWidth = 1;
+    [-3, -2, -1, 1, 2, 3].forEach(function (v) { x.beginPath(); x.moveTo(l, Y(v)); x.lineTo(r, Y(v)); x.stroke(); label(x, (v > 0 ? '+' : '−') + Math.abs(v), l - 6, Y(v) + 4, '#9AA6CF', sm, 'right'); });
+    x.fillStyle = 'rgba(255,159,107,.08)'; x.fillRect(l, Y(3), r - l, Y(.5) - Y(3));
+    x.fillStyle = 'rgba(79,216,255,.08)'; x.fillRect(l, Y(-.5), r - l, Y(-3) - Y(-.5));
+    x.strokeStyle = '#E8EDFF'; x.lineWidth = 1.4; x.beginPath(); x.moveTo(l, y0); x.lineTo(r, y0); x.stroke(); label(x, '0', l - 6, y0 + 4, '#E8EDFF', sm, 'right');
+    x.setLineDash([6, 4]); x.strokeStyle = '#FF9F6B'; x.beginPath(); x.moveTo(l, Y(.5)); x.lineTo(r, Y(.5)); x.stroke(); x.strokeStyle = '#4FD8FF'; x.beginPath(); x.moveTo(l, Y(-.5)); x.lineTo(r, Y(-.5)); x.stroke(); x.setLineDash([]);
+    label(x, 'เขตเอลนีโญ (≥ +0.5)', r - 4, Y(2.75), '#FF9F6B', sm, 'right'); label(x, 'เขตลานีญา (≤ −0.5)', r - 4, Y(-2.6), '#4FD8FF', sm, 'right');
+    var n = EV.length, bw = (r - l) / n;
+    EV.forEach(function (e, i) { var bx = l + bw * i + bw * .22, ww = bw * .56, rec = S.c2[i], on = i === ce;
+      var col = rec ? (e.a === 0 ? '#FF9F6B' : e.a === 2 ? '#4FD8FF' : '#9AA6CF') : '#E8EDFF';
+      if (on) { x.save(); x.shadowColor = '#FFD166'; x.shadowBlur = 14; }
+      x.fillStyle = col; x.globalAlpha = on ? 1 : .75; x.fillRect(bx, Math.min(Y(e.v), y0), ww, Math.abs(Y(e.v) - y0)); x.globalAlpha = 1;
+      if (on) { x.restore(); x.strokeStyle = '#FFD166'; x.lineWidth = 2; x.strokeRect(bx - 2, Math.min(Y(e.v), y0) - 2, ww + 4, Math.abs(Y(e.v) - y0) + 4); }
+      label(x, (e.v > 0 ? '+' : '−') + fmt(Math.abs(e.v), 1), bx + ww / 2, e.v > 0 ? Y(e.v) - 5 : Y(e.v) + 14, on ? '#FFD166' : '#E8EDFF', sm);
+      label(x, e.n.replace('25', '').replace('–25', '–'), bx + ww / 2, H - 14, on ? '#FFD166' : '#9AA6CF', sm); });
+    label(x, 'อุณหภูมิผิวน้ำแปซิฟิกตอนกลาง ต่างจากปกติ (°C)', 8, 16, '#4FD8FF', sm + 1, 'left');
+  }
+  function updProg() {
+    var a = ST.filter(function (s, i) { return S.c1[i]; }).length, b = EV.filter(function (e, i) { return S.c2[i]; }).length;
+    $('progC').innerHTML = 'ภารกิจ C บันทึกแล้ว : สภาวะ <b>' + a + '/3</b> · ดัชนีมหาสมุทร <b>' + b + '/6</b>';
+  }
+
+  // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส
+  var CL = [
+    { L: 'W', q: 'กระแสน้ำผิวหน้าในมหาสมุทรเกิดจากอะไรเป็นหลัก', o: ['ดวงจันทร์ดึงดูดน้ำ', 'ลมที่พัดผ่านผิวน้ำ', 'แผ่นดินไหวใต้ทะเล', 'น้ำจากแม่น้ำไหลลงทะเล'], a: 1,
+      w: 'ลมที่พัดผ่านผิวน้ำลากน้ำผิวหน้าให้ไหลไปด้วย ลมประจำอย่างลมค้าและลมตะวันตกจึงเป็นตัวกำหนดเส้นทางกระแสน้ำผิวหน้าทั่วโลก' },
+    { L: 'A', q: 'กระแสน้ำวนขนาดใหญ่ในมหาสมุทรซีกโลกเหนือ หมุนทิศใด', o: ['ทวนเข็มนาฬิกา', 'ไม่หมุน ไหลตรง', 'ตามเข็มนาฬิกา', 'เปลี่ยนทิศทุกวัน'], a: 2,
+      w: 'ลมค้าพัดน้ำไปทางตะวันตก ลมตะวันตกพัดกลับไปทางตะวันออก น้ำเบี่ยงไปทางขวาและถูกทวีปขวางกั้น จึงวนตามเข็มนาฬิกา (ซีกโลกใต้วนทวนเข็มนาฬิกา)' },
+    { L: 'L', q: 'ชายฝั่งที่มีกระแสน้ำเย็นไหลผ่าน เช่น ชายฝั่งเปรูและชิลี มีภูมิอากาศอย่างไร', o: ['ร้อนชื้น ฝนตกชุกทั้งปี', 'มีพายุหมุนเขตร้อนบ่อย', 'หนาวจัดมีหิมะตลอดปี', 'เย็น แห้งแล้ง เกิดทะเลทรายชายฝั่ง'], a: 3,
+      w: 'น้ำเย็นทำให้อากาศเหนือชายฝั่งเย็นและจมตัว ไม่เกิดเมฆฝน ทะเลทรายอาตากามาและทะเลทรายนามิบจึงอยู่ติดทะเลที่มีกระแสน้ำเย็น' },
+    { L: 'K', q: 'น้ำผุด (upwelling) ทำให้ทะเลบริเวณนั้นมีปลาชุกชุม เพราะอะไร', o: ['น้ำเย็นจากด้านล่างนำธาตุอาหารขึ้นมา แพลงก์ตอนเติบโต', 'น้ำผิวหน้าอุ่นขึ้น ปลาชอบน้ำอุ่น', 'มีคลื่นแรง ปลาว่ายเข้าฝั่ง', 'น้ำจืดจากแม่น้ำไหลลงทะเล'], a: 0,
+      w: 'เมื่อน้ำผิวหน้าถูกพัดออกจากฝั่ง น้ำเย็นที่มีธาตุอาหารมากจากด้านล่างผุดขึ้นมาแทน แพลงก์ตอนพืชเติบโตเป็นอาหารของปลา' },
+    { L: 'E', q: 'ปีที่เกิดเอลนีโญ ประเทศไทยมักเป็นอย่างไร', o: ['ฝนตกมากกว่าปกติ น้ำท่วม', 'ฝนน้อย แห้งแล้ง ร้อนกว่าปกติ', 'มีหิมะตกบนยอดดอย', 'ไม่ได้รับผลใด ๆ'], a: 1,
+      w: 'ลมค้าอ่อนลง น้ำอุ่นและเมฆฝนย้ายไปทางตะวันออกของแปซิฟิก ฝั่งตะวันตกรวมทั้งไทย อินโดนีเซีย และออสเตรเลียจึงฝนน้อย แห้งแล้ง' },
+    { L: 'R', q: 'ปรากฏการณ์ลานีญาเกิดขึ้นเมื่อใด', o: ['ลมค้าหยุดพัด', 'น้ำทะเลทั้งโลกร้อนขึ้นพร้อมกัน', 'ลมค้าแรงกว่าปกติ น้ำอุ่นสะสมฝั่งตะวันตกมากขึ้น', 'เกิดแผ่นดินไหวกลางมหาสมุทร'], a: 2,
+      w: 'ลานีญาคือภาวะตรงข้ามกับเอลนีโญ ลมค้าแรงกว่าปกติ น้ำอุ่นและเมฆฝนสะสมทางตะวันตก ไทยฝนมาก ส่วนเปรูน้ำเย็นจัด' }
+  ];
+  function cluesUI() {
+    var h = '';
+    CL.forEach(function (a, i) {
+      var ok = S.cl[i] === a.a;
+      h += '<div class="al' + (ok ? ' ok' : '') + '"><span class="letter">' + (ok ? a.L : '?') + '</span><div class="t">คำถามที่ ' + (i + 1) + (ok ? ' · ไขแล้ว' : '') + '</div><div class="q">' + a.q + '</div><div class="opts">';
+      a.o.forEach(function (o, j) { h += '<button data-i="' + i + '" data-j="' + j + '" class="' + (ok && j === a.a ? 'ok' : '') + '">' + o + '</button>'; });
+      h += '</div>' + (ok ? '<div class="why">' + a.w + '</div>' : '') + '</div>';
+    });
+    $('clues').innerHTML = h;
+    Array.prototype.forEach.call($('clues').querySelectorAll('button'), function (b) {
+      b.onclick = function () { var i = +b.getAttribute('data-i'), j = +b.getAttribute('data-j');
+        if (S.cl[i] === CL[i].a) return;
+        if (j === CL[i].a) { S.cl[i] = j; save(); cluesUI(); } else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); } };
+    });
+    $('prog').innerHTML = 'รหัสผ่าน : <b>' + CL.map(function (a, i) { return S.cl[i] === a.a ? a.L : '_'; }).join(' ') + '</b>';
+    $('winC').classList.toggle('hide', !CL.every(function (a, i) { return S.cl[i] === a.a; }));
+  }
+  // ---------------------------------------------------------------- คลังผลกระทบ
+  var LIBC = [
+    { c: 'en', y: 'เอลนีโญ · เกษตร', n: 'ข้าว อ้อย และน้ำในเขื่อน', d: 'ฝนน้อยกว่าปกติ น้ำในเขื่อนลดลง ชาวนาอาจต้องงดทำนาปรัง ผลผลิตอ้อยและข้าวลดลง ราคาสินค้าเกษตรสูงขึ้น', i: 'ใครได้รับผล : เกษตรกร ผู้บริโภค' },
+    { c: 'en', y: 'เอลนีโญ · ทะเล', n: 'ปะการังฟอกขาว', d: 'น้ำทะเลอุ่นกว่าปกตินาน ๆ ทำให้ปะการังขับสาหร่ายที่อาศัยอยู่ออกไป ปะการังกลายเป็นสีขาวและตายได้ แหล่งดำน้ำบางแห่งต้องปิด', i: 'ใครได้รับผล : สัตว์ทะเล ชาวประมง การท่องเที่ยว' },
+    { c: 'en', y: 'เอลนีโญ · อากาศ', n: 'ไฟป่าและหมอกควัน', d: 'อากาศแห้งทำให้ไฟป่าในอินโดนีเซียและภาคเหนือของไทยลุกลามง่าย หมอกควันและฝุ่นละอองทำให้เกิดปัญหาสุขภาพทางเดินหายใจ', i: 'ใครได้รับผล : ทุกคน โดยเฉพาะเด็กและผู้สูงอายุ' },
+    { c: 'ln', y: 'ลานีญา · น้ำ', n: 'ฝนมาก น้ำท่วม', d: 'ฝนตกมากกว่าปกติ เสี่ยงน้ำท่วมและดินถล่ม แต่เขื่อนก็มีน้ำเก็บไว้มากขึ้นสำหรับฤดูแล้ง', i: 'ใครได้รับผล : ชุมชนริมน้ำ ที่ลุ่ม เชิงเขา' },
+    { c: 'ln', y: 'ลานีญา · สุขภาพ', n: 'ยุงและโรคที่มากับน้ำ', d: 'น้ำขังหลังฝนตกหนักเป็นแหล่งเพาะพันธุ์ยุง โรคไข้เลือดออกอาจระบาดมากขึ้น และมีโรคที่มากับน้ำท่วม เช่น ฉี่หนู ท้องร่วง', i: 'ใครได้รับผล : ทุกคนในพื้นที่น้ำท่วม' },
+    { c: 'en', y: 'ทั้งสองแบบ · โลก', n: 'ผลไกลถึงอีกฝั่งโลก', d: 'เอลนีโญทำให้เปรูฝนตกหนัก ปลาแอนโชวีลดลง ออสเตรเลียแห้งแล้ง ส่วนลานีญาทำให้ออสเตรเลียฝนมาก แสดงว่ามหาสมุทรกับบรรยากาศเชื่อมโยงกันทั้งโลก', i: 'ติดตามได้ที่ : กรมอุตุนิยมวิทยา' }];
+  $('libC').innerHTML = LIBC.map(function (e) { return '<div class="ev ' + e.c + '"><div class="y">' + e.y + '</div><div class="n">' + e.n + '</div>' + e.d + '<div class="id">' + e.i + '</div></div>'; }).join('');
+
+  // ---------------------------------------------------------------- เริ่ม
+  function drawAll() {
+    if (tab === 'A') { drawA1(); drawA2(); }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { drawC1(); drawC2(); }
+  }
+  var anim = null;
+  function loop(now) {
+    var dt = lastT ? Math.min(.1, (now - lastT) / 1000) : 0; lastT = now; tA += dt;
+    if (tab === 'A') {
+      if (playA1) { pA1 = Math.min(1, pA1 + dt / 5); if (pA1 >= 1) playA1 = 0; updA1(); }
+      if (playA2) { pA2 = Math.min(1, pA2 + dt / 4); if (pA2 >= 1) playA2 = 0; updA2(); }
+      drawA1(); drawA2();
+    }
+    if (tab === 'B') drawB();
+    if (tab === 'C') { if (playC1) { pC1 = Math.min(1, pC1 + dt / 6); if (pC1 >= 1) playC1 = 0; updC1(); } drawC1(); }
+    anim = requestAnimationFrame(loop);
+  }
+  updA1(); updA2(); updB(); updC1(); updC2(); cluesUI();
+  var rt; addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(drawAll, 120); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
+  drawAll();
+  if (!reduce) anim = requestAnimationFrame(loop);
+  // ใช้ตอนสร้างภาพสไลด์/เฉลย
+  window.ESJ_A3 = { WINDS: WINDS, EARTH: EARTH, A1L: A1L, curV: curV, curDir: curDir, curKm: curKm, COAST: COAST, TG: TG, wcB: wcB, effB: effB, ST: ST, EV: EV, CLS: CLS, CL: CL,
+    stop: function () { if (anim) cancelAnimationFrame(anim); anim = null; },
+    tick: function (t) { tA = t; },
+    setA1: function (w, e, p) { playA1 = 0; aw = w; ae = e; pA1 = p; updA1(); drawA1(); },
+    setA2: function (k, p) { playA2 = 0; ac = k; pA2 = p; updA2(); drawA2(); },
+    setB: function (i, w) { selB = i; if (w != null) lay.w = w; updB(); drawB(); },
+    setC1: function (s, p) { playC1 = 0; cs = s; pC1 = p; updC1(); drawC1(); },
+    setC2: function (i) { ce = i; updC2(); drawC2(); },
+    recAll: function () { A1L.forEach(function (z) { S.a1[z[0] * 3 + z[1]] = 1; }); COAST.forEach(function (c, i) { S.a2[i] = 1; }); TG.forEach(function (t, i) { S.b[i] = 2; });
+      ST.forEach(function (s, i) { S.c1[i] = 1; }); EV.forEach(function (e, i) { S.c2[i] = 1; }); CL.forEach(function (a, i) { S.cl[i] = a.a; });
+      updA1(); updA2(); updB(); updC1(); updC2(); cluesUI(); drawAll(); } };
+})();
+</script>
+</body>
+</html>
