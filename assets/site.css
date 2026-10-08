@@ -18,6 +18,8 @@
   --head: "Chakra Petch", "Sarabun", sans-serif;
   --body: "Sarabun", "Chakra Petch", sans-serif;
   --r: 14px;
+  --t1: var(--cyan);
+  --t2: var(--violet);
 }
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; }
@@ -73,7 +75,7 @@ h1, h2, h3, .head { font-family: var(--head); line-height: 1.25; margin: 0; }
 .nav { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; }
 .nav a { font-family: var(--head); color: var(--muted); padding: 7px 12px; border-radius: 999px; font-size: 15px; white-space: nowrap; }
 .nav a:hover { color: var(--text); background: rgba(255,255,255,.06); text-decoration: none; }
-.nav a.on { color: var(--ink); background: var(--cyan); font-weight: 600; }
+.nav a.on { color: var(--ink); background: var(--t1); font-weight: 600; }
 @media (max-width: 760px) {
   .top .wrap { padding-top: 8px; padding-bottom: 8px; gap: 8px; }
   .nav { margin-left: 0; width: 100%; overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; scrollbar-width: none; }
@@ -169,7 +171,7 @@ main { padding: 26px 0 60px; }
 .rooms a:hover { border-color: var(--cyan); text-decoration: none; }
 .rooms .rn { font-family: var(--head); font-size: 30px; font-weight: 700; color: var(--cyan); }
 .bar { height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; margin-top: 8px; }
-.bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--cyan), var(--violet)); }
+.bar i { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--t1), var(--t2)); }
 
 /* แผนที่ภารกิจ */
 .unit { margin-top: 26px; }
@@ -222,7 +224,7 @@ main { padding: 26px 0 60px; }
 .mbar.now { border-color: var(--gold); }
 .tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 14px 0 10px; }
 .chip { font-family: var(--head); font-size: 14px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--line-hi); background: transparent; color: var(--muted); cursor: pointer; }
-.chip.on { background: var(--cyan); color: var(--ink); border-color: var(--cyan); font-weight: 600; }
+.chip.on { background: var(--t1); color: var(--ink); border-color: var(--t1); font-weight: 600; }
 .search { flex: 1; min-width: 180px; max-width: 320px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line-hi); background: rgba(0,0,0,.25); color: var(--text); font-family: var(--body); font-size: 16px; }
 .tablewrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); }
 table.roster { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 15px; }
@@ -277,3 +279,84 @@ table.grade { border-collapse: collapse; width: 100%; font-size: 15px; }
 footer { border-top: 1px solid var(--line); padding: 22px 0 40px; color: var(--muted); font-size: 14px; }
 footer .wrap { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 footer img { width: 34px; }
+
+/* ===== 3 ทีมนักบิน (ทีมละ 1 ห้อง · ภาพจากกลุ่ม LINE ของแต่ละห้อง) ===== */
+[data-team="nova"], .t-nova { --t1: #B48CFF; --t2: #FFD166; --t-glow: rgba(180,140,255,.45); }
+[data-team="terra"], .t-terra { --t1: #FF8A4C; --t2: #FFC56B; --t-glow: rgba(255,138,76,.45); }
+[data-team="aurora"], .t-aurora { --t1: #3FE0C5; --t2: #4FD8FF; --t-glow: rgba(63,224,197,.45); }
+body[data-team] .sky { background-size: cover; background-position: center top; background-repeat: no-repeat; }
+body[data-team="nova"] .sky { background-image: linear-gradient(rgba(5,9,28,.30), rgba(5,9,28,.70)), url(img/teams/nova-wall.jpg); }
+body[data-team="terra"] .sky { background-image: linear-gradient(rgba(10,7,6,.25), rgba(10,7,6,.65)), url(img/teams/terra-wall.jpg); }
+body[data-team="aurora"] .sky { background-image: linear-gradient(rgba(4,14,20,.25), rgba(4,14,20,.65)), url(img/teams/aurora-wall.jpg); }
+body[data-team] .top { border-bottom-color: var(--t1); }
+.patch { display: block; border-radius: 50%; object-fit: cover; }
+
+/* ตราทีมบนฮีโร่หน้าแรก */
+.dock { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.dock a { display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: 999px; border: 1px solid var(--t1); background: rgba(6,11,32,.55); color: var(--text); }
+.dock a:hover { text-decoration: none; box-shadow: 0 0 18px var(--t-glow); }
+.dock .patch { width: 44px; height: 44px; }
+.dock b { display: block; font-family: var(--head); color: var(--t1); line-height: 1.1; font-size: 15px; }
+.dock small { color: var(--muted); font-size: 13px; }
+
+/* การ์ดทีมหน้าแรก */
+.rooms a.team-card { padding: 0; overflow: hidden; border-color: var(--t1); display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; }
+.rooms a.team-card:hover { border-color: var(--t1); box-shadow: 0 0 0 1px var(--t1), 0 10px 30px var(--t-glow); transform: translateY(-3px); }
+@media (prefers-reduced-motion: reduce) { .rooms a.team-card:hover { transform: none; } }
+.tc-art { position: relative; height: 130px; background-size: cover; background-position: center; }
+.tc-art::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 30%, rgba(17,26,61,.95)); }
+.tc-art .patch { position: absolute; left: 16px; bottom: -38px; width: 96px; height: 96px; z-index: 1; box-shadow: 0 0 0 3px var(--panel-solid), 0 0 24px var(--t-glow); }
+.tc-body { padding: 44px 18px 18px; display: flex; flex-direction: column; flex: 1; }
+.tc-body .kicker { color: var(--t1); }
+.tc-body .tn { font-family: var(--head); font-size: 28px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.tc-body small { font-size: 13px; margin-top: 4px; }
+.tc-body .go { margin-top: 12px; align-self: flex-start; font-family: var(--head); font-weight: 600; font-size: 14px; padding: 5px 14px; border-radius: 999px; background: var(--t1); color: var(--ink); }
+.power-row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 12px; font-family: var(--head); }
+.power-row span { color: var(--muted); font-size: 14px; letter-spacing: .06em; }
+.power-row b { color: var(--t1); font-size: 22px; }
+
+/* ฐานทีม (หน้าห้อง) */
+.team-hero { position: relative; overflow: hidden; border-radius: 22px; border: 1px solid var(--t1); background-size: cover; background-position: center; padding: 28px; box-shadow: 0 0 40px var(--t-glow); }
+.team-hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(6,10,30,.92) 0%, rgba(6,10,30,.70) 55%, rgba(6,10,30,.25) 100%); }
+.team-hero > * { position: relative; }
+.th-in { display: flex; gap: 22px; align-items: center; }
+.th-in .patch { width: 150px; height: 150px; flex: none; box-shadow: 0 0 30px var(--t-glow); }
+.th-in .kicker { color: var(--t2); }
+.team-hero h1 { font-size: clamp(34px, 6vw, 56px); color: var(--t1); text-shadow: 0 0 24px var(--t-glow); }
+.th-room { font-family: var(--head); font-size: 16px; }
+.motto { margin: 8px 0 0; color: #D7DEFA; font-size: 16px; max-width: 520px; }
+.power { margin-top: 20px; max-width: 620px; }
+.power small { color: #C5CDEB; font-size: 14px; }
+.power .power-row b { font-size: 30px; }
+.bar.big { height: 16px; background: rgba(255,255,255,.12); }
+.mbar.full { border-color: var(--ok); background: rgba(94,242,165,.07); }
+.mbar.full .row span { color: var(--ok); font-family: var(--head); font-size: 13px; }
+@media (max-width: 600px) {
+  .team-hero { padding: 20px 16px; }
+  .team-hero::before { background: linear-gradient(180deg, rgba(6,10,30,.55) 0%, rgba(6,10,30,.92) 60%); }
+  .th-in { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .th-in .patch { width: 104px; height: 104px; }
+}
+
+/* การ์ดนักบิน (หน้ารายคน) */
+.panel.player { border-color: var(--t1); box-shadow: 0 0 30px var(--t-glow, transparent); }
+.pc-main { display: flex; gap: 18px; align-items: flex-start; }
+.pc-patch { width: 96px; height: 96px; flex: none; box-shadow: 0 0 22px var(--t-glow); }
+.player .callsign { color: var(--t1); }
+.lv { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-family: var(--head); }
+.lv-no { font-weight: 700; font-size: 14px; letter-spacing: .08em; padding: 2px 10px; border-radius: 6px; background: var(--t1); color: var(--ink); }
+.lv b { font-size: 19px; color: var(--t2); }
+.xp { margin-top: 6px; max-width: 420px; }
+.xp small { color: var(--muted); font-size: 14px; }
+@media (max-width: 600px) { .pc-main { flex-direction: column; gap: 10px; } .pc-patch { width: 76px; height: 76px; } }
+
+/* เหรียญภารกิจ (ตัวอักษรล้วน ไม่มีไอคอน) */
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.badge { position: relative; padding: 12px 14px; border-radius: 12px; border: 1px dashed var(--line-hi); background: rgba(255,255,255,.02); opacity: .55; }
+.badge b { display: block; font-family: var(--head); font-size: 16px; line-height: 1.3; }
+.badge small { display: block; color: var(--muted); font-size: 13px; line-height: 1.4; margin-top: 2px; }
+.badge .st { display: inline-block; margin-top: 8px; font-family: var(--head); font-size: 12px; padding: 1px 9px; border-radius: 999px; border: 1px solid var(--line-hi); color: var(--muted); }
+.badge.on { opacity: 1; border-style: solid; --bc: var(--gold); border-color: var(--bc); background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.01)); box-shadow: inset 0 0 0 1px rgba(255,255,255,.04), 0 0 18px rgba(255,209,102,.12); }
+.badge.on b { color: var(--bc); }
+.badge.on .st { background: var(--bc); border-color: var(--bc); color: var(--ink); font-weight: 600; }
+.badge.b-u1.on { --bc: var(--violet); } .badge.b-u2.on { --bc: var(--orange); } .badge.b-u3.on { --bc: var(--cyan); } .badge.b-ex.on { --bc: var(--ok); }

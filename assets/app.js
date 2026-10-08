@@ -25,6 +25,23 @@ window.ESJ = window.ESJ || {};
   function unitOf(id) { for (var i = 0; i < C.units.length; i++) if (C.units[i].id === id) return C.units[i]; return null; }
   function itemsOf(w) { return ESJ.weekItems[w] || []; }
 
+  /* ---------- ทีม (data/teams.js) ---------- */
+  function teamOf(r) { return (ESJ.teams && ESJ.teams[r]) || null; }
+  function teamImg(t, kind) { return "assets/img/teams/" + t.id + "-" + kind; }
+  function patchImg(t, cls) { return '<img class="patch' + (cls ? " " + cls : "") + '" src="' + teamImg(t, "patch.webp") + '" alt="ตรา' + esc(t.name) + '">'; }
+  /* พลังทีม = ร้อยละของงานที่ถึงกำหนดที่ทั้งห้องส่งแล้ว (สูตรเดียวกับความคืบหน้าห้องเดิม) */
+  function roomPower(r) {
+    var list = (S && S.rooms[r]) || [], due = 0, ok = 0;
+    list.forEach(function (st) { var a = analyse(st); due += a.due; ok += a.ok; });
+    return { n: list.length, pct: due ? Math.round(ok * 100 / due) : 0 };
+  }
+  /* ระดับนักบินรายคน คิดจากจำนวนงานที่ส่งแล้ว */
+  function levelOf(done) {
+    var L = ESJ.levels || [{ min: 0, lv: 1, title: "นักบิน" }], cur = L[0], next = null;
+    for (var i = 0; i < L.length; i++) { if (done >= L[i].min) { cur = L[i]; next = L[i + 1] || null; } }
+    return { cur: cur, next: next };
+  }
+
   /* สัปดาห์ปัจจุบันตามปฏิทิน: 0 = ก่อนเปิดภาค, 21 = หลังจบภาค */
   function calWeek() {
     if (C.forceWeek) return C.forceWeek;
@@ -119,8 +136,12 @@ window.ESJ = window.ESJ || {};
     h += '<section class="hero"><img class="p1" src="assets/img/planet-earth.png" alt=""><img class="p2" src="assets/img/planet-moon.png" alt="">' +
       '<div class="kicker">' + esc(C.term) + " · " + esc(C.code) + "</div><h1>ES JOURNEY</h1>" +
       '<div class="sub">ภารกิจ 20 สัปดาห์ สำรวจโลกและอวกาศ</div>' +
-      '<p class="meta">ทุกคนคือนักบินอวกาศ ครูคือศูนย์ควบคุมภารกิจ ทำใบงานทุกสัปดาห์ให้ครบ ภารกิจของเราไม่แข่งกัน แต่ไปถึงปลายทางด้วยกัน</p>' +
+      '<p class="meta">ทุกคนคือนักบินอวกาศ แต่ละห้องคือ 1 ทีม ครูคือศูนย์ควบคุมภารกิจ ทำใบงานทุกสัปดาห์ให้ครบเพื่อเพิ่มพลังทีม ภารกิจของเราไม่แข่งกัน แต่ไปถึงปลายทางด้วยกัน</p>' +
       '<span class="pill">' + (cw === 0 ? "นับถอยหลังสู่สัปดาห์ที่ 1" : cw > 20 ? "จบภาคเรียน" : "ตอนนี้ สัปดาห์ที่ " + cw + " จาก 20") + "</span>" +
+      '<div class="dock">' + C.rooms.map(function (r) {
+        var t = teamOf(r);
+        return t ? '<a class="t-' + t.id + '" href="#/room/' + roomKey(r) + '">' + patchImg(t) + "<span><b>" + esc(t.name) + "</b><small>ม." + r + "</small></span></a>" : "";
+      }).join("") + "</div>" +
       track(cw) + "</section>";
 
     h += '<div class="grid g2 sec" style="align-items:start">';
@@ -140,15 +161,20 @@ window.ESJ = window.ESJ || {};
       }).join("") + "</div></section>";
     h += "</div></div>";
 
-    h += '<section class="sec"><div class="sec-h"><h2>ความคืบหน้าของแต่ละห้อง</h2><span class="muted">คลิกห้องเพื่อดูการส่งงานรายคน</span></div><div class="grid g3 rooms">';
+    h += '<section class="sec"><div class="sec-h"><div><div class="kicker">3 TEAMS · 1 MISSION</div><h2>ทีมนักบิน 3 ทีม</h2></div><span class="muted">เลือกทีมของห้องตัวเอง เพื่อดูการส่งงานรายคนและการ์ดนักบินของตัวเอง</span></div><div class="grid g3 rooms teams">';
     C.rooms.forEach(function (r) {
-      var list = (S && S.rooms[r]) || [], due = 0, ok = 0;
-      list.forEach(function (st) { var a = analyse(st); due += a.due; ok += a.ok; });
-      var p = due ? Math.round(ok * 100 / due) : 0;
-      h += '<a href="#/room/' + roomKey(r) + '"><div class="rn">ม.' + r + '</div><div class="muted">' + esc(C.roomInfo[r]) + " · " + list.length + " คน</div>" +
-        '<div class="bar"><i style="width:' + p + '%"></i></div><div style="margin-top:6px;font-size:15px">ส่งงานแล้ว <b class="pct">' + p + "%</b> ของงานที่ถึงกำหนด</div></a>";
+      var t = teamOf(r), pw = roomPower(r);
+      if (!t) {
+        h += '<a href="#/room/' + roomKey(r) + '"><div class="rn">ม.' + r + '</div><div class="muted">' + esc(C.roomInfo[r]) + " · " + pw.n + " คน</div>" +
+          '<div class="bar"><i style="width:' + pw.pct + '%"></i></div><div style="margin-top:6px;font-size:15px">ส่งงานแล้ว <b class="pct">' + pw.pct + "%</b> ของงานที่ถึงกำหนด</div></a>";
+        return;
+      }
+      h += '<a class="team-card t-' + t.id + '" href="#/room/' + roomKey(r) + '"><div class="tc-art" style="background-image:url(' + teamImg(t, "banner.jpg") + ')">' + patchImg(t) + "</div>" +
+        '<div class="tc-body"><div class="kicker">' + esc(t.en) + '</div><div class="tn">' + esc(t.name) + '</div><div class="muted">ห้อง ม.' + r + " · " + esc(t.field) + " · " + pw.n + " คน</div>" +
+        '<div class="power-row"><span>พลังทีม</span><b class="pct">' + pw.pct + '%</b></div><div class="bar"><i style="width:' + pw.pct + '%"></i></div>' +
+        '<small class="muted">ร้อยละของงานที่ถึงกำหนดที่ทั้งทีมส่งแล้ว</small><span class="go">เข้าฐานทีม</span></div></a>';
     });
-    h += "</div>" + updatedNote() + "</section>";
+    h += '</div><p class="muted" style="font-size:14px;margin:10px 0 0">ไม่มีการแข่งขันหรือจัดอันดับระหว่างทีม ทุกทีมมีเป้าหมายเดียวกันคือพลังทีม 100% ส่งครบทุกคน</p>' + updatedNote() + "</section>";
     return h;
   }
 
@@ -215,18 +241,28 @@ window.ESJ = window.ESJ || {};
     var pend = A.reduce(function (s, x) { return s + x.a.pending.length; }, 0);
     var risk = A.filter(function (x) { return x.a.risk; }).length;
 
-    var h = sampleNote() + '<div class="sec-h"><div><div class="kicker">CREW ROSTER · ' + esc(C.roomInfo[r]) + '</div><h1 style="font-size:clamp(28px,5vw,40px)">ห้อง ม.' + r + "</h1></div></div>";
-    h += '<div class="stats"><div class="stat"><b>' + list.length + '</b><small>นักบินในห้อง</small></div>' +
+    var tm = teamOf(r), h = sampleNote();
+    if (tm) {
+      var pw = roomPower(r);
+      h += '<section class="team-hero" style="background-image:url(' + teamImg(tm, "banner.jpg") + ')"><div class="th-in">' + patchImg(tm) +
+        '<div><div class="kicker">' + esc(tm.en) + " · CREW ROSTER</div><h1>" + esc(tm.name) + '</h1><div class="th-room">ห้อง ม.' + r + " · " + esc(C.roomInfo[r]) + " · ทีมประจำ" + esc(tm.field) + "</div>" +
+        '<p class="motto">' + esc(tm.motto) + "</p></div></div>" +
+        '<div class="power"><div class="power-row"><span>พลังทีม</span><b class="pct">' + pw.pct + '%</b></div><div class="bar big"><i style="width:' + pw.pct + '%"></i></div>' +
+        "<small>ร้อยละของงานที่ถึงกำหนดที่ทั้งทีมส่งแล้ว เป้าหมายของทีมคือ 100% ช่วยกันเตือนเพื่อนในทีมให้ส่งครบ</small></div></section>";
+    } else {
+      h += '<div class="sec-h"><div><div class="kicker">CREW ROSTER · ' + esc(C.roomInfo[r]) + '</div><h1 style="font-size:clamp(28px,5vw,40px)">ห้อง ม.' + r + "</h1></div></div>";
+    }
+    h += '<div class="stats' + (tm ? " sec" : "") + '"><div class="stat"><b>' + list.length + '</b><small>นักบินในทีม</small></div>' +
       '<div class="stat ok"><b>' + allDone + '</b><small>ส่งครบทุกงานที่ถึงกำหนด</small></div>' +
       '<div class="stat warn"><b>' + pend + '</b><small>งานค้างรวมทั้งห้อง</small></div>' +
       '<div class="stat err"><b>' + risk + '</b><small>เสี่ยงติด ร</small></div></div>';
 
-    h += '<section class="sec"><div class="sec-h"><h2>ความคืบหน้าภารกิจของห้อง</h2><span class="muted">ร้อยละของนักเรียนที่ส่งงานแล้ว</span></div><div class="mbars">';
+    h += '<section class="sec"><div class="sec-h"><h2>ความคืบหน้าภารกิจของทีม</h2><span class="muted">ร้อยละของนักเรียนที่ส่งงานแล้ว · งานที่ส่งครบทุกคนจะขึ้นว่า "ครบทั้งทีม"</span></div><div class="mbars">';
     if (!shown.length) h += '<div class="empty">ยังไม่มีงานที่ถึงกำหนด</div>';
     shown.forEach(function (t) {
       var ok = list.filter(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true; }).length;
-      var p = list.length ? Math.round(ok * 100 / list.length) : 0;
-      h += '<div class="mbar' + (weekOf(t.code) === asOf ? " now" : "") + '"><div class="row"><b>' + t.code + "</b><span>" + ok + "/" + list.length + '</span></div><div class="bar"><i style="width:' + p + '%"></i></div></div>';
+      var p = list.length ? Math.round(ok * 100 / list.length) : 0, full = list.length && ok === list.length;
+      h += '<div class="mbar' + (weekOf(t.code) === asOf ? " now" : "") + (full ? " full" : "") + '"><div class="row"><b>' + t.code + "</b><span>" + (full ? "ครบทั้งทีม" : ok + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + p + '%"></i></div></div>';
     });
     if (shown.length && list.length && list[0].mid !== undefined && asOf >= 9) {
       var took = list.filter(function (st) { return st.mid; }).length, p2 = Math.round(took * 100 / list.length);
@@ -277,12 +313,16 @@ window.ESJ = window.ESJ || {};
     var r = roomFromKey(key), list = (S && S.rooms[r]) || [], st = null, idx = -1;
     for (var i = 0; i < list.length; i++) if (String(list[i].no) === String(no)) { st = list[i]; idx = i; }
     if (!st) return pageMissing();
-    var a = analyse(st), circ = 2 * Math.PI * 80, off = circ * (1 - a.pct / 100);
-    var h = sampleNote() + '<div class="panel me"><div><div class="callsign">นักบิน ES-' + r.replace("4/", "4") + "-" + pad(st.no) + '</div><h1>' + esc(st.name) + '</h1><div class="muted">ห้อง ม.' + r + " เลขที่ " + st.no + " · " + esc(C.roomInfo[r]) + "</div>" +
-      (a.risk ? '<p style="margin:12px 0 0"><span class="risk">เสี่ยงติด ร</span> <span class="muted">มีงานค้างและคะแนนรวมอาจไม่ถึง 70 รีบตามส่งงานได้เลย</span></p>' : "") + "</div>" +
+    var a = analyse(st), circ = 2 * Math.PI * 80, off = circ * (1 - a.pct / 100), tm = teamOf(r);
+    var doneN = a.rows.filter(function (rw) { return rw.state === "ok"; }).length, lv = levelOf(doneN);
+    var lvPct = lv.next ? Math.round((doneN - lv.cur.min) * 100 / (lv.next.min - lv.cur.min)) : 100;
+    var h = sampleNote() + '<div class="panel me player"><div class="pc-main">' + (tm ? patchImg(tm, "pc-patch") : "") + '<div><div class="callsign">นักบิน ES-' + r.replace("4/", "4") + "-" + pad(st.no) + (tm ? " · " + esc(tm.name) : "") + '</div><h1>' + esc(st.name) + '</h1><div class="muted">ห้อง ม.' + r + " เลขที่ " + st.no + " · " + esc(C.roomInfo[r]) + "</div>" +
+      '<div class="lv"><span class="lv-no">LV.' + lv.cur.lv + "</span><b>" + esc(lv.cur.title) + "</b></div>" +
+      '<div class="xp"><div class="bar"><i style="width:' + lvPct + '%"></i></div><small>ส่งงานแล้ว ' + doneN + " งาน" + (lv.next ? " · ส่งอีก " + (lv.next.min - doneN) + " งาน เลื่อนเป็น " + esc(lv.next.title) : " · ระดับสูงสุดแล้ว") + "</small></div>" +
+      (a.risk ? '<p style="margin:12px 0 0"><span class="risk">เสี่ยงติด ร</span> <span class="muted">มีงานค้างและคะแนนรวมอาจไม่ถึง 70 รีบตามส่งงานได้เลย</span></p>' : "") + "</div></div>" +
       '<div class="ring"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="80" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="16"/>' +
       '<circle cx="100" cy="100" r="80" fill="none" stroke="url(#gr)" stroke-width="16" stroke-linecap="round" stroke-dasharray="' + circ.toFixed(1) + '" stroke-dashoffset="' + off.toFixed(1) + '"/>' +
-      '<defs><linearGradient id="gr"><stop offset="0" stop-color="#4FD8FF"/><stop offset="1" stop-color="#A77BFF"/></linearGradient></defs></svg>' +
+      '<defs><linearGradient id="gr"><stop offset="0" style="stop-color:var(--t1)"/><stop offset="1" style="stop-color:var(--t2)"/></linearGradient></defs></svg>' +
       '<div class="lbl"><b>' + a.pct + '%</b><small>ส่งแล้ว ' + a.ok + "/" + a.due + "<br>งานที่ถึงกำหนด</small></div></div></div>";
 
     h += '<section class="sec"><div class="sec-h"><h2>คะแนนสะสม</h2><span class="muted">4 ช่องตามที่กรอกในระบบของโรงเรียน</span></div><div class="grid g4 scores">' +
@@ -298,6 +338,22 @@ window.ESJ = window.ESJ || {};
     } else if (a.due) {
       h += '<section class="sec done-all"><h2 style="font-size:20px;color:var(--ok)">ภารกิจครบทุกงานที่ถึงกำหนดแล้ว</h2><div class="muted">เดินทางต่อได้เลย นักบิน</div></section>';
     }
+
+    /* เหรียญภารกิจ: ครบทุกงานของหน่วย · ภารกิจปลายทางแต่ละชิ้น · สอบกลางภาค */
+    var okOf = function (code) { var v = st.done && st.done[code]; return v === 1 || v === true; };
+    var badges = C.units.map(function (u) {
+      var ts = C.tasks.filter(function (t) { var w = C.weeks[weekOf(t.code) - 1]; return w && w.unit === u.id; });
+      return { on: ts.length && ts.every(function (t) { return okOf(t.code); }), cls: "b-u" + u.id, name: "เหรียญหน่วยที่ " + u.id, sub: u.name + " ส่งครบ " + ts.length + " งาน" };
+    });
+    C.tasks.filter(function (t) { return t.capstone; }).forEach(function (t) {
+      badges.push({ on: okOf(t.code), cls: "b-cap", name: "ภารกิจปลายทาง " + t.code, sub: t.title });
+    });
+    badges.push({ on: !!st.mid, cls: "b-ex", name: "ผ่านด่านกลางภาค", sub: "สอบกลางภาคออนไลน์แล้วอย่างน้อย 1 ครั้ง" });
+    var got = badges.filter(function (b) { return b.on; }).length;
+    h += '<section class="sec"><div class="sec-h"><h2>เหรียญภารกิจ</h2><span class="muted">ได้แล้ว ' + got + " จาก " + badges.length + ' เหรียญ</span></div><div class="badges">' +
+      badges.map(function (b) {
+        return '<div class="badge ' + b.cls + (b.on ? " on" : "") + '"><b>' + esc(b.name) + "</b><small>" + esc(b.sub) + '</small><span class="st">' + (b.on ? "ได้รับแล้ว" : "ยังไม่ปลดล็อก") + "</span></div>";
+      }).join("") + "</div></section>";
 
     h += '<section class="sec"><div class="sec-h"><h2>บันทึกภารกิจ</h2></div>';
     C.units.forEach(function (u) {
@@ -353,7 +409,13 @@ window.ESJ = window.ESJ || {};
     else if (p[0] === "rules") h = pageRules();
     else h = pageMissing();
     $app.innerHTML = h;
+    /* หน้าทีมและหน้ารายคนใช้สีและลายพื้นของทีม */
+    var tm = (p[0] === "room" || p[0] === "student") && teamOf(roomFromKey(p[1] || "4-8"));
+    if (tm) document.body.setAttribute("data-team", tm.id); else document.body.removeAttribute("data-team");
     Array.prototype.forEach.call(document.querySelectorAll("#nav a"), function (a) { a.classList.toggle("on", a.getAttribute("data-r") === nav); });
+    /* จอมือถือ: เลื่อนแถบเมนูให้เห็นเมนูที่เลือกอยู่ */
+    var navEl = document.getElementById("nav"), onEl = navEl && navEl.querySelector("a.on");
+    if (onEl && navEl.scrollWidth > navEl.clientWidth) navEl.scrollLeft += onEl.getBoundingClientRect().left - navEl.getBoundingClientRect().left - 16;
     if (p[0] === "room") bindRoom();
     window.scrollTo(0, 0);
   }
