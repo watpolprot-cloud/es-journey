@@ -339,6 +339,15 @@ window.ESJ = window.ESJ || {};
       h += '<section class="sec done-all"><h2 style="font-size:20px;color:var(--ok)">ภารกิจครบทุกงานที่ถึงกำหนดแล้ว</h2><div class="muted">เดินทางต่อได้เลย นักบิน</div></section>';
     }
 
+    /* ข้อความจากศูนย์ควบคุม: จุดแข็ง + สิ่งที่ควรทำต่อ ของงานล่าสุด (ผู้ช่วยตรวจ AI ครูยืนยันแล้ว · ครูตกลง 13 ต.ค. 2569) */
+    if (st.note && (st.note.strength || st.note.practice)) {
+      var nt = st.note, ntT = C.tasks.filter(function (t) { return t.code === nt.code; })[0];
+      h += '<section class="sec"><div class="sec-h"><h2>ข้อความจากศูนย์ควบคุม</h2><span class="muted">จากงาน ' + esc(nt.code) + (ntT ? " " + esc(ntT.title) : "") + "</span></div>" +
+        (nt.strength ? '<p><b style="color:var(--ok)">จุดเด่น</b> ' + esc(nt.strength) + "</p>" : "") +
+        (nt.practice ? "<p><b>ภารกิจต่อไป</b> " + esc(nt.practice) + "</p>" : "") +
+        (nt.teacher ? "<p><b>ครูต้น</b> " + esc(nt.teacher) + "</p>" : "") + "</section>";
+    }
+
     /* เหรียญภารกิจ: ครบทุกงานของหน่วย · ภารกิจปลายทางแต่ละชิ้น · สอบกลางภาค */
     var okOf = function (code) { var v = st.done && st.done[code]; return v === 1 || v === true; };
     var badges = C.units.map(function (u) {
