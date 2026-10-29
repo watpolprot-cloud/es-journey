@@ -33,6 +33,8 @@ window.ESJ = window.ESJ || {};
   function roomPower(r) {
     var list = (S && S.rooms[r]) || [], due = 0, ok = 0;
     list.forEach(function (st) { var a = analyse(st); due += a.due; ok += a.ok; });
+    /* ยังไม่มีงานเก็บคะแนนที่ถึงกำหนด (สัปดาห์ที่ 1) ใช้การลงทะเบียนนักบินแทน */
+    if (!due && S && S.asOfWeek >= 1) { due = list.length; ok = list.filter(function (st) { return st.intro; }).length; }
     return { n: list.length, pct: due ? Math.round(ok * 100 / due) : 0 };
   }
   /* ระดับนักบินรายคน คิดจากจำนวนงานที่ส่งแล้ว */
@@ -252,13 +254,22 @@ window.ESJ = window.ESJ || {};
     } else {
       h += '<div class="sec-h"><div><div class="kicker">CREW ROSTER · ' + esc(C.roomInfo[r]) + '</div><h1 style="font-size:clamp(28px,5vw,40px)">ห้อง ม.' + r + "</h1></div></div>";
     }
+    var introOnly = !shown.length && asOf >= 1, introDone = list.filter(function (st) { return st.intro; }).length;
     h += '<div class="stats' + (tm ? " sec" : "") + '"><div class="stat"><b>' + list.length + '</b><small>นักบินในทีม</small></div>' +
+      (introOnly ? '<div class="stat ok"><b>' + introDone + '</b><small>ลงทะเบียนนักบินแล้ว</small></div>' +
+        '<div class="stat warn"><b>' + (list.length - introDone) + '</b><small>ยังไม่ได้ลงทะเบียน</small></div>' :
       '<div class="stat ok"><b>' + allDone + '</b><small>ส่งครบทุกงานที่ถึงกำหนด</small></div>' +
-      '<div class="stat warn"><b>' + pend + '</b><small>งานค้างรวมทั้งห้อง</small></div>' +
+      '<div class="stat warn"><b>' + pend + '</b><small>งานค้างรวมทั้งห้อง</small></div>') +
       '<div class="stat err"><b>' + risk + '</b><small>เสี่ยงติด ร</small></div></div>';
 
     h += '<section class="sec"><div class="sec-h"><h2>ความคืบหน้าภารกิจของทีม</h2><span class="muted">ร้อยละของนักเรียนที่ส่งงานแล้ว · งานที่ส่งครบทุกคนจะขึ้นว่า "ครบทั้งทีม"</span></div><div class="mbars">';
-    if (!shown.length) h += '<div class="empty">ยังไม่มีงานที่ถึงกำหนด</div>';
+    /* ลงทะเบียนนักบิน (แบบสอบถาม 00) ไม่มีคะแนน แสดงเฉพาะส่งแล้วหรือยัง */
+    var introN = list.filter(function (st) { return st.intro; }).length, hasIntro = asOf >= 1 && list.length;
+    if (hasIntro) {
+      var ip = Math.round(introN * 100 / list.length), ifull = introN === list.length;
+      h += '<div class="mbar' + (asOf === 1 ? " now" : "") + (ifull ? " full" : "") + '"><div class="row"><b>00 ลงทะเบียน</b><span>' + (ifull ? "ครบทั้งทีม" : introN + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + ip + '%"></i></div></div>';
+    }
+    if (!shown.length && !hasIntro) h += '<div class="empty">ยังไม่มีงานที่ถึงกำหนด</div>';
     shown.forEach(function (t) {
       var ok = list.filter(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true; }).length;
       var p = list.length ? Math.round(ok * 100 / list.length) : 0, full = list.length && ok === list.length;
@@ -274,21 +285,25 @@ window.ESJ = window.ESJ || {};
       '<div class="tools" id="tools"><button class="chip" data-f="all">ทั้งหมด</button><button class="chip" data-f="pend">มีงานค้าง</button><button class="chip" data-f="risk">เสี่ยงติด ร</button>' +
       '<input class="search" id="q" type="search" placeholder="ค้นหาชื่อหรือเลขที่" value="' + esc(roomQuery) + '"></div>' +
       '<div class="tablewrap"><table class="roster"><thead><tr><th class="no">เลขที่</th><th class="nm">ชื่อ-นามสกุล</th>' +
+      (hasIntro ? '<th class="' + (asOf === 1 ? "cur" : "") + '">00</th>' : "") +
       shown.map(function (t) { return '<th class="' + (weekOf(t.code) === asOf ? "cur" : "") + '">' + t.code + "</th>"; }).join("") +
-      (asOf >= 9 ? "<th>กลางภาค</th>" : "") + "<th>ส่งแล้ว</th><th>สถานะ</th></tr></thead><tbody id=\"rows\">";
+      (asOf >= 9 ? "<th>กลางภาค</th>" : "") + (introOnly ? "" : "<th>ส่งแล้ว</th><th>สถานะ</th>") + "</tr></thead><tbody id=\"rows\">";
     A.forEach(function (x) {
       var st = x.st, a = x.a;
       h += '<tr data-p="' + (a.pending.length ? 1 : 0) + '" data-r="' + (a.risk ? 1 : 0) + '" data-s="' + esc(st.no + " " + st.name) + '"><td class="no">' + st.no + '</td><td class="nm"><a href="#/student/' + key + "/" + st.no + '">' + esc(st.name) + "</a></td>";
+      if (hasIntro) h += "<td>" + (st.intro ? '<span class="c ok">ส่ง</span>' : '<span class="c ' + (asOf === 1 ? "now" : "miss") + '">' + (asOf === 1 ? "ยังไม่ส่ง" : "ค้าง") + "</span>") + "</td>";
       a.rows.forEach(function (rw) {
         if (rw.wk > asOf) return;
         var c = CELL[rw.state];
         h += '<td><span class="c ' + c[0] + '">' + c[1] + "</span></td>";
       });
       if (asOf >= 9) h += "<td>" + (st.mid ? st.mid.best : '<span class="c miss">ยังไม่สอบ</span>') + "</td>";
+      if (introOnly) { h += "</tr>"; return; }
       h += '<td class="pct">' + a.pct + "%</td><td>" + (a.risk ? '<span class="risk">เสี่ยงติด ร</span>' : a.pending.length ? '<span class="c miss">ค้าง ' + a.pending.length + "</span>" : '<span class="c ok">ครบ</span>') + "</td></tr>";
     });
     h += "</tbody></table></div>" +
       '<div class="legend"><span><span class="c ok">ส่ง</span> ส่งแล้ว</span><span><span class="c miss">ค้าง</span> ยังไม่ส่ง</span><span><span class="c part">ไม่ครบ</span> ภารกิจปลายทางยังไม่ครบทุกส่วน</span><span><span class="c now">กำลังทำ</span> งานของสัปดาห์นี้</span></div>' +
+      (hasIntro ? '<p class="muted" style="font-size:14px">ช่อง 00 คือการลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน) ไม่มีคะแนน แต่ขอให้ทุกคนส่ง ครูจะใช้ข้อมูลนี้ออกแบบการสอนให้เหมาะกับห้อง</p>' : "") +
       '<p class="muted" style="font-size:14px">ไม่มีการจัดอันดับ ตารางนี้ให้เพื่อนช่วยเตือนเพื่อนตามงาน ส่งย้อนหลังได้ทุกงานโดยไม่หักคะแนน</p>' + updatedNote() + "</section>";
     return h;
   }
@@ -317,6 +332,7 @@ window.ESJ = window.ESJ || {};
     var doneN = a.rows.filter(function (rw) { return rw.state === "ok"; }).length, lv = levelOf(doneN);
     var lvPct = lv.next ? Math.round((doneN - lv.cur.min) * 100 / (lv.next.min - lv.cur.min)) : 100;
     var h = sampleNote() + '<div class="panel me player"><div class="pc-main">' + (tm ? patchImg(tm, "pc-patch") : "") + '<div><div class="callsign">นักบิน ES-' + r.replace("4/", "4") + "-" + pad(st.no) + (tm ? " · " + esc(tm.name) : "") + '</div><h1>' + esc(st.name) + '</h1><div class="muted">ห้อง ม.' + r + " เลขที่ " + st.no + " · " + esc(C.roomInfo[r]) + "</div>" +
+      (S.asOfWeek >= 1 ? '<div style="margin-top:6px">' + (st.intro ? '<span class="c ok">ลงทะเบียนนักบินแล้ว</span>' : '<span class="c miss">ยังไม่ได้ลงทะเบียนนักบิน</span> <span class="muted">ทำแบบสอบถาม 00 จากลิงก์ภารกิจหน้าแรก</span>') + "</div>" : "") +
       '<div class="lv"><span class="lv-no">LV.' + lv.cur.lv + "</span><b>" + esc(lv.cur.title) + "</b></div>" +
       '<div class="xp"><div class="bar"><i style="width:' + lvPct + '%"></i></div><small>ส่งงานแล้ว ' + doneN + " งาน" + (lv.next ? " · ส่งอีก " + (lv.next.min - doneN) + " งาน เลื่อนเป็น " + esc(lv.next.title) : " · ระดับสูงสุดแล้ว") + "</small></div>" +
       (a.risk ? '<p style="margin:12px 0 0"><span class="risk">เสี่ยงติด ร</span> <span class="muted">มีงานค้างและคะแนนรวมอาจไม่ถึง 70 รีบตามส่งงานได้เลย</span></p>' : "") + "</div></div>" +
