@@ -21,6 +21,12 @@ window.ESJ = window.ESJ || {};
   function roomKey(r) { return r.replace("/", "-"); }
   function roomFromKey(k) { return k.replace("-", "/"); }
   function weekOf(code) { for (var i = 0; i < C.weeks.length; i++) if (C.weeks[i].task === code) return C.weeks[i].week; return 99; }
+  /* งานไม่มีคะแนนที่แสดงเฉพาะส่ง/ไม่ส่ง (data/course.js checks) ที่ถึงกำหนดแล้ว */
+  function checksDue() { var w = S ? S.asOfWeek : 0; return (C.checks || []).filter(function (k) { return k.week <= w; }); }
+  function sent(st, code) { var v = st.done && st.done[code]; return v === 1 || v === true; }
+  function checkCell(st, k, asOf) {
+    return sent(st, k.code) ? '<span class="c ok">ส่ง</span>' : '<span class="c ' + (k.week === asOf ? "now" : "miss") + '">' + (k.week === asOf ? "ยังไม่ส่ง" : "ค้าง") + "</span>";
+  }
   function taskOf(code) { for (var i = 0; i < C.tasks.length; i++) if (C.tasks[i].code === code) return C.tasks[i]; return null; }
   function unitOf(id) { for (var i = 0; i < C.units.length; i++) if (C.units[i].id === id) return C.units[i]; return null; }
   function itemsOf(w) { return ESJ.weekItems[w] || []; }
@@ -269,7 +275,12 @@ window.ESJ = window.ESJ || {};
       var ip = Math.round(introN * 100 / list.length), ifull = introN === list.length;
       h += '<div class="mbar' + (asOf === 1 ? " now" : "") + (ifull ? " full" : "") + '"><div class="row"><b>00 ลงทะเบียน</b><span>' + (ifull ? "ครบทั้งทีม" : introN + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + ip + '%"></i></div></div>';
     }
-    if (!shown.length && !hasIntro) h += '<div class="empty">ยังไม่มีงานที่ถึงกำหนด</div>';
+    var chk = checksDue();
+    chk.forEach(function (k) {
+      var n = list.filter(function (st) { return sent(st, k.code); }).length, p = list.length ? Math.round(n * 100 / list.length) : 0, full = list.length && n === list.length;
+      h += '<div class="mbar' + (k.week === asOf ? " now" : "") + (full ? " full" : "") + '"><div class="row"><b>' + k.code + "</b><span>" + (full ? "ครบทั้งทีม" : n + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + p + '%"></i></div></div>';
+    });
+    if (!shown.length && !hasIntro && !chk.length) h += '<div class="empty">ยังไม่มีงานที่ถึงกำหนด</div>';
     shown.forEach(function (t) {
       var ok = list.filter(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true; }).length;
       var p = list.length ? Math.round(ok * 100 / list.length) : 0, full = list.length && ok === list.length;
@@ -285,13 +296,16 @@ window.ESJ = window.ESJ || {};
       '<div class="tools" id="tools"><button class="chip" data-f="all">ทั้งหมด</button><button class="chip" data-f="pend">มีงานค้าง</button><button class="chip" data-f="risk">เสี่ยงติด ร</button>' +
       '<input class="search" id="q" type="search" placeholder="ค้นหาชื่อหรือเลขที่" value="' + esc(roomQuery) + '"></div>' +
       '<div class="tablewrap"><table class="roster"><thead><tr><th class="no">เลขที่</th><th class="nm">ชื่อ-นามสกุล</th>' +
-      (hasIntro ? '<th class="' + (asOf === 1 ? "cur" : "") + '">00</th>' : "") +
+      (hasIntro ? '<th class="' + (asOf === 1 ? "cur" : "") + '">ลงทะเบียน</th>' : "") +
+      chk.map(function (k) { return '<th class="' + (k.week === asOf ? "cur" : "") + '">' + k.code + "</th>"; }).join("") +
       shown.map(function (t) { return '<th class="' + (weekOf(t.code) === asOf ? "cur" : "") + '">' + t.code + "</th>"; }).join("") +
       (asOf >= 9 ? "<th>กลางภาค</th>" : "") + (introOnly ? "" : "<th>ส่งแล้ว</th><th>สถานะ</th>") + "</tr></thead><tbody id=\"rows\">";
     A.forEach(function (x) {
       var st = x.st, a = x.a;
-      h += '<tr data-p="' + (a.pending.length ? 1 : 0) + '" data-r="' + (a.risk ? 1 : 0) + '" data-s="' + esc(st.no + " " + st.name) + '"><td class="no">' + st.no + '</td><td class="nm"><a href="#/student/' + key + "/" + st.no + '">' + esc(st.name) + "</a></td>";
+      var miss = (hasIntro && !st.intro) || chk.some(function (k) { return !sent(st, k.code); });
+      h += '<tr data-p="' + (a.pending.length || miss ? 1 : 0) + '" data-r="' + (a.risk ? 1 : 0) + '" data-s="' + esc(st.no + " " + st.name) + '"><td class="no">' + st.no + '</td><td class="nm"><a href="#/student/' + key + "/" + st.no + '">' + esc(st.name) + "</a></td>";
       if (hasIntro) h += "<td>" + (st.intro ? '<span class="c ok">ส่ง</span>' : '<span class="c ' + (asOf === 1 ? "now" : "miss") + '">' + (asOf === 1 ? "ยังไม่ส่ง" : "ค้าง") + "</span>") + "</td>";
+      chk.forEach(function (k) { h += "<td>" + checkCell(st, k, asOf) + "</td>"; });
       a.rows.forEach(function (rw) {
         if (rw.wk > asOf) return;
         var c = CELL[rw.state];
@@ -303,7 +317,8 @@ window.ESJ = window.ESJ || {};
     });
     h += "</tbody></table></div>" +
       '<div class="legend"><span><span class="c ok">ส่ง</span> ส่งแล้ว</span><span><span class="c miss">ค้าง</span> ยังไม่ส่ง</span><span><span class="c part">ไม่ครบ</span> ภารกิจปลายทางยังไม่ครบทุกส่วน</span><span><span class="c now">กำลังทำ</span> งานของสัปดาห์นี้</span></div>' +
-      (hasIntro ? '<p class="muted" style="font-size:14px">ช่อง 00 คือการลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน) ไม่มีคะแนน แต่ขอให้ทุกคนส่ง ครูจะใช้ข้อมูลนี้ออกแบบการสอนให้เหมาะกับห้อง</p>' : "") +
+      (hasIntro ? '<p class="muted" style="font-size:14px">ช่อง ลงทะเบียน คือภารกิจ 00 ลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน) ไม่มีคะแนน แต่ขอให้ทุกคนส่ง ครูจะใช้ข้อมูลนี้ออกแบบการสอนให้เหมาะกับห้อง</p>' : "") +
+      (chk.length ? '<p class="muted" style="font-size:14px">ช่อง ' + chk.map(function (k) { return k.code; }).join(" ") + " คือ " + chk.map(function (k) { return esc(k.title); }).join(" · ") + " ไม่มีคะแนน แต่ขึ้นสถานะส่งแล้วหรือยัง ตามใบงานที่ครูสแกนให้ผู้ช่วยตรวจ AI</p>" : "") +
       '<p class="muted" style="font-size:14px">ไม่มีการจัดอันดับ ตารางนี้ให้เพื่อนช่วยเตือนเพื่อนตามงาน ส่งย้อนหลังได้ทุกงานโดยไม่หักคะแนน</p>' + updatedNote() + "</section>";
     return h;
   }
@@ -332,7 +347,8 @@ window.ESJ = window.ESJ || {};
     var doneN = a.rows.filter(function (rw) { return rw.state === "ok"; }).length, lv = levelOf(doneN);
     var lvPct = lv.next ? Math.round((doneN - lv.cur.min) * 100 / (lv.next.min - lv.cur.min)) : 100;
     var h = sampleNote() + '<div class="panel me player"><div class="pc-main">' + (tm ? patchImg(tm, "pc-patch") : "") + '<div><div class="callsign">นักบิน ES-' + r.replace("4/", "4") + "-" + pad(st.no) + (tm ? " · " + esc(tm.name) : "") + '</div><h1>' + esc(st.name) + '</h1><div class="muted">ห้อง ม.' + r + " เลขที่ " + st.no + " · " + esc(C.roomInfo[r]) + "</div>" +
-      (S.asOfWeek >= 1 ? '<div style="margin-top:6px">' + (st.intro ? '<span class="c ok">ลงทะเบียนนักบินแล้ว</span>' : '<span class="c miss">ยังไม่ได้ลงทะเบียนนักบิน</span> <span class="muted">ทำแบบสอบถาม 00 จากลิงก์ภารกิจหน้าแรก</span>') + "</div>" : "") +
+      (S.asOfWeek >= 1 ? '<div style="margin-top:6px">' + (st.intro ? '<span class="c ok">ลงทะเบียนนักบินแล้ว</span>' : '<span class="c miss">ยังไม่ได้ลงทะเบียนนักบิน</span> <span class="muted">ทำแบบสอบถาม 00 จากลิงก์ภารกิจหน้าแรก</span>') +
+        checksDue().map(function (k) { return " " + (sent(st, k.code) ? '<span class="c ok">ส่ง' + esc(k.title) + "แล้ว</span>" : '<span class="c miss">ยังไม่ส่ง' + esc(k.title) + "</span>"); }).join("") + "</div>" : "") +
       '<div class="lv"><span class="lv-no">LV.' + lv.cur.lv + "</span><b>" + esc(lv.cur.title) + "</b></div>" +
       '<div class="xp"><div class="bar"><i style="width:' + lvPct + '%"></i></div><small>ส่งงานแล้ว ' + doneN + " งาน" + (lv.next ? " · ส่งอีก " + (lv.next.min - doneN) + " งาน เลื่อนเป็น " + esc(lv.next.title) : " · ระดับสูงสุดแล้ว") + "</small></div>" +
       (a.risk ? '<p style="margin:12px 0 0"><span class="risk">เสี่ยงติด ร</span> <span class="muted">มีงานค้างและคะแนนรวมอาจไม่ถึง 70 รีบตามส่งงานได้เลย</span></p>' : "") + "</div></div>" +
