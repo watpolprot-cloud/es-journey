@@ -8,7 +8,7 @@ window.ESJ = window.ESJ || {};
 
   var TYPE = {
     slides: "สไลด์", worksheet: "ใบงาน", sim: "สถานการณ์จำลอง", activity: "กิจกรรมออนไลน์",
-    video: "วีดิทัศน์", link: "ลิงก์", doc: "เอกสาร"
+    video: "วีดิทัศน์", link: "ลิงก์", doc: "เอกสาร", key: "เฉลย"
   };
   var C, S, $app;
 

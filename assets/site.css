@@ -144,7 +144,7 @@ main { padding: 26px 0 60px; }
 .item { display: grid; grid-template-columns: 128px 1fr auto; gap: 14px; align-items: center; padding: 12px 14px; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
 .item .t { font-family: var(--head); font-size: 12px; letter-spacing: .08em; text-align: center; padding: 6px 4px; border-radius: 8px; border: 1px solid currentColor; }
 .t.slides { color: var(--violet); } .t.worksheet { color: var(--gold); } .t.sim { color: var(--ok); } .t.activity { color: var(--cyan); }
-.t.video { color: var(--orange); } .t.link, .t.doc { color: var(--muted); }
+.t.video { color: var(--orange); } .t.link, .t.doc { color: var(--muted); } .t.key { color: var(--ok); }
 .item b { display: block; font-weight: 600; }
 .item .n { color: var(--muted); font-size: 15px; }
 .item .qr { width: 96px; height: 96px; background: #fff; padding: 4px; border-radius: 8px; margin-top: 8px; }
