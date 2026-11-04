@@ -98,6 +98,19 @@ window.ESJ = window.ESJ || {};
     var proj = r.half1 + r.half2 + r.future + (mid != null ? mid : C.risk.assumeMid) + (fin != null ? fin : C.risk.assumeFinal);
     r.total = r.half1 + r.half2 + (mid || 0) + (fin || 0);
     r.risk = r.pending.length > 0 && proj < C.risk.passLine;
+    /* นับงานไม่มีคะแนน (00 ลงทะเบียน + checks เช่น ES00) ในร้อยละและสถานะด้วย (ครูแจ้ง 4 พ.ย. 2569)
+       ค้าง = งานสัปดาห์ก่อนที่ยังไม่ส่ง · กำลังทำ = งานสัปดาห์นี้ที่ยังไม่ส่ง (นับในตัวหารด้วย) */
+    r.extraMiss = []; r.nowOpen = 0;
+    if (asOf >= 1) {
+      r.due += 1;
+      if (st.intro) r.ok += 1; else if (asOf > 1) r.extraMiss.push("00"); else r.nowOpen += 1;
+    }
+    checksDue().forEach(function (k) {
+      r.due += 1;
+      if (sent(st, k.code)) r.ok += 1; else if (k.week < asOf) r.extraMiss.push(k.code); else r.nowOpen += 1;
+    });
+    r.rows.forEach(function (rw) { if (rw.state === "now" && !(st.done && st.done[rw.t.code])) { r.due += 1; r.nowOpen += 1; } });
+    r.missN = r.pending.length + r.extraMiss.length;
     r.pct = r.due ? Math.round(r.ok * 100 / r.due) : 0;
     return r;
   }
@@ -245,8 +258,8 @@ window.ESJ = window.ESJ || {};
     var asOf = S ? S.asOfWeek : 0;
     var shown = C.tasks.filter(function (t) { return weekOf(t.code) <= asOf; });
     var A = list.map(function (st) { return { st: st, a: analyse(st) }; });
-    var allDone = A.filter(function (x) { return !x.a.pending.length; }).length;
-    var pend = A.reduce(function (s, x) { return s + x.a.pending.length; }, 0);
+    var allDone = A.filter(function (x) { return !x.a.missN && !x.a.nowOpen; }).length;
+    var pend = A.reduce(function (s, x) { return s + x.a.missN; }, 0);
     var risk = A.filter(function (x) { return x.a.risk; }).length;
 
     var tm = teamOf(r), h = sampleNote();
@@ -313,7 +326,7 @@ window.ESJ = window.ESJ || {};
       });
       if (asOf >= 9) h += "<td>" + (st.mid ? st.mid.best : '<span class="c miss">ยังไม่สอบ</span>') + "</td>";
       if (introOnly) { h += "</tr>"; return; }
-      h += '<td class="pct">' + a.pct + "%</td><td>" + (a.risk ? '<span class="risk">เสี่ยงติด ร</span>' : a.pending.length ? '<span class="c miss">ค้าง ' + a.pending.length + "</span>" : '<span class="c ok">ครบ</span>') + "</td></tr>";
+      h += '<td class="pct">' + a.pct + "%</td><td>" + (a.risk ? '<span class="risk">เสี่ยงติด ร</span>' : a.missN ? '<span class="c miss">ค้าง ' + a.missN + "</span>" : a.nowOpen ? '<span class="c now">กำลังทำ</span>' : '<span class="c ok">ครบ</span>') + "</td></tr>";
     });
     h += "</tbody></table></div>" +
       '<div class="legend"><span><span class="c ok">ส่ง</span> ส่งแล้ว</span><span><span class="c miss">ค้าง</span> ยังไม่ส่ง</span><span><span class="c part">ไม่ครบ</span> ภารกิจปลายทางยังไม่ครบทุกส่วน</span><span><span class="c now">กำลังทำ</span> งานของสัปดาห์นี้</span></div>' +
@@ -363,11 +376,12 @@ window.ESJ = window.ESJ || {};
       '<div class="sc"><small>คะแนนเก็บหลังกลางภาค</small><b>' + a.half2 + " <span>/ 30</span></b></div>" +
       '<div class="sc"><small>สอบปลายภาค</small><b>' + (a.fin != null ? a.fin : "–") + " <span>/ 20</span></b></div></div></section>";
 
-    if (a.pending.length) {
-      h += '<section class="sec todo"><h2 style="font-size:20px">งานที่ต้องตามส่ง ' + a.pending.length + " งาน</h2><ul>" +
+    if (a.missN) {
+      h += '<section class="sec todo"><h2 style="font-size:20px">งานที่ต้องตามส่ง ' + a.missN + " งาน</h2><ul>" +
+        a.extraMiss.map(function (c) { var k = (C.checks || []).filter(function (x) { return x.code === c; })[0]; return "<li><b>" + c + "</b> " + (c === "00" ? "ลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน)" : esc(k ? k.title : "")) + ' <span class="muted">ไม่มีคะแนน แต่ต้องส่ง</span></li>'; }).join("") +
         a.pending.map(function (t) { return "<li><b>" + t.code + "</b> " + esc(t.title) + ' <a href="#/week/' + weekOf(t.code) + '">ดาวน์โหลดใบงาน</a></li>'; }).join("") +
         '</ul><div class="muted" style="font-size:15px">ส่งย้อนหลังได้ถึงวันสุดท้ายก่อนตัดสินผล ไม่หักคะแนน ไม่จำกัดครั้ง</div></section>';
-    } else if (a.due) {
+    } else if (a.due && !a.missN && !a.nowOpen) {
       h += '<section class="sec done-all"><h2 style="font-size:20px;color:var(--ok)">ภารกิจครบทุกงานที่ถึงกำหนดแล้ว</h2><div class="muted">เดินทางต่อได้เลย นักบิน</div></section>';
     }
 
