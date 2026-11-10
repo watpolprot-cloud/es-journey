@@ -464,8 +464,9 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     x.strokeStyle = 'rgba(255,255,255,.4)'; x.setLineDash([3, 4]); x.lineWidth = 1; x.beginPath(); x.moveTo(hx, hy - 10); x.lineTo(ex, ey); x.stroke(); x.setLineDash([]);
     x.fillStyle = '#FFD166'; x.beginPath(); x.moveTo(ex, ey - 2); x.lineTo(ex - 7, ey - 14); x.lineTo(ex + 7, ey - 14); x.closePath(); x.fill();
     label(x, 'จุดเหนือศูนย์เกิด', ex, ey - 18, '#FFD166', 12);
-    if (!slip && pA > .05) label(x, 'หินโค้งงอ สะสมพลังงาน', W * .78, ySurf - 12, '#FFD166', 13);
-    if (slip && pA < RUP + .2) label(x, 'หินแตก เลื่อนตัว ปล่อยพลังงาน', W * .78, ySurf - D - 12, '#FF6B8A', 13);
+    var nar = W < 560;   // จอแคบ : ย้ายข้อความสถานะลงใต้ผิวดินด้านซ้าย ไม่ให้ทับป้ายจุดเหนือศูนย์เกิด
+    if (!slip && pA > .05) { if (nar) label(x, 'หินโค้งงอ สะสมพลังงาน', 8, ySurf + 24, '#FFD166', 12.5, 'left'); else label(x, 'หินโค้งงอ สะสมพลังงาน', W * .78, ySurf - 12, '#FFD166', 13); }
+    if (slip && pA < RUP + .2) { if (nar) label(x, 'หินแตก ปล่อยพลังงาน', 8, ySurf + 24, '#FF6B8A', 12.5, 'left'); else label(x, 'หินแตก เลื่อนตัว ปล่อยพลังงาน', W * .78, ySurf - D - 12, '#FF6B8A', 13); }
     x.restore();
     // ---------------- แถบเมือง
     var y2 = H1 + 4, gy = H - 34;
@@ -734,7 +735,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
         label(x, 'พื้นทะเลยกตัว', sx + 6, sy - 22, '#FF9F6B', 11.5, 'left'); }
       else { x.fillStyle = '#8b6f55'; x.beginPath(); x.moveTo(sx - 16, seaY + 20); x.lineTo(sx - 4, seaY - 24); x.lineTo(sx + 6, seaY - 22); x.lineTo(sx + 16, seaY + 20); x.closePath(); x.fill();
         if (pC < .4) glow(x, sx, seaY - 26, 18, [255, 120, 60], .6); label(x, 'ภูเขาไฟ/ดินถล่ม', sx, seaY - 34, '#FF9F6B', 11.5); } }
-    else { var lx = X(.965); star(x, lx, seaY - seaY * .45, 9, '#FF4D5E'); label(x, 'แผ่นดินไหวบนบก', lx, seaY - seaY * .45 - 16, '#FF6B8A', 11.5, 'right');
+    else { var lx = X(.965); star(x, lx, seaY - seaY * .45, 9, '#FF4D5E'); label(x, 'แผ่นดินไหวบนบก', lx - 14, seaY - seaY * .45 + 4, '#FF6B8A', 11.5, 'right');
       if (pC > 0) label(x, 'ทะเลสงบ ไม่เกิดคลื่น', X(.45), seaY - 14, '#9AA6CF', 13); }
     // ทุ่น
     PROBES.forEach(function (p, i) { var bx = X(p.x), by = seaY - eta(p.x) * pxm, passed = xc >= p.x && C.A0 > 0 && C.src >= 0 && C.src < p.x;
@@ -793,7 +794,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     // พื้นที่เสี่ยงน้ำท่วม
     x.fillStyle = selS === 3 ? 'rgba(79,216,255,.5)' : 'rgba(79,216,255,.16)'; x.fillRect(W * sea, 0, W * (.66 - sea), H);
     x.strokeStyle = '#4FD8FF'; x.setLineDash([6, 5]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(W * .66, 0); x.lineTo(W * .66, H); x.stroke(); x.setLineDash([]);
-    label(x, 'แนวน้ำท่วมสึนามิ', W * .66 - 4, 16, '#4FD8FF', 11.5, 'right');
+    label(x, 'แนวน้ำท่วมสึนามิ', W * .66 - 4, W < 560 ? H - 8 : 16, '#4FD8FF', 11.5, 'right');   // จอแคบ : ย้ายลงล่าง ไม่ทับข้อความระยะคลื่น
     if (selS === 3) { for (var k = 0; k < 3; k++) { x.strokeStyle = 'rgba(255,255,255,.6)'; x.lineWidth = 2; x.beginPath(); for (var yy = 0; yy <= H; yy += 6) { var wx = W * (.5 + k * .05) + Math.sin(yy * .05 + tA * 3 + k) * 5; if (yy === 0) x.moveTo(wx, yy); else x.lineTo(wx, yy); } x.stroke(); } }
     // ถนนและเส้นทางอพยพ
     x.strokeStyle = '#8a8f9e'; x.lineWidth = 6; x.beginPath(); x.moveTo(W * .42, H * .5); x.lineTo(W * .84, H * .5); x.stroke();

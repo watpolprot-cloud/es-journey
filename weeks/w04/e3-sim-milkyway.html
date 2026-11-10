@@ -581,10 +581,11 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     x.strokeStyle = 'rgba(154,166,207,.35)'; x.setLineDash([3, 5]); x.lineWidth = 1;
     x.beginPath(); x.moveTo(0, c.H / 2); x.lineTo(c.W, c.H / 2); x.moveTo(c.W / 2, 0); x.lineTo(c.W / 2, c.H); x.stroke(); x.setLineDash([]);
     x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF';
-    x.fillText('ระนาบจาน', 6, c.H / 2 - 5); x.fillText('ทิศตั้งฉากกับจาน', 6, 14);
+    x.textAlign = 'right'; x.fillText('ระนาบจาน', c.W - 6, c.H / 2 - 5); x.textAlign = 'left'; x.fillText('ทิศตั้งฉากกับจาน', 6, 14);   // ป้ายระนาบจานชิดขวา ไม่ทับวงหมายเลข 3
     if (zShip) { x.fillStyle = '#FFD166'; x.fillText('มองจากยานที่ลอยสูง ' + fmt(zShip * 1000) + ' ปีแสง', c.W - 190, 14); return; }
     DIRS.forEach(function (D, k) {
       var p = skyXY(c, D.l, Math.min(D.b, 86)), on = k === curD;
+      p[0] = Math.max(15, Math.min(c.W - 26, p[0])); p[1] = Math.max(15, Math.min(c.H - 15, p[1]));   // กันวงหมายเลขตกขอบภาพ
       x.strokeStyle = on ? '#FFD166' : S.recB[D.k] ? '#5EF2A5' : '#4FD8FF'; x.lineWidth = on ? 2.4 : 1.4;
       x.beginPath(); x.arc(p[0], p[1], on ? 12 : 9, 0, 6.283); x.stroke();
       x.fillStyle = on ? '#FFD166' : '#E8EDFF'; x.font = (on ? '700 ' : '600 ') + '13px "Chakra Petch", Sarabun, sans-serif';
@@ -629,7 +630,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     x.fillStyle = '#FFD166'; x.beginPath(); x.arc(sx, sy, 3.5, 0, 6.283); x.fill();
     // ขวา : มองจากด้านข้าง (แกนนอน = แนวระบบสุริยะ-ใจกลาง)
     var qx = half + half / 2, qy = c.H / 2 + 6, s2 = s1 * 1.0, ex2 = 4;   // ขยายความหนาให้เห็นง่าย 4 เท่า
-    x.fillStyle = '#9AA6CF'; x.fillText('มองจากด้านข้าง (ความหนาขยาย 4 เท่า)', half + 6, 16);
+    x.fillStyle = '#9AA6CF'; x.fillText(half < 215 ? 'มองจากด้านข้าง (หนา ×4)' : 'มองจากด้านข้าง (ความหนาขยาย 4 เท่า)', half + 6, 16);
     x.fillStyle = 'rgba(150,180,255,.25)'; x.fillRect(qx - 50 * s2, qy - .5 * s2 * ex2, 100 * s2, 1 * s2 * ex2);
     x.fillStyle = 'rgba(255,214,160,.8)'; x.beginPath(); x.ellipse(qx, qy, 9, 5, 0, 0, 6.283); x.fill();
     x.strokeStyle = 'rgba(255,214,160,.18)'; x.beginPath(); x.arc(qx, qy, 46 * s2, 0, 6.283); x.stroke();

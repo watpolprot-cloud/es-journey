@@ -696,17 +696,18 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     var f = fit($('cvCalc')), x = f.x, W = f.W, H = f.H, sm = W < 480 ? 11 : 13;
     x.fillStyle = '#060b22'; x.fillRect(0, 0, W, H);
     var cols = [['วันปกติ', S.base], ['ตอนนี้', my], ['แผนลด', S.plan]], base = H - 30, top = 26, mx = 14, bw = Math.min(W * .16, 90);
+    cols.forEach(function (c) { if (c[1]) mx = Math.max(mx, Math.ceil((tot(c[1]) + .3) / 2) * 2); });   // ขยายแกนตั้งเมื่อผลรวมเกิน 14 แท่งจึงไม่ทะลุขอบบน
     x.strokeStyle = 'rgba(154,166,207,.18)'; x.font = '600 ' + (sm - 1) + 'px ' + HFONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right';
     for (var v = 0; v <= mx; v += 2) { var yy = base - (base - top) * v / mx; x.beginPath(); x.moveTo(40, yy); x.lineTo(W - 10, yy); x.stroke(); x.fillText(String(v), 34, yy + 4); }
     label(x, 'กก. CO₂ ต่อวัน', 6, 14, '#9AA6CF', sm - 1, 'left');
     var ty = base - (base - top) * 10 / mx; x.strokeStyle = 'rgba(255,209,102,.6)'; x.setLineDash([5, 4]); x.beginPath(); x.moveTo(40, ty); x.lineTo(W - 10, ty); x.stroke(); x.setLineDash([]);
-    label(x, 'คนไทยเฉลี่ยราว 10 กก. (รวมทุกภาคส่วน)', W - 12, ty - 5, '#FFD166', sm - 1, 'right');
     cols.forEach(function (c, k) {
       var cx = 40 + (W - 50) * (k + .5) / 3, y = base;
       if (c[1]) c[1].forEach(function (o, i) { var h = (base - top) * CAT[i].o[o][1] / mx; x.fillStyle = CAT[i].col; x.fillRect(cx - bw / 2, y - h, bw, h); y -= h; });
       label(x, c[1] ? fmt(tot(c[1]), 1) : '-', cx, y - 6, '#E8EDFF', sm + 1);
       label(x, c[0], cx, base + 18, k === 1 ? '#FFD166' : '#9AA6CF', sm);
     });
+    label(x, 'คนไทยเฉลี่ยราว 10 กก. (รวมทุกภาคส่วน)', W - 12, ty - 5, '#FFD166', sm - 1, 'right');   // วาดหลังแท่ง ข้อความจึงไม่ถูกแท่งบัง
   }
 
   // ---------------------------------------------------------------- ขั้นที่ 3 ไขรหัส

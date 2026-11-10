@@ -484,7 +484,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     var st = pol(cx, cy, R, 1.0, deg), sx = st[0], sy = st[1];
     x.save(); x.translate(sx, sy); x.rotate(deg * Math.PI / 180);
     x.fillStyle = '#FFD166'; x.beginPath(); x.moveTo(0, -16); x.lineTo(-8, 0); x.lineTo(8, 0); x.closePath(); x.fill(); x.restore();
-    var lt = pol(cx, cy, R, 1.24, deg); lt[0] = clamp(lt[0], 42, W - 42); x.font = '700 13px ' + HFONT; x.fillStyle = '#FFD166'; x.fillText('สถานี ' + deg + '°', lt[0], lt[1] + 4);
+    var lt = pol(cx, cy, R, 1.24, deg); lt[0] = clamp(lt[0], 42, W - 42); x.font = '700 13px ' + HFONT; x.fillStyle = '#FFD166'; x.fillText('สถานี ' + deg + '°', lt[0], Math.min(lt[1] + 4, H - 6));   // กันป้ายตกขอบล่าง
     // คำอธิบายสี
     x.textAlign = 'left'; x.font = '600 12px ' + FONT;
     x.fillStyle = '#4FD8FF'; x.fillRect(10, H - 34, 16, 3); x.fillText('คลื่น P', 30, H - 29);

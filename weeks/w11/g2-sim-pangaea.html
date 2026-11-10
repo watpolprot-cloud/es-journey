@@ -575,7 +575,9 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
       // เข็มทิศสนามแม่เหล็กโลก ณ เวลานั้น
       var nrmT = polAt(Tn);
       x.font = '700 15px ' + HFONT; x.textAlign = 'center'; x.fillStyle = '#FFD166';
-      x.fillText(fmt(Tn, 1) + ' ล้านปีก่อน · สนามแม่เหล็กโลก : ' + (nrmT ? 'ปกติ (เหมือนปัจจุบัน)' : 'กลับขั้ว'), W / 2, sea - 30);
+      var ttl = fmt(Tn, 1) + ' ล้านปีก่อน · สนามแม่เหล็กโลก : ' + (nrmT ? 'ปกติ (เหมือนปัจจุบัน)' : 'กลับขั้ว'), ttw = x.measureText(ttl).width;
+      if (ttw > W - 12) x.font = '700 ' + Math.max(10.5, 15 * (W - 12) / ttw).toFixed(1) + 'px ' + HFONT;   // จอแคบ : ย่อให้พอดี ไม่ล้นขอบ
+      x.fillText(ttl, W / 2, sea - 30);
       arrow(x, mid + (nrmT ? -26 : 26), sea - 10, mid + (nrmT ? 26 : -26), sea - 10, nrmT ? '#3FA9F5' : '#FF6B8A', 3, 10);
     }
     // คำอธิบายสี

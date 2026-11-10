@@ -791,13 +791,14 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     label(x, 'เส้นศูนย์สูตร', W - 6, Y(0) - 5, '#E8EDFF', sm, 'right');
     var gI = x.createLinearGradient(0, Y(M.itcz + 3), 0, Y(M.itcz - 3)); gI.addColorStop(0, 'rgba(255,107,138,0)'); gI.addColorStop(.5, 'rgba(255,107,138,.35)'); gI.addColorStop(1, 'rgba(255,107,138,0)');
     x.fillStyle = gI; x.fillRect(0, Y(M.itcz + 3), W, Y(M.itcz - 3) - Y(M.itcz + 3));
-    label(x, 'แถบความกดอากาศต่ำเขตร้อน (ร่องฝน)', 8, Y(M.itcz) + 4, '#FF6B8A', sm, 'left');
+    label(x, W < 520 ? 'ร่องฝน' : 'แถบความกดอากาศต่ำเขตร้อน (ร่องฝน)', W - 6, Y(M.itcz) + 4, '#FF6B8A', sm, 'right');   // ชิดขวา และย่อบนจอแคบ ไม่ทับป้ายอื่น (ชื่อเต็มอยู่ในคำอธิบายสีใต้ภาพ)
     x.lineCap = 'round';
     PART.forEach(function (p) { var v = monVel(p[0], p[1], cmon), a = Math.sin(Math.PI * clamp(p[2], 0, 1));
       x.strokeStyle = 'rgba(232,237,255,' + (.85 * a) + ')'; x.lineWidth = 2; x.beginPath(); x.moveTo(X(p[0]), Y(p[1])); x.lineTo(X(p[0] - v[0] * 2.2), Y(p[1] - v[1] * 2.2)); x.stroke();
       x.fillStyle = 'rgba(255,255,255,' + (.95 * a) + ')'; x.beginPath(); x.arc(X(p[0]), Y(p[1]), 2.2, 0, 6.283); x.fill(); });
     x.lineCap = 'butt';
-    M.H.forEach(function (h) { label(x, h[2], X(h[0]), Y(h[1]) + 6, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', 22); label(x, h[3], X(h[0]), Y(h[1]) + 22, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', sm); });
+    M.H.forEach(function (h) { var ly = Math.min(Y(h[1]) + 22, H - 6);   // กันป้ายตกขอบล่างบนจอแคบ
+      label(x, h[2], X(h[0]), ly - 16, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', 22); label(x, h[3], X(h[0]), ly, h[2] === 'L' ? '#FF6B8A' : '#4FD8FF', sm); });
     label(x, 'มหาสมุทรอินเดีย', X(80), Y(-6), 'rgba(154,166,207,.9)', sm); label(x, 'อ่าวเบงกอล', X(89), Y(15), 'rgba(154,166,207,.9)', sm); label(x, 'ทะเลจีนใต้', X(113), Y(13), 'rgba(154,166,207,.9)', sm);
     var tx = X(100.5), ty = Y(14.5), v = monVel(100.5, 14.5, cmon), m = Math.hypot(v[0], v[1]), L = Math.max(46, W * .09);
     glow(x, tx, ty, 22, [255, 209, 102], .55); x.fillStyle = '#FFD166'; x.beginPath(); x.arc(tx, ty, 5, 0, 6.283); x.fill();

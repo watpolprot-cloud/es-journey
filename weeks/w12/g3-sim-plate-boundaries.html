@@ -408,7 +408,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     f(x, W, H, mid, p, t);
     x.restore();
     if (cs.k !== 'TF') { x.font = '600 11px ' + FONT; x.fillStyle = '#9AA6CF'; x.textAlign = 'right'; x.fillText('ภาพตัดขวาง · ความสูงขยายเกินจริง', W - 8, H - 6); }
-    if (shakeA > 0) label(x, 'แผ่นดินไหว !', W / 2, 30, '#FF6B8A', 22);
+    if (shakeA > 0) label(x, 'แผ่นดินไหว !', W / 2, cs.k === 'TF' ? 52 : 30, '#FF6B8A', 22);   // มุมมองด้านบนมีป้ายรอยเลื่อนอยู่บรรทัดแรก จึงเลื่อนลง
   }
   var drawCaseFns = {
     DO: function (x, W, H, mid, p, t) {

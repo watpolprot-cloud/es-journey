@@ -388,7 +388,10 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
       });
       x.globalAlpha = 1;
     }
-    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ขั้นที่ ' + (fStage + 1) + ' : ' + STAGES[fStage].n, 12, 22);
+    x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif';
+    var ttl = 'ขั้นที่ ' + (fStage + 1) + ' : ' + STAGES[fStage].n, ttw = x.measureText(ttl).width;
+    if (ttw > W - 24) x.font = '700 ' + Math.max(10.5, 14 * (W - 24) / ttw).toFixed(1) + 'px "Chakra Petch", Sarabun, sans-serif';   // จอแคบ : ย่อหัวข้อให้พอดี ไม่ล้นขอบ
+    x.fillText(ttl, 12, 22);
     x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ภาพจำลอง ไม่ตามมาตราส่วน', W - 8, H - 6); x.textAlign = 'left';
   }
   function goStage(k) {
@@ -437,14 +440,14 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     var c = fit($('cvZone')), x = c.x, W = c.W, H = c.H;
     x.fillStyle = '#04060f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .35);
     var x0 = 40, x1 = W - 14, L0 = Math.log10(.25), L1 = Math.log10(150000), X = function (d) { return x0 + (Math.log10(d) - L0) / (L1 - L0) * (x1 - x0); };
-    var y0 = 46, y1 = H - 58;
+    var nar = W < 560, y0 = nar ? 60 : 46, y1 = H - 58;   // จอแคบ : เผื่อที่ด้านบนให้ป้ายเขต 3 ระดับ ไม่ทับกัน
     ZONES.forEach(function (z, i) {
       var a = X(z.lo), b = X(z.hi), on = i === selZone;
       x.fillStyle = rgba(z.col, on ? .22 : .1); x.fillRect(a, y0, b - a, y1 - y0);
       x.strokeStyle = rgba(z.col, on ? .95 : .45); x.lineWidth = on ? 2 : 1; x.strokeRect(a, y0, b - a, y1 - y0);
       x.fillStyle = rgba(z.col, 1); x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'center';
-      var lab = W < 560 ? ['ชั้นใน', 'แถบดาวเคราะห์น้อย', 'ชั้นนอก', 'ไคเปอร์', 'เมฆออร์ต'][i] : z.n;
-      x.fillText(lab, (a + b) / 2, i % 2 ? y0 - 18 : y0 - 6);
+      var lab = nar ? ['ชั้นใน', 'แถบดาวเคราะห์น้อย', 'ชั้นนอก', 'ไคเปอร์', 'เมฆออร์ต'][i] : z.n;
+      x.fillText(lab, (a + b) / 2, nar ? y0 - [6, 40, 6, 23, 6][i] : (i % 2 ? y0 - 22 : y0 - 6));
     });
     // แนวหิมะ
     var fx = X(3); x.strokeStyle = 'rgba(160,220,255,.9)'; x.setLineDash([5, 4]); x.lineWidth = 1.5; x.beginPath(); x.moveTo(fx, y0 - 2); x.lineTo(fx, y1 + 4); x.stroke(); x.setLineDash([]);
@@ -540,7 +543,10 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     if (bM) {
       x.strokeStyle = 'rgba(79,216,255,.55)'; x.lineWidth = 1.3;
       [1, 1.45, 1.95].forEach(function (k) { x.beginPath(); x.ellipse(px + 4 * k, py, R * .55 * k, R * .9 * k, 0, 0, 6.283); x.stroke(); });
-      x.fillStyle = '#4FD8FF'; x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'left'; x.fillText('สนามแม่เหล็ก', px + R * 1.15 + 6, py + 4);
+      x.fillStyle = '#4FD8FF'; x.font = '600 12px Sarabun, sans-serif'; x.textAlign = 'left';
+      var mw = x.measureText('สนามแม่เหล็ก').width;
+      if (px + R * 1.15 + 6 + mw > W - 4) { x.textAlign = 'center'; x.fillText('สนามแม่เหล็ก', Math.min(W - mw / 2 - 4, px + 8), py + R * 1.755 + 16); x.textAlign = 'left'; }   // ชิดขอบขวา : ย้ายป้ายลงใต้เส้นสนามแม่เหล็ก
+      else x.fillText('สนามแม่เหล็ก', px + R * 1.15 + 6, py + 4);
     }
     // บรรยากาศ
     if (e !== 'none') {
@@ -554,8 +560,13 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     planet(x, px, py, pr, tc);
     if (bA === 'thick' || (T > 100 && e !== 'none')) { x.fillStyle = 'rgba(255,230,180,.25)'; x.beginPath(); x.arc(px, py, pr, 0, 6.283); x.fill(); }
     x.textAlign = 'left'; x.fillStyle = '#FFD166'; x.font = '700 14px "Chakra Petch", Sarabun, sans-serif';
-    x.fillText(DNAME[bD] + ' · ' + ATM[bA].n + (bM ? ' · มีสนามแม่เหล็ก' : ' · ไม่มีสนามแม่เหล็ก'), 10, H - 52 < 0 ? 18 : 18);
-    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ขีดสีเหลืองคือลมสุริยะ', W - 8, 18);
+    if (W < 640) {   // จอแคบ : แบ่งหัวข้อเป็น 2 บรรทัด และย่อให้พอดี ไม่ทับคำอธิบายด้านขวา
+      var t1 = DNAME[bD] + ' · ' + ATM[bA].n, t1w = x.measureText(t1).width;
+      if (t1w > W - 20) x.font = '700 ' + Math.max(10.5, 14 * (W - 20) / t1w).toFixed(1) + 'px "Chakra Petch", Sarabun, sans-serif';
+      x.fillText(t1, 10, 18);
+      x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText(bM ? 'มีสนามแม่เหล็ก' : 'ไม่มีสนามแม่เหล็ก', 10, 36);
+    } else x.fillText(DNAME[bD] + ' · ' + ATM[bA].n + (bM ? ' · มีสนามแม่เหล็ก' : ' · ไม่มีสนามแม่เหล็ก'), 10, 18);
+    x.textAlign = 'right'; x.fillStyle = '#9AA6CF'; x.font = '12px Sarabun, sans-serif'; x.fillText('ขีดสีเหลืองคือลมสุริยะ', W - 8, W < 640 ? 36 : 18);
   }
   function loopB(now) { fT = now / 1000; if (tab === 'B') drawLab(); if (tab === 'A') drawForm(); bAnim = requestAnimationFrame(loopB); }
   function updB() {

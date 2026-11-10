@@ -440,7 +440,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     var g = x.createLinearGradient(0, atT, 0, gY); g.addColorStop(0, 'rgba(79,216,255,.05)'); g.addColorStop(1, 'rgba(79,216,255,.30)');
     x.fillStyle = g; x.fillRect(0, atT, W, gY - atT);
     x.setLineDash([6, 5]); x.strokeStyle = 'rgba(79,216,255,.5)'; x.lineWidth = 1.2; x.beginPath(); x.moveTo(0, atT); x.lineTo(W, atT); x.stroke(); x.setLineDash([]);
-    label(x, 'ชั้นบรรยากาศ (ย่อส่วน)', W - 52, atT + 16, '#4FD8FF', 12, 'right');
+    label(x, 'ชั้นบรรยากาศ (ย่อส่วน)', W - 52, atT - 6, '#4FD8FF', 12, 'right');   // วางเหนือเส้นประ ไม่ทับป้ายแสงสะท้อน
     // พื้นผิว
     x.fillStyle = sf.col; x.fillRect(0, gY, W, H - gY);
     x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = 1;

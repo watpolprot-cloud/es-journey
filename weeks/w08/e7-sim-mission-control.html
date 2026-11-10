@@ -460,7 +460,8 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
   function drawOrb() {
     var c = fit($('cvOrb')), x = c.x, W = c.W, H = c.H;
     x.fillStyle = '#03050f'; x.fillRect(0, 0, W, H); starfield(x, W, H, .6);
-    var cx = W / 2, cy = H / 2 + 6, Rm = Math.min(W, H) / 2 - 22, k = Rm / (RE + AMAX), re = RE * k;
+    // เว้นที่ด้านบน 52 px ให้หัวข้อ และด้านล่าง 30 px ให้คำอธิบาย วงโคจรจึงไม่ทับข้อความบนจอแคบ
+    var cx = W / 2, Rm = Math.min(W / 2 - 22, (H - 82) / 2), cy = 52 + (H - 82) / 2, k = Rm / (RE + AMAX), re = RE * k;
     // วงโคจรอ้างอิง 3 ระดับ
     x.setLineDash([4, 5]); x.lineWidth = 1;
     [[700, 'วงโคจรต่ำ'], [20200, 'ปานกลาง'], [35786, 'ค้างฟ้า']].forEach(function (o) {
@@ -490,7 +491,7 @@ footer { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: cen
     x.font = '12px Sarabun, sans-serif'; x.fillStyle = '#9AA6CF';
     x.fillText('จุดสีทอง = ประเทศไทย · 1 วินาที = 1 ชั่วโมง', 12, 40);
     x.textAlign = 'right'; x.fillText('ระยะตามมาตราส่วนจริง มองจากเหนือขั้วโลก', W - 8, H - 7);
-    if (Math.abs(T - SID) < 600) { x.textAlign = 'left'; x.fillStyle = '#5EF2A5'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ดาวเทียมอยู่เหนือจุดเดิมตลอด', 12, H - 10); }
+    if (Math.abs(T - SID) < 600) { x.textAlign = 'left'; x.fillStyle = '#5EF2A5'; x.font = '700 13px "Chakra Petch", Sarabun, sans-serif'; x.fillText('ดาวเทียมอยู่เหนือจุดเดิมตลอด', 12, W < 560 ? H - 24 : H - 10); }
     x.textAlign = 'left';
   }
   function updB() {
