@@ -256,7 +256,9 @@ window.ESJ = window.ESJ || {};
     var r = roomFromKey(key), list = (S && S.rooms[r]) || [];
     if (C.rooms.indexOf(r) < 0) return pageMissing();
     var asOf = S ? S.asOfWeek : 0;
-    var shown = C.tasks.filter(function (t) { return weekOf(t.code) <= asOf; });
+    /* งานที่ยังไม่ถึงสัปดาห์ แต่มีนักเรียนในห้องส่งแล้ว (ครูให้ทำล่วงหน้า) ก็แสดงด้วย */
+    var shown = C.tasks.filter(function (t) { return weekOf(t.code) <= asOf || list.some(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true || v === "p"; }); });
+    var shownCodes = shown.map(function (t) { return t.code; });
     var A = list.map(function (st) { return { st: st, a: analyse(st) }; });
     var allDone = A.filter(function (x) { return !x.a.missN && !x.a.nowOpen; }).length;
     var pend = A.reduce(function (s, x) { return s + x.a.missN; }, 0);
@@ -320,7 +322,7 @@ window.ESJ = window.ESJ || {};
       if (hasIntro) h += "<td>" + (st.intro ? '<span class="c ok">ส่ง</span>' : '<span class="c ' + (asOf === 1 ? "now" : "miss") + '">' + (asOf === 1 ? "ยังไม่ส่ง" : "ค้าง") + "</span>") + "</td>";
       chk.forEach(function (k) { h += "<td>" + checkCell(st, k, asOf) + "</td>"; });
       a.rows.forEach(function (rw) {
-        if (rw.wk > asOf) return;
+        if (shownCodes.indexOf(rw.t.code) < 0) return;
         var c = CELL[rw.state];
         h += '<td><span class="c ' + c[0] + '">' + c[1] + "</span></td>";
       });
