@@ -66,11 +66,13 @@ ESJ.course = {
   ],
 
   // งานเก็บคะแนน: code, title, kpi (ตัวชี้วัด), pts (คะแนน), capstone (ภารกิจปลายทาง ต้องทำครบทุกส่วน), half (1 = ก่อนกลางภาค, 2 = หลังกลางภาค)
+  // week (ใส่เฉพาะงานที่ไม่ใช่งานหลักใน weeks) เช่น E4M ใบงานเสริม Interstellar สัปดาห์ที่ 5 แบ่งคะแนนกับ E4 (2 + 2 = 4 เท่าเดิม ครูสั่ง 16 พ.ย. 2569)
   tasks: [
     { code: "E1", title: "ใบงาน เอกภพและทฤษฎีบิกแบง", kpi: "ว 3.1 ม.4-6/1", pts: 4, capstone: false, half: 1 },
     { code: "E2", title: "กิจกรรม หลักฐานที่สนับสนุนทฤษฎีบิกแบง", kpi: "ว 3.1 ม.4-6/2", pts: 4, capstone: false, half: 1 },
     { code: "E3", title: "ใบงาน กาแล็กซีทางช้างเผือก", kpi: "ว 3.1 ม.4-6/3", pts: 4, capstone: false, half: 1 },
-    { code: "E4", title: "ใบงาน กำเนิดและวิวัฒนาการของดาวฤกษ์", kpi: "ว 3.1 ม.4-6/4, 7", pts: 4, capstone: false, half: 1 },
+    { code: "E4", title: "ใบงาน กำเนิดและวิวัฒนาการของดาวฤกษ์", kpi: "ว 3.1 ม.4-6/4, 7", pts: 2, capstone: false, half: 1 },
+    { code: "E4M", week: 5, title: "ใบงาน นักสืบดาราศาสตร์ในภาพยนตร์ Interstellar", kpi: "ว 3.1 ม.4-6/7", pts: 2, capstone: false, half: 1 },
     { code: "E5", title: "ใบงาน สมบัติของดาวฤกษ์", kpi: "ว 3.1 ม.4-6/5, 6", pts: 4, capstone: false, half: 1 },
     { code: "E6", title: "ภารกิจ ระบบสุริยะ ดวงอาทิตย์ และผลของลมสุริยะต่อโลก", kpi: "ว 3.1 ม.4-6/8, 9", pts: 5, capstone: true, half: 1 },
     { code: "E7", title: "ภารกิจ เทคโนโลยีอวกาศกับชีวิตประจำวัน", kpi: "ว 3.1 ม.4-6/10", pts: 5, capstone: true, half: 1 },

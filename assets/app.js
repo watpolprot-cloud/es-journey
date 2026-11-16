@@ -20,7 +20,9 @@ window.ESJ = window.ESJ || {};
   function pad(n) { return (n < 10 ? "0" : "") + n; }
   function roomKey(r) { return r.replace("/", "-"); }
   function roomFromKey(k) { return k.replace("-", "/"); }
-  function weekOf(code) { for (var i = 0; i < C.weeks.length; i++) if (C.weeks[i].task === code) return C.weeks[i].week; return 99; }
+  function weekOf(code) { for (var i = 0; i < C.weeks.length; i++) if (C.weeks[i].task === code) return C.weeks[i].week; var t = taskOf(code); return t && t.week ? t.week : 99; }
+  /* งานเก็บคะแนนเพิ่มในสัปดาห์เดียวกับงานหลัก (data/course.js tasks ที่มี week) เช่น E4M ในสัปดาห์ที่ 5 */
+  function extraTasks(w) { return C.tasks.filter(function (t) { return t.week === w.week && t.code !== w.task; }); }
   /* งานไม่มีคะแนนที่แสดงเฉพาะส่ง/ไม่ส่ง (data/course.js checks) ที่ถึงกำหนดแล้ว */
   function checksDue() { var w = S ? S.asOfWeek : 0; return (C.checks || []).filter(function (k) { return k.week <= w; }); }
   function sent(st, code) { var v = st.done && st.done[code]; return v === 1 || v === true; }
@@ -65,7 +67,7 @@ window.ESJ = window.ESJ || {};
   function taskLabel(w) {
     if (w.task === "MID") return "กลางภาค";
     if (w.task === "FINAL") return "ปลายภาค";
-    return w.task || "ปฐมนิเทศ";
+    return (w.task || "ปฐมนิเทศ") + extraTasks(w).map(function (t) { return " + " + t.code; }).join("");
   }
   function planetOf(w) {
     if (w.task === "MID") return "assets/img/planet-saturn.png";
@@ -237,6 +239,9 @@ window.ESJ = window.ESJ || {};
     if (t) {
       h += '<div class="fact"><small>งานเก็บคะแนน</small>' + esc(t.code) + " " + esc(t.title) + "</div>" +
         '<div class="fact"><small>ตัวชี้วัด · คะแนน</small>' + esc(t.kpi) + " · " + t.pts + " คะแนน</div>";
+      extraTasks(w).forEach(function (x) {
+        h += '<div class="fact"><small>งานเก็บคะแนนเพิ่ม</small>' + esc(x.code) + " " + esc(x.title) + " · " + x.pts + " คะแนน</div>";
+      });
     } else if (w.task === "MID") {
       h += '<div class="fact"><small>สอบกลางภาค</small>ออนไลน์ 20 ข้อ 20 คะแนน หน่วยที่ 1 · ส่งแล้วเห็นเฉลยทันที สอบซ้ำได้ไม่จำกัด ใช้คะแนนสูงสุด</div>';
     } else if (w.task === "FINAL") {
