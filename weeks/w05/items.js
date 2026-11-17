@@ -6,5 +6,6 @@ ESJ.week(5, [
   { type: "sim",       code: "E4", title: "สถานการณ์จำลอง ห้องทดลองชีวิตดาวฤกษ์ (ภารกิจ A B C)", file: "e4-sim-starlife.html", note: "ใช้คู่กับใบงาน E4 · เปิดบนมือถือหรือคอมพิวเตอร์ได้", qr: "qr-e4-sim.png" },
   { type: "worksheet", code: "E4", title: "ใบงาน E4 ห้องทดลองชีวิตดาวฤกษ์ (1 แผ่น 2 หน้า)", file: "e4-worksheet.pdf", note: "2 คะแนน · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
   { type: "worksheet", code: "E4M", title: "ใบงาน E4M นักสืบดาราศาสตร์ในภาพยนตร์ Interstellar (1 แผ่น 2 หน้า)", file: "e4m-worksheet-interstellar.pdf", note: "2 คะแนน · ใช้คู่กับใบงาน E4 · ส่งครบ 2 หน้า = เต็ม · พิมพ์หน้า-หลัง" },
-  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 5 E4 กำเนิดและวิวัฒนาการดาวฤกษ์", file: "w05-slides-e4-stars.pdf", note: "25 หน้า · คาบคู่และคาบเดี่ยว" }
+  { type: "slides",    title: "สไลด์ สัปดาห์ที่ 5 E4 กำเนิดและวิวัฒนาการดาวฤกษ์", file: "w05-slides-e4-stars.pdf", note: "25 หน้า · คาบคู่และคาบเดี่ยว" },
+  { type: "slides",    code: "E4M", title: "สไลด์ E4M ดาราศาสตร์ในภาพยนตร์ Interstellar", file: "w05-slides-e4m-interstellar.pdf", note: "31 หน้า · ใช้คู่กับใบงาน E4M · ภาพนิ่งจากภาพยนตร์ใช้เพื่อการศึกษา" }
 ]);
