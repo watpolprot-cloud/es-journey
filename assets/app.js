@@ -26,6 +26,24 @@ window.ESJ = window.ESJ || {};
   /* งานไม่มีคะแนนที่แสดงเฉพาะส่ง/ไม่ส่ง (data/course.js checks) ที่ถึงกำหนดแล้ว */
   function checksDue() { var w = S ? S.asOfWeek : 0; return (C.checks || []).filter(function (k) { return k.week <= w; }); }
   function sent(st, code) { var v = st.done && st.done[code]; return v === 1 || v === true; }
+  /* งานที่ห้องนี้มีผลตรวจแล้ว (มีนักเรียนในห้องส่งอย่างน้อย 1 คน = ครูสแกนส่งตรวจแล้ว)
+     งานที่ห้องนั้นยังไม่มีผลตรวจเลย ไม่นับเป็น "ค้าง" และไม่นับในร้อยละ เพราะแต่ละห้องเรียนเร็วช้าต่างกัน
+     และครูอาจยังไม่ได้สแกนส่งตรวจ (ครูสั่งอัปเดตเว็บถึงเรื่องล่าสุด 17 พ.ย. 2569) */
+  var scanCache = {};
+  function scannedIn(r) {
+    if (scanCache[r]) return scanCache[r];
+    var m = {};
+    ((S && S.rooms[r]) || []).forEach(function (st) {
+      Object.keys(st.done || {}).forEach(function (c) { var v = st.done[c]; if (v === 1 || v === true || v === "p") m[c] = true; });
+    });
+    return (scanCache[r] = m);
+  }
+  /* สัปดาห์ล่าสุดที่ห้องนี้ไปถึง = สัปดาห์ตามปฏิทิน หรือสัปดาห์ของงานที่ห้องนี้มีผลตรวจแล้ว (เลือกที่ไกลกว่า) */
+  function latestWeekOf(r) {
+    var w = Math.max(1, Math.min(20, calWeek() || 1)), m = scannedIn(r);
+    C.tasks.forEach(function (t) { if (m[t.code]) w = Math.max(w, weekOf(t.code)); });
+    return Math.min(20, w);
+  }
   function checkCell(st, k, asOf) {
     return sent(st, k.code) ? '<span class="c ok">ส่ง</span>' : '<span class="c ' + (k.week === asOf ? "now" : "miss") + '">' + (k.week === asOf ? "ยังไม่ส่ง" : "ค้าง") + "</span>";
   }
@@ -40,7 +58,7 @@ window.ESJ = window.ESJ || {};
   /* พลังทีม = ร้อยละของงานที่ถึงกำหนดที่ทั้งห้องส่งแล้ว (สูตรเดียวกับความคืบหน้าห้องเดิม) */
   function roomPower(r) {
     var list = (S && S.rooms[r]) || [], due = 0, ok = 0;
-    list.forEach(function (st) { var a = analyse(st); due += a.due; ok += a.ok; });
+    list.forEach(function (st) { var a = analyse(st, r); due += a.due; ok += a.ok; });
     /* ยังไม่มีงานเก็บคะแนนที่ถึงกำหนด (สัปดาห์ที่ 1) ใช้การลงทะเบียนนักบินแทน */
     if (!due && S && S.asOfWeek >= 1) { due = list.length; ok = list.filter(function (st) { return st.intro; }).length; }
     return { n: list.length, pct: due ? Math.round(ok * 100 / due) : 0 };
@@ -77,22 +95,20 @@ window.ESJ = window.ESJ || {};
   }
 
   /* ---------- คำนวณผลรายคน ---------- */
-  function analyse(st) {
-    var asOf = S.asOfWeek || 0, r = { half1: 0, half2: 0, due: 0, ok: 0, pending: [], future: 0, rows: [] };
+  function analyse(st, room) {
+    var asOf = S.asOfWeek || 0, r = { half1: 0, half2: 0, due: 0, ok: 0, pending: [], future: 0, rows: [] }, sc = scannedIn(room);
     C.tasks.forEach(function (t) {
       var wk = weekOf(t.code), v = st.done && st.done[t.code], state;
       if (v === 1 || v === true) state = "ok";
       else if (v === "p") state = "part";
+      else if (!sc[t.code]) state = wk <= asOf ? "wait" : "na";   /* ห้องนี้ยังไม่มีผลตรวจงานนี้ */
       else if (wk < asOf) state = "miss";
-      else if (wk === asOf) state = "now";
-      else state = "na";
+      else state = "now";   /* งานสัปดาห์นี้ หรืองานล่าสุดที่ห้องนี้ทำล่วงหน้า */
       if (state === "ok") { r[t.half === 1 ? "half1" : "half2"] += t.pts; }
-      if (wk <= asOf || state === "ok" || state === "part") {
-        if (state !== "now" || v) r.due += 1;
-        if (state === "ok") r.ok += 1;
-      }
+      if (state === "ok" || state === "part" || state === "miss") r.due += 1;
+      if (state === "ok") r.ok += 1;
       if (state === "miss" || state === "part") r.pending.push(t);
-      if (state === "na" || state === "now") r.future += t.pts;
+      if (state === "na" || state === "now" || state === "wait") r.future += t.pts;
       r.rows.push({ t: t, wk: wk, state: state });
     });
     var mid = st.mid ? st.mid.best : null, fin = st.final;
@@ -116,14 +132,14 @@ window.ESJ = window.ESJ || {};
     r.pct = r.due ? Math.round(r.ok * 100 / r.due) : 0;
     return r;
   }
-  var CELL = { ok: ["ok", "ส่ง"], part: ["part", "ไม่ครบ"], miss: ["miss", "ค้าง"], now: ["now", "กำลังทำ"], na: ["na", "–"] };
-  var STATE_TXT = { ok: "ส่งแล้ว", part: "ส่งแล้ว ยังไม่ครบทุกส่วน", miss: "ค้างส่ง", now: "สัปดาห์นี้", na: "ยังไม่ถึงกำหนด" };
+  var CELL = { ok: ["ok", "ส่ง"], part: ["part", "ไม่ครบ"], miss: ["miss", "ค้าง"], now: ["now", "กำลังทำ"], na: ["na", "–"], wait: ["na", "รอผลตรวจ"] };
+  var STATE_TXT = { ok: "ส่งแล้ว", part: "ส่งแล้ว ยังไม่ครบทุกส่วน", miss: "ค้างส่ง", now: "งานล่าสุด ส่งได้เลย", na: "ยังไม่ถึงกำหนด", wait: "ห้องนี้ยังไม่มีผลตรวจ" };
 
   function sampleNote() {
     return S && S.sample ? '<div class="sample">ตอนนี้เป็นข้อมูลตัวอย่าง ชื่อนักเรียนเป็นชื่อสมมติ เพื่อดูหน้าตาเว็บเท่านั้น เมื่อเปิดภาคเรียนครูจะอัปเดตเป็นข้อมูลจริง</div>' : "";
   }
   function updatedNote() {
-    return S ? '<p class="muted" style="font-size:14px;margin-top:10px">ข้อมูลการส่งงานอัปเดต ' + esc(S.updated) + (S.asOfWeek ? " · นับงานถึงสัปดาห์ที่ " + S.asOfWeek : "") + "</p>" : "";
+    return S ? '<p class="muted" style="font-size:14px;margin-top:10px">ข้อมูลการส่งงานอัปเดต ' + esc(S.updated) + (S.asOfWeek ? " · นับงานถึงสัปดาห์ที่ " + S.asOfWeek + " เฉพาะงานที่ห้องนั้นมีผลตรวจแล้ว" : "") + "</p>" : "";
   }
 
   /* ---------- ชิ้นส่วนที่ใช้ซ้ำ ---------- */
@@ -149,6 +165,11 @@ window.ESJ = window.ESJ || {};
     var its = itemsOf(w);
     if (!its.length) return '<div class="empty">ครูกำลังเตรียมใบงานและสื่อของสัปดาห์นี้</div>';
     return '<div class="items">' + its.map(function (it) { return itemHTML(it, w); }).join("") + "</div>";
+  }
+
+  function latestLine(r) {
+    var lw = latestWeekOf(r), w = C.weeks[lw - 1];
+    return '<div style="margin-top:8px;font-size:14px">ภารกิจล่าสุด สัปดาห์ที่ ' + lw + " · " + esc(taskLabel(w)) + "</div>";
   }
 
   /* ---------- หน้า: ศูนย์ควบคุม ---------- */
@@ -195,7 +216,7 @@ window.ESJ = window.ESJ || {};
       h += '<a class="team-card t-' + t.id + '" href="#/room/' + roomKey(r) + '"><div class="tc-art" style="background-image:url(' + teamImg(t, "banner.jpg") + ')">' + patchImg(t) + "</div>" +
         '<div class="tc-body"><div class="kicker">' + esc(t.en) + '</div><div class="tn">' + esc(t.name) + '</div><div class="muted">ห้อง ม.' + r + " · " + esc(t.field) + " · " + pw.n + " คน</div>" +
         '<div class="power-row"><span>พลังทีม</span><b class="pct">' + pw.pct + '%</b></div><div class="bar"><i style="width:' + pw.pct + '%"></i></div>' +
-        '<small class="muted">ร้อยละของงานที่ถึงกำหนดที่ทั้งทีมส่งแล้ว</small><span class="go">เข้าฐานทีม</span></div></a>';
+        '<small class="muted">ร้อยละของงานที่ถึงกำหนดที่ทั้งทีมส่งแล้ว</small>' + latestLine(r) + '<span class="go">เข้าฐานทีม</span></div></a>';
     });
     h += '</div><p class="muted" style="font-size:14px;margin:10px 0 0">ไม่มีการแข่งขันหรือจัดอันดับระหว่างทีม ทุกทีมมีเป้าหมายเดียวกันคือพลังทีม 100% ส่งครบทุกคน</p>' + updatedNote() + "</section>";
     return h;
@@ -262,9 +283,11 @@ window.ESJ = window.ESJ || {};
     if (C.rooms.indexOf(r) < 0) return pageMissing();
     var asOf = S ? S.asOfWeek : 0;
     /* งานที่ยังไม่ถึงสัปดาห์ แต่มีนักเรียนในห้องส่งแล้ว (ครูให้ทำล่วงหน้า) ก็แสดงด้วย */
-    var shown = C.tasks.filter(function (t) { return weekOf(t.code) <= asOf || list.some(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true || v === "p"; }); });
+    /* แสดงเฉพาะงานที่ห้องนี้มีผลตรวจแล้ว (รวมงานที่ห้องนี้ทำล่วงหน้า) · งานที่ถึงสัปดาห์แล้วแต่ยังไม่มีผลตรวจ บอกไว้ใต้แถบความคืบหน้า */
+    var sc = scannedIn(r), shown = C.tasks.filter(function (t) { return sc[t.code]; });
+    var waiting = C.tasks.filter(function (t) { return !sc[t.code] && weekOf(t.code) <= asOf; });
     var shownCodes = shown.map(function (t) { return t.code; });
-    var A = list.map(function (st) { return { st: st, a: analyse(st) }; });
+    var A = list.map(function (st) { return { st: st, a: analyse(st, r) }; });
     var allDone = A.filter(function (x) { return !x.a.missN && !x.a.nowOpen; }).length;
     var pend = A.reduce(function (s, x) { return s + x.a.missN; }, 0);
     var risk = A.filter(function (x) { return x.a.risk; }).length;
@@ -304,13 +327,17 @@ window.ESJ = window.ESJ || {};
     shown.forEach(function (t) {
       var ok = list.filter(function (st) { var v = st.done && st.done[t.code]; return v === 1 || v === true; }).length;
       var p = list.length ? Math.round(ok * 100 / list.length) : 0, full = list.length && ok === list.length;
-      h += '<div class="mbar' + (weekOf(t.code) === asOf ? " now" : "") + (full ? " full" : "") + '"><div class="row"><b>' + t.code + "</b><span>" + (full ? "ครบทั้งทีม" : ok + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + p + '%"></i></div></div>';
+      h += '<div class="mbar' + (weekOf(t.code) >= asOf ? " now" : "") + (full ? " full" : "") + '"><div class="row"><b>' + t.code + "</b><span>" + (full ? "ครบทั้งทีม" : ok + "/" + list.length) + '</span></div><div class="bar"><i style="width:' + p + '%"></i></div></div>';
     });
     if (shown.length && list.length && list[0].mid !== undefined && asOf >= 9) {
       var took = list.filter(function (st) { return st.mid; }).length, p2 = Math.round(took * 100 / list.length);
       h += '<div class="mbar"><div class="row"><b>กลางภาค</b><span>สอบแล้ว ' + took + "/" + list.length + '</span></div><div class="bar"><i style="width:' + p2 + '%"></i></div></div>';
     }
-    h += "</div></section>";
+    h += "</div>";
+    if (waiting.length) h += '<p class="muted" style="font-size:14px;margin:10px 0 0">ยังไม่มีผลตรวจของห้องนี้ : ' + waiting.map(function (t) { return esc(t.code); }).join(" ") + " · ขึ้นผลเมื่อครูสแกนส่งตรวจแล้ว ระหว่างนี้ยังไม่นับเป็นงานค้าง</p>";
+    var lw = latestWeekOf(r), lwW = C.weeks[lw - 1];
+    h += '<p style="font-size:15px;margin:10px 0 0">ภารกิจล่าสุดของทีม : <a href="#/week/' + lw + '">สัปดาห์ที่ ' + lw + " " + esc(lwW.title) + " (" + esc(taskLabel(lwW)) + ")</a></p>";
+    h += "</section>";
 
     h += '<section class="sec"><div class="sec-h"><h2>การส่งงานรายคน</h2><span class="muted">เรียงตามเลขที่ คลิกชื่อเพื่อดูรายละเอียด</span></div>' +
       '<div class="tools" id="tools"><button class="chip" data-f="all">ทั้งหมด</button><button class="chip" data-f="pend">มีงานค้าง</button><button class="chip" data-f="risk">เสี่ยงติด ร</button>' +
@@ -318,7 +345,7 @@ window.ESJ = window.ESJ || {};
       '<div class="tablewrap"><table class="roster"><thead><tr><th class="no">เลขที่</th><th class="nm">ชื่อ-นามสกุล</th>' +
       (hasIntro ? '<th class="' + (asOf === 1 ? "cur" : "") + '">ลงทะเบียน</th>' : "") +
       chk.map(function (k) { return '<th class="' + (k.week === asOf ? "cur" : "") + '">' + k.code + "</th>"; }).join("") +
-      shown.map(function (t) { return '<th class="' + (weekOf(t.code) === asOf ? "cur" : "") + '">' + t.code + "</th>"; }).join("") +
+      shown.map(function (t) { return '<th class="' + (weekOf(t.code) >= asOf ? "cur" : "") + '">' + t.code + "</th>"; }).join("") +
       (asOf >= 9 ? "<th>กลางภาค</th>" : "") + (introOnly ? "" : "<th>ส่งแล้ว</th><th>สถานะ</th>") + "</tr></thead><tbody id=\"rows\">";
     A.forEach(function (x) {
       var st = x.st, a = x.a;
@@ -336,7 +363,7 @@ window.ESJ = window.ESJ || {};
       h += '<td class="pct">' + a.pct + "%</td><td>" + (a.risk ? '<span class="risk">เสี่ยงติด ร</span>' : a.missN ? '<span class="c miss">ค้าง ' + a.missN + "</span>" : a.nowOpen ? '<span class="c now">กำลังทำ</span>' : '<span class="c ok">ครบ</span>') + "</td></tr>";
     });
     h += "</tbody></table></div>" +
-      '<div class="legend"><span><span class="c ok">ส่ง</span> ส่งแล้ว</span><span><span class="c miss">ค้าง</span> ยังไม่ส่ง</span><span><span class="c part">ไม่ครบ</span> ภารกิจปลายทางยังไม่ครบทุกส่วน</span><span><span class="c now">กำลังทำ</span> งานของสัปดาห์นี้</span></div>' +
+      '<div class="legend"><span><span class="c ok">ส่ง</span> ส่งแล้ว</span><span><span class="c miss">ค้าง</span> ยังไม่ส่ง</span><span><span class="c part">ไม่ครบ</span> ภารกิจปลายทางยังไม่ครบทุกส่วน</span><span><span class="c now">กำลังทำ</span> งานสัปดาห์นี้หรืองานล่าสุดของทีม ยังไม่ส่ง</span></div>' +
       (hasIntro ? '<p class="muted" style="font-size:14px">ช่อง ลงทะเบียน คือภารกิจ 00 ลงทะเบียนนักบิน (แบบสอบถามรู้จักนักเรียน) ไม่มีคะแนน แต่ขอให้ทุกคนส่ง ครูจะใช้ข้อมูลนี้ออกแบบการสอนให้เหมาะกับห้อง</p>' : "") +
       (chk.length ? '<p class="muted" style="font-size:14px">ช่อง ' + chk.map(function (k) { return k.code; }).join(" ") + " คือ " + chk.map(function (k) { return esc(k.title); }).join(" · ") + " ไม่มีคะแนน แต่ขึ้นสถานะส่งแล้วหรือยัง ตามใบงานที่ครูสแกนให้ผู้ช่วยตรวจ AI</p>" : "") +
       '<p class="muted" style="font-size:14px">ไม่มีการจัดอันดับ ตารางนี้ให้เพื่อนช่วยเตือนเพื่อนตามงาน ส่งย้อนหลังได้ทุกงานโดยไม่หักคะแนน</p>' + updatedNote() + "</section>";
@@ -363,7 +390,7 @@ window.ESJ = window.ESJ || {};
     var r = roomFromKey(key), list = (S && S.rooms[r]) || [], st = null, idx = -1;
     for (var i = 0; i < list.length; i++) if (String(list[i].no) === String(no)) { st = list[i]; idx = i; }
     if (!st) return pageMissing();
-    var a = analyse(st), circ = 2 * Math.PI * 80, off = circ * (1 - a.pct / 100), tm = teamOf(r);
+    var a = analyse(st, r), circ = 2 * Math.PI * 80, off = circ * (1 - a.pct / 100), tm = teamOf(r);
     var doneN = a.rows.filter(function (rw) { return rw.state === "ok"; }).length, lv = levelOf(doneN);
     var lvPct = lv.next ? Math.round((doneN - lv.cur.min) * 100 / (lv.next.min - lv.cur.min)) : 100;
     var h = sampleNote() + '<div class="panel me player"><div class="pc-main">' + (tm ? patchImg(tm, "pc-patch") : "") + '<div><div class="callsign">นักบิน ES-' + r.replace("4/", "4") + "-" + pad(st.no) + (tm ? " · " + esc(tm.name) : "") + '</div><h1>' + esc(st.name) + '</h1><div class="muted">ห้อง ม.' + r + " เลขที่ " + st.no + " · " + esc(C.roomInfo[r]) + "</div>" +
