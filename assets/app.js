@@ -5,6 +5,7 @@ window.ESJ = window.ESJ || {};
   ESJ.weekItems = {};
   ESJ.week = function (n, items) { ESJ.weekItems[n] = (items || []).filter(Boolean); };
   ESJ.scores = function (data) { ESJ.scoreData = data; };
+  ESJ.worksheets = function (data) { ESJ.wsData = data; };
 
   var TYPE = {
     slides: "สไลด์", worksheet: "ใบงาน", sim: "สถานการณ์จำลอง", activity: "กิจกรรมออนไลน์",
@@ -419,6 +420,8 @@ window.ESJ = window.ESJ || {};
       h += '<section class="sec done-all"><h2 style="font-size:20px;color:var(--ok)">ภารกิจครบทุกงานที่ถึงกำหนดแล้ว</h2><div class="muted">เดินทางต่อได้เลย นักบิน</div></section>';
     }
 
+    h += wsSection(r, st);
+
     /* ข้อความจากศูนย์ควบคุม: จุดแข็ง + สิ่งที่ควรทำต่อ ของงานล่าสุด (ผู้ช่วยตรวจ AI ครูยืนยันแล้ว · ครูตกลง 13 ต.ค. 2569) */
     if (st.note && (st.note.strength || st.note.practice)) {
       var nt = st.note, ntT = C.tasks.filter(function (t) { return t.code === nt.code; })[0];
@@ -462,6 +465,81 @@ window.ESJ = window.ESJ || {};
     return h;
   }
 
+  /* ---------- ใบงานที่ส่ง : ลิงก์ไฟล์สแกนรายคนใน Google Drive (ครูสั่ง 21 พ.ย. 2569) ----------
+     data/worksheets.js สร้างด้วย build_worksheet_links.py (เก็บนอก repo)
+     k = รหัสงานที่มีไฟล์ · mode "gate" = ลิงก์เข้ารหัส AES-GCM ด้วยกุญแจ PBKDF2 จากเลขประจำตัว 5 หลัก
+     นักเรียนพิมพ์เลขประจำตัวจึงเห็นลิงก์ของตัวเอง (เว็บไม่มีและไม่แสดงเลขประจำตัว) · mode "open" = f เป็นลิงก์ตรง */
+  function wsEntry(r, no) { var d = ESJ.wsData; return (d && d.rooms && d.rooms[r] && d.rooms[r][String(no)]) || null; }
+  function wsTitle(code) {
+    var t = taskOf(code); if (t) return t.title;
+    var k = (C.checks || []).filter(function (x) { return x.code === code; })[0];
+    return k ? k.title : "";
+  }
+  function wsList(files) {
+    var cnt = {}, idx = {};
+    files.forEach(function (f) { cnt[f[0]] = (cnt[f[0]] || 0) + 1; });
+    return '<div class="tasks">' + files.map(function (f) {
+      idx[f[0]] = (idx[f[0]] || 0) + 1;
+      var t = taskOf(f[0]), w = t ? C.weeks[weekOf(f[0]) - 1] : null;
+      return '<div class="trow"><span class="code ' + (w ? "u" + w.unit : "u0") + '">' + esc(f[0]) + '</span><div class="tt">' + esc(wsTitle(f[0])) +
+        (cnt[f[0]] > 1 ? "<small>ไฟล์ที่ " + idx[f[0]] + " จาก " + cnt[f[0]] + " (ส่งมากกว่า 1 ครั้ง)</small>" : "") + "</div>" +
+        '<a class="btn ghost" href="https://drive.google.com/file/d/' + encodeURIComponent(f[1]) + '/view" target="_blank" rel="noopener">ดูใบงาน</a></div>';
+    }).join("") + "</div>";
+  }
+  function wsSection(r, st) {
+    var e = wsEntry(r, st.no);
+    if (!e || !e.k || !e.k.length) return "";
+    var h = '<section class="sec" id="ws"><div class="sec-h"><h2>ใบงานที่ส่ง</h2><span class="muted">ไฟล์สแกนที่ผู้ช่วยตรวจ AI ตรวจแล้ว เปิดดูใน Google Drive</span></div>',
+      foot = '<p class="muted ws-foot">ใบงานที่เพิ่งส่งจะขึ้นเมื่อครูอัปเดตเว็บครั้งถัดไป · บนใบงานมีเลขประจำตัวของเรา อย่าส่งลิงก์ต่อให้คนอื่น</p>';
+    if (e.f) return h + wsList(e.f) + foot + "</section>";
+    return h + '<div id="ws-body"><p class="ws-lead">มีใบงานสแกน ' + e.k.length + " งาน : " + e.k.map(esc).join(" · ") +
+      '<br><span class="muted">พิมพ์เลขประจำตัวนักเรียน 5 หลัก (เลขเดียวกับที่ฝนบนใบงาน) เพื่อเปิดดูใบงานของตัวเอง</span></p>' +
+      '<form class="tools ws-form" id="ws-form" autocomplete="off"><input class="search" id="ws-id" type="text" inputmode="numeric" maxlength="5" placeholder="เลขประจำตัว 5 หลัก" aria-label="เลขประจำตัวนักเรียน 5 หลัก">' +
+      '<button class="btn" type="submit">เปิดดูใบงาน</button><label class="ws-rem"><input type="checkbox" id="ws-rem" checked> จำไว้ในเครื่องนี้</label></form>' +
+      '<div id="ws-msg" class="ws-msg" role="status"></div></div>' + foot + "</section>";
+  }
+  function b64bytes(s) { var b = atob(s), u = new Uint8Array(b.length); for (var i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+  function thaiDigits(s) { return String(s).replace(/[๐-๙]/g, function (c) { return String(c.charCodeAt(0) - 0x0E50); }); }
+  function wsDecrypt(e, pid) {
+    var cs = window.crypto && window.crypto.subtle;
+    if (!cs || !window.TextEncoder || !window.Promise) return { then: function (ok, bad) { bad(new Error("nocrypto")); } };
+    var iter = (ESJ.wsData && ESJ.wsData.iter) || 250000;
+    return cs.importKey("raw", new TextEncoder().encode(pid), "PBKDF2", false, ["deriveKey"]).then(function (base) {
+      return cs.deriveKey({ name: "PBKDF2", salt: b64bytes(e.s), iterations: iter, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+    }).then(function (key) {
+      return cs.decrypt({ name: "AES-GCM", iv: b64bytes(e.iv) }, key, b64bytes(e.c));
+    }).then(function (buf) { return JSON.parse(new TextDecoder().decode(buf)); });
+  }
+  function bindWs(r, no) {
+    var form = document.getElementById("ws-form"), e = wsEntry(r, no);
+    if (!form || !e) return;
+    var body = document.getElementById("ws-body"), orig = body.innerHTML, store = "esj-ws-" + r + "-" + no, busy = false;
+    function remember(v) { try { if (v) localStorage.setItem(store, v); else localStorage.removeItem(store); } catch (x) { /* โหมดส่วนตัว */ } }
+    function msg(t) { var m = document.getElementById("ws-msg"); if (m) m.textContent = t; }
+    function unlock(pid, keep, auto) {
+      if (busy) return; busy = true; msg("กำลังเปิด...");
+      wsDecrypt(e, pid).then(function (files) {
+        busy = false;
+        if (keep) remember(pid);
+        body.innerHTML = wsList(files) + '<p class="ws-lock"><button class="chip" type="button" id="ws-lock">ปิดรายการและลืมเลขในเครื่องนี้</button></p>';
+        document.getElementById("ws-lock").addEventListener("click", function () { remember(""); body.innerHTML = orig; bindWs(r, no); });
+      }, function (err) {
+        busy = false;
+        if (auto) { remember(""); msg(""); return; }
+        msg(err && err.message === "nocrypto" ? "เบราว์เซอร์นี้เปิดรายการไม่ได้ ลองเปิดเว็บด้วย Chrome หรือ Safari" : "เลขประจำตัวไม่ตรงกับนักบินคนนี้ ตรวจเลขแล้วลองใหม่อีกครั้ง");
+      });
+    }
+    form.addEventListener("submit", function (ev) {
+      ev.preventDefault();
+      var pid = thaiDigits(document.getElementById("ws-id").value).replace(/\D/g, "");
+      if (pid.length !== 5) { msg("พิมพ์เลขประจำตัวให้ครบ 5 หลัก"); return; }
+      unlock(pid, document.getElementById("ws-rem").checked, false);
+    });
+    var saved = null;
+    try { saved = localStorage.getItem(store); } catch (x) { saved = null; }
+    if (saved) unlock(saved, true, true);
+  }
+
   /* ---------- หน้า: กติกา ---------- */
   function pageRules() {
     var grades = [["80–100", "4"], ["75–79", "3.5"], ["70–74", "3"], ["65–69", "2.5"], ["60–64", "2"], ["55–59", "1.5"], ["50–54", "1"], ["0–49", "0"]];
@@ -487,7 +565,7 @@ window.ESJ = window.ESJ || {};
       '<p class="muted" style="font-size:15px">ป้าย <span class="risk">เสี่ยงติด ร</span> บนเว็บเป็นการเตือนล่วงหน้า ขึ้นเมื่อมีงานค้างและคะแนนที่คาดว่าจะได้ (คิดกลางภาคและปลายภาคอย่างละ ' + C.risk.assumeFinal + " คะแนนถ้ายังไม่ได้สอบ) ต่ำกว่า " + C.risk.passLine + " ตามส่งงานแล้วป้ายจะหายไป</p></section>" +
       '<section class="panel"><h2 style="font-size:22px;margin-bottom:10px">เกณฑ์ระดับผลการเรียน</h2><table class="grade"><tr><th>คะแนน</th><th>เกรด</th></tr>' +
       grades.map(function (g) { return "<tr><td>" + g[0] + "</td><td>" + g[1] + "</td></tr>"; }).join("") + "</table></section></div>" +
-      '<section class="sec panel"><h2 style="font-size:22px">ข้อมูลบนเว็บนี้</h2><p class="muted" style="margin:6px 0 0">แสดงเฉพาะเลขที่ ชื่อ-นามสกุล และสถานะการส่งงาน ไม่แสดงเลขประจำตัวนักเรียน ไม่มีรูปนักเรียน และไม่มีการจัดอันดับ</p></section>';
+      '<section class="sec panel"><h2 style="font-size:22px">ข้อมูลบนเว็บนี้</h2><p class="muted" style="margin:6px 0 0">แสดงเฉพาะเลขที่ ชื่อ-นามสกุล และสถานะการส่งงาน ไม่แสดงเลขประจำตัวนักเรียน ไม่มีรูปนักเรียน และไม่มีการจัดอันดับ · ใบงานสแกนของแต่ละคนอยู่ใน Google Drive ของครู ' + (ESJ.wsData && ESJ.wsData.mode === "gate" ? "เปิดจากหน้ารายคนได้เมื่อพิมพ์เลขประจำตัว 5 หลักของตัวเอง" : "กดปุ่ม ดูใบงาน ในหน้ารายคนเพื่อเปิดดูย้อนหลัง") + '</p></section>';
   }
   function pageMissing() {
     return '<div class="panel" style="text-align:center;padding:40px"><h1 style="font-size:28px">ไม่พบหน้านี้</h1><p class="muted">สัญญาณหาย ลองกลับไปที่ศูนย์ควบคุม</p><a class="btn" href="#/">ศูนย์ควบคุม</a></div>';
@@ -512,6 +590,7 @@ window.ESJ = window.ESJ || {};
     var navEl = document.getElementById("nav"), onEl = navEl && navEl.querySelector("a.on");
     if (onEl && navEl.scrollWidth > navEl.clientWidth) navEl.scrollLeft += onEl.getBoundingClientRect().left - navEl.getBoundingClientRect().left - 16;
     if (p[0] === "room") bindRoom();
+    if (p[0] === "student") bindWs(roomFromKey(p[1] || ""), p[2]);
     window.scrollTo(0, 0);
   }
   ESJ.start = function () {

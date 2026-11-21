@@ -360,3 +360,15 @@ body[data-team] .top { border-bottom-color: var(--t1); }
 .badge.on b { color: var(--bc); }
 .badge.on .st { background: var(--bc); border-color: var(--bc); color: var(--ink); font-weight: 600; }
 .badge.b-u1.on { --bc: var(--violet); } .badge.b-u2.on { --bc: var(--orange); } .badge.b-u3.on { --bc: var(--cyan); } .badge.b-ex.on { --bc: var(--ok); }
+
+/* ใบงานที่ส่ง (ลิงก์ไฟล์สแกนใน Google Drive · 21 พ.ย. 2569) */
+.ws-lead { margin: 0 0 4px; }
+.ws-form { margin: 8px 0 4px; }
+.ws-form .search { max-width: 220px; letter-spacing: .12em; }
+.ws-form .search::placeholder { letter-spacing: normal; }
+.ws-rem { font-size: 14px; color: var(--muted); display: inline-flex; gap: 6px; align-items: center; }
+.ws-msg { min-height: 22px; font-size: 15px; color: var(--gold); }
+.ws-foot { font-size: 14px; margin: 10px 0 0; }
+.ws-lock { margin: 10px 0 0; }
+#ws .trow .btn { padding: 6px 14px; font-size: 14px; }
+@media (max-width: 600px) { #ws .trow { grid-template-columns: 52px 1fr; } #ws .trow .btn { grid-column: 2; justify-self: start; } }
