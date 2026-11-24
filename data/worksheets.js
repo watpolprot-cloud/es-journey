@@ -6,7 +6,7 @@
    ไฟล์ใน Drive ตั้งแชร์ ทุกคนที่มีลิงก์ (ดูได้อย่างเดียว) เฉพาะไฟล์ที่อยู่ในรายการนี้
    ไม่มีเลขประจำตัวนักเรียนในไฟล์นี้ ไฟล์ใบงานอยู่ใน Drive ครู ไม่ได้อยู่ใน repo
    ===================================================================== */
-ESJ.worksheets({"mode":"open","iter":250000,"updated":"21 พ.ย. 2569","rooms":{"4/8":{"1":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1Yx4OX9-hEnPsRjdzF9Ukj8IrZjWm4X77"],["E1","1MCvvUPj9GTsEsiV8UN42a6oIkVSZqfId"],["E3","11rhMlzZ-ktaDn1mV4wWG1YfwheOfLZgL"],["E4M","12PK6y1MM2pFsMHS7kzlFfDhCwBsq0OIF"]]},
+ESJ.worksheets({"mode":"open","iter":250000,"updated":"24 พ.ย. 2569","rooms":{"4/8":{"1":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1Yx4OX9-hEnPsRjdzF9Ukj8IrZjWm4X77"],["E1","1MCvvUPj9GTsEsiV8UN42a6oIkVSZqfId"],["E3","11rhMlzZ-ktaDn1mV4wWG1YfwheOfLZgL"],["E4M","12PK6y1MM2pFsMHS7kzlFfDhCwBsq0OIF"]]},
 "2":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1kDXiO0gVlapBLeckYoq0HfWph2OpkAdn"],["E1","1rzJGpRJUWtup6a9OIHSRKsJYFBbjq0zz"],["E3","1Zpg9Rsw_hYT4CV-2q_M-RCJvDYEDsZK5"],["E4M","1nvrsDRvzPJLWRiccNAZHT_NB82hvjoVs"]]},
 "3":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1B8cyd_TnVqd6-b9eUMqmDEmE88eoo4X-"],["E1","1Q8gDbrSHqnyPkSlKThaqsS2ot-Wco58I"],["E3","1zEy7dyhdjRAZEgJpV2552fKE22kR7pP2"],["E4M","1zKRLjbjKREevUCZNjNOVUvCZLenTBLhi"]]},
 "4":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","18nNtZAcVApKTPdMP_tVHfoIIYRiqRWRR"],["E1","1rBMASrwJxjFDuBCCkLoUfrGD6LQYjJbp"],["E3","111Eo--1SbjcK75PLeXZTwcQL08lNWJs3"],["E4M","1OeNK3keW6SlTs7m1eurT_JjwwIvc9jQY"]]},
@@ -44,7 +44,7 @@ ESJ.worksheets({"mode":"open","iter":250000,"updated":"21 พ.ย. 2569","rooms"
 "36":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1h9jacbaJc9_aQBOlawdrEBec3Ufefp2L"],["E1","1jmCSQtWMQJHsyYdmkTvWoDR2cTozHt5x"],["E3","1BIBRAiMLzasFSrFbUXYDel2KPml6vPHX"],["E4M","1Yo-VCQ0rAUsMFfvnym04HhcKiJ_gpwnL"]]},
 "37":{"k":["ES00","E1","E3","E4M"],"f":[["ES00","1V5aLjls8uyeEFSkCdPk2ui6cEFbD0sPo"],["E1","1Hq_q3VWFLqmmPcUfmklvce2jAsgd_f69"],["E3","1CdxYn40Sbi_qE-TNbrog7WG6cXQxHX6m"],["E4M","1qineixJ-SGJX3MQ3OlengECg6VQnXbLR"]]},
 "38":{"k":["E1","E3","E4M"],"f":[["E1","14PYktOFym59VTxsR4ZgF5gkANAS-1qrk"],["E3","1Vd6HM-s6HjfBiw3L28cKIVLQvvrf15xE"],["E4M","1b_S9lRzpKkOnhnog2bO3Q1k-EtynKTy8"]]}},
-"4/9":{"1":{"k":["ES00","E1"],"f":[["ES00","1n5H9jfEIaZbVKmlVz2W5Xl0bMQ-7BW9k"],["E1","1wjCbfUx19KiS7uK39ApoygioFV9jn7fJ"]]},
+"4/9":{"1":{"k":["ES00","E1","E2"],"f":[["ES00","1n5H9jfEIaZbVKmlVz2W5Xl0bMQ-7BW9k"],["E1","1wjCbfUx19KiS7uK39ApoygioFV9jn7fJ"],["E2","1d4O4od7YJw3raJL62Mj36kl-9M7_ksF0"]]},
 "2":{"k":["ES00","E1"],"f":[["ES00","16YNTKYpNAk8WtLQPvIRB0GGJ0mRnFHCC"],["E1","1ht6PA4_JLlYQNLa9HnDb7I4UBgrAndxs"]]},
 "3":{"k":["ES00","E1","E2","E3"],"f":[["ES00","16VlbQOXGbevHxPkIkhGsOyphlCoGESYY"],["E1","1Hzva3zpqhBWF_A6uTV2I5fybx6krfZTb"],["E2","17c5SOlRBPq9b2BblMxp3GIlq3XFvVcg5"],["E3","1Pi1TesMLyt2Pu-o8xJwF6p9qBMv0ci0H"]]},
 "4":{"k":["ES00","E1","E2","E3"],"f":[["ES00","19HZcNnsM2akUlWM_hkmQ4ul1gCsCCwK_"],["E1","1RnQ0j0h5VaBNamSj7_qx9UVEdWpXodhR"],["E2","1cPl5IonNDC_LDIoEbJOsLxqaYtNl71YG"],["E3","1Afx6pXbPFn2MVO3sZzbi0ZDdZYYjZSCn"]]},
@@ -59,7 +59,7 @@ ESJ.worksheets({"mode":"open","iter":250000,"updated":"21 พ.ย. 2569","rooms"
 "13":{"k":["ES00","E1","E2","E3"],"f":[["ES00","10QE9LkLz0jsFPrBOSqJqvcDVklwgZ-Q4"],["E1","1yxTHmalBpfIz47N5WBYfIL6RI5W5iF5z"],["E2","1xNZU0p9SREJDi3NmMZ7NrYYQ_WZO0tip"],["E3","1j7Au3Wiu2_85UfJdik9RVkRfv0lnEOxs"]]},
 "14":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1ElTYnttaUwnVYNs-8zcXKlLeuLddlxV8"],["E1","1Dg3FG1ZjF1V9KPSGzn8ay6-TfMgqY0QG"],["E2","1ONLZJV7HrhpFKzh4PMeqoRNSyner9h7O"],["E3","1ATMka_X6U4YOzec6xraiN-cwgEq13avQ"]]},
 "15":{"k":["E1"],"f":[["E1","1AWDjMVN8c5BeDhmyIEHH4NXjnRt6iWgm"]]},
-"16":{"k":["ES00","E2","E3"],"f":[["ES00","1TtYOiWEzFQ6ON7AetfQDg1BoeMKuU8sx"],["E2","1J0h0toxHkWNC6y8MpsukQ40gJlZq25e1"],["E3","1vDUL0TLkpzwFgYWbN8rbWCVlv9qslTgL"]]},
+"16":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1TtYOiWEzFQ6ON7AetfQDg1BoeMKuU8sx"],["E1","1TvYtvDArSJmiOLtx_BMGgPUwz63EnSDe"],["E2","1J0h0toxHkWNC6y8MpsukQ40gJlZq25e1"],["E3","1vDUL0TLkpzwFgYWbN8rbWCVlv9qslTgL"]]},
 "17":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1j_yKOdPIZbVWSNRQdm8TqDf942PPR5q5"],["E1","1t9f0vADRdCNwWub3cscpQ_GSyZ_PVPrV"],["E2","1d7fwQ_4FQFMtB9y2BkT-VyDbixh2244p"],["E3","17i-8yYwFUw2jANYo3pttJBpvaMVpfFG0"]]},
 "18":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1enTjc9IUZbd1syyGgPoB9A18tVTzAKuL"],["E1","180aI4Yt19O_bXkxfuJaPCcVGRn9gVwhh"],["E2","1_HBaqXzTE0XLyERRZ3BN4l9AL9npdyHC"],["E3","1hszdFR_cea-vXHm3LhyHigNT_ziIySs0"]]},
 "19":{"k":["ES00","E1","E3"],"f":[["ES00","1oIkLFrKf3cXMfhUTP1e2_0aZIYxTeoXz"],["E1","1FrQ88957zAP4nbz1XV2WYwwtHj_xt1eE"],["E3","1zLbmrRt_2J7vF1TOCFn1dO7iRW5u_wQH"]]},
@@ -75,7 +75,7 @@ ESJ.worksheets({"mode":"open","iter":250000,"updated":"21 พ.ย. 2569","rooms"
 "29":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1kANtPI2oJpJCk9bkWHqBKkCKLOtjXZZD"],["E1","164oTKnjCwhXY9RBA1H4kJK2mpRv7McoK"],["E2","1ysUjPBcXEAsa5bpkfzJle3uBR1N4ke3w"],["E3","1ZH1iMiIGcA0OJb3fjlhPPHI8y5JheZiq"]]},
 "30":{"k":["E1"],"f":[["E1","1WzLkx0ze6YePk7x7s8BtzJ0TpT0mCWoz"]]},
 "31":{"k":["ES00","E1","E2","E3"],"f":[["ES00","11XpTne0F2nFV0A0qg4ktgsiLRcj4RMD2"],["E1","1hbIPWin1yA4Q6eoqS3REAAW5Vol0u7hD"],["E2","16bBLmtDHOxIRn155SCBfOEymwj4ZXnt4"],["E3","1l7IH2AWB8Uq7iLzpboBEwQF3DnncbLYT"]]},
-"32":{"k":["ES00","E1"],"f":[["ES00","1xy3ycuZCa5Z1KcQf0zI-5HgJ-H1UqP21"],["E1","1M4ZJgXnqV1N06-pj5AYj8qlsVOGlCxua"]]},
+"32":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1xy3ycuZCa5Z1KcQf0zI-5HgJ-H1UqP21"],["E1","1M4ZJgXnqV1N06-pj5AYj8qlsVOGlCxua"],["E2","1z05TcJiz38E8CNCAmXj902mSPkVRJP1y"],["E3","1JWAE2Zi-J8C0KI2vsYMquJhR649oQcJD"]]},
 "33":{"k":["ES00","E1","E2","E3"],"f":[["ES00","1VCusVJIz8B8CgGQT3_CFxrd3YXBQSd5c"],["E1","14UwW6p18D2ZwQAGT5PCWjbF43RHgLkjE"],["E2","1TnkvA5SVU0wIa-NWPCK302ye4a_rtjJh"],["E3","1fpGawXLVDrVypdZU3F1d2_ujspMmaXxn"]]},
 "34":{"k":["ES00","E1","E2","E3"],"f":[["ES00","15G1yo-JuwP7XNpBD9mxVrWlxCMjpwvjJ"],["E1","11J3ojUkhfCbGmbpPHI65xGH570q2CTeD"],["E2","1E5g5ga_s-oDHNJwD5SLvLyRHcP6pXm0w"],["E3","1u4KV9ScrPkHkIlPe8QM2PQbGCS2SbOo-"]]},
 "35":{"k":["E1","E2","E3"],"f":[["E1","1cy6RD2QYaDw1E2x5jqW_ptR-ccMD-90M"],["E2","1GmRvIFkNrw3c9qTUU3PCEFDaj-gqIbVN"],["E3","1kPhMv_LUi0BHzeknO3OQ5-8yvPbUxbIn"]]},
