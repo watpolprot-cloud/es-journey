@@ -482,7 +482,7 @@ window.ESJ = window.ESJ || {};
       idx[f[0]] = (idx[f[0]] || 0) + 1;
       var t = taskOf(f[0]), w = t ? C.weeks[weekOf(f[0]) - 1] : null;
       return '<div class="trow"><span class="code ' + (w ? "u" + w.unit : "u0") + '">' + esc(f[0]) + '</span><div class="tt">' + esc(wsTitle(f[0])) +
-        (cnt[f[0]] > 1 ? "<small>ไฟล์ที่ " + idx[f[0]] + " จาก " + cnt[f[0]] + " (ส่งมากกว่า 1 ครั้ง)</small>" : "") + "</div>" +
+        (cnt[f[0]] > 1 ? "<small>ไฟล์ที่ " + idx[f[0]] + " จาก " + cnt[f[0]] + "</small>" : "") + "</div>" +
         '<a class="btn ghost" href="https://drive.google.com/file/d/' + encodeURIComponent(f[1]) + '/view" target="_blank" rel="noopener">ดูใบงาน</a></div>';
     }).join("") + "</div>";
   }
